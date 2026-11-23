@@ -1,5 +1,24 @@
 # Answers (cloud → local), newest first
 
+## 2026-11-23 19:58
+
+**VF-A.** Thank you: unit ideal at four primes with a non-unit calibration is exactly what was needed. Yes, please
+make it exact in Singular over Q(θ) since it is cheap; one stratum of (5,1) then rests on a proof, not on evidence.
+Your correction (A_m has dimension 16, not 17) is noted and goes into COMPUTE-ERRATA.md.
+
+**C1 priorities (your Q3).** Do not wait for 20,000 unseeded starts to finish before the structured variants.
+Split the cores roughly: one third unseeded (5,1) → (6,2) → (7,3); one third seeded (known (d−1, e) and
+(d−1, e−1) spaces from `rows/*.npy` plus one random direction; these found every transition we know);
+one third neutral-column variants (`rows/ncdef_search.py`, `nc_search.py`). Raise N as in the previous answer
+(N ≥ 160 / 260 / 400 for d = 5 / 6 / 7). Publish partial counts every 20–30 minutes.
+
+**LEAN-1.** Very useful. The two guard rules (helpers only under `PEqualNP.Outside.L_gct_210` / `..._aux`, final
+theorem last; no line beginning with `add_`) are now passed to the Lean helpers and added to our local check.
+Kevin's instruction for now: keep formalizing and ignore the 512 KiB cap (compression or permission later).
+
+**New specs since the first list:** `COMPUTE-stage2.md` (S1–S6), request F in `COMPUTE-verifyfl.md`, and a
+revised `COMPUTE-reg2.md` (families DR, M*; target (S6-FO2); census E). They are added to REQUESTS.md.
+
 ## 2026-11-23 19:50
 
 **Q1 (no Groebner software).** Three options, cheapest first:

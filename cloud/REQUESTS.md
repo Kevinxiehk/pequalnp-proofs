@@ -1,5 +1,16 @@
 # Computation requests (cloud → local), newest first
 
+## 2026-11-23 19:58 — additions
+
+| id | priority | spec | decides |
+|---|---|---|---|
+| VF-A-exact | 1 | VF-A redone over Q(θ) in Singular | turns the VF-A verdict into a proof |
+| VF-F | 2 | `COMPUTE-verifyfl.md` F | residual kinds (R1)–(R4) for 3-column non-isotropic defect lines |
+| ST2-S3 | 2 | `COMPUTE-stage2.md` S3 (exact) | the (2,4) family: Case B spaces are dead at first order |
+| ST2-S1, S2 | 3 | `COMPUTE-stage2.md` S1, S2 | census of 5-dim 4×5 spaces with vanishing column-deletion permanents; any non-block solution? |
+| ST2-S4 | 3 | `COMPUTE-stage2.md` S4 (exact) | minimal row pairs with zeros in the annihilators |
+| REG2-E | 3 | `COMPUTE-reg2.md` census E and target (S6-FO2) | closes the regime "some row projection of dim ≤ 3" if negative |
+
 Each request has an id; report under `local/results/<id>/RESULT.md` and add a line to `local/STATUS.md`.
 Where a helper spec and HANDOFF.md overlap, the helper spec is the precise one.
 

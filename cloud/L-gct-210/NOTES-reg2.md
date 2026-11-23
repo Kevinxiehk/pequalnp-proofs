@@ -37,7 +37,7 @@
  D [NOT DONE] no proof of (S6-FO2); no classification of the 6-dim spaces ("deletable line" is the 4x5 analogue of conjecture (D));
     no proof of "4x5 level <= 6". The first-order criterion alone cannot close the regime (M*).
  Best next steps: (1) census of 6-dim 4x5 level spaces with dim Omega >= 4 and no full free row, with the FO2 bound of each
-    (COMPUTE-reg2.md, sections 1-3; the equal-column extensions of 5-dim equal-column spaces are the place to look: M* is one);
+    (COMPUTE-reg2.md, sections 1-3b; the equal-column extensions of 5-dim equal-column spaces are the place to look: M* is one);
     (2) prove "6-dim 4x5 level => deletable row or column" along upstream L_gct_215's case tree; (3) for REGIME 1 the criterion
     gives the cheap filter Omega(L_r) = C^5; hyperplanes of the F spaces with Omega = C^5 and of M*-like spaces are candidates there.
 STATUS 18:53: BRIEF + rows/stage2/chief notes read. First facts (numerical, reg2/t.py, a1.py, a2.py):
@@ -193,3 +193,16 @@ STATUS 19:50: CORRECTION of the 19:18-19:40 picture. Two new censuses not seeded
      moves: Omega 5 -> 4 -> 3, T_1 12 -> 11 -> 10, FO2 bound 9 -> 8 -> 8. So in everything found:
           FO2 bound = 9  <=>  full free row (and Omega = C^5);   no full free row  =>  FO2 bound <= 8.
 STATUS 19:55: COMPUTE-reg2.md revised (families DR, M*; target (S6-FO2); census E). Final report follows.
+ 4.6 EXACT certificates (reg2/exact_fo2.py, Fractions; gradient rows at 300 integer points, exact kernel, exact rank of q_Y on it):
+       M*_1 with (x,y) = ((1,-1,0),(1,1,-2)), ((2,-1,-1),(0,1,-1)), ((1,2,-3),(5,-4,-1)) and
+       M*_2 := e_3 (x) {sum w = 0, w_1 = w_2} (+) {x e_4^T : x in C^3, sum x = 0} (+) C e_2 (e_1 - e_2)^T  (unique up to symmetry):
+            dim ker = 11, Omega inside (e_1 - e_2)^perp, rank q = 5  =>  every level space containing the space has dim <= 8  [THEOREM for
+            these four spaces, given that they are level (section 4.3 / Lemma EC)];
+       Type F parent e_3 (x) 1^perp (+) {x e_4^T}: dim ker = 12, Omega = C^5, rank q = 6: second order allows 9; only FL excludes it.
+     Up to row/column permutations the single EC moves of the two known kinds of Type F spaces with Omega = C^5 are exactly M*_2 and the
+     one-parameter family M*_1(x). Remark: M* contains rows' split pair e_3 (x) U (+) e_2 (x) U' with U' = C(e_1 - e_2) (two-column m);
+     Theorem FL2* gives only dim <= 10 - dim(U o U') = 9 there -- this is the case the team already found delicate (verifyfl's TC5).
+STATUS 19:56: final. Scripts added since 19:40: linespan.py, drsearch.py, look3.py, look4.py, mstar2.py, mstar2_fo2.py, exact_fo2.py, ecmove.py,
+ ecmove2.py, ext55.py, ext55b.py, ext7.py; data: Mstar2.npy, dr_u3_*.npy, ec_*.npy, ec2_*.npy, linespan_other_*.npy.
+ 4.7 (reg2/ecmove3.py) EC moves of the Type F row-4 kernels of ex2, ex3, fam2 and the s-family (their N lives on two columns, three
+     zero columns): 24 more spaces, all level, all (dim Omega, dim T_1, FO2) = (4, 11, 8). Total: 54 single-move spaces, all (4,11,8).
