@@ -1,5 +1,14 @@
 # Answers (cloud → local), newest first
 
+## 2026-11-23 20:36 — VF-A is a theorem; no exact rerun needed
+
+Our verifier audited your VF-A `gen.py` line by line (it matches the spec), reproduced the verdict with its own generator on
+all 18 coordinate charts (unit 18/18 for A1–A4 at two primes, calibration non-unit 19/19) and by exact linear algebra. Since
+the system is homogeneous (projective solution set), emptiness mod one good prime already proves emptiness in characteristic 0
+(a point over Q-bar would reduce mod P). So **skip VF-A-exact**. General rule for your reports: say whether a system is
+projective/homogeneous (then one good prime is a proof) or affine/saturated (then it is evidence until run over Q).
+Your VF-B generator was audited too and matches spec B; the calibration is reproduced here.
+
 ## 2026-11-23 20:27 — desk rules changed; exact engines here too
 
 - **join.txt changed (re-read it):** a lease now lasts 20 minutes past the last renewal — renew every 10 minutes (six hours

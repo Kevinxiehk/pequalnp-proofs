@@ -299,3 +299,45 @@ STATUS 20:08: (2) the families with a 3-dim single-row part (M*, EC moves, DR3) 
      0, C k, k^perp cap 1^perp or 1^perp, and k = e_a - e_b is a two-column vector as soon as some U_i != 0, 1^perp [A(Cw) has dim
      6 - |supp w| or <= 2]. The last two cases are excluded (SP8(a), FL), so all single-row elements of L outside row r would be
      multiples of e_i (e_a - e_b)^T with u_ra = u_rb on L^.  (Stated as a target; not proved.)
+STATUS 20:25: msolve / Singular runs (reg2/gb/): the NC family of 2.5 and the whole support pattern (2,2|2) are now settled EXACTLY
+ (char 0, all charts, calibrations non-unit). verify2's remark checked: (S6-FO2) + FL exclude a_r = 3 as well (section 8.1).
+
+## 8. Exact results with msolve / Singular (round 2; scripts reg2/gb/polylib.py, famtool.py, gen_nc.py, gen_dr22.py; reg2/dr22_exact.py)
+ 8.1 Two remarks [rigorous].
+   (a) q_0 := D^2 perm(J) = 12 P_2 and tau_r = J - 5 e_r 1^T lies in T_1(M) for every M, with P_2(tau_r) = -200. So the rank of q_0 on T_1(M) is
+       >= 1 and  FO2 bound(M) <= dim T_1(M) - 1  ALWAYS: every level space containing M has dim <= dim T_1(M) - 1. In particular
+       dim T_1(M) <= 9  ==>  (S6-FO2) for M; and (S6-FO2) for M with dim T_1 = 10, 11 means rank q >= 3, 5.
+   (b) (S6-FO2) + FL  ==>  no 9-dim level space has a row or column with a_r >= 2 -- INCLUDING a_r = 3: if dim L_r >= 6 take any 6-dim
+       subspace M_6 of L_r; either M_6 contains a full free row (then L does: dim L <= 7 by FL) or FO2 bound(M_6) <= 8 and L contains M_6.
+       (My round-1 statement "a_r = 3 needs the non-existence of 7-dim 4x5 spaces" was unnecessarily weak: the FO2 bound holds for every
+       level space CONTAINING M_6, not only for those with L_r = M_6.)
+ 8.2 THEOREM NC-FAM [EXACT, char 0]. For every member M(w0,w1,w3) of the family of section 2.5 (w_i != 0):
+        Omega(M) = span(1, e_0),   E_0(M) = M (+) C d^0 (d^0 = 1 (x) (5 e_0 - 1)),   dim T_1(M) = 9.
+     Hence: L_r = M => dim L <= 7 (criterion A); every level space containing M has dim <= 8 (8.1(a)); M is a maximal 4x5 level space (7.2).
+     Method (gen_nc.py): variables w0, w1, w3 (12), X (20), rho (5); equations: the 7 family relations, the 32 coefficient equations of
+     D_t perm(J + (Y;0)) = 0 in y (the polynomial has only 32 monomials in y), a parameter chart a_1 = 1, b_j = 1, c_l = 1 (five charts
+     (1,1,1), (1,1,2), (1,2,1), (1,2,2), (1,2,3) cover all members up to the S_4 symmetry of the columns 1..4), and
+       Omega-test: rho_0 = 0, rho_1+..+rho_4 = 0 (allowed: subtract tau and e_r (5e_0 - 1)^T), chart rho_j = 1 (j = 1..4): 20 systems;
+       E_0-test:   rho = 0, column 0 of X zero, x_{0,ja} = x_{1,jb} = x_{3,jc} = 0 (X modulo M + C d^0), chart x_ib = 1: 65 systems.
+     Results: UNIT IDEAL in all 85 systems over Q (Singular std, 14 s + 3 s) and modulo 65521, 2147483629, 1073741789 (msolve, 4 s each).
+     Calibrations (must be non-unit, and are, over Q and mod p): rho = e_0 (basis sizes 151-187); column 0 of X free with x_00 = 1 (110-123).
+ 8.3 THEOREM DR22 [EXACT, char 0]: the complete support pattern (2,2|2) (two rows with 2-dim single-row parts, one column with a 2-dim
+     single-column part, direct sum of dimension 6).
+     (i) [hand] P_1, P_2 force, up to the symmetries: U_0 = {w : w_0 = 0, sum w = 0, <mu,w> = 0} (mu in C^4 on columns 1..4, not
+         constant), U_1 = (U_0 + C1)^perp cap 1^perp = span(5 e_0 - 1, mu~ - mean), V = {x : x_1 = 0, sum x = 0};
+         M(mu) := e_0 (x) U_0 (+) e_1 (x) U_1 (+) V (x) e_0.   [cases: both row parts vanishing at column 0, or V vanishing at both rows,
+         are impossible by dimension.]
+     (ii) [exact] in the chart mu = (0,1,m3,m4) ALL coefficients of F(J'+Y) - 120 vanish identically: M(mu) is level for EVERY mu.
+          Row 1 is deletable, e = 4, no neutral column, no full free row.
+     (iii) [exact] E_0(M(mu)) = M (+) C d_1 for every (m3,m4) (13 X-charts, elimination ideal (1)).
+     (iv) [exact] in each of the four rho-charts the elimination ideal of {(m3,m4) : Omega not inside span(1,e_0)} is (m3^2 - m3, m4^2 - m4)
+          (over Q and mod two 31-bit primes). So for mu NOT a 0/1 vector: Omega = span(1, e_0), dim T_1 = 9: dim L <= 7 if L_r = M, and <= 8
+          for every level space containing M.
+     (v) [exact, Fractions] the four special members mu = (0,1,0,0), (0,1,0,1), (0,1,1,0), (0,1,1,1) (mu = indicator of a column set T;
+          two orbits): dim T_1 = 10, Omega = span(e_0, 1_T, 1_{T^c}) (dim 3), rank q = 4: every level space containing them has dim <= 8.
+     So (S6-FO2) holds on the whole pattern (2,2|2). Calibration: rho = e_0 is non-unit (basis size 21). Numerics agree (dr22_num.py).
+ 8.4 Pattern remarks [hand]. In a line-spanned space the P_2 conditions are: <u,u'> = 0 for single-row elements in different rows, and
+     u_c x_i = 0 for e_i u^T and x e_c^T. Hence for a row with a 3-dim part U = {1,m}^perp every single-row element in another row is a
+     multiple of e_i' m^T: the patterns (3,1|2), (3,1|1,1) always contain the split pair, and SP8(b) applies when <m,m> != 0.
+     Not yet treated exactly: (2,1,1|2) and the NC patterns (3|3), (3|2,1), (3|1,1,1), (2,1|3), (2,1|2,1), (2,1|1,1,1), (1,1,1|2,1)
+     (all (2,9,7) numerically); precise task in COMPUTE-reg2.md section 7.

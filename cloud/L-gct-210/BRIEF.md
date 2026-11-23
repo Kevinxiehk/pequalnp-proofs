@@ -160,3 +160,15 @@ When your budget ends (stated in your task) or you finish, reply with: what you 
 * **New verified / proved today (see the NOTES files):** (FO-r) (stage2 R7); dim L ≤ dim L_r + dim Ω(L_r) − 1 and family M*
   (reg2); NCOL-P3, P51, Theorem DC (rows R5); SL3-RED, Lemma NP, Props I-ALL / II-ALL, (SL_m) ⟺ [DC3], [T22], [T31]
   (verifyfl R5); Theorem Z22 and z = (1,0,0,0,0) except F4b (stage3 §26).
+
+## UPDATE 10 (20:36) — when a modular verdict IS a proof (verify2)
+
+If the system is HOMOGENEOUS (its solution set is a projective variety: unknowns up to a common scalar, no affine
+normalisation) and has coefficients in the ring of integers of the number field localised away from finitely many primes,
+then "no projective solution mod one good prime P" PROVES "no solution in characteristic 0": a point over Q-bar would
+reduce to a point mod P (projective schemes are proper). So formulate emptiness claims projectively (all coordinate charts
+x_i = 1, or: the homogeneous Gröbner basis contains a power of every variable) and say which primes are bad (those dividing
+denominators or where the constants i, sqrt 3, omega, ... do not exist or collide). Then the label is [exact], not [modular].
+Affine or saturated systems (after `sat`, Rabinowitsch) do not have this property automatically — say explicitly which is used.
+First instance: verifyfl's request A is now a THEOREM (three independent derivations, NOTES-verify2.md STATUS 20:25):
+no principal (5,1) space for m = (1, omega, omega^2, 0, 0); with PR3: none for any 3-support m.
