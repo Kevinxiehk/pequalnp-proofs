@@ -1173,3 +1173,44 @@ STATUS 19:13: RESULT-R6 at the top. Runs to report (round 6): r6_census.py was l
  - SANITY of (T2) (stage2/r6_T2_sanity.py): on the 7 known spaces, for all 10 lines with full projection (rows and columns), G = 0 on L_r
    and (T2) is solvable with sum_k T_k = J' (distance <= 5e-15); for random spaces of the same dimension 3 the distance is about 4.
 STATUS 19:18: R6-8 added. Final report sent.
+
+# ROUND 7 (start 19:33, budget 90 min -> ends ~21:03). Targets: (0) COMPUTE-stage2.md; (1) dim T_1 and "not level beyond" for the (2,4)
+# family; (2) z = 3 in REG1; (3) what remains of REG1. Correction to (Q-r)(iii) from verify2: the column projections of L_r have dim <= 3
+# except possibly for ONE column c with kappa^r = e_c, kappa'^c = e_r (entry (r,c) = 0 on L), where only <= 4 holds and L = L_r + L^c.
+STATUS 19:36: /home/claude/work/L-gct-210/COMPUTE-stage2.md written (tasks S1-S6: census at scale, non-block solutions, exact FO2 for (2,4),
+ minimal pairs with zeros as an exact problem, two-row-column blocks, z = 3). Starting (1).
+STATUS 19:44: new first-order test (FO-r) found: it kills the generic (2,4) solutions and the whole cross family including the locus b = 0.
+
+## R7-1. LEMMA (FO-r): the row-r projection of T_1(L_r) must be all of C^5  [rigorous; sharper than "dim T_1 >= 9"]
+ Let r be a row with 4-dim projection of a level space L, X = L_r. Then T_1(X) contains L and tau = e_r 1^T - J/5 (R5-4), whose row r is
+ (4/5) 1, not in pi_r(L) = (kappa^r)^perp. Hence  pi_r(T_1(X)) = C^5.  Explicitly (perm(u) = <u_r, G(u')>):
+     t_0 in pi_r(T_1(X))   <=>   the function xi -> <t_0, G(J' + xi)> on X lies in D(X) := { xi -> D_{t'} N(J' + xi) : t' in C^{4x5} },
+ so (FO-r) says: EVERY column-deletion permanent G_j(J' + xi) is, on L_r, a first-order variation of the level function N.
+ [It is the order-1 part at v = 1 of chief's identity: G_j(J' + xi) + D_{T(e_j)} N(J' + xi) = 600 kappa^r_j.]
+ Always: pi_r(T_1(X)) contains (C(X) + C1)^perp and 1, so its dimension is >= 5 - e(X); (FO-r) can only fail if e(X) >= 2.
+ APPLIED to every saved candidate (stage2/r7_FOrow.py; dim T_1, dim of the row projection):
+   cross X(a,b), b != 0: (10, 3) DEAD;   cross, b = 0 (3-dim single-column part): (13, 3) DEAD;   cross, a in C1 (3-dim single-row part): (13, 5) passes;
+   (2,4) solutions with dim T_1 = 9 (all of "Case B" below; 6 saved): (9, 2) DEAD;   (2,4) "Case A" (3 saved): (12, 5) pass (FO2 bound 8);
+   (3,3) solutions with z = 3 (6 saved): (13, 5) pass;   (1,5) candidate: (13, 5) passes (dead by (T2)).
+ For the cross family this is a one-line proof from R6-2/R6-3: the row-0 part of T_1(X(a,b)) is (y_0 ; -2 nu a + c_0 1) for b != 0, and
+ (y_0 ; span(1,a)) for b = 0: dimension 3 < 5 in both cases. So EVERY cross space with a not in C1 is excluded at first order [rigorous],
+ including the split-free-column locus b = 0 that FO2 could not exclude.
+
+## R7-2. The (2,4) family  [formulas rigorous and machine-checked (stage2/r7_fk24_formula.py); the last step of Case B numerical]
+ Rows 0 (= r, zero on X), 1, 2 (= s_1 e_0, s_2 e_0), 3, 4 (= p, q). U = J + xi, P = 1 + p, Q = 1 + q, ' = columns 1..4, al = sum P', be = sum Q',
+ gam = al be - <P',Q'>, al_j = al - P'_j, be_j = be - Q'_j, gam_j = al_j be_j - <P',Q'> + P'_j Q'_j, s = s_1 + s_2, h_j := 2 P_0 be_j + 2 Q_0 al_j.
+ Cofactors:  C_00 = C_10 = C_20 = 2 gam,  C_30 = 6 be,  C_40 = 6 al,  and for j = 1..4:
+     C_0j = (2 + s) gam_j + h_j,   C_1j = (2 + s_2) gam_j + h_j,   C_2j = (2 + s_1) gam_j + h_j,   C_3j = 2(3 + s) be_j + 6 Q_0,   C_4j = 2(3 + s) al_j + 6 P_0.
+ Hence C_00 = C_10 and C_0j - C_1j = s_1 gam_j, C_1j - C_2j = (s_2 - s_1) gam_j, so
+     pi_r(T_1(X)) = C e_0 (+) { t in C^4 : s * sum_j t_j gam_j restricted to X lies in D(X) }.
+ Level conditions (R6-1): s = -(p_0 + a + q_0 + b),  p_0 a + q_0 b + a^2 + ab + b^2 + <p',q'> = 0,  s (ab - <p',q'>) = 0  (a = sum p', b = sum q').
+ CASE A (s = 0 on X): rows 1,2 form a domino direction, (p,q) runs through a 2-row level space; pi_r(T_1(X)) = C^5: (FO-r) holds, no
+   first-order obstruction. The three solutions found have dim T_1 = 12, rank 7, FO2 bound 8 (and one earlier (8,3,6)): dead by FO2
+   numerically; not proved.
+ CASE B (ab = <p',q'> on X, s not 0): then p_0 a + q_0 b + (a+b)^2 = 0, i.e. a u + b w = 0 with u = a + b + p_0, w = a + b + q_0; if a, b are
+   independent on X this forces p_0 = -a - (1+mu) b, q_0 = (mu-1) a - b, s = (1-mu) a + (1+mu) b for a constant mu.
+   (FO-r) requires s * gam_j in D(X) for every j. In all 6 saved Case-B solutions (and all 20 census solutions with dim T_1 = 9) the
+   projection is only C e_0 (+) C 1: DEAD at first order. A proof needs the parametrisation of the 5-dim solutions of Case B
+   (COMPUTE-stage2.md, S3); I did not obtain it.
+ So "dim T_1 = 9" is explained: T_1(X) = (7-dim part with zero row r) (+) (2-dim row-r part e_0, 1); and "not level beyond" holds in the
+ stronger form "no level space with a 4-dim row-r projection contains X as its L_r".

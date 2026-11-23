@@ -98,3 +98,28 @@ Method: exact Groebner / primary decomposition; output: for each F the irreducib
 for each component whether the row-sum vector of E is 0 on it, and the ranks of columns 4 and 5 of E).  This decides which branches of the
 type analysis of (SL_m) for |supp m| = 3 are empty (R5 of NOTES-verifyfl.md); in particular "no component with row sums spanning a 3-dim
 space together" for F = span(chi_1 l^T) kills type (3,1) with that Z_*.
+
+## F. (numerical first, then exact) The four residual kinds (R1)-(R4) of (SL_m) for |supp m| = 3, m non-isotropic   [added 19:45]
+
+Proved by hand (NOTES-verifyfl.md, section DI5-R5, Theorem SL3-RED): let m = (m_1,m_2,m_3,0,0) with m_1 m_2 m_3 != 0, sum m_j^2 != 0, and let
+K be a 4-dim column-centred space with defect in C m.  Put s(Y) := vector of the four row sums, q := rank of s on K, N := {Y in K : s(Y) = 0},
+N_P := {Y in N : columns 4 and 5 are 0}.  Then K is of one of four kinds; each is a much smaller search than Gr(4,15):
+ (R1) q = 3, N = C Zs, Zs has columns 4, 5 zero, all row and column sums zero, and <z_1,z_1> != 0 (z_j = columns of Zs).
+      Unknowns: Zs (6-dim linear space of such matrices: (z_1, z_2) in V x V, z_3 = -z_1 - z_2) and three more matrices Y_1, Y_2, Y_3 with zero
+      column sums and s(Y_i) = i-th vector of a fixed basis of V (12 unknowns each).  Equations: all coefficients of R_i(t Zs + x_1 Y_1 + x_2 Y_2
+      + x_3 Y_3).  Necessary conditions already known for Zs alone: <z_j,z_j> = th m_j (j = 1,2,3) for one number th != 0, sum_k (z_1 z_2 z_3)_k = 0.
+ (R2) m = (1,1,-2,0,0), q = 3, N = C v (1,-1,0,0,0) with v in V, <v,v> = 0 (one-parameter family of v up to scale: v = chi_1 + x chi_2
+      - (x^2/2) chi_3, or v = chi_3).  Unknowns: x and Y_1, Y_2, Y_3 as in (R1).
+ (R3) q = 2, dim N = 2, the image of s is u^perp cap V for some u in V with <u,u> = 0, and some matrix in N has a nonzero column 4 or 5.
+ (R4) q = 1, dim N = 3: i.e. a 3-dim space N of matrices with ALL row and column sums zero (ambient dim 12) with defect in C m.
+Requests.  (F1) Gr(3,12) search for (R4): 3-dim doubly centred spaces with defect in C m, m = (1,2,-3,0,0), (1,1,-2,0,0), (2,-1,-1,0,0),
+ two random complex m.  CALIBRATION: Gr(2,12) with the same code must find the explicit planes N_V of request E (they have defect exactly
+ C m) at a healthy rate.  Output: no 3-dim hit  =>  evidence that (R4) is empty (the hand proof needs "doubly centred => dim <= 2").
+ An exact version is feasible: N = N_V + C E or N = (a known 1-dim piece) + ..., as in E.
+ (F2) typed LM searches for (R1), (R2), (R3) with >= 5000 starts each; calibration for (R3): the same code with the two-column
+ m = (1,-1,0,0,0) MUST find 4-dim spaces (they exist with q = 2, dim N = 2, e.g. verifyfl/r5_r2_control_zeta_1.npy, a 4x4x5 array).
+ (F3) exact, for (R2): for v = zeta := (1,w,w^2,0) and v = chi_1, all column-centred E (modulo v (1,-1,0,0,0), one affine normalisation)
+ such that span(v (1,-1,0,0,0), E) has defect in C (1,1,-2,0,0); then the same one dimension up.  Output: the components and the rank of
+ s on each; (R2) needs a 3-dim family of E with s(E) spanning V.
+Any verified 4-dim hit for a non-two-column m is a counterexample to (SL_m): save it and try to extend it to a 5-dim space with defect
+in C m (di_ext.ext).

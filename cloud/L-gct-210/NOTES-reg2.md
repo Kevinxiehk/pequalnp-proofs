@@ -1,5 +1,5 @@
 # NOTES-reg2 (role reg2; start 18:47, budget 100 min -> ends ~20:27). Regime: some row/column with a_r >= 2.
-## RESULT (reg2, final 19:50) -- regime a_r >= 2 NOT closed by a proof; it is reduced to ONE first-order statement about 6-dim 4x5 spaces
+## RESULT (reg2, final 19:40) -- regime a_r >= 2 NOT closed by a proof; it is reduced to ONE first-order statement about 6-dim 4x5 spaces
  Notation: L level 5x5, row r, M := L_r (4x5 level, dim 4 + a_r if dim L = 9), W_r := row-r projection of L, J' = 4x5 all-ones,
  N_j(X) = perm_4(X without column j), F = sum_j N_j, C(M) = defect space (rows), e = dim C(M), Phi(Y) = N(Y),
  T_1(M) = stage2's first-order space (M placed in the rows != r), Omega(M) := row-r projection of T_1(M)  (a subspace of C^5).
@@ -20,12 +20,16 @@
       TYPE NC: no full free row; exactly one NEUTRAL column c (C(M) = e_c^perp cap 1^perp, e = 3; the deletion of column c is a 4x4
                level space of dim 3, 4 or 5 and M is its transposed defect extension); Omega(M) = span(1, e_c), dim T_1 = 9, FO2 = 7.
     Sources: the 20 files of rows (19 of them NC; their sparse limits identified), the 21 six-dim line-kernels of the 7 known 7-dim
-    spaces, and 140+ new spaces = ALL 6-dim level extensions found of 60 known 2-,3-,4-,5-dim level spaces (search inside
-    E_0(M_b)/M_b, 2-13 unknowns, finds both types). Every one has E_0(M) = M (+) C d, P_2(d) != 0 (so it is a maximal 4x5 level
-    space: no 7-dim 4x5 level space contains any of them; no 7-dim 4x5 level space is known).
+    spaces, and 146 solutions of extension censuses = all 6-dim level spaces found through 71 known 2-,3-,4-,5-dim level spaces
+    (search inside E_0(M_b)/M_b, 2-13 unknowns; finds both types; part of the 146 re-find a parent space from a random subspace).
+    The 41 spaces of the first two sources have E_0(M) = M (+) C d, P_2(d) != 0: maximal 4x5 level spaces. 7-dim search through
+    45 known 3-,4-,5-dim level spaces (reg2/ext7.py, same solver): 0 of 132 starts, residual floor 118 (6-dim solutions: 1e-11).
+    EXACT (rational arithmetic, reg2/exact_T1.py): for the L080 row-0 kernel and for the member w0=(1,-1,0,0), w1=(0,0,1,-1),
+    w3=(1,1,-1,-1) of the exact NC family of section 2.5, rank_Q(gradient span) >= 16 and Omega lies in span(1, e_c): for these
+    two spaces "L_r = M  =>  dim L <= 7" is a theorem (criterion A).
  C [CONSEQUENCE, rigorous given A, FL, SL_3 and L_gct_215] Regime a_r >= 2 is IMPOSSIBLE as soon as
       (S6')  every 6-dim 4x5 level space M without a full free row has dim Omega(M) <= 2
-    holds (true for all ~180 spaces; "<= 3" already kills a_r = 2). Proof: a_r = 2: M = L_r is 6-dim; a full free row gives dim L <= 7
+    holds (true for every space found; "<= 3" already kills a_r = 2). Proof: a_r = 2: M = L_r is 6-dim; a full free row gives dim L <= 7
     (FL); otherwise dim W_r <= 1 < 3. a_r = 3: M is 7-dim, has no full free row (rows' SL_3 corollary), every 6-dim subspace M_6
     has Omega(M) inside Omega(M_6), so dim W_r <= 1 < 2. In fact (S6') gives: dim L_r >= 6  =>  dim L <= dim L_r + 1 <= 8.
     So with A the whole regime is one statement on 4x5 matrices, of first order (no P_2-isotropy / FO2 needed).
@@ -147,3 +151,5 @@ STATUS 19:30: COMPUTE-reg2.md written (heavy computations for the 24-core machin
  Files: reg2/{t,a1,a2,a5,a6,a7,a8,a9,a10,a11,a12,a13,show}.py (invariants), ext6.py, ext6b.py, ext6c.py, ext5.py (censuses),
  fam_nc.py (exact family), chk_lemma.py (sanity of section 1), M_L080_col0.npy, M_ex2_row4.npy (Type F with Omega = C^5),
  ext_*.npy (new NC spaces). Heavy-computation plan: COMPUTE-reg2.md.
+STATUS 19:40: exact certificates (exact_T1.py) and the 7-dim extension search (ext7.py) added; RESULT block final. Remaining budget
+ used for one more attempt on (ii) "neutral column => no twisted extension" (lead below).

@@ -5503,6 +5503,412 @@ theorem LemmaHYP_b (m : Fin 5 → ℂ) (hm0 : m ≠ 0)
     rw [hval i] at h0
     exact hj0' h0
 
+theorem Vp_sum (i : Fin 4) (y : V4) (hy : tau y = 0) (hyi : y i = 0) :
+    y (i.succAbove 0) + y (i.succAbove 1) + y (i.succAbove 2) = 0 := by
+  have h := Fin.sum_univ_succAbove y i
+  rw [Fin.sum_univ_four, Fin.sum_univ_three] at h
+  simp only [tau] at hy
+  linear_combination hy - h - hyi
+
+theorem Vp_ext (i : Fin 4) (x y : V4) (hi : x i = y i)
+    (h0 : x (i.succAbove 0) = y (i.succAbove 0)) (h1 : x (i.succAbove 1) = y (i.succAbove 1))
+    (h2 : x (i.succAbove 2) = y (i.succAbove 2)) : x = y := by
+  funext k
+  by_cases hk : k = i
+  · rw [hk]
+    exact hi
+  · obtain ⟨k', hk'⟩ := Fin.exists_succAbove_eq hk
+    subst hk'
+    fin_cases k'
+    · exact h0
+    · exact h1
+    · exact h2
+
+theorem Vp_zero (i : Fin 4) (y : V4) (hy : tau y = 0) (hyi : y i = 0)
+    (h0 : y (i.succAbove 0) = 0) (h1 : y (i.succAbove 1) = 0) : y = 0 := by
+  have hs := Vp_sum i y hy hyi
+  have h2 : y (i.succAbove 2) = 0 := by linear_combination hs - h0 - h1
+  exact Vp_ext i y 0 hyi h0 h1 h2
+
+theorem cramer2 (a b c d e f : ℂ) (hdet : a * d - b * c ≠ 0) :
+    ∃ p r : ℂ, e = p * a + r * c ∧ f = p * b + r * d := by
+  obtain ⟨p, hp⟩ : ∃ p : ℂ, p * (a * d - b * c) = e * d - f * c :=
+    ⟨(e * d - f * c) / (a * d - b * c), div_mul_cancel₀ _ hdet⟩
+  obtain ⟨r, hr⟩ : ∃ r : ℂ, r * (a * d - b * c) = a * f - b * e :=
+    ⟨(a * f - b * e) / (a * d - b * c), div_mul_cancel₀ _ hdet⟩
+  refine ⟨p, r, ?_, ?_⟩
+  · apply mul_left_cancel₀ hdet
+    linear_combination (-a) * hp - c * hr
+  · apply mul_left_cancel₀ hdet
+    linear_combination (-b) * hp - d * hr
+
+theorem Vp_span (i : Fin 4) (v w : V4) (hv : tau v = 0) (hvi : v i = 0) (hw : tau w = 0)
+    (hwi : w i = 0) (hind : indep v w) (x : V4) (hx : tau x = 0) (hxi : x i = 0) :
+    ∃ p r : ℂ, x = p • v + r • w := by
+  have comb : ∀ s t : ℂ, tau (s • v + t • w) = 0 ∧ (s • v + t • w) i = 0 := by
+    intro s t
+    constructor
+    · simp only [tau, Pi.add_apply, Pi.smul_apply, smul_eq_mul] at hv hw ⊢
+      linear_combination s * hv + t * hw
+    · simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, hvi, hwi]
+      ring
+  have hdet : v (i.succAbove 0) * w (i.succAbove 1) - v (i.succAbove 1) * w (i.succAbove 0) ≠ 0 := by
+    intro hd
+    have r1 : w (i.succAbove 1) • v + (-v (i.succAbove 1)) • w = 0 := by
+      apply Vp_zero i _ (comb _ _).1 (comb _ _).2
+      · simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+        linear_combination hd
+      · simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+        ring
+    have r2 : w (i.succAbove 0) • v + (-v (i.succAbove 0)) • w = 0 := by
+      apply Vp_zero i _ (comb _ _).1 (comb _ _).2
+      · simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+        ring
+      · simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+        linear_combination -hd
+    have q1 := hind _ _ r1
+    have q2 := hind _ _ r2
+    have hv0 : v = 0 := Vp_zero i v hv hvi (neg_eq_zero.mp q2.2) (neg_eq_zero.mp q1.2)
+    have q3 := hind 1 0 (by
+      rw [hv0]
+      simp)
+    exact one_ne_zero q3.1
+  obtain ⟨p, r, e1, e2⟩ := cramer2 (v (i.succAbove 0)) (v (i.succAbove 1)) (w (i.succAbove 0))
+    (w (i.succAbove 1)) (x (i.succAbove 0)) (x (i.succAbove 1)) hdet
+  refine ⟨p, r, ?_⟩
+  have hd0 : x - (p • v + r • w) = 0 := by
+    apply Vp_zero i
+    · simp only [tau, Pi.sub_apply, Pi.add_apply, Pi.smul_apply, smul_eq_mul] at hv hw hx ⊢
+      linear_combination hx - p * hv - r * hw
+    · simp only [Pi.sub_apply, Pi.add_apply, Pi.smul_apply, smul_eq_mul, hvi, hwi, hxi]
+      ring
+    · simp only [Pi.sub_apply, Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+      linear_combination e1
+    · simp only [Pi.sub_apply, Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+      linear_combination e2
+  exact sub_eq_zero.mp hd0
+
+theorem Vp_nondeg (i : Fin 4) (u : V4) (hu : tau u = 0) (hui : u i = 0)
+    (h : ∀ x : V4, tau x = 0 → x i = 0 → ip u x = 0) : u = 0 := by
+  have key : ∀ k : Fin 4, k ≠ i → u k = 0 := by
+    intro k hk
+    have hx1 : tau (fun a : Fin 4 => (if a = k then (3 : ℂ) else 0) - 1
+        + (if a = i then 1 else 0)) = 0 := by
+      have e : tau (fun a : Fin 4 => (if a = k then (3 : ℂ) else 0) - 1
+          + (if a = i then 1 else 0)) = ∑ a : Fin 4, ((if a = k then (3 : ℂ) else 0) - 1
+          + (if a = i then 1 else 0)) := by
+        rw [Fin.sum_univ_four]
+        rfl
+      rw [e]
+      norm_num [Finset.sum_add_distrib, Finset.sum_sub_distrib]
+    have hx2 : (fun a : Fin 4 => (if a = k then (3 : ℂ) else 0) - 1
+        + (if a = i then 1 else 0)) i = 0 := by
+      have hik : ¬ i = k := fun h => hk h.symm
+      simp [hik]
+    have h0 := h _ hx1 hx2
+    have e2 : ip u (fun a : Fin 4 => (if a = k then (3 : ℂ) else 0) - 1
+        + (if a = i then 1 else 0)) = ∑ a : Fin 4, u a * ((if a = k then (3 : ℂ) else 0) - 1
+        + (if a = i then 1 else 0)) := by
+      rw [Fin.sum_univ_four]
+      rfl
+    rw [e2] at h0
+    simp only [mul_add, mul_sub, mul_one, mul_ite, mul_zero, Finset.sum_add_distrib,
+      Finset.sum_sub_distrib, Finset.sum_ite_eq', Finset.mem_univ, if_true] at h0
+    have e3 : ∑ a : Fin 4, u a = 0 := by
+      rw [Fin.sum_univ_four]
+      exact hu
+    rw [e3, hui] at h0
+    have h3 : u k * 3 = 0 := by linear_combination h0
+    exact (mul_eq_zero.mp h3).resolve_right (by norm_num)
+  apply Vp_ext i u 0 hui
+  · exact key _ (Fin.succAbove_ne i 0)
+  · exact key _ (Fin.succAbove_ne i 1)
+  · exact key _ (Fin.succAbove_ne i 2)
+
+theorem Vp_t3 (i : Fin 4) (v : V4) (hv : tau v = 0) (hvi : v i = 0) (hvv : ip v v = 0)
+    (h3 : t3 v v v = 0) : v = 0 := by
+  apply iso34 v hv hvv h3
+  have he4 : v 0 * v 1 * v 2 * v 3 = 0 := by
+    have h := Finset.prod_eq_zero (Finset.mem_univ i) hvi
+    rw [Fin.prod_univ_four] at h
+    exact h
+  simp only [tau, ip, t3, t4] at hv hvv h3 ⊢
+  linear_combination (v 0 + v 1 + v 2 + v 3) * h3
+    - (v 0 * v 1 + v 0 * v 2 + v 0 * v 3 + v 1 * v 2 + v 1 * v 3 + v 2 * v 3) * hvv
+    + (v 0 * v 1 * v 2 + v 0 * v 1 * v 3 + v 0 * v 2 * v 3 + v 1 * v 2 * v 3) * hv - 4 * he4
+
+theorem rs_row (K : Submodule ℂ M45) (i : Fin 4) (hrow : ∀ Y ∈ K, ∀ j, Y (i, j) = 0)
+    (Y : M45) (hY : Y ∈ K) : rs Y i = 0 := by
+  rw [rs_apply, hrow Y hY 0, hrow Y hY 1, hrow Y hY 2, hrow Y hY 3, hrow Y hY 4]
+  ring
+
+theorem Vp_finrank (i : Fin 4) :
+    Module.finrank ℂ (sumZero 4 ⊓ LinearMap.ker (LinearMap.proj i : V4 →ₗ[ℂ] ℂ) :
+      Submodule ℂ V4) ≤ 2 := by
+  have rn := rank_nullity (sumZero 4) (LinearMap.proj i : V4 →ₗ[ℂ] ℂ)
+  have h3 : Module.finrank ℂ (sumZero 4) ≤ 3 :=
+    (finrank_sumZero (n := 4) (by norm_num)).trans (by norm_num)
+  have hne : Module.finrank ℂ ((sumZero 4).map (LinearMap.proj i : V4 →ₗ[ℂ] ℂ)) ≠ 0 := by
+    intro h0
+    have hb := Submodule.finrank_eq_zero.mp h0
+    have hx : (fun a : Fin 4 => (if a = i then (4 : ℂ) else 0) - 1) ∈ sumZero 4 := by
+      rw [mem_sumZero]
+      norm_num [Finset.sum_sub_distrib]
+    have hm : (LinearMap.proj i : V4 →ₗ[ℂ] ℂ) (fun a : Fin 4 => (if a = i then (4 : ℂ) else 0) - 1)
+        ∈ (sumZero 4).map (LinearMap.proj i : V4 →ₗ[ℂ] ℂ) := Submodule.mem_map_of_mem hx
+    rw [hb, Submodule.mem_bot] at hm
+    norm_num at hm
+  have h4 : Module.finrank ℂ (sumZero 4 ⊓ LinearMap.ker (LinearMap.proj i : V4 →ₗ[ℂ] ℂ) :
+      Submodule ℂ V4) + Module.finrank ℂ ((sumZero 4).map (LinearMap.proj i : V4 →ₗ[ℂ] ℂ)) ≤ 3 := by
+    rw [← rn]
+    exact h3
+  omega
+
+theorem SL3_rs_le (K : Submodule ℂ M45) (hK : SLev K) (i : Fin 4)
+    (hrow : ∀ Y ∈ K, ∀ j, Y (i, j) = 0) :
+    K.map rs ≤ (sumZero 4 ⊓ LinearMap.ker (LinearMap.proj i : V4 →ₗ[ℂ] ℂ) : Submodule ℂ V4) := by
+  rintro _ ⟨Y, hY, rfl⟩
+  refine Submodule.mem_inf.mpr ⟨map_rs_le K hK (Submodule.mem_map_of_mem hY), ?_⟩
+  exact LinearMap.mem_ker.mpr (rs_row K i hrow Y hY)
+
+theorem SL3_q2 (K : Submodule ℂ M45) (hK : SLev K) (i : Fin 4)
+    (hrow : ∀ Y ∈ K, ∀ j, Y (i, j) = 0) (hq : Module.finrank ℂ (K.map rs) = 2) :
+    (K ⊓ LinearMap.ker rs : Submodule ℂ M45) = ⊥ := by
+  by_contra hne
+  obtain ⟨u, huS, hu0, huperp⟩ := Bii K hK hq hne
+  have hle := SL3_rs_le K hK i hrow
+  have heq : K.map rs =
+      (sumZero 4 ⊓ LinearMap.ker (LinearMap.proj i : V4 →ₗ[ℂ] ℂ) : Submodule ℂ V4) :=
+    Submodule.eq_of_le_of_finrank_le hle (by
+      rw [hq]
+      exact Vp_finrank i)
+  have hu' := Submodule.mem_inf.mp (hle huS)
+  have hut : tau u = 0 := (mem_Vs u).mp hu'.1
+  have hui : u i = 0 := LinearMap.mem_ker.mp hu'.2
+  apply hu0
+  apply Vp_nondeg i u hut hui
+  intro x hx hxi
+  apply huperp
+  rw [heq]
+  exact Submodule.mem_inf.mpr ⟨(mem_Vs x).mpr hx, LinearMap.mem_ker.mpr hxi⟩
+
+theorem T4col (K : Submodule ℂ M45) (hK : SLev K) (σ : Equiv.Perm (Fin 5)) (Y : M45)
+    (hY : Y ∈ K) :
+    t3 (col Y (σ 0)) (col Y (σ 1)) (col Y (σ 2)) + t3 (col Y (σ 0)) (col Y (σ 1)) (col Y (σ 3))
+      + t3 (col Y (σ 0)) (col Y (σ 2)) (col Y (σ 3))
+      + t3 (col Y (σ 1)) (col Y (σ 2)) (col Y (σ 3)) = 0 := by
+  have hKσ := SLev_perm σ K hK
+  have hYσ : cperm σ Y ∈ K.map (cperm σ) := Submodule.mem_map_of_mem hY
+  have k4 := (C34 _ hKσ _ hYσ 4).2.1
+  rw [sa4.1, sa4.2.1, sa4.2.2.1, sa4.2.2.2] at k4
+  exact k4
+
+theorem SL3_two (K : Submodule ℂ M45) (hK : SLev K) (i : Fin 4)
+    (hrow : ∀ Y ∈ K, ∀ j, Y (i, j) = 0)
+    (hd : Module.finrank ℂ (K ⊓ LinearMap.ker rs : Submodule ℂ M45) = 2)
+    (z : M45) (hz : z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45))
+    (hmax : ∀ Z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45), ∀ m, ∃ c : ℂ, col Z m = c • col z m)
+    (σ : Equiv.Perm (Fin 5)) (v w : V4) (hvw : indep v w) (c0 : col z (σ 0) = v)
+    (c1 : col z (σ 1) = (-1 : ℂ) • v) (c2 : col z (σ 2) = w)
+    (c3 : col z (σ 3) = (-1 : ℂ) • w) (c4 : col z (σ 4) = 0)
+    (id1 : t3 v w w = 0) (id2 : t3 v v w = 0) (Y0 : M45) (hY0 : Y0 ∈ K) : rs Y0 = 0 := by
+  have hNs := SLev_N K hK
+  have hrs := rs_N K
+  have hzK : z ∈ K := (Submodule.mem_inf.mp hz).1
+  have hv1 : tau v = 0 := by
+    rw [← c0]
+    exact C1 K hK z hzK (σ 0)
+  have hvi : v i = 0 := by
+    rw [← c0]
+    exact hrow z hzK (σ 0)
+  have hvv : ip v v = 0 := by
+    rw [← c0]
+    exact Niso _ hNs hrs z z hz hz (σ 0)
+  have hw1 : tau w = 0 := by
+    rw [← c2]
+    exact C1 K hK z hzK (σ 2)
+  have hwi : w i = 0 := by
+    rw [← c2]
+    exact hrow z hzK (σ 2)
+  have hww : ip w w = 0 := by
+    rw [← c2]
+    exact Niso _ hNs hrs z z hz hz (σ 2)
+  have hv0 : v ≠ 0 := by
+    intro h
+    have h1 := (hvw 1 0 (by
+      rw [h]
+      simp)).1
+    exact one_ne_zero h1
+  have hw0 : w ≠ 0 := by
+    intro h
+    have h1 := (hvw 0 1 (by
+      rw [h]
+      simp)).2
+    exact one_ne_zero h1
+  have gv : t3 v v v ≠ 0 := fun h => hv0 (Vp_t3 i v hv1 hvi hvv h)
+  have gw : t3 w w w ≠ 0 := fun h => hw0 (Vp_t3 i w hw1 hwi hww h)
+  have hβ : ip v w ≠ 0 := by
+    intro hb
+    apply hv0
+    apply Vp_nondeg i v hv1 hvi
+    intro x hx hxi
+    obtain ⟨p, r, rfl⟩ := Vp_span i v w hv1 hvi hw1 hwi hvw x hx hxi
+    simp only [ip, Pi.add_apply, Pi.smul_apply, smul_eq_mul] at hvv hb ⊢
+    linear_combination p * hvv + r * hb
+  have keyw : ∀ x : V4, tau x = 0 → x i = 0 → t3 x w w * ip v w = t3 w w w * ip x v := by
+    intro x hx hxi
+    obtain ⟨p, r, rfl⟩ := Vp_span i v w hv1 hvi hw1 hwi hvw x hx hxi
+    simp only [ip, t3, Pi.add_apply, Pi.smul_apply, smul_eq_mul] at hvv id1 ⊢
+    linear_combination (p * (v 0 * w 0 + v 1 * w 1 + v 2 * w 2 + v 3 * w 3)) * id1
+      - (p * (w 0 * w 0 * w 0 + w 1 * w 1 * w 1 + w 2 * w 2 * w 2 + w 3 * w 3 * w 3)) * hvv
+  have keyv : ∀ x : V4, tau x = 0 → x i = 0 → t3 x v v * ip v w = t3 v v v * ip x w := by
+    intro x hx hxi
+    obtain ⟨p, r, rfl⟩ := Vp_span i v w hv1 hvi hw1 hwi hvw x hx hxi
+    simp only [ip, t3, Pi.add_apply, Pi.smul_apply, smul_eq_mul] at hww id2 ⊢
+    linear_combination (r * (v 0 * w 0 + v 1 * w 1 + v 2 * w 2 + v 3 * w 3)) * id2
+      - (r * (v 0 * v 0 * v 0 + v 1 * v 1 * v 1 + v 2 * v 2 * v 2 + v 3 * v 3 * v 3)) * hww
+  obtain ⟨W2, hW2, w20, w21, w22, w23⟩ := S7_elem _ hNs hrs hd z hmax σ v w hvw c1 c2 c3 c4
+  obtain ⟨W1, hW1, w10, w11, w12, w13⟩ := S7_elem _ hNs hrs hd z hmax (σ * swp) w v
+    (indep_symm hvw)
+    (by
+      rw [Equiv.Perm.mul_apply, swp1]
+      exact c3)
+    (by
+      rw [Equiv.Perm.mul_apply, swp2]
+      exact c0)
+    (by
+      rw [Equiv.Perm.mul_apply, swp3]
+      exact c1)
+    (by
+      rw [Equiv.Perm.mul_apply, swp4]
+      exact c4)
+  rw [Equiv.Perm.mul_apply, swp0] at w10
+  rw [Equiv.Perm.mul_apply, swp1] at w11
+  rw [Equiv.Perm.mul_apply, swp2] at w12
+  rw [Equiv.Perm.mul_apply, swp3] at w13
+  have hW1K : W1 ∈ K := (Submodule.mem_inf.mp hW1).1
+  have hW2K : W2 ∈ K := (Submodule.mem_inf.mp hW2).1
+  have hyV : ∀ m, tau (col Y0 m) = 0 ∧ col Y0 m i = 0 := fun m =>
+    ⟨C1 K hK Y0 hY0 m, hrow Y0 hY0 m⟩
+  have cA : ∀ (W : M45) (k : Fin 5), col (Y0 + W) k = col Y0 k + col W k := fun _ _ => rfl
+  have cS : ∀ (W : M45) (k : Fin 5), col (Y0 - W) k = col Y0 k - col W k := fun _ _ => rfl
+  have A : t3 (col Y0 (σ 0)) w w + t3 (col Y0 (σ 1)) w w = 0 := by
+    have tp := T4col K hK σ (Y0 + W2) (K.add_mem hY0 hW2K)
+    have tm := T4col K hK σ (Y0 - W2) (K.sub_mem hY0 hW2K)
+    have t0 := T4col K hK σ Y0 hY0
+    simp only [cA, cS, w20, w21, w22, w23] at tp tm
+    simp only [t3, Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
+      at tp tm t0 ⊢
+    linear_combination (-1 / 2 : ℂ) * (tp + tm - 2 * t0)
+  have B : t3 (col Y0 (σ 2)) v v + t3 (col Y0 (σ 3)) v v = 0 := by
+    have tp := T4col K hK σ (Y0 + W1) (K.add_mem hY0 hW1K)
+    have tm := T4col K hK σ (Y0 - W1) (K.sub_mem hY0 hW1K)
+    have t0 := T4col K hK σ Y0 hY0
+    simp only [cA, cS, w10, w11, w12, w13] at tp tm
+    simp only [t3, Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
+      at tp tm t0 ⊢
+    linear_combination (-1 / 2 : ℂ) * (tp + tm - 2 * t0)
+  have hI : ip (col Y0 (σ 0)) v + ip (col Y0 (σ 1)) v = 0 := by
+    have k0 := keyw _ (hyV (σ 0)).1 (hyV (σ 0)).2
+    have k1 := keyw _ (hyV (σ 1)).1 (hyV (σ 1)).2
+    have h : t3 w w w * (ip (col Y0 (σ 0)) v + ip (col Y0 (σ 1)) v) = 0 := by
+      linear_combination (ip v w) * A - k0 - k1
+    exact (mul_eq_zero.mp h).resolve_left gw
+  have hJ : ip (col Y0 (σ 2)) w + ip (col Y0 (σ 3)) w = 0 := by
+    have k0 := keyv _ (hyV (σ 2)).1 (hyV (σ 2)).2
+    have k1 := keyv _ (hyV (σ 3)).1 (hyV (σ 3)).2
+    have h : t3 v v v * (ip (col Y0 (σ 2)) w + ip (col Y0 (σ 3)) w) = 0 := by
+      linear_combination (ip v w) * B - k0 - k1
+    exact (mul_eq_zero.mp h).resolve_left gv
+  have huv : ip (rs Y0) v = 0 := by
+    have x0 := C2pol K hK Y0 W1 hY0 hW1K (σ 0)
+    have x1 := C2pol K hK Y0 W1 hY0 hW1K (σ 1)
+    rw [w12, hrs W1 hW1] at x0
+    rw [w13, hrs W1 hW1] at x1
+    simp only [ip, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at x0 x1 hI ⊢
+    linear_combination (-1 / 2 : ℂ) * x0 + (1 / 2 : ℂ) * x1 + hI
+  have huw : ip (rs Y0) w = 0 := by
+    have x0 := C2pol K hK Y0 W2 hY0 hW2K (σ 2)
+    have x1 := C2pol K hK Y0 W2 hY0 hW2K (σ 3)
+    rw [w22, hrs W2 hW2] at x0
+    rw [w23, hrs W2 hW2] at x1
+    simp only [ip, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at x0 x1 hJ ⊢
+    linear_combination (-1 / 2 : ℂ) * x0 + (1 / 2 : ℂ) * x1 + hJ
+  apply Vp_nondeg i (rs Y0) (tau_rs K hK Y0 hY0) (rs_row K i hrow Y0 hY0)
+  intro x hx hxi
+  obtain ⟨p, r, rfl⟩ := Vp_span i v w hv1 hvi hw1 hwi hvw x hx hxi
+  simp only [ip, Pi.add_apply, Pi.smul_apply, smul_eq_mul] at huv huw ⊢
+  linear_combination p * huv + r * huw
+
+theorem SL3_d2 (K : Submodule ℂ M45) (hK : SLev K) (i : Fin 4)
+    (hrow : ∀ Y ∈ K, ∀ j, Y (i, j) = 0)
+    (hd : Module.finrank ℂ (K ⊓ LinearMap.ker rs : Submodule ℂ M45) = 2) :
+    ∀ Y ∈ K, rs Y = 0 := by
+  have hNs := SLev_N K hK
+  have hrs := rs_N K
+  obtain ⟨z, hz, hmax⟩ := maxpt _ hNs hrs
+  have hzK : z ∈ K := (Submodule.mem_inf.mp hz).1
+  have hcolV : ∀ m, tau (col z m) = 0 ∧ col z m i = 0 := fun m =>
+    ⟨C1 K hK z hzK m, hrow z hzK m⟩
+  rcases tricho _ z hmax with ⟨a, b, c, hab, hac, hbc, hind⟩ | ⟨a, b, hab, hspan⟩ |
+    ⟨m0, hm0, hform⟩ | hbot
+  · exfalso
+    by_cases h2 : indep (col z a) (col z b)
+    · obtain ⟨p, r, e⟩ := Vp_span i (col z a) (col z b) (hcolV a).1 (hcolV a).2 (hcolV b).1
+        (hcolV b).2 h2 (col z c) (hcolV c).1 (hcolV c).2
+      have h3 := hind p r (-1) (by
+        rw [e]
+        funext k
+        simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
+        ring)
+      exact one_ne_zero (neg_eq_zero.mp h3.2.2)
+    · have h2' : ∃ s t : ℂ, s • col z a + t • col z b = 0 ∧ ¬ (s = 0 ∧ t = 0) := by
+        by_contra hc
+        exact h2 (fun s t e => by
+          by_contra hh
+          exact hc ⟨s, t, e, hh⟩)
+      obtain ⟨s, t, hst, hne⟩ := h2'
+      have h3 := hind s t 0 (by
+        rw [zero_smul, add_zero]
+        exact hst)
+      exact hne ⟨h3.1, h3.2.1⟩
+  · obtain ⟨σ, h0, h2, e1, e3, e4⟩ := two_line_pattern _ hNs hrs z hz a b hab hspan
+    subst h0
+    subst h2
+    have ids := typeII_ids _ hNs z hz σ (col z (σ 0)) (col z (σ 2)) rfl e1 rfl e3 e4
+    intro Y0 hY0
+    exact SL3_two K hK i hrow hd z hz hmax σ (col z (σ 0)) (col z (σ 2)) hab rfl e1 rfl e3 e4
+      ids.1 ids.2.1 Y0 hY0
+  · exfalso
+    have hv3 : t3 (col z m0) (col z m0) (col z m0) ≠ 0 := fun h =>
+      hm0 (Vp_t3 i _ (hcolV m0).1 (hcolV m0).2 (Niso _ hNs hrs z z hz hz m0) h)
+    have h1 := A1b _ hNs hrs (col z m0) hm0 (C1 _ hNs z hz m0)
+      (Niso _ hNs hrs z z hz hz m0) hform hv3
+    omega
+  · exfalso
+    rw [hbot, finrank_bot] at hd
+    omega
+
+theorem LemmaSL3 (K : Submodule ℂ M45) (hK : SLev K) (i : Fin 4)
+    (hrow : ∀ Y ∈ K, ∀ j, Y (i, j) = 0) : Module.finrank ℂ K ≤ 2 := by
+  have r := rank_nullity K rs
+  have hd := LemA_proof _ (SLev_N K hK) (rs_N K)
+  have hq := (Submodule.finrank_mono (SL3_rs_le K hK i hrow)).trans (Vp_finrank i)
+  by_cases h2 : Module.finrank ℂ (K ⊓ LinearMap.ker rs : Submodule ℂ M45) = 2
+  · have h0 := SL3_d2 K hK i hrow h2
+    have hb : K.map rs = ⊥ := by
+      rw [eq_bot_iff]
+      rintro _ ⟨Y, hY, rfl⟩
+      rw [Submodule.mem_bot]
+      exact h0 Y hY
+    rw [hb, finrank_bot] at r
+    omega
+  · by_cases hq2 : Module.finrank ℂ (K.map rs) = 2
+    · have hb := SL3_q2 K hK i hrow hq2
+      rw [hb, finrank_bot] at r
+      omega
+    · omega
+
 end
 
 end PEqualNP.Gct.FL210

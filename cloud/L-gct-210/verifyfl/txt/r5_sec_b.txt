@@ -1,0 +1,74 @@
+
+ R5.5 PROPOSITIONS I' AND V (rigorous).
+   PROP I' (ANY m with |P| = 3).  If K contains chi_1 (x) W_P then dim K <= 3; more precisely K lies in chi_1 (x) C^P (3-column, "R3")
+   or in chi_1 (x) W_P (+) C chi_3 (e_n - e_n')^T.
+   Proof. Lemma T for all l in W_P.  (al) with l_a l_b l_c != 0: <chi_3,y_n> = <chi_3,y_n'> = 0.  (be) with l = (1,-1,0): l_b l_c = 0, so
+   the multiple of m is 0 and l_a l_b <chi_2,w> = 0: <chi_2,w> = 0.  (ep) with l = (1,-1,0): <chi_2,y_c> = -<chi_2,y_n'> = -<chi_2,y_n>;
+   with <chi_2,w> = 0: <chi_2,y_n> = <chi_2,y_n'> = <chi_2,y_c> = 0, and likewise for a, b.  So on K: y_n = al_n chi_3, y_n' = al_n' chi_3,
+   y_j = p_j chi_1 + r_j chi_3 (j in P), s = s_1 chi_1 + s_3 chi_3.
+   (C2'pol) between Y and Z = chi_1 x^T (x in W_P), column j in P:  x_j <2y_j - s, chi_1> = 2 m_j Theta(Y,Z); the right side is linear in x,
+   Theta(Y, chi_1 x^T) = sum_k th_k x_k; x = e_k - e_k' with k, k' != j gives th_k = th_k' for all pairs, so Theta(Y,Z) = th sum x = 0 and
+   <2y_j - s, chi_1> = 0: r_j = s_3/2 (j in P).  Comparing chi_3-coefficients in sum_j y_j = s: s_3 = -2(al_n + al_n').
+   (C4'_n') and (ID8) with p = (p_a,p_b,p_c,0), r = (s_3/2,s_3/2,s_3/2,al_n):  0 = [y_a,y_b,y_c,y_n] = al_n s_3 (4 e_2(p_a,p_b,p_c) - 3 s_3^2);
+   replacing Y by Y + chi_1 x^T changes only p -> p + x, and e_2(x) is not == 0 on W_P: al_n s_3 = 0, likewise al_n' s_3 = 0, so
+   s_3^2 = -2(al_n + al_n') s_3 = 0: s_3 == 0, al_n' = -al_n, r_j = 0.  (C2'_n): 0 = <y_n,y_n> - <s,y_n> = -4 al_n s_1, so al_n == 0 or s_1 == 0
+   on K (linear forms).  al_n == 0: K in chi_1 (x) C^P.  s_1 == 0: s == 0 and K in chi_1 (x) W_P (+) C chi_3 (e_n - e_n')^T.  QED
+   PROP V (m non-isotropic).  If N_P is a type V plane then K is a 3-column space, hence dim K <= 3 (Lemma 3C).
+   Proof. c^+ has no zero entry and is not proportional to 1/m (sum_j 1/m_j = -<m,m>/(2 e_3(m)) != 0), and e_2(c^+) != 0 (a zero-sum l with
+   e_2(l) = 0 is a multiple of (1,w,w^2) or (1,w^2,w), and Q_m(1,w,w^2) = m_a + w^2 m_b + w m_c vanishes only for m proportional to
+   (1,w^2,w), which is isotropic).  Lemma T for chi_1 c^+T: y_n = k chi_2 + rho_n chi_3, y_n' = -k chi_2 + rho_n' chi_3.  Lemma T with
+   chi_1, chi_3 exchanged, for chi_3 c^-T: the chi_3-coefficients vanish, rho_n = rho_n' = 0.  (ep) for chi_1 c^+T, difference of its two
+   versions: e_2(c^+) <chi_2, y_n' - y_n> = -8 k e_2(c^+) = 0, so k = 0.  QED
+
+ R5.6 THEOREM SL3-RED (rigorous): what is left of (SL_m) for |supp m| = 3, m NON-ISOTROPIC.
+   Let dim K = 4.  Then dim N_P <= 1, and K is of one of the following four kinds (types (q,d)):
+     (R1)  (3,1):  N = C Z_* inside N_P with vartheta(Z_*) != 0   [Z_* = v_+ c^+T + v_- c^-T, <v_+,v_-> != 0, c^+_j c^-_j = k_0 m_j,
+                   one cubic relation tau(z_a z_b z_c) = 0 between the isotropic v_+, v_-];
+     (R2)  (3,1):  two entries of m are equal, m_a = m_b (so m is a multiple of (1,1,-2,0,0)), and N = C v (e_a - e_b)^T, v isotropic;
+     (R3)  (2,2):  S = u^perp for an isotropic u, and at least one neutral column is active on N;
+     (R4)  (1,3):  both neutral columns are active on N and dim N_P = 1.
+   In particular: type (0,4) is impossible, and for m with three DISTINCT nonzero entries a 4-dim K of type (3,1) must have
+   vartheta(Z_*) != 0.
+   Proof. dim N_P <= 2 (NP), and dim N_P = 2 gives dim K <= 3 by Prop I' or Prop V.  So dim N_P <= 1.
+   Type (0,4): K = N; by (Nn) nu maps N into C v_n x C v_n', so dim N_P >= 2.  Contradiction.
+   Type (1,3): dim N_P >= 1, hence = 1, and nu(N) is 2-dim: (R4).
+   Type (2,2): N is not inside N_P, so some neutral column is active on N, and (B-ii') forces S degenerate: S = u^perp: (R3).
+   Type (3,1): N = C Z_* and Z_* is in N_P by (B-i').  Suppose vartheta(Z_*) = 0.  Then the three columns of Z_* are isotropic, pairwise
+   orthogonal, so Z_* = v l^T with v isotropic and l in W_P \ 0 (Q1).
+    (i) all l_j != 0: tau(z_a z_b z_c) = e_3(l) tau(v^3) = 0, so v = chi_1 after a row permutation; l is not proportional to 1/m (sum l = 0,
+        sum 1/m_j != 0).  Lemma T: y_n = k chi_2 + rho_n chi_3, y_n' = -k chi_2 + rho_n' chi_3 and, say, rho_n == 0 (the other case is
+        symmetric).  (C2'_n): 4k^2 = k <s,chi_2>, so k == 0 or 4k == <s,chi_2>.
+        k == 0: y_n == 0, y_n' = rho_n' chi_3, and (C2'_n'): rho_n' <s,chi_3> == 0; as q = 3, <s,chi_3> is not == 0, so rho_n' == 0 and K is
+        a 4-dim 3-column space, contradicting Lemma 3C.
+        4k == <s,chi_2>: (C2'_n') reads 4k^2 = -4k^2 + rho_n' <s,chi_3>, i.e. rho_n' <s,chi_3> = <s,chi_2>^2/2; as q = 3 the linear forms
+        <s,chi_2>, <s,chi_3> on K are independent, so <s,chi_3> does not divide <s,chi_2>^2.  Contradiction.
+    (ii) some l_j = 0, say Z_* = v (e_a - e_b)^T.  (C2'pol) between Y in K and Z_*: column c gives 0 = 2 m_c Theta(Y,Z_*), so Theta(.,Z_*) = 0,
+        and columns a, b give <b_a(Y),v> = <b_b(Y),v> = 0.  So b_a(K), b_b(K) lie in v^perp cap V, on which g has rank 1: the forms
+        s^*g + 4 m_a vartheta and s^*g + 4 m_b vartheta have rank <= 1 on K.  If m_a != m_b then s^*g, a combination of the two, has
+        rank <= 2, but q = 3.  So m_a = m_b: (R2).     QED
+   REMARKS.  (1) The two-column counterexamples to (SL_m) live in type (2,2) with S degenerate [r5_climb_r2.py: for m = (1,-1,0,0,0) a
+   greedy climb from zeta (e_0 - e_1)^T reaches a column-centred (4,1) space of type (2,2)], i.e. in the analogue of (R3); so (R3) is
+   where "m is not two-column" has to be used, and it is the analogue of blueprint S7/S8.  (2) For (R1) the constraints already
+   available are, for all Y in K (u = y_n, u' = y_n', w = u + u'; proofs as for Lemma T):
+       <om,u> = <om,u'> = 0 with om := -6 z_a z_b z_c + vartheta(Z_*) sum_P m_j z_j;   (<z_b z_c,w>, <z_a z_c,w>, <z_a z_b,w>) in C m;
+       ([z_b,z_c,u,u'], [z_a,z_c,u,u'], [z_a,z_b,u,u']) in C m;   and B_n, B_n' are isometries of V with u = (B_n + 1)sigma/2.
+   If these force u = u' = 0, Lemma 3C finishes (R1); I could not decide this by hand in the time (one-parameter family of Z_*).
+   (3) [NUMERICAL] for m = (1,1,-2,0,0) greedy climbs from v (e_0 - e_1)^T (v = zeta, chi_1, generic) stop at dim <= 3 (r5_climb_r2.out).
+
+ R5.7 THE OTHER STRATA (status; nothing proved beyond R5.1 and the items listed).
+   |supp m| = 3, m isotropic (m = (1,w,w^2) on P): Lemma 3C, Lemma T and Prop I' hold (they do not use isotropy); NP gives only
+     dim N_P <= 3, and the exceptional direction of Lemma T is exactly l = mbar = 1/m (this is where the planes N of R4.5 (i) and
+     U_2 (x) mbar live).  Type (0,4) is not excluded by the argument of R5.6 (it needs dim N_P <= 1 or the Props).  Open.
+   |supp m| = 4 (one neutral column n): R5.1 gives (Nn), (B-i'), (B-ii') for that column only; N is supported on P when q = 3, but four
+     P-columns with <z_j,z_j> = vartheta m_j and sum z_j = 0 no longer determine the cross terms <z_j,z_k>, so NP has no analogue yet.
+     Pencil: if m has four distinct nonzero entries and q = 3, d = 1 then vartheta(Z_*) = 0 (det(s^*g + x vartheta) has the five roots
+     0, 4m_j; R4.3-type argument), the columns of Z_* are isotropic and Theta(.,Z_*) = 2<phi,s(.)> with phi isotropic.  Open.
+   |supp m| = 5 (no neutral column): only the pencil; nothing of S3-S8 survives directly.  Open.
+
+ R5.8 NUMERICS OF ROUND 5 (flagged numerical) AND REQUESTS TO THE COMPUTE MACHINE.
+   r5_types.py (Gr(3,15), m = (1,2,-3,0,0), 19 hits/65 starts): 18 of type (3,0) (11 with genuine defect, neutral columns of every rank
+   pattern from [0,0] to [2,3]), 1 strongly level of type (1,2).  So 3-dim column-centred spaces with defect are plentiful and of type
+   (3,0); none with d >= 1 and defect was seen.   r5_checks.py, r5_lemT.py, r5_3col.py: checks quoted above.
+   /home/claude/work/L-gct-210/COMPUTE-verifyfl.md: requests A (the four isotropic planes N have no extension; exact, small),
+   B (N-problem for |P| = 4, 5; exact), C (calibrated Gr(4,15) searches), D (direct (5,1) searches), E (extension varieties of explicit
+   2-dim spaces for m = (1,2,-3,0,0)), F (typed searches for the residual kinds (R1)-(R4)).

@@ -1,0 +1,50 @@
+noncomputable def dotD {N : ℕ} : (Fin N → ℂ) →ₗ[ℂ] Module.Dual ℂ (Fin N → ℂ) :=
+  LinearMap.mk₂ ℂ (fun a z => ∑ m, z m * a m)
+    (fun a b z => by simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib])
+    (fun k a z => by
+      simp only [Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun m _ => ?_
+      ring)
+    (fun a z z' => by simp only [Pi.add_apply, add_mul, Finset.sum_add_distrib])
+    (fun k a z => by
+      simp only [Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun m _ => ?_
+      ring)
+
+theorem dotD_apply {N : ℕ} (a z : Fin N → ℂ) : dotD a z = ∑ m, z m * a m := rfl
+
+theorem dotD_injective {N : ℕ} : Function.Injective (dotD (N := N)) := by
+  intro a b hab
+  funext m
+  have h : dotD a (Pi.single m 1) = dotD b (Pi.single m 1) := by rw [hab]
+  rw [dotD_apply, dotD_apply, sum_single_mul, sum_single_mul] at h
+  exact h
+
+theorem perp_bound {N : ℕ} (A B : Submodule ℂ (Fin N → ℂ))
+    (h : ∀ a ∈ A, ∀ b ∈ B, ∑ m, b m * a m = 0) :
+    Module.finrank ℂ A + Module.finrank ℂ B ≤ N := by
+  have hle : A.map dotD ≤ B.dualAnnihilator := by
+    rintro _ ⟨a, ha, rfl⟩
+    rw [Submodule.mem_dualAnnihilator]
+    intro b hb
+    exact h a ha b hb
+  have e1 : Module.finrank ℂ (A.map dotD) = Module.finrank ℂ A :=
+    (LinearEquiv.finrank_eq (Submodule.equivMapOfInjective _ dotD_injective A)).symm
+  have e2 := Subspace.finrank_add_finrank_dualAnnihilator_eq B
+  have e3 := Submodule.finrank_mono hle
+  rw [Module.finrank_fintype_fun_eq_card, Fintype.card_fin] at e2
+  omega
+
+theorem rank_one_bound {N : ℕ} (A B : Submodule ℂ (Fin N → ℂ)) (f : (Fin N → ℂ) →ₗ[ℂ] ℂ)
+    (g : (Fin N → ℂ) → ℂ) (h : ∀ a ∈ A, ∀ b ∈ B, ∑ m, b m * a m = f a * g b) :
+    Module.finrank ℂ A + Module.finrank ℂ B ≤ N + 1 := by
+  have h1 := perp_bound (A ⊓ LinearMap.ker f) B (fun a ha b hb => by
+    rw [h a (Submodule.mem_inf.mp ha).1 b hb, LinearMap.mem_ker.mp (Submodule.mem_inf.mp ha).2,
+      zero_mul])
+  have h2 : Module.finrank ℂ A =
+      Module.finrank ℂ (A ⊓ LinearMap.ker f : Submodule ℂ (Fin N → ℂ)) +
+      Module.finrank ℂ (A.map f) := rank_nullity A f
+  have h3 := Submodule.finrank_le (A.map f)
+  rw [Module.finrank_self] at h3
+  omega
+

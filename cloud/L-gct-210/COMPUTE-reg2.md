@@ -34,7 +34,7 @@ mirror that layout or edit the first line of each script). They need numpy only.
   the team): a 5x5 level space containing a full free row has dim <= 7.
 - THE TARGET STATEMENT (S6'): every 6-dim 4x5 level space M WITHOUT a full free row has dim Omega(M) <= 2.
   (S6') implies: no 9-dim level space has a row or column with a_r >= 2.  ("dim Omega <= 3" suffices for a_r = 2;
-  a_r = 3 would also follow from "no 7-dim 4x5 level space exists".)  About 180 six-dim spaces checked so far: all Type F or NC.
+  a_r = 3 would also follow from "no 7-dim 4x5 level space exists".)  About 180 six-dim spaces checked so far (41 independent ones + 146 census solutions): all Type F or NC.
 
 Helper functions already written (import from reg2/):
   t.py: perm, level_err(B) (max |F(J'+Y)-120| at random points of span(B)), rank, rowpart/colpart (single-row/column parts);
@@ -62,7 +62,7 @@ c52_*.npy, cc_d*_*.npy (check shape (d,4,5) and level_err < 1e-9 first), all lin
 spaces in chief/core.py (dict core.SP; see ext6c.py for how kernels are taken; use rows AND columns = transposes), and for
 every 6-dim space found, 20 random subspaces of each dimension 1, 2, 3 (ITERATE until no new type appears); (ii) 200 starts per
 base (solve_ext uses a finite-difference Jacobian and LM; raise iters to 600; for m(q-m) > 20 use N = 500 sample points);
-(iii) also target dimension 7 (m = 7 - b).
+(iii) also target dimension 7 (m = 7 - b): `python3 -I ext7.py SEED TMAX` (here: 0 of 132 starts, residual floor 118).
 Calibration that must succeed first: from a random 3-dim subspace of ../rows/rc45.npy and of ../rows/nc_d6_k1_s4.npy the
 search must return the 6-dim space itself (it does here: 4-5 of 5 starts, about 1 s per start).
 Output and decision: table base -> number of solutions of type F / NC / OTHER, plus for each solution dim T_1, dim Omega, e,
@@ -121,6 +121,8 @@ where it drops): proves "(S6') on the whole family" or exhibits the special memb
 (c) Exact local classification: for an exact 5-dim level space M_5 (e.g. hyperplanes of the spaces in (a), the 5-dim kernels
 of ex1 over Q(w)), solve EXACTLY (Groebner / msolve; <= 5 unknowns, equations of degree <= 4) the system of section 1 with
 m = 1: this lists rigorously all 6-dim level spaces through M_5, and E_0 computed exactly gives q.
+    A working exact prototype for (a): `python3 -I exact_T1.py` (pure Fractions; evaluates cof at 260 integer points, exact rank
+    and exact kernel; already certifies Omega inside span(1,e_c) for the L080 row-0 kernel and the rational member of (b)).
 (d) The same for dimension 7 over each exact 6-dim space: E_0(M) = M (+) C d always so far; exact check that P_2(d) != 0
 proves that M lies in no 7-dim 4x5 level space.
 

@@ -4,7 +4,7 @@ from scipy.optimize import least_squares
 # vectors (index): y_a..y_d = 0..3, p = 4, w = 5, g_a..g_d = 6..9   (rows a,b,c,d,e = 0..4)
 SG=np.array(list(itertools.product([1,-1],repeat=4))); SG=np.concatenate([np.ones((16,1)),SG],axis=1); SP=SG.prod(axis=1)
 def perm5(X):                      # Glynn, X (N,5,5)
-    S=np.einsum('di,nij->ndj',SG,X); return (S.prod(axis=2)*SP).sum(axis=1)/16.0
+    N=X.shape[0]; S=(SG@X.transpose(1,0,2).reshape(5,N*5)).reshape(16,N,5); return (S.prod(axis=2)*SP[:,None]).sum(axis=0)/16.0
 MODE=sys.argv[2]; NEX=2 if MODE=='B' else 0; D=7+NEX
 NV=10; NU=NV*5+NEX*25
 def basis(z):

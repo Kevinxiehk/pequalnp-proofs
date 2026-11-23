@@ -1,0 +1,35 @@
+## RESULT ROUND 5 (verifyfl, 19:14-20:54; details in section DI5-R5; compute requests in COMPUTE-verifyfl.md)
+
+ (SL_m) IS NOT PROVED IN ANY FULL STRATUM.  It is reduced, for |supp m| = 3 and m non-isotropic, to four explicit residual kinds.
+ All items G1-G6 are rigorous hand proofs (R = rigorous); numerics are flagged (N).
+ G1 (R) Lemma C' (R5.1): column form with defect; which blueprint lemmas survive: for a NEUTRAL column n (m_n = 0) Lemma N, (B1), (B3),
+        (B-i), (B-ii) hold verbatim for that column; for columns of P one has the pencil <z_j,z_j> = vartheta m_j on the doubly centred
+        part N and b_j^*g = s^*g + 4 m_j vartheta; (B-i) fails (q = 3 does not force N = 0); Lemma A and S6-S8 must be redone.
+ G2 (R) Lemma 3C (R5.2), ANY m with |supp m| = 3: a column-centred space with defect in C m all of whose matrices vanish on the two
+        neutral columns has dim <= 3.  (Proof: a diagonalising change of columns turns the three quadratic conditions into
+        <Y'_j,Y'_j> = vartheta'' m_j^2; rank analysis; the rank-1 case dies on the mu t^2 terms of tau(y_a y_b y_c).)
+ G3 (R) Lemma NP (R5.3): N_P := doubly centred part supported on P.  m non-isotropic: dim N_P <= 2, and dim 2 only for TYPE I'
+        chi_1 (x) W_P or the NEW TYPE V  chi_1 (x) c^+ (+) chi_3 (x) c^-  (c^+- the two roots of m_a l_b l_c + m_b l_a l_c + m_c l_a l_b on
+        zero-sum l) - an exact family of doubly centred (2,1) spaces for EVERY non-isotropic 3-support m.  m isotropic: dim N_P <= 3;
+        U_2 (x) (1/m), U_2 = {(x,y,-x,-y)}, is an exact doubly centred (2,1) space.
+ G4 (R) Lemma T (R5.4): if chi_1 l^T is in K (l zero-sum on P, no zero entry, l not proportional to 1/m) then on ALL of K the neutral
+        columns are y_n = k chi_2 + rho_n chi_3, y_n' = -k chi_2 + rho_n' chi_3 with rho_n rho_n' == 0.   (t-top-degree coefficients of
+        the cubic and quartic conditions; four coefficient identities, checked numerically.)
+ G5 (R) Prop I' (any m): K containing chi_1 (x) W_P has dim <= 3.   Prop V (m non-isotropic): if N_P is of type V then K is 3-column,
+        dim <= 3.   (R5.5)
+ G6 (R) THEOREM SL3-RED (R5.6): |supp m| = 3, m non-isotropic, dim K = 4  ==>  dim N_P <= 1 and K is of kind
+          (R1) type (3,1), N = C Z_* supported on P with vartheta(Z_*) != 0;
+          (R2) type (3,1), m proportional to (1,1,-2,0,0) and N = C v (e_a - e_b)^T on the two equal columns;
+          (R3) type (2,2), S = u^perp (u isotropic), a neutral column active on N;
+          (R4) type (1,3), both neutral columns active on N, dim N_P = 1.
+        Excluded: type (0,4); every K with dim N_P = 2; type (3,1) with vartheta(Z_*) = 0 unless (R2).
+        (R3) is the analogue of blueprint S7/S8 and is where the two-column counterexamples live ((N): a climb for m = (1,-1,0,0,0)
+        reaches a column-centred (4,1) space of type (2,2)); so it is the place where "not two-column" must enter.
+ G7 (R) |supp m| >= 4 with four distinct nonzero entries, type (3,1): the pencil forces vartheta(Z_*) = 0, Theta(.,Z_*) = <phi,s(.)> with
+        phi isotropic, phi != 0 (R5.7).  Nothing else proved for |supp m| = 4, 5 or for isotropic m (status list in R5.7).
+ (N) Sanity/landscape: 3-column spaces of dim 3 abundant, dim 4 never (0/100); 3-dim column-centred spaces with defect are plentiful
+     and of type (3,0) (R5.8); for m = (1,1,-2,0,0) climbs from v (e_a - e_b)^T stop at dim <= 3.
+ COMPUTE-verifyfl.md (for the 24-core machine): A isotropic planes N maximal (exact, small, decides the principal isotropic (5,1));
+     B the N-problem for |P| = 4, 5 (exact); C calibrated Gr(4,15); D direct (5,1); E extension varieties of explicit planes; F typed
+     searches for (R1)-(R4).
+

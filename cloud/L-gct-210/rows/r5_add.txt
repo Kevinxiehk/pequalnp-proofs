@@ -1,0 +1,45 @@
+## Section R5 (round 5; started 19:14)
+ Notation as in R4. For a 4 x 5 matrix Y: c(Y) in C^5 column sums, s(Y) in C^4 row sums. For L' with neutral column n: Y = (q | x), Q = {q}
+ (level 4 x 4), rho(q), kappa(q) = row / column sums of q, X_n = {x : (0|x) in L'}, e^col(Q) = dim span{M(q) - 24*1} (row deletions of Q),
+ e^row(Q) = dim span{R(q) - 24*1} (column deletions).  Q_dc := doubly centred part of Q (rho = kappa = 0); L'_dc likewise for L'.
+ R5.1 THE EXACT 4 x 4 STATEMENT BEHIND (NC') (rigorous reformulation).  Put Adj(q)_ij := perm_3((J+q) minus row i, column j) (4 x 4;
+   Adj(0) = 6J; M(q) = Adj(q) 1; R(q) = Adj(q)^T 1; 1^T Adj(q) 1 = 96 on a level Q).  With W_0 := {w in C^4 (columns != n) : w perp 1,
+   w perp C(L')} (so W = W_0 + C(1 - 5e_n), dim W_0 = 3 - e) the lift is  L = {(q | x ; w_0)} + C e_r(1 - 5e_n)^T  and
+        perm(J - E + [[q, x],[w_0, 0]]) = 120 + (1+x)^T Adj(q) w_0,      E := e_r(1 - 5e_n)^T.
+   Hence: (L' level with neutral column n and W_0 perp C(L'))  <=>  Q level and  xh^T (Adj(q) - Adj(0)) wh = 0  for all (q|x) in L' and
+   all xh in {1 + x} + ..., wh in C1 + W_0; in the UNTWISTED case (L' = (Q|0) + (0|X)) this reads: for Xh := C1 + X, Wh := C1 + W_0,
+        (TRI)   Xh^T (Adj(q) - 6J) Wh = 0 for all q in Q     and the claim (NC') is     dim Q + dim Xh + dim Wh <= 8.
+   Extreme cases: Q = 0 (trivial, 0 + 4 + 4) and Xh = Wh = C1 (then (TRI) is empty and the claim is the checked L_gct_214, 6 + 1 + 1).
+   So (NC') is an interpolation between a triviality and L_gct_214; first order of (TRI): Xh^T q Wh = 0 (R4.15 (F1^T)).
+ R5.2 THEOREM DC (rigorous, elementary).  (a) For every 4 x 5 level space:  dim L' = rank c + rank s + dim L'_dc,  rank c <= e (c(L') lies
+   in C because p_1 = -6c), rank s <= 3.  So  dim L' <= e + 3 + dim L'_dc - (e - rank c) - (3 - rank s):  (DI_5) can only fail through
+   DOUBLY CENTRED elements, and (DI_5) <=> "dim L'_dc <= (e - rank c) + (3 - rank s) for every 4 x 5 level space".
+   (b) THEOREM NC'-DC. If column n is neutral:  dim L' = dim Q + dim X_n,  dim Q = rank rho + rank kappa + dim Q_dc,  rank rho <= e^col(Q)
+   (M^(1) = -6 rho),  dim X_n <= 3 - e^col(Q) (R4.10),  rank kappa <= e (kappa(q) = c(Y) on the columns != n).  Hence the IDENTITY
+        dim L' = e + 3 + delta - s1 - s2 - s3,   delta := dim Q_dc,  s1 := e^col(Q) - rank rho,  s2 := 3 - e^col(Q) - dim X_n,  s3 := e - rank kappa
+   (all s_i >= 0), and (NC'_e) <=> (DC-COST): delta <= s1 + s2 + s3.  Consequences: (i) (NC') holds whenever Q has no nonzero doubly
+   centred element; (ii) with the checked L_gct_216 (delta <= 3): every 4 x 5 level space with a neutral column has dim <= e + 6
+   [and <= 7 by L_gct_215]; (iii) an (e+4,e) space with a neutral column contains Y = (q|x) with q != 0 doubly centred.
+   Census (rows/slack_chk.py, all 101 (space, neutral column) pairs of extremal spaces): the identity holds in every case; delta = 0 and
+   s1 = s2 = s3 = 0 in 94; delta = 1 or 2 in 7, paid by s3 (rank kappa < e: 6 cases) or s1 (1 case); s2 = 0 always (saturation
+   dim X_n = 3 - e^col(Q)).  So doubly centred elements DO occur in extremal towers, always paid exactly.
+   What the three checked 4 x 4 theorems give: dim Q <= min(6, 5 + rank rho, 5 + rank kappa, 3 + rank rho + rank kappa) (214, 217, 217^T, 216);
+   this proves (NC'_3) only for dim X_n = 0 and does not reach (DC-COST): (DC-COST) with X_n = 0 = W_0 IS L_gct_214.
+ R5.3 (7,3) FROM (NCOL_3) AND A 4 x 4 STATEMENT (rigorous).  (DI_4x4): a 4 x 4 level space has dim Q <= e^col(Q) + 3.
+   (a) (DI_4x4) is (DI_5) for 4 x 5 spaces with a ZERO column: (Q^T | 0) is level with defect dimension e^col(Q) (R4.10(c) computation).
+   (b) (NCOL_3) + (DI_4x4) => no (7,3) space.  Proof: by C-UP a (7,3) space has a neutral column n; dim Q + dim X_n = 7 with
+       dim X_n <= 3 - e^col(Q) gives dim Q >= e^col(Q) + 4.  QED.   [Equivalently: (7,3) follows from (NCOL_3) and the exclusion of (5,1),
+       (6,2) for spaces with a zero column; for (6,2) and (5,1) themselves the same count gives only equality cases, see (DC-COST).]
+   (c) (DI_4x4) needs: no (dim, e^col) = (5,1), (6,2).  (5,1) with a TWO-COLUMN defect line is excluded by TC5 (padding).  Since
+       rank rho <= e^col, a (5,1) space has a row-centred part of dim >= 4 with row-deletion vectors in 24*1 + C mu.
+   Numerical (rows/q44_search.py, calibrated; 4 x 4 via padding): (4,1) 9/17, (5,1) 0/14; (5,2) 2/10, (6,2) 0/15; ANY 6-dim 4 x 4 level
+   space: 0/15 (the checked bound 6 may not be sharp; all Q of the census have dim <= 5).  Row-centred: (3,1) 14/16; (4,1) 1/34, and
+   the one hit has the two-column defect line e_0 - e_1 (as in the 4 x 5 case, where verifyfl's (SL_m) fails exactly for two-column m).
+ R5.4 TOWERS GO ON (numerical, rows/tower_chk.py): in all 118 (extremal space, neutral column) pairs the 4 x 4 space Q has again a
+   deletable row or column (3 x 4 or 4 x 3 rest level): every known 7-dim level space is a tower 5x5 -> 4x5 -> 4x4 -> 3x4/4x3.
+   PRINCIPAL CENSUS (rows/kc_chk.py): in 90 of 95 extremal spaces rank c = e and K = ker c is a 3-dim STRONGLY LEVEL space with
+   s(K) = 1^perp (verifyfl's "principal" kind, for every e); exceptions: one column-centred (4,1) with two-column line, one (5,2)
+   with e(K) = 1, three (6,3) with rank c < 3 (K of dim 4, 5).  In the principal case L'_dc = 0.
+ R5.5 (NCOL_3), block pattern (3,2) (numerical, rows/fixC_search.py ... b32): defect space fixed = V_{012} + V_{34}: dim 5 found 2/9,
+   dim 6: 0/30 (control with a neutral column: 4/19).  With R4.13 (generic C0: 0/46) and (FS-DEC): no sign of a (6,3) space
+   without neutral column.

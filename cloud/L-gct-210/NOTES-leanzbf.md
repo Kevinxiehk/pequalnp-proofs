@@ -1,10 +1,12 @@
 # NOTES-leanzbf (role: leanzbf; start 16:38, budget 2 h -> ends ~18:38)
-## ROUND 2 RESULT (final, 19:35) -- file lean/zbf/Zbf10.lean (5177 lines, 253 KB) = Zbf.lean (round 1) + round-2 sections
+## ROUND 2 RESULT (final, 19:42) -- file lean/zbf/Zbf11.lean (5227 lines, 256 KB) = Zbf.lean (round 1) + round-2 sections
 leancheck: lean exit code 0; axioms [propext, Classical.choice, Quot.sound]; format quotes/hash/import/banned/comments all 0.
 Checker sanity test (19:32): the same file with one deliberately false lemma appended gives exactly ONE error (that lemma) and
 exit code 1 (lean/zbf/sanity.log) -- so "exit 0" really means every declaration of the file was checked.
-Snapshots of every compiling state: Zbf2_v1..v5_ok, Zbf3_v1..v3_ok, Zbf4_v1_ok, ..., Zbf10_v1_ok (.lean, same folder; Zbf10 = current).
-Combined file with the Frame210 kit: lean/zbf/FrameZbf2.lean (6554 lines, 320 KB; log frame2.log; see STATUS 19:36 for its result).
+Snapshots of every compiling state: Zbf2_v1..v5_ok, Zbf3_v1..v3_ok, Zbf4_v1_ok, ..., Zbf11_v1_ok (.lean, same folder; Zbf11 = current).
+Combined file with the Frame210 kit: lean/zbf/FrameZbf2.lean (6604 lines, 323 KB; log frame2.log): COMPILES (exit 0, axioms ok,
+format 0) = Frame210 kit (MethodCeiling, Helpers.Minc, Helpers.RankOne, Kit086, F210) + the whole ZBF210 namespace of Zbf11 +
+bridge ZBF210.lev_iff_F210 + the final theorem. (The round-1 files Zbf.lean / FrameZbf.lean are unchanged.)
 No sorry, no axiom, NO REMAINING EXPLICIT-HYPOTHESIS HOLE in targets (1)-(4). EVERYTHING BELOW IS COMPILED unless marked NOT DONE.
  target                         | status   | Lean name(s)                         | remarks
  (1) Theorem N3'                | COMPILED | n3prime                              | unconditional. b 3x3, pm b != 0, pm (b + eta) = pm b on V0 => finrank V0 <= 3.
@@ -26,8 +28,11 @@ No sorry, no axiom, NO REMAINING EXPLICIT-HYPOTHESIS HOLE in targets (1)-(4). EV
                                 |          | rows_disjoint_bound, dS_*, stage3_G2 |
  (5) Theorem G                  | PARTLY   | pm_mask_sum, pm_mask_zero,           | COMPILED: the generalised Laplace identity (sum over row sets A of
                                 |          | pm_mask_factor, thG_term, thG_masked | size m and column sets of products of complementary minors of two
-                                |          |                                      | elements of L^ = n! C(n,m) c1^(n-m) c2^m). NOT DONE: the rho_k
-                                |          |                                      | inequalities (dim K_2 >= 5).
+                                |          | perp_bound, rank_one_bound           | elements of L^ = n! C(n,m) c1^(n-m) c2^m), and the linear-algebra
+                                |          |                                      | core of the inequality (A, B in C^N with dot pairing a.b = f(a) g(b)
+                                |          |                                      | on A x B  =>  dim A + dim B <= N + 1). NOT DONE: assembling these
+                                |          |                                      | into rho_k + rho_(5-k) <= C(5,k)^2 + 1 (index bookkeeping over
+                                |          |                                      | pairs (A,T)) and dim K_2 >= 5.
 NOT DONE inside (3) (none of it is needed for the classification statement): (i) condition (c) of C7' (sigma != 0 for two columns
  at the same point), hence "sigma_0 != 0" in Type I; (ii) the normalisations c = 1/(K_1 - K_2), sigma_0 = -K_2 (1 + c) and the final
  tau-relations on L of NOTES-stage2 section 3 (they follow from sum kappa = sum kappa' = 1 and sum nu + sum nu' = 0, all available
@@ -75,7 +80,9 @@ NO PAPER STEP FAILED in round 2. Remarks for the authors of the paper proofs:
                                    zero-free kappa, omega, and rho, rho' non-constant;   c7_rows_ind : same with (row ranks >= 4 and
                                    "(nu,nu') is not a multiple of (kappa,-kappa')") instead of non-constancy
  c7_final hL r r' hr hmin ha ha' : the statement about L only (existence of the data + classification when kappa, kappa' zero-free)
- Final placeholder theorem PEqualNP.Outside.L_gct_210_zbf (Zbf10.lean): R0 + Lemma C (rows, columns) + N3' + C4.
+ dotD, perp_bound A B h          : A, B in C^N with sum_m b m * a m = 0 on A x B -> finrank A + finrank B <= N
+ rank_one_bound A B f g h        : sum_m b m * a m = f a * g b on A x B (f linear) -> finrank A + finrank B <= N + 1   (core of ThG)
+ Final placeholder theorem PEqualNP.Outside.L_gct_210_zbf (Zbf11.lean): R0 + Lemma C (rows, columns) + N3' + C4.
 
 ## RESULT (final, 17:40) -- ONE FILE, EVERYTHING BELOW IS COMPILED (no sketch, no hole, no failure)
 File: /home/claude/work/L-gct-210/lean/zbf/Zbf.lean  (2015 lines, 97 KB; backups Zbf_v1..v9_ok.lean, v9 = current; log last.log)
@@ -275,3 +282,11 @@ STATUS 19:36 (round 2): Zbf10.lean compiles (5177 lines, 253 KB; snapshots Zbf7.
  FrameZbf2.lean (Frame210 kit + current ZBF210 namespace + bridge lev_iff_F210 + final theorem) assembled; compile result below.
 STATUS 19:36 (cont.): FrameZbf2.lean COMPILES (exit 0, axioms ok, format 0; 6554 lines, 320 KB; log lean/zbf/frame2.log): the P_k tools of
  Frame210 (namespaces MethodCeiling, Helpers.Minc, Helpers.RankOne, Kit086, F210) and all ZBF210 results of rounds 1-2 coexist in one file.
+STATUS 19:42 (round 2, FINAL): Zbf11.lean (5227 lines, 256 KB) and FrameZbf2.lean (6604 lines, 323 KB) both compile: exit 0, axioms
+ [propext, Classical.choice, Quot.sound], format counts 0. Added since 19:36: dotD, perp_bound, rank_one_bound (linear-algebra core of the
+ ThG inequality). Round-2 targets: (1) N3' + N3'-L COMPILED; (2) C4 COMPILED; (3) C7/C7'' COMPILED (c7_final); (4) (P),(G1),(G2) COMPILED;
+ (5) ThG identity + rank-one bound COMPILED, the rho_k / K_2 inequalities NOT assembled. No paper step failed.
+ Best next steps for a continuation: (a) ThG: define A_k(u) on the index type {(A,T)} and combine thG_masked + pm_mask_factor +
+ rank_one_bound (generalise rank_one_bound from Fin N to a Fintype index); (b) Type I / II normal forms of stage2 section 3 from c7_final
+ (sum kappa = sum kappa' = 1, sum nu + sum nu' = 0 are available as conjuncts); (c) T0 / T1 / T2 of stage2 (triples) on top of zbf_prod for
+ 3x2 blocks and n3prime_L_full; (d) column versions of c4 / c7 by transposition (lev_tr, as done for lemmaC_col_gen).

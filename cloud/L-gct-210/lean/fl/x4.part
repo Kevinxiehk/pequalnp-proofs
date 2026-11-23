@@ -1,0 +1,160 @@
+
+def ev (i : Fin 4) (x : ℂ) : V4 := fun k => if k = i then x else 1
+
+theorem pc_ev (i : Fin 4) (x1 x2 x3 x4 : ℂ) :
+    pc (ev i x1) (ev i x2) (ev i x3) (ev i x4) = 6 * (x1 + x2 + x3 + x4) := by
+  fin_cases i <;>
+    simp (config := {decide := true}) only [pc, ev, Fin.sum_univ_four, ite_true, ite_false,
+      add_zero, zero_add] <;>
+    ring
+
+theorem P4_repl_ones (b : Fin 5) (i : Fin 4) (m : Fin 5 → ℂ) :
+    P4 b (repl i m (fun _ => 1)) = 6 * (m (b.succAbove 0) + m (b.succAbove 1)
+      + m (b.succAbove 2) + m (b.succAbove 3)) := by
+  rw [P4_cols]
+  exact pc_ev i _ _ _ _
+
+theorem P4_lin (b : Fin 5) (Y : M45) : ∃ A2 A3 A4 : ℂ, ∀ c : ℂ,
+    P4 b (fun p => 1 + c * Y p) = 24 + c * (6 * (tau (col Y (b.succAbove 0))
+      + tau (col Y (b.succAbove 1)) + tau (col Y (b.succAbove 2))
+      + tau (col Y (b.succAbove 3)))) + c ^ 2 * A2 + c ^ 3 * A3 + c ^ 4 * A4 := by
+  have h := fun c : ℂ => (P4_cols b (fun p => 1 + c * Y p)).trans
+    (pc_expand (col Y (b.succAbove 0)) (col Y (b.succAbove 1)) (col Y (b.succAbove 2))
+      (col Y (b.succAbove 3)) c)
+  exact ⟨_, _, _, h⟩
+
+theorem inj_succ5 : Function.Injective (fun k : Fin 5 => ((k : ℕ) : ℂ) + 1) := by
+  intro i j h
+  have h' : ((i : ℕ) : ℂ) = ((j : ℕ) : ℂ) := add_right_cancel h
+  exact Fin.ext (Nat.cast_injective h')
+
+theorem split_id (K : Submodule ℂ M45) (m : Fin 5 → ℂ) (hdef : DefLine K m)
+    (hm : ∑ a, m a = 0) (i : Fin 4)
+    (hsplit : (fun p : Fin 4 × Fin 5 => if p.1 = i then m p.2 else 0) ∈ K)
+    (Y : M45) (hYK : Y ∈ K) (b : Fin 5) :
+    (P4 b (fun p => 1 + Y p) - 24) * (m 0 * m 0 + m 1 * m 1 + m 2 * m 2 + m 3 * m 3 + m 4 * m 4)
+      = P4 b (repl i m (fun p => 1 + Y p)) * phiRow i m Y := by
+  obtain ⟨θ, hθ⟩ := hdef Y hYK
+  obtain ⟨θ1, hθ1⟩ := hdef _ (K.add_mem hYK hsplit)
+  have eN : repl i (fun j => 1 + Y (i, j)) (fun p => 1 + Y p) = fun p => 1 + Y p :=
+    repl_self i (fun p => 1 + Y p)
+  have eN1 : (fun p : Fin 4 × Fin 5 =>
+      1 + (Y + fun p : Fin 4 × Fin 5 => if p.1 = i then m p.2 else 0) p) =
+      repl i ((fun j => 1 + Y (i, j)) + m) (fun p => 1 + Y p) := by
+    funext ⟨k, j⟩
+    by_cases h : k = i
+    · rw [h, repl_at]
+      show 1 + (Y (i, j) + if i = i then m j else 0) = 1 + Y (i, j) + m j
+      rw [if_pos rfl]
+      ring
+    · rw [repl_ne i k h]
+      show 1 + (Y (k, j) + if k = i then m j else 0) = 1 + Y (k, j)
+      rw [if_neg h]
+      ring
+  have h0 : ∀ b, P4 b (repl i (fun j => 1 + Y (i, j)) (fun p => 1 + Y p)) = 24 + θ * m b := by
+    intro b
+    rw [eN]
+    exact hθ b
+  have hD : ∀ b, P4 b (repl i m (fun p => 1 + Y p)) = (θ1 - θ) * m b := by
+    intro b
+    have h1 := hθ1 b
+    rw [eN1] at h1
+    have hadd := P4_repl_add b i (fun j => 1 + Y (i, j)) m (fun p => 1 + Y p)
+    linear_combination h1 - h0 b - hadd
+  have hs := P4_sym 0 i m (fun j => 1 + Y (i, j)) (fun p => 1 + Y p)
+  rw [Fin.sum_univ_five, Fin.sum_univ_five] at hs
+  rw [h0 0, h0 1, h0 2, h0 3, h0 4, hD 0, hD 1, hD 2, hD 3, hD 4] at hs
+  rw [Fin.sum_univ_five] at hm
+  rw [hθ b, hD b, phiRow_apply]
+  linear_combination (m b) * hs + (m b * (θ1 - θ - 24)) * hm
+
+theorem split_ker (K : Submodule ℂ M45) (m : Fin 5 → ℂ) (hdef : DefLine K m)
+    (hm : ∑ a, m a = 0) (hmm : ∑ a, m a * m a ≠ 0) (i : Fin 4)
+    (hsplit : (fun p : Fin 4 × Fin 5 => if p.1 = i then m p.2 else 0) ∈ K)
+    (Y : M45) (hY : Y ∈ K) (hcs : ∀ j, ∑ k : Fin 4, Y (k, j) = 0) : phiRow i m Y = 0 := by
+  obtain ⟨b0, hb0⟩ : ∃ b, m b ≠ 0 := by
+    by_contra hc
+    apply hmm
+    have hz : ∀ b, m b = 0 := fun b => by
+      by_contra hb
+      exact hc ⟨b, hb⟩
+    simp [hz]
+  have htau : ∀ j, tau (col Y j) = 0 := by
+    intro j
+    have h := hcs j
+    rw [Fin.sum_univ_four] at h
+    exact h
+  obtain ⟨A2, A3, A4, hA⟩ := P4_lin b0 Y
+  simp only [htau] at hA
+  obtain ⟨d0, d1, d2, d3, d4, hB⟩ := P4_poly b0 (repl i m (fun _ => 1)) (repl i 0 Y)
+  have hd0 : d0 = -6 * m b0 := by
+    have h := hB 0
+    have e : (fun p : Fin 4 × Fin 5 => repl i m (fun _ => 1) p + 0 * repl i 0 Y p) =
+        repl i m (fun _ => 1) := by
+      funext p
+      ring
+    rw [e, P4_repl_ones] at h
+    have hs := Fin.sum_univ_succAbove m b0
+    rw [Fin.sum_univ_four, hm] at hs
+    linear_combination (-1 : ℂ) * h - 6 * hs
+  have hpoly : ∀ c : ℂ, c ≠ 0 →
+      -d0 * phiRow i m Y
+        + (A2 * (m 0 * m 0 + m 1 * m 1 + m 2 * m 2 + m 3 * m 3 + m 4 * m 4)
+          - d1 * phiRow i m Y) * c
+        + (A3 * (m 0 * m 0 + m 1 * m 1 + m 2 * m 2 + m 3 * m 3 + m 4 * m 4)
+          - d2 * phiRow i m Y) * c ^ 2
+        + (A4 * (m 0 * m 0 + m 1 * m 1 + m 2 * m 2 + m 3 * m 3 + m 4 * m 4)
+          - d3 * phiRow i m Y) * c ^ 3
+        + (-d4 * phiRow i m Y) * c ^ 4 = 0 := by
+    intro c hc
+    have h := split_id K m hdef hm i hsplit (c • Y) (K.smul_mem c hY) b0
+    have e1 : (fun p : Fin 4 × Fin 5 => 1 + (c • Y) p) = fun p => 1 + c * Y p := by
+      funext p
+      simp only [Pi.smul_apply, smul_eq_mul]
+    have e2 : repl i m (fun p => 1 + c * Y p) =
+        fun p => repl i m (fun _ => 1) p + c * repl i 0 Y p := by
+      funext ⟨k, j⟩
+      show repl i m (fun p => 1 + c * Y p) (k, j) =
+        repl i m (fun _ => 1) (k, j) + c * repl i 0 Y (k, j)
+      by_cases hk : k = i
+      · rw [hk, repl_at, repl_at, repl_at]
+        simp only [Pi.zero_apply]
+        ring
+      · rw [repl_ne i k hk, repl_ne i k hk, repl_ne i k hk]
+    have e3 : phiRow i m (c • Y) = c * phiRow i m Y := by
+      rw [map_smul, smul_eq_mul]
+    rw [e1, e2, e3, hA c, hB c] at h
+    apply mul_left_cancel₀ hc
+    linear_combination h
+  have hroots := roots5 (fun k : Fin 5 => ((k : ℕ) : ℂ) + 1) inj_succ5
+    (-d0 * phiRow i m Y)
+    (A2 * (m 0 * m 0 + m 1 * m 1 + m 2 * m 2 + m 3 * m 3 + m 4 * m 4) - d1 * phiRow i m Y)
+    (A3 * (m 0 * m 0 + m 1 * m 1 + m 2 * m 2 + m 3 * m 3 + m 4 * m 4) - d2 * phiRow i m Y)
+    (A4 * (m 0 * m 0 + m 1 * m 1 + m 2 * m 2 + m 3 * m 3 + m 4 * m 4) - d3 * phiRow i m Y)
+    (-d4 * phiRow i m Y) (fun k => hpoly _ (Nat.cast_add_one_ne_zero _))
+  have h0 : d0 * phiRow i m Y = 0 := by linear_combination (-1 : ℂ) * hroots.1
+  rcases mul_eq_zero.mp h0 with h | h
+  · exfalso
+    rw [hd0] at h
+    have h2 : m b0 = 0 := by linear_combination (-1 / 6 : ℂ) * h
+    exact hb0 h2
+  · exact h
+
+def csL : M45 →ₗ[ℂ] (Fin 5 → ℂ) := LinearMap.pi (fun j => colsumL j)
+
+theorem ThmSplit_kappa (K : Submodule ℂ M45) (m : Fin 5 → ℂ) (hdef : DefLine K m)
+    (hm : ∑ a, m a = 0) (hmm : ∑ a, m a * m a ≠ 0) (i : Fin 4)
+    (hsplit : (fun p : Fin 4 × Fin 5 => if p.1 = i then m p.2 else 0) ∈ K) :
+    SLev (K ⊓ LinearMap.ker csL) ∧
+      Module.finrank ℂ (K ⊓ LinearMap.ker csL : Submodule ℂ M45) ≤ 3 := by
+  have h := (ThmSplit K m hdef hm hmm i hsplit).1
+  have hle : (K ⊓ LinearMap.ker csL : Submodule ℂ M45) ≤ K ⊓ LinearMap.ker (phiRow i m) := by
+    intro Y hY
+    obtain ⟨hYK, hYc⟩ := Submodule.mem_inf.mp hY
+    have hc : csL Y = 0 := LinearMap.mem_ker.mp hYc
+    refine Submodule.mem_inf.mpr ⟨hYK, LinearMap.mem_ker.mpr ?_⟩
+    apply split_ker K m hdef hm hmm i hsplit Y hYK
+    intro j
+    exact congrFun hc j
+  have hS := SLev_mono h hle
+  exact ⟨hS, LemmaSL _ hS⟩
