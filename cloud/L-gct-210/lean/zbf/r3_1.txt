@@ -1,0 +1,203 @@
+theorem rowsZero_tr {n : ℕ} (L : Submodule ℂ (Fin n × Fin n → ℂ)) (c1 c2 : Fin n) :
+    rowsZero (L.map (trE n : (Fin n × Fin n → ℂ) →ₗ[ℂ] (Fin n × Fin n → ℂ))) c1 c2 =
+      (colsZero L c1 c2).map (trE n : (Fin n × Fin n → ℂ) →ₗ[ℂ] (Fin n × Fin n → ℂ)) := by
+  apply le_antisymm
+  · intro t' ht'
+    obtain ⟨⟨t, ht, rfl⟩, hz1, hz2⟩ := (mem_rowsZero _ c1 c2 t').mp ht'
+    refine Submodule.mem_map_of_mem ((mem_colsZero L c1 c2 t).mpr ⟨ht, fun i => ?_, fun i => ?_⟩)
+    · exact hz1 i
+    · exact hz2 i
+  · rintro _ ⟨t, ht, rfl⟩
+    obtain ⟨htL, h1, h2⟩ := (mem_colsZero L c1 c2 t).mp ht
+    exact (mem_rowsZero _ c1 c2 _).mpr
+      ⟨Submodule.mem_map_of_mem htL, fun j => h1 j, fun j => h2 j⟩
+
+theorem map_tr_row {n : ℕ} (L : Submodule ℂ (Fin n × Fin n → ℂ)) (c : Fin n) :
+    (L.map (trE n : (Fin n × Fin n → ℂ) →ₗ[ℂ] (Fin n × Fin n → ℂ))).map (rowMap c) =
+      L.map (colMap c) := by
+  have e : (rowMap c).comp (trE n : (Fin n × Fin n → ℂ) →ₗ[ℂ] (Fin n × Fin n → ℂ)) =
+      colMap c := LinearMap.ext fun t => rfl
+  rw [← Submodule.map_comp, e]
+
+theorem tr_min {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (c c' : Fin 5)
+    (hmin : Module.finrank ℂ L = Module.finrank ℂ (colsZero L c c') + 7) :
+    Module.finrank ℂ (L.map (trE 5 : (Fin 5 × Fin 5 → ℂ) →ₗ[ℂ] (Fin 5 × Fin 5 → ℂ))) =
+      Module.finrank ℂ (rowsZero
+        (L.map (trE 5 : (Fin 5 × Fin 5 → ℂ) →ₗ[ℂ] (Fin 5 × Fin 5 → ℂ))) c c') + 7 := by
+  have e1 := LinearEquiv.finrank_map_eq (trE 5) L
+  have e2 := LinearEquiv.finrank_map_eq (trE 5) (colsZero L c c')
+  have e3 : Module.finrank ℂ (rowsZero
+      (L.map (trE 5 : (Fin 5 × Fin 5 → ℂ) →ₗ[ℂ] (Fin 5 × Fin 5 → ℂ))) c c') =
+      Module.finrank ℂ ((colsZero L c c').map
+        (trE 5 : (Fin 5 × Fin 5 → ℂ) →ₗ[ℂ] (Fin 5 × Fin 5 → ℂ))) := by
+    rw [rowsZero_tr]
+  omega
+
+theorem c4_col {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L) (c : Fin 5) (p : Fin 4)
+    (hmin : Module.finrank ℂ L = Module.finrank ℂ (colsZero L c (c.succAbove p)) + 7)
+    (ha : Module.finrank ℂ (L.map (colMap c)) = 4)
+    (ha' : Module.finrank ℂ (L.map (colMap (c.succAbove p))) = 4)
+    (x : Fin 5 × Fin 5 → ℂ) (hx : x ∈ colsZero L c (c.succAbove p)) (i0 : Fin 5) (q0 : Fin 4) :
+    blk (fun b : Fin 3 => i0.succAbove (q0.succAbove b))
+      (fun a : Fin 3 => c.succAbove (p.succAbove a)) x = 0 := by
+  have haT : Module.finrank ℂ ((L.map
+      (trE 5 : (Fin 5 × Fin 5 → ℂ) →ₗ[ℂ] (Fin 5 × Fin 5 → ℂ))).map (rowMap c)) = 4 := by
+    rw [map_tr_row]
+    exact ha
+  have haT' : Module.finrank ℂ ((L.map
+      (trE 5 : (Fin 5 × Fin 5 → ℂ) →ₗ[ℂ] (Fin 5 × Fin 5 → ℂ))).map
+        (rowMap (c.succAbove p))) = 4 := by
+    rw [map_tr_row]
+    exact ha'
+  have hxT : trE 5 x ∈ rowsZero
+      (L.map (trE 5 : (Fin 5 × Fin 5 → ℂ) →ₗ[ℂ] (Fin 5 × Fin 5 → ℂ))) c (c.succAbove p) := by
+    rw [rowsZero_tr]
+    exact Submodule.mem_map_of_mem hx
+  have h := c4 (lev_tr hL) c p (tr_min c (c.succAbove p) hmin) haT haT' (trE 5 x) hxT i0 q0
+  unfold Bx at h
+  rw [blk_tr] at h
+  exact h
+
+def TypeCl (κ κ' ν ν' : Fin 5 → ℂ) (a b : Fin 5) : Prop :=
+  ν a / κ a ≠ ν b / κ b ∧ ν' a / κ' a ≠ ν' b / κ' b ∧
+    ν a / κ a + ν' a / κ' a = ν b / κ b + ν' b / κ' b ∧
+    ∀ m, (ν m / κ m = ν a / κ a ∧ ν' m / κ' m = ν' a / κ' a ∧
+        κ' m / κ m = κ' a / κ a) ∨
+      (ν m / κ m = ν b / κ b ∧ ν' m / κ' m = ν' b / κ' b ∧
+        κ' m / κ m = - (κ' a / κ a)) ∨
+      (ν m / κ m = ν a / κ a ∧ ν' m / κ' m = ν' b / κ' b ∧
+        ν a / κ a + ν' a / κ' a ≠ 0 ∧ (κ' m / κ m) ^ 2 = - (κ' a / κ a) ^ 2 ∧
+        (ν a / κ a + ν' b / κ' b) ^ 2 = - (ν a / κ a + ν' a / κ' a) ^ 2 ∧
+        κ' a / κ a * (ν a / κ a + ν' a / κ' a) +
+          κ' m / κ m * (ν a / κ a + ν' b / κ' b) = 0)
+
+def MinPairCl (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ))
+    (π π' : (Fin 5 × Fin 5 → ℂ) →ₗ[ℂ] (Fin 5 → ℂ)) : Prop :=
+  ∃ κ κ' ν ν' : Fin 5 → ℂ,
+    (∀ t ∈ L, dotL κ (π t) = 0) ∧ dotL κ 1 = 1 ∧
+    (∀ t ∈ L, dotL κ' (π' t) = 0) ∧ dotL κ' 1 = 1 ∧
+    (∀ t ∈ L, dotL ν (π t) + dotL ν' (π' t) = 0) ∧
+    dotL ν 1 + dotL ν' 1 = 0 ∧
+    ((∀ j, κ j ≠ 0) → (∀ j, κ' j ≠ 0) → ∃ a b, TypeCl κ κ' ν ν' a b)
+
+def MinPairNF (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ))
+    (π π' : (Fin 5 × Fin 5 → ℂ) →ₗ[ℂ] (Fin 5 → ℂ)) : Prop :=
+  ∃ κ κ' ν ν' : Fin 5 → ℂ,
+    (∀ t ∈ L, dotL κ (π t) = 0) ∧ dotL κ 1 = 1 ∧
+    (∀ t ∈ L, dotL κ' (π' t) = 0) ∧ dotL κ' 1 = 1 ∧
+    (∀ t ∈ L, dotL ν (π t) + dotL ν' (π' t) = 0) ∧
+    dotL ν 1 + dotL ν' 1 = 0 ∧
+    ((∀ j, κ j ≠ 0) → (∀ j, κ' j ≠ 0) → ∃ a b, TypeCl κ κ' ν ν' a b ∧
+      ∃ Qa Qb : Finset (Fin 5), (∀ m, m ∈ Qa ↔ ν' m / κ' m = ν' a / κ' a) ∧
+        (∀ m, m ∈ Qb ↔ ν m / κ m = ν b / κ b) ∧
+        ∀ t ∈ L, ∑ m ∈ Qb, π t m * κ m + ∑ m ∈ Qa, π' t m * κ' m = 0)
+
+theorem c7_final_cl {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L) (r r' : Fin 5)
+    (hr : r ≠ r')
+    (hmin : Module.finrank ℂ L = Module.finrank ℂ (rowsZero L r r') + 7)
+    (ha : 4 ≤ Module.finrank ℂ (L.map (rowMap r)))
+    (ha' : 4 ≤ Module.finrank ℂ (L.map (rowMap r'))) :
+    MinPairCl L (rowMap r) (rowMap r') :=
+  c7_final hL r r' hr hmin ha ha'
+
+theorem c7_final_col {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L) (c c' : Fin 5)
+    (hc : c ≠ c')
+    (hmin : Module.finrank ℂ L = Module.finrank ℂ (colsZero L c c') + 7)
+    (ha : 4 ≤ Module.finrank ℂ (L.map (colMap c)))
+    (ha' : 4 ≤ Module.finrank ℂ (L.map (colMap c'))) :
+    MinPairCl L (colMap c) (colMap c') := by
+  have haT : 4 ≤ Module.finrank ℂ ((L.map
+      (trE 5 : (Fin 5 × Fin 5 → ℂ) →ₗ[ℂ] (Fin 5 × Fin 5 → ℂ))).map (rowMap c)) := by
+    rw [map_tr_row]
+    exact ha
+  have haT' : 4 ≤ Module.finrank ℂ ((L.map
+      (trE 5 : (Fin 5 × Fin 5 → ℂ) →ₗ[ℂ] (Fin 5 × Fin 5 → ℂ))).map (rowMap c')) := by
+    rw [map_tr_row]
+    exact ha'
+  obtain ⟨κ, κ', ν, ν', h1, h2, h3, h4, h5, h6, h7⟩ :=
+    c7_final (lev_tr hL) c c' hc (tr_min c c' hmin) haT haT'
+  exact ⟨κ, κ', ν, ν', fun t ht => h1 (trE 5 t) (Submodule.mem_map_of_mem ht), h2,
+    fun t ht => h3 (trE 5 t) (Submodule.mem_map_of_mem ht), h4,
+    fun t ht => h5 (trE 5 t) (Submodule.mem_map_of_mem ht), h6, h7⟩
+
+theorem c7_nf (κ κ' ν ν' : Fin 5 → ℂ) (hκ0 : ∀ j, κ j ≠ 0) (hκ'0 : ∀ j, κ' j ≠ 0)
+    (a b : Fin 5) (hcl : TypeCl κ κ' ν ν' a b) (Qa Qb : Finset (Fin 5))
+    (hQa : ∀ m, m ∈ Qa ↔ ν' m / κ' m = ν' a / κ' a)
+    (hQb : ∀ m, m ∈ Qb ↔ ν m / κ m = ν b / κ b)
+    (z1 z2 : Fin 5 → ℂ) (h1 : dotL κ z1 = 0) (h2 : dotL κ' z2 = 0)
+    (h3 : dotL ν z1 + dotL ν' z2 = 0) :
+    ∑ m ∈ Qb, z1 m * κ m + ∑ m ∈ Qa, z2 m * κ' m = 0 := by
+  obtain ⟨hab, hab', hσ, hall⟩ := hcl
+  have hν : ∀ m, ν m = ν m / κ m * κ m := fun m => (div_mul_cancel₀ _ (hκ0 m)).symm
+  have hν' : ∀ m, ν' m = ν' m / κ' m * κ' m := fun m => (div_mul_cancel₀ _ (hκ'0 m)).symm
+  have hQ1 : ∑ m ∈ Qb, z1 m * κ m = ∑ m, if m ∈ Qb then z1 m * κ m else 0 := by
+    rw [Finset.sum_ite_mem, Finset.univ_inter]
+  have hQ2 : ∑ m ∈ Qa, z2 m * κ' m = ∑ m, if m ∈ Qa then z2 m * κ' m else 0 := by
+    rw [Finset.sum_ite_mem, Finset.univ_inter]
+  have e1 : ∑ m, z1 m * ν m = ν a / κ a * ∑ m, z1 m * κ m +
+      (ν b / κ b - ν a / κ a) * ∑ m ∈ Qb, z1 m * κ m := by
+    rw [hQ1, Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl fun m _ => ?_
+    rcases hall m with h | h | h
+    · rw [if_neg (fun hm => hab (h.1.symm.trans ((hQb m).mp hm))), hν m, h.1]
+      ring
+    · rw [if_pos ((hQb m).mpr h.1), hν m, h.1]
+      ring
+    · rw [if_neg (fun hm => hab (h.1.symm.trans ((hQb m).mp hm))), hν m, h.1]
+      ring
+  have e2 : ∑ m, z2 m * ν' m = ν' b / κ' b * ∑ m, z2 m * κ' m +
+      (ν' a / κ' a - ν' b / κ' b) * ∑ m ∈ Qa, z2 m * κ' m := by
+    rw [hQ2, Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl fun m _ => ?_
+    rcases hall m with h | h | h
+    · rw [if_pos ((hQa m).mpr h.2.1), hν' m, h.2.1]
+      ring
+    · rw [if_neg (fun hm => hab' (((hQa m).mp hm).symm.trans h.2.1)), hν' m, h.2.1]
+      ring
+    · rw [if_neg (fun hm => hab' (((hQa m).mp hm).symm.trans h.2.1)), hν' m, h.2.1]
+      ring
+  rw [dotL_apply] at h1 h2
+  rw [dotL_apply, dotL_apply] at h3
+  have h4 : (ν b / κ b - ν a / κ a) *
+      (∑ m ∈ Qb, z1 m * κ m + ∑ m ∈ Qa, z2 m * κ' m) = 0 := by
+    linear_combination h3 - e1 - e2 - (ν a / κ a) * h1 - (ν' b / κ' b) * h2 -
+      (∑ m ∈ Qa, z2 m * κ' m) * hσ
+  exact (mul_eq_zero.mp h4).resolve_left (sub_ne_zero.mpr hab.symm)
+
+theorem minPair_nf {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)}
+    (π π' : (Fin 5 × Fin 5 → ℂ) →ₗ[ℂ] (Fin 5 → ℂ)) (h : MinPairCl L π π') :
+    MinPairNF L π π' := by
+  classical
+  obtain ⟨κ, κ', ν, ν', h1, h2, h3, h4, h5, h6, h7⟩ := h
+  refine ⟨κ, κ', ν, ν', h1, h2, h3, h4, h5, h6, fun hκ0 hκ'0 => ?_⟩
+  obtain ⟨a, b, hcl⟩ := h7 hκ0 hκ'0
+  refine ⟨a, b, hcl, Finset.univ.filter (fun m => ν' m / κ' m = ν' a / κ' a),
+    Finset.univ.filter (fun m => ν m / κ m = ν b / κ b), fun m => ?_, fun m => ?_,
+    fun t ht => ?_⟩
+  · exact ⟨fun hm => (Finset.mem_filter.mp hm).2,
+      fun hm => Finset.mem_filter.mpr ⟨Finset.mem_univ m, hm⟩⟩
+  · exact ⟨fun hm => (Finset.mem_filter.mp hm).2,
+      fun hm => Finset.mem_filter.mpr ⟨Finset.mem_univ m, hm⟩⟩
+  · exact c7_nf κ κ' ν ν' hκ0 hκ'0 a b hcl _ _
+      (fun m => ⟨fun hm => (Finset.mem_filter.mp hm).2,
+        fun hm => Finset.mem_filter.mpr ⟨Finset.mem_univ m, hm⟩⟩)
+      (fun m => ⟨fun hm => (Finset.mem_filter.mp hm).2,
+        fun hm => Finset.mem_filter.mpr ⟨Finset.mem_univ m, hm⟩⟩)
+      (π t) (π' t) (h1 t ht) (h3 t ht) (h5 t ht)
+
+theorem c7_rows_nf {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L) (r r' : Fin 5)
+    (hr : r ≠ r')
+    (hmin : Module.finrank ℂ L = Module.finrank ℂ (rowsZero L r r') + 7)
+    (ha : 4 ≤ Module.finrank ℂ (L.map (rowMap r)))
+    (ha' : 4 ≤ Module.finrank ℂ (L.map (rowMap r'))) :
+    MinPairNF L (rowMap r) (rowMap r') :=
+  minPair_nf _ _ (c7_final_cl hL r r' hr hmin ha ha')
+
+theorem c7_cols_nf {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L) (c c' : Fin 5)
+    (hc : c ≠ c')
+    (hmin : Module.finrank ℂ L = Module.finrank ℂ (colsZero L c c') + 7)
+    (ha : 4 ≤ Module.finrank ℂ (L.map (colMap c)))
+    (ha' : 4 ≤ Module.finrank ℂ (L.map (colMap c'))) :
+    MinPairNF L (colMap c) (colMap c') :=
+  minPair_nf _ _ (c7_final_col hL c c' hc hmin ha ha')
+

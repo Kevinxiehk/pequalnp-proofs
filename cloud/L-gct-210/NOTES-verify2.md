@@ -1,4 +1,40 @@
-# NOTES-verify2 (role: verify2; round 1: 16:09-16:49; round 2: 16:49-17:31; round 3: 18:06-18:49; round 4: 18:57-19:27)
+# NOTES-verify2 (role: verify2; round 1: 16:09-16:49; round 2: 16:49-17:31; round 3: 18:06-18:49; round 4: 18:57-19:27; round 5: 19:33-20:10)
+
+## RESULT ROUND 5 (verify2, 20:05) -- spec audit (COMPUTE-ERRATA.md) + rows R4.10/R4.14/R4.15, verifyfl R4/R5, stage2 R6, stage3 sec. 26, reg2
+ PART 1: AUDIT of handoff/HANDOFF.md sec. 2, handoff/oracle.py, COMPUTE-{rows,verifyfl,stage3,reg2,stage2}.md -> /home/claude/work/L-gct-210/COMPUTE-ERRATA.md
+  Six [A] items (would give a wrong conclusion or a meaningless run):
+   A1 COMPUTE-stage3 sec. 0 says "Level spaces of dim 8 exist": false (largest known 7); two "calibrations at dim 8" cannot succeed.
+   A2 COMPUTE-stage3 (5c): the pure-plane CLAIM is false. Counterexample: P_c = P_d = P_e = span(e_1, e_2 + e_3), P_a = P_b = span(e_2 - e_3, e_4),
+      rho_a = rho_b = e_2 - e_3: all hypotheses hold, four columns used. N2-X is unaffected (it excludes P_c = P_d = P_e by (Q5J)/(P2));
+      correct three-way conclusion given.
+   A3 COMPUTE-verifyfl C/D (HANDOFF C3): the scripts under-sample (28/44/40/60/45 points vs 34/69/69/125 monomials) and the acceptance
+      list has no fresh-point test: a spurious hit would be reported as a counterexample to (SL_m) or as a (5,1) space. Test added.
+      (Empirically 19 of 19 hits for k = 3 were genuine: a risk, not an observed failure.)
+   A4 "unit ideal modulo p" is evidence, not proof (HANDOFF C4, verifyfl A/B/E, stage3 2/5, rows X1-X4).
+   A5 rows/clm.py samples N = 140 points: too few for d = 7 (210 quartic coefficients) and for 5x5 with d = 7, 8 (462, 792);
+      run_clm.py does not pass N. reg2/ext7.py: 300 points vs 329.
+   A6 "(S6') dim Omega <= 2 without a full free row" (HANDOFF branch 4, C2) is FALSE: reg2's exact family M* (confirmed by me: level
+      exactly for 3 rational members; (dim T_1, dim Omega, rank, FO2) = (11, 4, 5, 8); no full free row). Target is (S6-FO2).
+  [B]: A_m has dim 16, not 17 (verifyfl A: 13 unknowns; D: Gr(5,16)); "(NCOL_3) + (DI_4x4) => no (7,3)" needs (DI_5;2); C1 acceptance should
+   be d - e >= 4; "7-dim 4x5" decides the gap only if e <= 3; FO2 on unpolished LM output under-estimates T_1.
+  No errors: oracle.py (the conjugation is handled correctly; three spot runs), all definitions of COMPUTE-rows (re-derived incl. Walsh
+   coordinates P_2 = 8 sum x^2, P_3 = 64 perm_3(x), padding, (X2)-(X4)), COMPUTE-reg2 (19:52 version), COMPUTE-stage2 (S3 formulas re-derived).
+ PART 2: VERIFICATION (own re-derivation; no error found)
+  rows R4.10 (a)-(d) transposed defect construction + padding lemma                     VERIFIED
+  rows R4.14 Theorem NCOL-S (a), (b)                                                   VERIFIED (D^(1)(Y) m = -2S m + 4 c o m - 2(c.m) 1 recomputed)
+  rows R4.15 (F1), (F2), (FS-DEC) with the lists for e = 1, 2, 3, (F1^T)               VERIFIED
+  verifyfl R4.1 Lemma QB, R4.3 Theorem PS, R4.4 PR-RED, R4.5 THEOREM PR3               VERIFIED (all tau-values; det Q_m = -<m,m>/2; remark (i))
+  verifyfl R5.1 Lemma C', R5.2 Lemma 3C, R5.3 Lemma NP                                 VERIFIED; the blueprint fact "7 pairs" confirmed numerically
+  verifyfl R5.4 Lemma T, R5.5 Prop I', Prop V, R5.6 Theorem SL3-RED (extra)            VERIFIED (my ID8 reads -2<chi_3,u><chi_3,u'> + 2<chi_2,uu'>;
+                                                                                        it agrees with the notes' form where it is used)
+  stage2 R6-2 cross-family theorem                                                     VERIFIED (T_1 by hand for all b != 0, a not in C1; rank 5 by the
+                                                                                        block argument + numerics; the polar formula of P_2 not recomputed)
+  stage2 R6-5 (z_i = 3 => four minimal pairs), (T2), lam = 5 lemma, Lemma (z_i = 3)    VERIFIED
+  stage3 sec. 26 (round 7): (c1)-(c5), (A1), (A2), (A3) F1, (A4) F3 and F4a, (B)       VERIFIED ((A4): every input of N2-X re-derived for the pair
+                                                                                        with lam = 4; the isotropy count replaces (beta-0))
+  stage3 sec. 26 (A5) F4b structure, (C5)-(C8)                                         (C5) checked; the rest NOT verified (open families)
+  reg2 section 1 (L1-L5), 4.3 (M* level by hand + EC), RESULT C (S6-FO2 => no a_r = 2) VERIFIED; (S6') is false (see A6); the taxonomy F/NC/DR/M*
+                                                                                        is numerical (not rerun beyond the 20 files of round 4 and M*)
 
 ## RESULT ROUND 4 (verify2, 19:27) -- stage2 RESULT-R5, stage3 sec. 24 (round 6), rows R4 + FL2* consequences, reg2
  Method as before. No error found. One statement is unproved as written ((Q-r)(iii) for columns; partial proof supplied), two wordings are
@@ -372,3 +408,5 @@ STATUS 20:35: stage3 sec. 26 (round 7): counting tools (c1)-(c5); (A1); (A2) lam
  injectivity lemma, planes independent of m, (Qb), (Q5) by the hyperplane argument, (NT), (NT'), (M7)), and the isotropy count replacing
  (beta-0) (Q = (J_3 - I) (x) I_2 nondegenerate on P^3); (B) Lemma dim(U o U') >= 2 and its corollary: re-derived, no error. (A5), (C5)-(C8):
  structure statements read, (C5) checked, the rest not (open families).
+STATUS 20:05: stage2 COMPUTE spec read; reg2's M* confirmed (verify2/reg2_mstar.py, reg2_mstar_exact.py); verifyfl R5.4-R5.6 verified; errata
+ updated (A6, stage2, section F); RESULT ROUND 5 written. Lemma Z probe running (verify2/lemmaz_probe.py).

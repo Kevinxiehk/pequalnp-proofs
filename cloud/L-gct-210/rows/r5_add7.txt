@@ -1,0 +1,18 @@
+ R5.13 PROPOSITION NCOL2-P (rigorous, partial (NCOL_2); kernel spanned by single-column elements, C "square-generic").
+   Let L' be a 4 x 5 level space with dim C = 2 whose single-column elements have row sums spanning V (K = (+) X_n e_n^T as in R5.7) and
+   such that the column sums map N = L' cap ker s ONTO C (e.g. a principal (5,2) space).  Assume
+        (G)  the classes of u1 o u1, u1 o u2, u2 o u2 (entrywise products, u1, u2 a basis of C) are linearly independent modulo C.
+   Then some column n with X_n != 0 is neutral.
+   Proof. Suppose not. By R5.12, Z_u = (1/4) 1 u^T + F(u), F(u) in V (x) C, F_n(u) perp X_n. By (SC1) (R5.6), for x in X_n the row vector
+   x^T F(u) = (<x, z_j>)_j lies in C cap e_n^perp, a LINE C u^(n) (n is not neutral). As V = (+) X_n orthogonally,
+        F(u) = sum_n xi_n(u) (x) u^(n),     xi_n : C -> X_n linear.
+   Degree 2 of the defect: p_2(Z_u)_j = (3/2) u_j^2 - 2 <F_j,F_j> = (3/2) u_j^2 - 2 sum_n <xi_n(u),xi_n(u)> (u^(n)_j)^2 is a vector of C. By (G):
+        (3/4) u (x) u = sum_n nu_n(u) u^(n) (x) u^(n)   in Sym^2 C,    nu_n(u) := <xi_n(u), xi_n(u)>,   for all u in C.
+   The squares u (x) u span the 3-dim space Sym^2 C, so at least three columns are active with pairwise independent u^(n): the kernel
+   has type (1,1,1), each X_n is a line and nu_n(u) = l_n(u)^2 <x_n,x_n> is the SQUARE of a linear form.  But in the basis
+   u^(a) (x) u^(a), u^(b) (x) u^(b), u^(c) (x) u^(c) of Sym^2 C the coefficients of u (x) u are products of two INDEPENDENT linear forms
+   (for u = alpha u^(a) + beta u^(b), u^(c) = g_a u^(a) + g_b u^(b): the coefficient of u^(c) (x) u^(c) is alpha beta/(g_a g_b)).  Contradiction.  QED
+   Scope: (G) FAILS for the defect planes of the known (5,2) spaces (e.g. u o u' in C by (F2), or C = V_S), so this does not prove (NCOL_2);
+   it shows that a (5,2) space of this kernel type without neutral column needs a relation between C o C and C.  The same argument for
+   e = 1 is R5.7 (C cap e_n^perp = 0 forces F = 0).
+STATUS 20:05: R5.13 written.  Round 5 final: see RESULT ROUND 5 at the top.

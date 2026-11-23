@@ -290,3 +290,13 @@ STATUS 19:42 (round 2, FINAL): Zbf11.lean (5227 lines, 256 KB) and FrameZbf2.lea
  rank_one_bound (generalise rank_one_bound from Fin N to a Fintype index); (b) Type I / II normal forms of stage2 section 3 from c7_final
  (sum kappa = sum kappa' = 1, sum nu + sum nu' = 0 are available as conjuncts); (c) T0 / T1 / T2 of stage2 (triples) on top of zbf_prod for
  3x2 blocks and n3prime_L_full; (d) column versions of c4 / c7 by transposition (lev_tr, as done for lemmaC_col_gen).
+
+## ROUND 3 (start 19:55, budget 2 h -> ends ~21:55); files lean/zbf/R3a.lean, R3b.lean, ... (R3x = Zbf11 + new sections)
+NEW MECHANICAL RULES ADOPTED: namespace is now PEqualNP.Outside.L_gct_210_aux.ZBF (was PEqualNP.Gct.ZBF210); no line begins with add_
+ (the six `add_mem' := by` fields were joined to the preceding carrier line with `; `); final theorem last. leancheck guard line: 0 / 0.
+STATUS 20:02 (round 3): R3a.lean (= Zbf11 renamed) and R3b.lean compile (exit 0, axioms ok, format 0, guard 0/0). Target (1) DONE:
+ rowsZero_tr, map_tr_row, tr_min (transposition transport); c4_col (C4 for column pairs); TypeCl / MinPairCl / MinPairNF (Prop-valued
+ defs packaging the classification); c7_final_cl (rows), c7_final_col (columns, by transposition); c7_nf + minPair_nf (NORMAL FORM in
+ tau-coordinates: with Q_a = {m : rho'_m = rho'_a}, Q_b = {m : rho_m = rho_b}: for all t in L
+ sum_{m in Q_b} kappa_m t(r,m) + sum_{m in Q_a} kappa'_m t(r',m) = 0; in Type I, Q_b = C^c, Q_a = C: the weighted partial sums over C
+ agree; in Type II these are the cells Q_3, Q_2 of stage2 section 3); c7_rows_nf, c7_cols_nf.

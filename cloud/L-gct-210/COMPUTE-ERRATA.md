@@ -96,8 +96,9 @@ Summary of the [A] items
    Recommended: >= 2 x (monomial count) sample points (70, 140, 250 for k = 3, 4, 5), or the exact coefficient equations.
  [A4] A, B, E: "work modulo a prime p ... for several primes" gives evidence only. The decisions "UNIT IDEAL ==> no extension /
    no principal (5,1)" are valid for a computation over Q(i, sqrt 3, xi) resp. Q, or for a lifted and verified certificate.
- [C] The chain "UNIT IDEAL for all four N ==> no principal (5,1) for m = (1,w,w^2,0,0)" rests on verifyfl's Theorem PS / PR3
-   (hand proofs, being verified now; see NOTES-verify2.md round 5).
+ [C] The chain "UNIT IDEAL for all four N ==> no principal (5,1) for m = (1,w,w^2,0,0)" rests on verifyfl's Theorem PS and the proof
+   of PR3 (both verified by me in round 5: the four planes are exactly the solutions of step (4) for isotropic m), and B's system
+   (1)-(4) is a set of NECESSARY conditions for a principal (5,1) (Theorem PS (a)-(c)); so "unit ideal over Q" does decide what is claimed.
 
 ## COMPUTE-stage3.md
  Conventions (sigma_k, squarefree algebra, bilinear <,>, a_r, L_r, lam, Z_r), T_1 / FO2 block, coefficient counts (45 + 165 + 495 +
@@ -156,8 +157,9 @@ Summary of the [A] items
  [C] S4 (closed-form pair conditions, pairlib.py): not audited.
 
 ## COMPUTE-verifyfl.md, section F (added 19:45)
- Rests on verifyfl's Theorem SL3-RED (NOTES-verifyfl R5.6), which I have not verified (Lemma C', Lemma 3C, Lemma NP are verified).
- The kinds (R1)-(R4) are search targets; a hit is a counterexample to (SL_m) only after the fresh-point test of A3.
+ Rests on verifyfl's Theorem SL3-RED (NOTES-verifyfl R5.6): verified by me after the first version of this file (Lemma C', 3C, NP,
+ Lemma T, Propositions I' and V, and the four-way case analysis re-derived; the kinds (R1)-(R4) are stated correctly).
+ A hit is a counterexample to (SL_m) only after the fresh-point test of A3.
  (R2): v = chi_1 + x chi_2 - (x^2/2) chi_3 is isotropic (checked).
 
 ## Sample-size table (number of coefficients of a form of degree k in d coordinates = C(d+k−1, k))

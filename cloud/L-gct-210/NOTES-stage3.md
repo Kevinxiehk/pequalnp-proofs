@@ -1,5 +1,5 @@
 # NOTES-stage3 (role: stage3; start 14:37, budget 90 min -> ends ~16:07)
-## RESULT, ROUND 7 (stage3, 20:03; final) -- details in section 26; requests for the heavy machine in COMPUTE-stage3.md
+## RESULT, ROUND 7 (stage3, 20:02; final) -- details in section 26; requests for the heavy machine in COMPUTE-stage3.md
  Regime: 9-dim level L, all a_r = 1, all lam >= 3 ("no minimal row pair"), z = vector of the dims of the single-row parts.
  (1) z = (1,0,0,0,0) (exactly one single-row direction) is IMPOSSIBLE in the families F1 (all lam = 3), F3 (lam_ae = 4), F4a (lam_ab = 4,
      lam_cd = 3)  [rigorous hand proofs, NOT yet verified independently].
@@ -10,6 +10,8 @@
      the shape and all invariants of the F4b core exists (free column (+) cube-root-of-unity block; exact check in Z[omega]); it
      violates (iii) and has dim T_1(M_0) = 8. So F4b cannot be excluded by the level conditions of the core alone. F4b is OPEN.
  (2) two rows with 2-dim single-row parts: impossible by rows' FL2* unless both planes are degenerate (Lemma: dim(U o U') >= 2).
+     Degenerate case: Lemma DEG (all 3x3 subpermanents vanish identically on X_de when the radical is a line) and the resulting
+     small list of identities (section 26 (B')); NOT settled.
  (3) (S3-a), z_e = 2: structure sharpened (all 2-row spaces through e are trivial, lam_{rr'} = 2 + m_kl, (Q4) for the four other rows),
      and a precise reason why the missing cyclic identity cannot come from lineality along e_e Z. NOT settled.
  (4) What is left: table in section 26 (D):  F4b;  z = (2,0,0,0,0);  two entries 2 with both planes degenerate;  the z-vectors with
@@ -1317,6 +1319,26 @@ STATUS 19:20: results so far: (i) pattern m_ie = 3 is impossible by counting, th
    COROLLARY. If z_i = z_i' = 2 for two rows and <,> is nondegenerate on Z_i, then Z_i' = (Z_i + C1)^perp (Lemma S3-2 (b)), L contains
    the split pair e_i (x) Z_i (+) e_i' (x) Z_i', and FL2* gives dim L <= 10 - 2 = 8. So z-vectors with two entries 2 occur at most
    with BOTH planes degenerate (then Z_i and Z_i' share an isotropic vector orthogonal to both).
+   (B') THE DEGENERATE TWO-PLANE CASE (z_d = z_e = 2, <,> degenerate on Z_d) [rigorous partial result; the case is NOT settled].
+        Z_e = (Z_d + C1)^perp, so Z_d cap Z_e = rad(Z_d). Either (deg-1) rad(Z_d) = C n is a line (n isotropic, s(n) = 0), V_3 := Z_d + Z_e
+        is 3-dim and V_3^perp = span(1, n); or (deg-2) Z_d = Z_e is a totally isotropic plane.
+        LEMMA DEG. In case (deg-1) every x in X_de (rows a,b,c; lam_de >= 3) has X_a X_b X_c = 0 in A_3 (all ten 3x3 subpermanents vanish).
+        Proof. For x in X_de and z in Z_d the element x + e_d z^T lies in L_e, so (CA2) (a_e = 1) gives z . X_a X_b X_c = 0 in A_4; the same
+        with L_d and Z_e. So B := B_{X_a X_b X_c} (symmetric, zero diagonal) kills V_3 and has rank <= 2. If B != 0 its rank is 2,
+        B = al be^T + be al^T with al_j be_j = 0 for all j, and ker B = {al, be}^perp = V_3, so span(al, be) = span(1, n). Then 1 = x al + y be
+        with disjoint supports forces al, be to be multiples of the indicator vectors 1_A, 1_B of a partition of the columns, and
+        n = la 1_A + mu 1_B with <n,1> = la|A| + mu|B| = 0, <n,n> = la^2|A| + mu^2|B| = 0 gives la^2 |A| (1 + |A|/|B|) = 0, n = 0. QED
+        CONSEQUENCES in case (deg-1), z = (0,0,0,2,2): counting gives lam_{rd} = lam_{re} = 3 and lam_{rr'} >= 4 for r,r' in {a,b,c}; if
+        lam_ab = lam_ac = lam_bc = 4 then L_a = C t (+) e_d Z_d (+) e_e Z_e with a 2-row element t on (b,c), likewise t' on (a,c), t'' on (a,b),
+        lam_de = 3 and X_de = span(t, t', t'') if these three are independent (otherwise X_de contains a genuine 3-row element), and
+          t_b + t_c = mu n,  t'_a + t'_c = mu' n,  t''_a + t''_b = mu'' n      [column sums of X_de are orthogonal to V_3 and have sum 0];
+          t_b t_c . P_a = 0,  t'_a t'_c . P_b = 0,  t''_a t''_b . P_c = 0,  t'_a t''_b t_c + t''_a t_b t'_c = 0  in A_3   [Lemma DEG; P_a :=
+          span(t'_a, t''_a), ...];      Z_d Z_e . t_b t_c = 0 in A_4 (and for t', t'')   [(CA2) on L_a, L_b, L_c];
+          a 2-row element with t_b t_c = 0 is x (e_b - e_c) e_j^T   [(Q0): type B would make n 2-sparse, hence not isotropic].
+          sigma_2 on X_de reads  e_2(x_a) + e_2(x_b) + e_2(x_c) = 0  (e_2 = second elementary symmetric function of a row), because the
+          column sum of x is a multiple of the isotropic n; e.g. for mu = mu' = 0: t = (e_b - e_c) u^T, t' = (e_c - e_a) v^T need
+          <u,u> = s(u)^2, <v,v> = s(v)^2, <u,v> = s(u) s(v), which excludes unit vectors in two different columns.
+        OPEN: finish (deg-1) from these identities (a small exact problem), the sub-case lam_ab = 5, and (deg-2).
  (C) (S3-a), z_e = 2 -- structure sharpened, NOT settled.
    (C5) Rigidity: for r in R, pi_e(L_r) = Z, so every 2-row space through e is trivial, Y_ke = e_e Z, and X_{rr'} = Y_kl (+) e_e Z:
         lam_{rr'} = 2 + m_kl in {3,4}; the m-pattern on R is (t0), (t1) or (t2) of section 16, and (Q4) holds for R in all three.
@@ -1333,10 +1355,11 @@ STATUS 19:20: results so far: (i) pattern m_ie = 3 is impossible by counting, th
    z = 0:                 impossible (Theorem N = N1 + N2-X).
    z = (1,0,0,0,0):       F1, F3, F4a impossible ((A3), (A4));   F4b OPEN ((A5), (A5'): core shape realisable (M_0), identities (i)-(iii)).
    z = (2,0,0,0,0):       OPEN = (S3-a): missing cyclic identity / weakened plane problem ((C), section 24 (C)).
-   two entries 2:         impossible unless both planes are degenerate ((B)); the degenerate case OPEN.
+   two entries 2:         impossible unless both planes are degenerate ((B)); the degenerate case OPEN, partial result Lemma DEG ((B')).
    z = (1,1,*,*,*), (2,1,*,*,*) with one entry 2 at most: OPEN, not analysed (for two rows e, e' with z = 1 one has
                           W W' . P_k P_l = 0 for the pairs of the other three rows; the single-row vectors are pairwise orthogonal).
    Besides: rows with a_r >= 2 (reg2), the transposed statements, and the verification of sections 21, 24, 26.
 STATUS 19:25 (round 7): section 26 written: z = (1,0,0,0,0) impossible in F1, F3, F4a; FL2* corollary; structure of (S3-a); table (D).
 STATUS 19:31: COMPUTE-stage3.md written (requests for the 24-core machine).
-STATUS 20:03: F4b: (CA2) gives exactly (i)-(iii); exact level space M_0 of F4b-core shape found (violates (iii), dim T_1 = 8); F4b stays OPEN. Final report.
+STATUS 19:58: F4b: (CA2) gives exactly (i)-(iii); exact level space M_0 of F4b-core shape found (violates (iii), dim T_1 = 8); F4b stays OPEN.
+STATUS 20:02: Lemma DEG for the degenerate two-plane case added (section 26 (B')). Final report of round 7.

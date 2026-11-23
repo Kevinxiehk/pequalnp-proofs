@@ -1,6 +1,6 @@
 # NOTES-rows (role rows; start 14:17, budget 90 min -> ends ~15:47)
-## RESULT, ROUND 5 (rows; final 20:02) -- (NC') NOT proved; (NCOL_1) PROVED in the principal case (Theorem NCOL-P3), exact 4x4 statement found
- Details and proofs: section R5 (R5.1 - R5.12).  Heavy-computation requests: COMPUTE-rows.md (H1-H6, exact systems X1-X4).
+## RESULT, ROUND 5 (rows; final 20:00) -- (NC') NOT proved; (NCOL_1) PROVED in the principal case (Theorem NCOL-P3), exact 4x4 statement found
+ Details and proofs: section R5 (R5.1 - R5.13).  Heavy-computation requests: COMPUTE-rows.md (H1-H6, exact systems X1-X4).
  V1 [RIGOROUS, R5.9] THEOREM NCOL-P3: let L' be a 4 x 5 level space with defect line C m (ANY m, isotropic allowed), K in L' a 3-dim strongly
     level subspace with row sums s(K) = 1^perp living on three columns a, b, c, and Z in L' with zero row sums and c(Z) != 0. Then
     m_a m_b m_c = 0 (two columns: m_a m_b = 0). So every (4,1) space whose column-centred part ker c is such a K has a neutral column,
@@ -31,6 +31,8 @@
     the 4 x 4 base Q has again a deletable row or column.  Principal census: 90 of 95 extremal spaces have ker c = strongly level
     3-space with s = 1^perp, always on <= 3 columns, always containing a single-column element in a neutral column.
     Slack census: delta = 0 in 126 of 135 tower positions; delta > 0 in 7, always paid exactly (s3 or s1); s2 = 0 always.
+ V6 [RIGOROUS, partial, R5.13] (NCOL_2) for kernels spanned by single-column elements when C o C is independent of C modulo C
+    (hypothesis (G)); (G) fails for the known defect planes, so this is a constraint, not a proof of (NCOL_2).
  NOT PROVED: (NC'_e) (= (DC-COST)); (DI_4x4); (NCOL_1) for non-principal spaces and "K on <= 3 columns"; (NCOL_2), (NCOL_3)
     (for e >= 2 the Gram argument of V1 needs rank-one column data; only numerics and (FS-DEC)).
 ## RESULT, ROUND 4 (rows; final 19:13) -- (6,2), (7,3) and (D) NOT proved. Induction on e set up exactly; one new structural law
@@ -945,3 +947,21 @@ STATUS 19:55: R5.10, R5.11 (Theorem P51) written.
    isomorphically onto C by the column sums; an (e+4,e) space of this kind would have N of dim e+1 inside C^4 (x) C with a doubly centred
    element of rank <= e whose rows lie in C.
 STATUS 19:59: R5.12 (R-LAW) written.
+ R5.13 PROPOSITION NCOL2-P (rigorous, partial (NCOL_2); kernel spanned by single-column elements, C "square-generic").
+   Let L' be a 4 x 5 level space with dim C = 2 whose single-column elements have row sums spanning V (K = (+) X_n e_n^T as in R5.7) and
+   such that the column sums map N = L' cap ker s ONTO C (e.g. a principal (5,2) space).  Assume
+        (G)  the classes of u1 o u1, u1 o u2, u2 o u2 (entrywise products, u1, u2 a basis of C) are linearly independent modulo C.
+   Then some column n with X_n != 0 is neutral.
+   Proof. Suppose not. By R5.12, Z_u = (1/4) 1 u^T + F(u), F(u) in V (x) C, F_n(u) perp X_n. By (SC1) (R5.6), for x in X_n the row vector
+   x^T F(u) = (<x, z_j>)_j lies in C cap e_n^perp, a LINE C u^(n) (n is not neutral). As V = (+) X_n orthogonally,
+        F(u) = sum_n xi_n(u) (x) u^(n),     xi_n : C -> X_n linear.
+   Degree 2 of the defect: p_2(Z_u)_j = (3/2) u_j^2 - 2 <F_j,F_j> = (3/2) u_j^2 - 2 sum_n <xi_n(u),xi_n(u)> (u^(n)_j)^2 is a vector of C. By (G):
+        (3/4) u (x) u = sum_n nu_n(u) u^(n) (x) u^(n)   in Sym^2 C,    nu_n(u) := <xi_n(u), xi_n(u)>,   for all u in C.
+   The squares u (x) u span the 3-dim space Sym^2 C, so at least three columns are active with pairwise independent u^(n): the kernel
+   has type (1,1,1), each X_n is a line and nu_n(u) = l_n(u)^2 <x_n,x_n> is the SQUARE of a linear form.  But in the basis
+   u^(a) (x) u^(a), u^(b) (x) u^(b), u^(c) (x) u^(c) of Sym^2 C the coefficients of u (x) u are products of two INDEPENDENT linear forms
+   (for u = alpha u^(a) + beta u^(b), u^(c) = g_a u^(a) + g_b u^(b): the coefficient of u^(c) (x) u^(c) is alpha beta/(g_a g_b)).  Contradiction.  QED
+   Scope: (G) FAILS for the defect planes of the known (5,2) spaces (e.g. u o u' in C by (F2), or C = V_S), so this does not prove (NCOL_2);
+   it shows that a (5,2) space of this kernel type without neutral column needs a relation between C o C and C.  The same argument for
+   e = 1 is R5.7 (C cap e_n^perp = 0 forces F = 0).
+STATUS 20:00: R5.13 written.  Round 5 final: see RESULT ROUND 5 at the top.

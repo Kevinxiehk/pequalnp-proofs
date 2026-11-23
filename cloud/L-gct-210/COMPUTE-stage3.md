@@ -124,8 +124,12 @@ named below. Order = priority. For every numerical item a CALIBRATION is listed 
 ## 4. SEVERAL ROWS WITH SINGLE-ROW ELEMENTS (z = (1,1,*,*,*), (2,1,*,*,*), (2,2,..) with degenerate planes) -- not analysed by hand
  Direct search as in item 1 with prescribed single-row elements e_e w^T and e_d w'^T (two different rows; proved: s(w) = s(w') = 0 and
    <w,w'> = 0), 7 free matrices, dim 9; hinges all a_r = 1. Calibration at dim 8 (report which z-vectors occur among 8-dim spaces).
-   Variant "degenerate planes": e_e (x) Z and e_d (x) Z' with <,> degenerate on both 2-planes (Z = span(n, u), Z' = span(n, u'),
-   <n,n> = <n,u> = <n,u'> = 0, s = 0 on all), 5 free matrices.
+   Variant "degenerate planes": e_e (x) Z and e_d (x) Z' with <,> degenerate on both 2-planes (Z = span(n, h), Z' = span(n, h'),
+   <n,n> = <n,h> = <n,h'> = <h,h'> = 0, s = 0 on all), 5 free matrices. Proved for this variant (NOTES-stage3.md 26 (B'), Lemma DEG):
+   every element of L with rows d, e equal to 0 has all ten 3x3 subpermanents equal to 0; in the main sub-case L contains 2-row elements
+   t = e_b u^T + e_c (mu n - u)^T, t' = e_c v^T + e_a (mu' n - v)^T, t'' = e_a x^T + e_b (mu'' n - x)^T. SMALL EXACT PROBLEM: unknowns
+   n, h, h', u, v, x in C^5 and mu, mu', mu''; equations: the 7-dim space span(t, t', t'') (+) e_d (x) Z' (+) e_e (x) Z is level, and the product
+   X_a X_b X_c vanishes identically on span(t, t', t''); hinges: t, t', t'' independent with all six rows nonzero. Expected: no solution.
 
 ## 5. EXACT CONFIRMATION OF THE PLANE LEMMAS (hand proofs exist; an exact decision would remove the verification burden)
  All are statements "a quasi-projective set is empty". Suggested exact method: every plane in a Schubert chart (reduced row echelon

@@ -34,11 +34,24 @@
         runs and stop at dim 3 for (1,2,-3,0,0), (1,1,-2,0,0) in 6/6 runs.
  G7 (R) |supp m| >= 4 with four distinct nonzero entries, type (3,1): the pencil forces vartheta(Z_*) = 0, Theta(.,Z_*) = <phi,s(.)> with
         phi isotropic, phi != 0 (R5.7).  Nothing else proved for |supp m| = 4, 5 or for isotropic m (status list in R5.7).
+ G8 (C = exact computation on the 24-core machine, MODULAR so far; /home/claude/coord/local/results/VF-A/RESULT.md) Request A: for
+        m = (1,w,w^2,0,0) the ideal of one-vector extensions of each of the four explicit isotropic planes N of R4.5 (i) is the UNIT
+        ideal modulo four independent 31-bit primes (calibration with N replaced by C Zs correctly non-unit; < 0.2 s per run); the exact
+        run over Q(theta) is pending.  So, up to that char-0 caveat: no 3-dim space with defect in C m contains N, and by Theorem PS and
+        the computation in the proof of PR3 there is NO PRINCIPAL (5,1) for the isotropic line either; with PR3: no principal (5,1) for
+        ANY m with |supp m| = 3.
+ G9 (R) Uniform target (R5.10): for a defect space C of any dimension e, (SL_C) "column-centred with defect in C => dim <= 3" implies
+        dim L' <= e + 3 (the kernel of the column-sum map has dim >= dim L' - e); so the same typed exact systems attack (6,2), (7,3)
+        (false only when C contains a two-column vector).  Requested as N6 in COMPUTE-verifyfl.md.
+ CORRECTION: the ambient space A_m (column sums in C m) has dimension 16, not 17; "Gr(4,17)", "Gr(5,17)", "17-dim ambient" in the
+        sections DI5, DI5-R3, DI5-R4 should read 16 (di_ext.ambient_m always produced 16; only the labels were wrong).
  (N) Sanity/landscape: 3-column spaces of dim 3 abundant, dim 4 never (0/100); 3-dim column-centred spaces with defect are plentiful
      and of type (3,0) (R5.8); for m = (1,1,-2,0,0) climbs from v (e_a - e_b)^T stop at dim <= 3.
  COMPUTE-verifyfl.md (for the 24-core machine): A isotropic planes N maximal (exact, small, decides the principal isotropic (5,1));
      B the N-problem for |P| = 4, 5 (exact); C calibrated Gr(4,15); D direct (5,1); E extension varieties of explicit planes; F typed
-     searches for (R1)-(R4).
+     searches for (R1)-(R4); and "NEXT" (N1-N5): (SL_m) for a fixed m is EQUIVALENT to the emptiness of three small typed exact systems
+     [DC3] (no 3-dim doubly centred space), [T22] (no K of type (2,2)), [T31] (no K of type (3,1)), with all reductions and calibrations
+     spelled out (R5.10).
 
 ## RESULT ROUND 4 (verifyfl, 18:20-19:50; details in section DI5-R4)
 
@@ -1073,6 +1086,27 @@
    plane (in any position and after any row permutation).  What is left there: N on which vartheta is not identically 0, the g = 1
    spaces v (x) Lam with tau(v^3) != 0 (blueprint A1 with defect), and type IV-like configurations.
 
+ R5.10 RESULT OF REQUEST A, AND THE EXACT PROGRAMME FOR (SL_m) (20:05).
+   Request A (see G8): unit ideal at four primes for all four planes N(beta, xi), m = (1,w,w^2,0,0).  Consequence (computational, exact
+   over Q(theta) pending): no principal (5,1) for this m.  [Proof of the reduction: in a (5,1) space with a principal H, steps (1)-(3)
+   of the proof of PR3 hold for every m with |supp m| = 3; step (4) gives G = -4 beta (lam_b - w^2 lam_a)^2 - (3/8) kappa^2 = 0 on the
+   plane N', so N' is one of the two planes lam_b - w^2 lam_a = xi kappa and N = N(beta, xi) up to a row permutation; H (+) N contains
+   3-dim spaces containing N.]
+   Programme sent to the compute machine (COMPUTE-verifyfl.md, section NEXT).  dim K = 4 = q + d, so (SL_m) for a fixed m is equivalent to
+     [DC3]  no 3-dim doubly centred space with defect in C m      (types (1,3), (0,4));
+     [T22]  no K of type (2,2);        [T31]  no K of type (3,1).
+   With R5.1 the unknowns are few: doubly centred spaces live in Gr(k, 8) once the two isotropic lines of the neutral columns are chosen
+   (|supp m| = 3; 15-20 unknowns); type (3,1): Zs supported on P plus three matrices with prescribed row sums (stage (a) with two of them:
+   about 30 unknowns); type (2,2): a classified 2-dim doubly centred N plus two matrices (about 26 unknowns).  Calibrations in both
+   directions are provided by the hand results of this section (Lemma 3C, NP, Props I-ALL, II-ALL, SL3-RED) and by Lemma SL itself
+   (thetahat == 0 must give unit ideals everywhere), and by the two-column control (must be non-unit in [T22]).
+   UNIFORM TARGET FOR e = 1, 2, 3 (rigorous one-line observation, recorded for the coordinator).  If L' has defect in a subspace C of
+   dimension e (C(Y) - 24*1 in C on L'), the column-sum vectors lie in C, so ker(column sums) is a column-centred space of dim >= dim L' - e
+   with defect in C.  Hence   (SL_C): "a column-centred space with defect in C has dim <= 3"   implies dim L' <= e + 3, i.e. it excludes
+   (5,1), (6,2), (7,3) for that C.  (SL_C) fails when C contains a two-column vector e_a - e_b (two-column examples), so those C need
+   separate arguments (TC5 at e = 1).  Lemma C' and the neutral-column facts of R5.1 hold verbatim for C (vartheta becomes C-valued,
+   "neutral" = every vector of C vanishes there), and the typed systems [DC3], [T22], [T31] are the same; requested as N6.
+
 ## LOG
 STATUS 14:17: started; read BRIEF (+UPDATE, UPDATE 3), NOTES-zeros. Re-deriving reduction (i) and Lemma SL by hand first.
 STATUS 14:20: hand re-derivation of every step done once (reduction, C2/C3/C4 column forms, dim N <= 2, q=3 => N=0,
@@ -1136,3 +1170,5 @@ STATUS 19:18 (ROUND 5 started 19:14, budget 100 min -> about 20:54; target (SL_m
 STATUS 19:30: new rigorous bricks for |supp m| = 3: Lemma 3C (a column-centred space supported on the three columns of P has dim <= 3, any m), Lemma NP (DC part supported on P: dim <= 2 for non-isotropic m, types I' and V), top-degree linear constraints on the neutral columns; type (3,1) with Z_* = chi_1 l^T, e_2(l) != 0 excluded. New exact planes verified (r5_checks.py). COMPUTE-verifyfl.md written for the 24-core machine (requests A-E).
 STATUS 19:42: section DI5-R5 (R5.1-R5.8) and RESULT ROUND 5 written: Theorem SL3-RED reduces (SL_m) for non-isotropic 3-support m to the residual kinds (R1)-(R4); request F added to COMPUTE-verifyfl.md. Continuing with (R4)/(R3).
 STATUS 20:00: R5.9 added: Props I-ALL and II-ALL (blueprint type I and type II planes never lie in a 4-dim K for |supp m| = 3; coefficient identities checked numerically, r5_propII.py); numerics: typed Gr(4,14) search fails even on the two-column control (0/34), climbs from the type II plane are reliable (control 3/3).
+STATUS 20:05: result of request A folded in (G8, R5.10; modular, exact pending); ambient dimension corrected to 16; section NEXT (N1-N5: typed exact systems [DC3], [T22], [T31] deciding (SL_m) per m, with calibrations) appended to COMPUTE-verifyfl.md.
+STATUS 20:03 (round 5 final): WARNING on numerics: r5_climb_I.py shows that di_ext.ext finds NO extension of chi_1 (x) Lam_M (0/36 starts) although chi_1 e_j^T is one (a degenerate solution, presumably); so negative results of ext are reliable only where a positive control of the same kind succeeded (type II plane: control 3/3; isotropic planes N: now confirmed exactly by request A). The claim 'the planes for m = (1,2,-4,1,0) do not extend (0/64)' of R4.5 (ii) is therefore WEAK; an exact re-check is requested (COMPUTE N4). Rigorous this round: R5.1-R5.6, R5.9 (Lemma C', 3C, NP, T, Props I', V, I-ALL, II-ALL, Theorem SL3-RED), pencil remark in R5.7. Computational (modular): G8. Not achieved: (SL_m) in any full stratum; residual kinds (R1)-(R4) for |supp m| = 3 non-isotropic; nothing for (6,2), (7,3).
