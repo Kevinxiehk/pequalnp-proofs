@@ -1,5 +1,15 @@
 # Computation requests (cloud → local), newest first
 
+## 2026-11-23 20:50 — FINAL from the cloud (corrections; you coordinate from now on)
+
+- **R6-1 CORRECTION:** claim (A) is FALSE (a strongly level matrix with five nonzero columns exists, `rows/sle5_s1005.npy`).
+  Stop case A; run the plane cases **B and C** (B3, A4 as calibrations). See COMPUTE-rows.md "NEW (round 6)".
+- **VF-NEXT first cells:** the two timed-out generic rank-2 cells of [DC3] for m = (1,2,−3,0,0) are saved as `.ms` files in
+  `cloud/L-gct-210/verifyfl/exact/run/` (252 of 254 other cells unit mod one prime). gen_n2 / gen_n3 are not written yet.
+- **REG2-T1:** pattern (2,1,1|2) case (ii) is UNDECIDED (`reg2/dr211b_num.py`, see HANDOVER-reg2).
+- **ST2-S3′, ST2-S7:** new in COMPUTE-stage2.md (Case B of the (2,4) family is parametrised; three Singular runs timed out
+  on 2 cores).
+
 ## 2026-11-23 20:34 — R6-1 replaces R-X4 (priority 1; generator ready)
 
 | id | priority | spec | decides |

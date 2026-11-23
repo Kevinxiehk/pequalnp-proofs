@@ -369,3 +369,9 @@ STATUS 20:25: msolve / Singular runs (reg2/gb/): the NC family of 2.5 and the wh
      multiple of e_i' m^T: the patterns (3,1|2), (3,1|1,1) always contain the split pair, and SP8(b) applies when <m,m> != 0.
      Not yet treated exactly: (2,1,1|2) and the NC patterns (3|3), (3|2,1), (3|1,1,1), (2,1|3), (2,1|2,1), (2,1|1,1,1), (1,1,1|2,1)
      (all (2,9,7) numerically); precise task in COMPUTE-reg2.md section 7.
+STATUS 20:35 (END OF ROUND 2, stopped on the coordinator's instruction): handover written: handover/HANDOVER-reg2.md.
+ Added after section 8 was written: pattern (2,1,1|2) case (iii) EXACT (level for every mu; Omega = span(1,e_0), E_0 = M + C d_1 for every
+ mu; reg2/gb/gen_dr211.py); case (ii) (reg2/gb/gen_dr211b.py): level conditions = P_2 relations + triple product, calibration non-unit,
+ but the Omega-test over Q is NON-UNIT in chart (1,2,3), rho_2, rho_3, rho_4: UNDECIDED whether these members have a larger Omega
+ generically; their (dim T_1, dim Omega, FO2) were NOT computed (reg2/dr211b_num.py is written but not run). First pending task.
+ Small lemma not recorded above (P8 of the handover): a level 4x5 space with an identically zero column has that column neutral.

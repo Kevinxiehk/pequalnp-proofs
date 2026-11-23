@@ -1,4 +1,33 @@
-# NOTES-verify2 (role: verify2; round 1: 16:09-16:49; round 2: 16:49-17:31; round 3: 18:06-18:49; round 4: 18:57-19:27; round 5: 19:33-20:04)
+# NOTES-verify2 (role: verify2; round 1: 16:09-16:49; round 2: 16:49-17:31; round 3: 18:06-18:49; round 4: 18:57-19:27; round 5: 19:33-20:04; round 6: 20:09-20:33, stopped early)
+
+## RESULT ROUND 6 (verify2, 20:33; round STOPPED EARLY at 20:30 by change of plan) -- audit of the local runs VF-A / VF-B, spec sections, rows R5, stage2 R7
+ HANDOVER for the next team: handover/HANDOVER-verify2.md (ledger of every named result with status, pitfalls, errata state, remaining work, scripts).
+ Errata: COMPUTE-ERRATA.md, "ROUND 6 ADDENDUM" (20:26) + last block (20:32).
+ 1. LOCAL RUN VF-A (request A)                          gen.py = spec A line by line: NO ERROR. Verdict CONFIRMED and now a PROOF in char 0:
+      own generator on ALL 18 coordinate charts (unit 18/18 for A1-A4 at two primes; CAL non-unit 19/19); homogeneous basis = 18 linear
+      forms + E34^2, E32 E34, E32^2; and exact linear algebra mod p without Groebner bases (first-order rank 12 on the 16-dim A_m, binary
+      quadrics of rank 3). The solution set is projective, so emptiness mod one prime proves emptiness over Q-bar. The single generic
+      affine normalisation of gen.py WAS a gap for a proof; it is closed by these runs. Consequence (with PS, PR3, both verified in
+      round 5): no principal (5,1) space for |supp m| = 3.   Scripts: verify2/vf/{own_gen_A.py, drive_A.sh, exact_A.py}.
+ 2. LOCAL RUN VF-B (request B)                          gen.py = spec B: NO ERROR; calibration REPRODUCED (Singular + own generator
+      verify2/vf/own_gen_B.py in an exact chart gauge: unit / dim 0 vdim 24 / unit). Caveats: generic gauge is probabilistic (exact
+      replacement given in the errata); after saturation the set is only quasi-projective, so mod-p unit = EVIDENCE, not proof.
+      Main cases |P| = 4, 5: no result seen before the stop.
+ 3. COMPUTE-verifyfl NEXT                               (F1)-(F4), N6 logic VERIFIED. ERROR: "(SL_m) iff [DC3],[T22],[T31] empty" is only
+      "if"; a non-unit [DC3] needs [T13] (3-dim doubly centred + one Y with s(Y) != 0) and [DC4]. Rigour note (v) sharpened (projectivity).
+ 4. COMPUTE-stage2 S4                                   closed form (i),(ii) VERIFIED (hand + 29750 random column pairs);
+      ERRATUM: the normalisation sum nu + sum nu' = 0 is missing; data are modulo (kappa,-kappa') and scaling.
+    COMPUTE-rows X4, X5                                 VERIFIED (X5 normal form re-derived), no error.
+ 5. rows R5.6 (SC1), R5.7 NCOL-P, R5.9 NCOL-P3, R5.11 P51 (i),(ii), R5.13 NCOL2-P (+ rigorous part of R5.12)      VERIFIED
+    rows R5.2 Theorem DC (a) / NC'-DC (b)               ERROR, REPAIRED: "dim L' = rank c + rank s + dim L'_dc" is only "<=" (correct with
+      rank(s restricted to ker c)); counterexample: the level line C(e_0 u^T + (e_1 - e_2) e_0^T), sum u = 0. The "<=" consequences
+      stand; the reverse implications are not proved as stated. R5.3 (b) needs (DI_5;2).
+ 6. stage2 R7: Lemma (FO-r); cross family excluded for all a not in C1 incl. b = 0; the 25 cofactor formulas; pi_r(T_1(X)); R7-3 (a)   VERIFIED
+      (slip: "(FO-r) can only fail if e(X) >= 2" should read >= 1).
+ 7. verifyfl R5.10: reduction for request A VERIFIED; (SL_C) => dim L' <= e + 3 VERIFIED; the "equivalent to" has the flaw of item 3.
+ NOT DONE (stopped): verifyfl R5.9 (Props I-ALL, II-ALL: text read, nothing re-derived); stage3 round 7 final (Theorem Z22, Lemma DEG,
+   sec. 26 (B'), F4b core M_0, (A5), (C6)-(C8)); reg2's hand proof of 20:08 (3-dim single-row part); rest of stage2 R7; rows R5.1,
+   R5.4, R5.5, R5.8, R5.10. GB CPU used this round: about 3 minutes.
 
 ## RESULT ROUND 5 (verify2, 20:04) -- spec audit (COMPUTE-ERRATA.md) + rows R4.10/R4.14/R4.15, verifyfl R4/R5, stage2 R6, stage3 sec. 26, reg2
  PART 1: AUDIT of handoff/HANDOFF.md sec. 2, handoff/oracle.py, COMPUTE-{rows,verifyfl,stage3,reg2,stage2}.md -> /home/claude/work/L-gct-210/COMPUTE-ERRATA.md
@@ -417,7 +446,7 @@ STATUS 20:04: Lemma Z probe: 0 constrained solutions in 9 starts, control 20/20 
 # ROUND 6 (start 20:09, budget ~2 h -> ends ~22:09). (1) audit local session's exact runs /home/claude/coord/local/results/VF-A, VF-B;
 #  (2) COMPUTE-verifyfl NEXT (N1-N6, (F1)-(F4)), COMPUTE-stage2 S4, COMPUTE-rows X4/X5; (3) rows R5 (NCOL-P3, P51, SC1, DC/NC'-DC, R5.13),
 #  stage2 R7 ((FO-r), 25 cofactors, cross family), verifyfl R5.9, R5.10; (4) stage3 sec. 26 (A5), (C6)-(C8).
-STATUS 20:25: VF-A audited line by line (gen.py = spec A; W basis, A_m parametrisation, coefficient extraction, cases, normalisation). The verdict is
+STATUS 20:18: VF-A audited line by line (gen.py = spec A; W basis, A_m parametrisation, coefficient extraction, cases, normalisation). The verdict is
  now established three ways: (i) local gen.py (generic chart, 4 primes); (ii) my OWN generator (verify2/vf/own_gen_A.py: 20 variables + linear
  constraints, squarefree-algebra expansion, N removed by two zero cells) on ALL 18 coordinate charts: unit in 18/18 for A1-A4 at two primes, CAL
  non-unit in 19/19; homogeneous Groebner basis = 18 linear forms + all three quadratic monomials of the two remaining variables; (iii) exact
@@ -425,7 +454,7 @@ STATUS 20:25: VF-A audited line by line (gen.py = spec A; W basis, A_m parametri
  span all binary quadrics. Since the solution set is PROJECTIVE, emptiness mod one prime proves emptiness in characteristic 0 (a point over
  Q-bar reduces to a point mod P): request A is a THEOREM, not only evidence. VF-B: gen.py = spec B (parametrisation, (2), (3), saturation);
  calibration reproduced here with Singular (unit; dim 0 vdim 24) and with my OWN generator in an exact chart gauge (verify2/vf/own_gen_B.py).
-STATUS 20:40: COMPUTE-verifyfl NEXT audited: (F1)-(F4) correct; "(SL_m) iff [DC3],[T22],[T31] empty" is only "if" ((SL_m) does not imply [DC3]; if
+STATUS 20:23: COMPUTE-verifyfl NEXT audited: (F1)-(F4) correct; "(SL_m) iff [DC3],[T22],[T31] empty" is only "if" ((SL_m) does not imply [DC3]; if
  [DC3] is non-unit, type (1,3) = 3-dim doubly centred + one more needs its own system); RIGOUR NOTE (v) can be sharpened: for a system covering ALL
  points of a PROJECTIVE variety, unit at one prime IS a proof in char 0 (not so with saturations / open conditions). COMPUTE-rows X4, X5 consistent
  (X5 normal form re-derived: f = phi v + eta n, t = 2 m_a m_b eta/(m_a - m_b), only m_c = 0 possible). COMPUTE-stage2 S4: the closed form (i), (ii)
@@ -433,3 +462,9 @@ STATUS 20:40: COMPUTE-verifyfl NEXT audited: (F1)-(F4) correct; "(SL_m) iff [DC3
  but S4 omits the normalisation sum nu + sum nu' = 0 (and (nu,nu') is defined modulo (kappa,-kappa'), not modulo (kappa,0) and (0,kappa')).
  rows R5: (SC1), NCOL-P, NCOL-P3, P51 (i),(ii), NCOL2-P (R5.13) VERIFIED. Theorem DC (a) / NC'-DC (b): the "=" is wrong (counterexample: the level
  line C(e_0 u^T + (e_1 - e_2) e_0^T): rank c = rank s = 1, no dc part, dim 1); correct with rank(s restricted to ker c); the "<=" consequences stand.
+STATUS 20:27: stage2 R7 verified ((FO-r), cross family incl. b = 0, 25 cofactor formulas, pi_r(T_1(X)), R7-3 (a)); round-6 addendum appended to
+ COMPUTE-ERRATA.md.
+STATUS 20:33: CHANGE OF PLAN from the coordinator (work moves to the local 24-core session): round stopped at 20:30, no new computations.
+ Corrected one over-statement in the addendum (Props I-ALL / II-ALL are NOT verified by me); added the last errata block (stage2 R7-1 slip,
+ rows R5.3 (b), state at stop). Wrote handover/HANDOVER-verify2.md (ledger, pitfalls, errata state, ranked remaining work, scripts) and
+ RESULT ROUND 6 at the top of this file. Handing back.

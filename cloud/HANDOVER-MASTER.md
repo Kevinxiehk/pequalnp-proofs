@@ -103,6 +103,38 @@ Model: Kevin asked to move back to **Opus** (Fable usage nearly exhausted); run 
   are what is moving things fastest.
 - **Lean:** a complete formal proof along this route would be several megabytes, beyond the cap as the rules stand.
 
+### 2.5 Last changes, 20:30–20:45, from the helper handovers. These override anything above.
+- **rows:** claim (A) of R6-1 is FALSE. A strongly level 4×5 matrix with five nonzero columns exists
+  (`rows/sle5_s1005.npy`). R6-1 must therefore run the plane cases **B and C** (B3 and A4 remain calibrations); see
+  COMPUTE-rows.md "NEW (round 6)". The calibration A4 did not finish in 100 s on the cloud.
+- **stage3:**
+  - [exact] the free-column sub-family of F4b is impossible: unit ideal on all 81 charts, over ℚ with Singular and mod 3
+    primes with msolve, with the level-only calibration non-unit.
+  - Parallel y_a..y_d force that sub-family, so F4b is open only for non-parallel y_r.
+  - Next idea: a "four lines and a plane" lemma, tested first by a 30-unknown msolve run (HANDOVER-stage3 §3).
+- **verifyfl:**
+  - In `verifyfl/exact/`, `exactlib.py`, `gen_n1.py` and `gen_n1s.py` pass their substitution tests; `gen_n2.py` ([T31])
+    and `gen_n3.py` ([T22]) are NOT written.
+  - [modular, one prime] the cross-checks Lemma 3C and Lemma SL come out unit.
+  - [DC3] for m = (1,2,−3,0,0) is unit in 252 of 254 structured cases. The two generic rank-2 cells timed out and are saved
+    as `.ms` files in `exact/run/`, so there is no [DC3] verdict yet: run those two cells on 24 cores first.
+- **reg2:**
+  - (S6-FO2) is proved by hand (SP8) for every family with a 3-dim single-row part.
+  - [exact over ℚ] it also holds for the NC family, pattern (2,2|2) and pattern (2,1,1|2) case (iii).
+  - **UNDECIDED:** pattern (2,1,1|2) case (ii), where the exact Ω-test is non-unit in chart (1,2,3). This is task T1;
+    `reg2/dr211b_num.py` is written but not run.
+- **stage2:**
+  - Case B of the (2,4) family is now fully parametrised. This CORRECTS round 7's "Ω = span(e₀, 1) on all of Case B":
+    dim Ω is 3 or 4 on special loci, never 5 in 47 members (unproved).
+  - Three Singular runs timed out. New tasks S3′ and S7 are in COMPUTE-stage2.md; the 18 candidate arrays are in
+    `stage2/data/`.
+- **Lean, final states:**
+  - `lean/fl/FL.lean` = FL.v32: 7,451 lines, 341,940 bytes, about 4.5 min to compile here, no hypotheses.
+  - `lean/zbf/R3e.lean` (= R3e_ok): 5,914 lines, 290,918 bytes; T1, T2, T2″ and R3-1 are stated as explicit hypotheses.
+  - Both use standard axioms only and pass the format and guard checks.
+- **Still unverified** (verify2's list): verifyfl R5.9 (Props I-ALL, II-ALL); stage3 rounds 7 (final part) and 8; reg2's SP8
+  and its exact runs; rows R6; stage2 R8; the VF-B main cases.
+
 ---------------------------------------------------------------------------------------------------------------------
 ## 3. Computation queue (your machine) and specs
 - **Requests:** `cloud/REQUESTS.md` (newest first). **Answers to your questions:** `cloud/ANSWERS.md`.

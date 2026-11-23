@@ -185,7 +185,7 @@ Summary of the [A] items
  Rule already stated in HANDOFF C1 ("sample >= 2 x the number of monomials") — apply it to every script before a long run.
 
 ==========================================================================================================================
-# ROUND 6 ADDENDUM (verify2, 2026-11-23 20:35) — audit of the local session's exact runs VF-A, VF-B and of the new spec sections
+# ROUND 6 ADDENDUM (verify2, 2026-11-23 20:26) — audit of the local session's exact runs VF-A, VF-B and of the new spec sections
 Files audited: /home/claude/coord/local/results/VF-A/{gen.py, RESULT.md, A1_2147483629.ms, CAL_2147483629.gb}, VF-B/{gen.py, calpts.py,
 RESULT.md}; COMPUTE-verifyfl.md section NEXT (20:05); COMPUTE-stage2.md S4; COMPUTE-rows.md X4, X5.
 Own scripts (all in /home/claude/work/L-gct-210/verify2/vf/): own_gen_A.py, drive_A.sh, exact_A.py, firstorder_A.py, secondorder_A.py,
@@ -276,3 +276,9 @@ own_gen_B.py; outputs in vf/run and vf/runB.
  [B] (rows' notes, not the spec) Theorem DC (a) and NC'-DC (b) of NOTES-rows R5.2 state identities that are only inequalities:
    dim L' = rank c + rank(s restricted to ker c) + dim L'_dc <= rank c + rank s + dim L'_dc (example with strict inequality: the level
    line spanned by e_0 u^T + (e_1 - e_2) e_0^T). All uses in COMPUTE-rows are of the "<=" form and stand.
+
+## Two further items found in round 6 in the helpers' NOTES (not in the specs), recorded here for completeness (20:32)
+ NOTES-stage2 R7-1 (Lemma (FO-r)): "(FO-r) can only fail if e(X) >= 2" should read e(X) >= 1. The lemma and its proof are correct.
+ NOTES-rows R5.3 (b): the use of C-UP needs (DI_5;2) as a hypothesis (same point as the [B] item "(NCOL_3) + (DI_4x4) => no (7,3)").
+ STATE AT STOP (20:30, change of plan): not audited by verify2 — VF-B main cases, local results C1 / LEAN-1 / R6-1, verifyfl R5.9,
+ stage3 round 7 final (Z22, DEG, (B'), M_0), reg2's hand proof of 20:08. Full ledger: handover/HANDOVER-verify2.md.

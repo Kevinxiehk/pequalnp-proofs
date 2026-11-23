@@ -7353,6 +7353,80 @@ theorem R415_F2 (K : Submodule ℂ M45) (hK : Lev45 K) (i k : Fin 4) (hik : i �
   simp only [e] at h
   exact h
 
+theorem SLev_Lev45 {K : Submodule ℂ M45} (h : SLev K) : Lev45 K := by
+  intro Y hY
+  rw [Fin.sum_univ_five, h Y hY 0, h Y hY 1, h Y hY 2, h Y hY 3, h Y hY 4]
+  norm_num
+
+theorem DefLine_Lev45 {K : Submodule ℂ M45} {m : Fin 5 → ℂ} (h : DefLine K m)
+    (hm : ∑ a, m a = 0) : Lev45 K := by
+  intro Y hY
+  obtain ⟨θ, hθ⟩ := h Y hY
+  rw [Fin.sum_univ_five] at hm ⊢
+  rw [hθ 0, hθ 1, hθ 2, hθ 3, hθ 4]
+  linear_combination θ * hm
+
+theorem SLev_DefLine {K : Submodule ℂ M45} (h : SLev K) (m : Fin 5 → ℂ) : DefLine K m := by
+  intro Y hY
+  refine ⟨0, fun a => ?_⟩
+  rw [h Y hY a]
+  ring
+
+theorem NCOL_S_neutral (K : Submodule ℂ M45) (m : Fin 5 → ℂ) (hdef : DefLine K m)
+    (hm : ∑ a, m a = 0) (hmm : ∑ a, m a * m a ≠ 0) (i : Fin 4)
+    (hsplit : (fun p : Fin 4 × Fin 5 => if p.1 = i then m p.2 else 0) ∈ K)
+    (h4 : 4 ≤ Module.finrank ℂ K) : ∃ n, m n = 0 := by
+  by_contra hc
+  have hm0 : ∀ j, m j ≠ 0 := fun j hj => hc ⟨j, hj⟩
+  have h3 := (NCOL_S_a K m hdef hm hmm i hsplit hm0).2
+  omega
+
+def zE (z : V4) : M45 := fun p => if p.2 = 0 then z p.1 else if p.2 = 1 then -z p.1 else 0
+
+theorem zE0 (z : V4) (k : Fin 4) : zE z (k, 0) = z k := by simp [zE]
+
+theorem zE1 (z : V4) (k : Fin 4) : zE z (k, 1) = -z k := by simp [zE]
+
+theorem zE3 (z : V4) (k : Fin 4) : zE z (k, 3) = 0 := by simp [zE]
+
+theorem zE4 (z : V4) (k : Fin 4) : zE z (k, 4) = 0 := by simp [zE]
+
+theorem pc_ones : pc (fun _ : Fin 4 => (1 : ℂ)) (fun _ => 1) (fun _ => 1) (fun _ => 1) = 24 := by
+  have h1 := P4_ones 0
+  rw [P4_c0] at h1
+  have hc : ∀ j, col (fun _ : Fin 4 × Fin 5 => (1 : ℂ)) j = fun _ => 1 := fun j => rfl
+  rw [hc, hc, hc, hc] at h1
+  exact h1
+
+theorem LemmaZ1 (K : Submodule ℂ M45) (hdef : DefLine K mTC) (z : V4) (hz : zE z ∈ K) :
+    e2 z = 0 := by
+  have h := ((TC5_normal K).mp hdef (zE z) hz).2.1
+  have eu : (fun k => 1 + uY (zE z) k) = fun _ => (1 : ℂ) := by
+    funext k
+    simp only [uY, zE0, zE1]
+    ring
+  have ed : dY (zE z) = z := by
+    funext k
+    simp only [dY, zE0, zE1]
+    ring
+  have e3 : (fun k => 1 + zE z (k, 3)) = fun _ => (1 : ℂ) := by
+    funext k
+    rw [zE3, add_zero]
+  have e4 : (fun k => 1 + zE z (k, 4)) = fun _ => (1 : ℂ) := by
+    funext k
+    rw [zE4, add_zero]
+  rw [eu, ed, e3, e4, pc_ones] at h
+  have hd := TC5_dd z 0 0
+  have e0 : (fun k : Fin 4 => (1 : ℂ) + (0 : V4) k) = fun _ => 1 := by
+    funext k
+    simp
+  have hp0 : pc z z 0 0 = 0 := by
+    simp [pc]
+  have hi0 : ip ((0 : V4) + 0) (Ed z) = 0 := by
+    simp [ip]
+  rw [e0, hp0, hi0] at hd
+  linear_combination (-1 / 4 : ℂ) * h - (1 / 4 : ℂ) * hd
+
 end
 
 end PEqualNP.Outside.L_gct_210_aux.FL

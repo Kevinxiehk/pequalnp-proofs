@@ -1,4 +1,15 @@
 # NOTES-stage2 (role: stage2; start 14:38, budget 90 min -> ends ~16:08)
+## RESULT-R8 (stage2 round 8, 20:30; STOPPED EARLY after 30 min for the handover) -- details in R8-1 .. R8-4 at the end;
+## handover file: handover/HANDOVER-stage2.md.  Nothing in REG1 was closed in this round.
+ 1 [hand derivation, not machine-checked] graded form of (FO-r): (FO-r)_j <=> exists theta_j with D_{theta_j} P_k = P_{k-1}(xi^(j)) on
+   L_r for k = 1..4 (P_k = sum of k x k subpermanents); obstruction only in k = 3, 4. The structural statement of target (1) is NOT proved.
+ 2 [rigorous + validated on 47 members] Case B, sub-case (B1), of the (2,4) family is parametrised completely (maximal isotropic Y_0,
+   parameter mu) and Omega is reduced to a criterion on quadrics. CORRECTION of round 7: "Omega = span(e_0,1) in all of Case B" is FALSE
+   on special loci (dim Omega = 3 when A' = n^perp with n two-valued, hand proof; dim Omega = 4 at one explicit member).
+   Omega = C^5 never seen in genuine (B1), not proved; 3 Singular runs timed out (no verdict). Sub-case (B2) untouched.
+ 3 [rigorous] (B0a): Lemma B0-1 (all 3x3 subpermanents of the 4x4 block of x_0 vanish); the (2,4) family never has a 4-dim column
+   projection, so it does not occur in (B0a). No contradiction and no candidate.
+ 4 Not reached: z = 3 with isotropic m.
 ## RESULT-R7 (stage2 round 7, 19:50) -- details in sections R7-1 .. R7-4 at the end; heavy-computation specs in COMPUTE-stage2.md.
  REG1 is NOT proved; (2,4) is settled only numerically; z = 3 is reduced, not closed.
  (FO-r) LEMMA [rigorous; sanity on the 10 full-projection lines of the known spaces]: for a line r with 4-dim projection, the projection
@@ -1284,3 +1295,73 @@ STATUS 19:50: RESULT-R7 at the top. Runs: r6_extend.py on three files reached it
 STATUS 20:03: plan fixed. (B0) has a clean exact form: with the hook (row r, column c) free and u_0 = E_rc + B in L^,
  L^ = {u = [[c, w],[y, M]] : M = cB + alpha(w) + beta(y) + lam x_0} and  c perm_4(M) + y^T Pi(M) w = 120 c^5  (Pi = matrix of 3x3
  subpermanents of the 4x4 minor). Working on it, then on the graded form of (FO-r).
+STATUS 20:30: ROUND 8 STOPPED EARLY on the coordinator's change of plan (handover to the 24-core session). No computation is running.
+ What was reached in 30 minutes is written below (R8-1 .. R8-4); the handover is handover/HANDOVER-stage2.md.
+
+## R8-1. Graded form of (FO-r)  [hand derivation; NOT yet checked by an independent script -- first thing to machine-check]
+ X = L_r (4x5 matrices), P_k(xi) := sum of all k x k subpermanents of xi (P_0 = 1), xi^(j) := xi without column j, xi^[j] := column j of xi,
+ tau_j := 1 e_j^T, N(A) = sum_j G_j(A) = perm of the 4x5 matrix, N(J'+xi) = sum_k (5-k)! P_k(xi), G_j(J'+xi) = sum_d (4-d)! P_d(xi^(j)).
+ Level on X <=> P_1 = P_2 = P_3 = P_4 = 0 on X; (ii) <=> P_4(xi^(j)) = 0 on X for all j.
+ (a) Column Euler identity: G_j(A) = N(A) - D_{A^[j]} N(A). On X: G_j(J'+xi) = D_{J'/4 - tau_j} N(J'+xi) - D_{xi^[j]} N(J'+xi).
+     So (FO-r)_j <=> the column-scaling function xi -> D_{xi^[j]} N(J'+xi) lies in D(X) (reg2's description of Omega, same thing).
+ (b) (FO-r)_j  <=>  there is theta_j in M_{4x5} with   D_{theta_j} P_k (xi) = P_{k-1}(xi^(j))   for all xi in X and k = 1,2,3,4
+     (k = 1: sigma(theta_j) = 1).  Because D_{tau_j} P_k = (5-k) P_{k-1}(xi^(j)), this is
+          theta_j  in  (tau_j/4 + K_1) cap (tau_j/3 + K_2) cap (tau_j/2 + K_3) cap (tau_j + K_4),   K_k(X) := {t' : D_{t'} P_k = 0 on X}.
+     All K_k contain X; K_2, K_3, K_4 contain J'. Necessary: tau_j in K_3 + K_4, tau_j in K_2 + K_3, tau_j in K_2 + K_4 for every j.
+ (c) K_2 = H^{-1} X^perp with H = Hessian of P_2 = I - (row sums) - (column sums) + (total sum), eigenvalues 1, -4, -3, 12: invertible.
+     So degrees 0 and 1 never obstruct; the obstruction is in k = 3, 4: 15 + 35 linear conditions on <= 14 unknowns, for 4 columns.
+ (d) Single-column elements linearise: if zeta = c e_0^T lies in X, every cofactor C_kj(J + xi + t zeta) is affine in t (constant for j = 0),
+     so the T_1 condition splits into its t^0 and t^1 parts. Every (2,4)-type X contains such a zeta (R8-2).
+ The structural statement of target (1) is NOT proved. It also needs the transposed alternative ("3-dim single-COLUMN part"): the spaces
+ X = C_0 (+) Y of R8-2 (B2a) are level, satisfy (ii), (iii) and have a 3-dim single-column part; they were not tested.
+
+## R8-2. Case B of the (2,4) family  [parametrisation and criterion: hand proofs, validated numerically (stage2/r8_caseB.py, r8_caseB2.py);
+##       the round-7 claim "Omega = span(e_0, 1) in all of Case B" is CORRECTED: true generically, false on special loci]
+ Notation as in R7-2: xi = [s_1 e_0; s_2 e_0; p; q], p = (p_0,p'), q = (q_0,q'), a = sum p', b = sum q', s = s_1 + s_2.
+ Level <=> sigma = 0, q_1 := a u + b w = 0 (u = a+b+p_0, w = a+b+q_0), s q_2 = 0 with q_2 := a b - <p',q'> = p'^T K q', K = J - I.
+ (0) [rigorous] In every case there is a linear relation among s_1, s_2, p_0, q_0 on X, so the column-0 projection of a (2,4)-type X has
+     dim <= 3 (other columns <= 2): a (2,4)-type X never has a 4-dim column projection, so it is never the L_r of case (B0a).
+ (1) [rigorous] Omega(X) contains e_0 and 1 for every (2,4)-type X (C_00 = C_10 = 2 gamma). (0,v) in Omega <=> s_1 gamma_v in D(X),
+     gamma_v = sum_j v_j gamma_j. Case A (s = 0): Omega = C^5.
+ (2) [rigorous] Sub-case (B1) (a, b independent on X): p_0 = -a-(1+mu) b, q_0 = (mu-1) a - b, s = (1-mu) a + (1+mu) b, and
+     X = C xi_d (+) X_0, xi_d = (e_1 - e_2) e_0^T, X_0 = Y_0 := a MAXIMAL isotropic (4-dim) subspace of C^4 x C^4 for p'^T K q':
+       Y_0 = {(p',q') : p' in A', (K q')|_A' = omega(p')},  k = dim A', omega skew on A',  B := Y_0 cap {p' = 0} = K^{-1} A'^perp.
+     (iii) forces k in {1,2,3}, omega = 0 unless k = 3; k = 3 needs (1+mu) sigma_n = 0 (A' = n^perp) and, if omega != 0,
+     (mu-1) a(w*) = 0; k = 1 needs mu = 1.  Split case omega = 0: Y_0 = A' (+) B.
+ (3) [rigorous, validated] In (B1):  Omega = C e_0 (+) {(0,v) : s gamma_v in D_0},
+       D_0 = C 1 + C a + C b + (3+s) Y_0^* + span{(2 + s/2) gamma_j + h_j : j = 1..4}   (functions on Y_0),
+     and, for s != 0 on Y_0, criterion [CRIT]: (0,v) in Omega <=> there are e in C^4, x, y with
+       g_e = 0 on Y_0   and   4 E_v + s (P_e + Q_e) - 2 p_0 Q_e - 2 q_0 P_e = s (x a + y b) on Y_0,
+       g_e = sum_j e_j (2 p_j q_j - a q_j - b p_j),  E_v = 2 sum_j v_j p_j q_j + (1-mu) a (2 P_v + Q_v) + (1+mu) b (P_v + 2 Q_v),
+       P_v = <v,p'>, Q_v = <v,q'>.   (quadrics on a 4-dim space; 20 linear equations in the 10 unknowns v, e, x, y.)
+ (4) Split k = 3, mu = -1 (hand): w := 8v + 3e = x 1' + t n, and the (1,1)-part reads n_j^2 - c n_j - kappa = 0 for all j. Hence
+     dim Omega = 3 when n takes exactly two values, 2 otherwise (confirmed: n = (2,2,2,5), (2,2,5,5), (1,1,1,3), (1,1,2,2), (0,1,1,1),
+     (0,0,0,1) give 3; random n, (1,-1,2,5), (0,0,1,2), (1,2,3,-6) give 2). Mirror statement for k = 1, mu = 1.
+ (5) [numerical] 47 members built: T_1 tool, D_0 form and [CRIT] agree except (i) n = (1,1,1,1.0001) (rank tolerance, near a = 0 on A')
+     and (ii) two members with b = 0 on Y_0 and mu = 1, i.e. s = 0 (Case A, where [CRIT] does not apply; D_0 form and T_1 tool agree: 5).
+     Largest dim Omega in genuine (B1): 4, at A' = span{(1,-1,0,0),(0,0,1,2)}, omega = 0, mu = -1 (dim T_1 = 10, rows (1,1,2,3)).
+     Omega = C^5 was found in NO genuine (B1) member, but this is NOT proved.
+ (6) Exact attempt: Singular std mod 32003 of the existential ideal "[CRIT] solvable for v = e_1, e_2, e_3" (18 linear unknowns and
+     4 / 5 / 7 parameters for k = 1 / 2 / 3; generator stage2/r8_gen.py) did not finish in 100 s for any stratum: 3 runs, 3 timeouts,
+     NO verdict. Better formulation for the 24-core machine: COMPUTE-stage2.md S3'.
+ (7) NOT DONE: sub-case (B2) (a, b dependent). (B2a) a = b = 0 contains X = C_0 (+) Y, C_0 = {c e_0^T : sum c = 0} (full free column),
+     Y a 2-dim isotropic subspace of 1'^perp x 1'^perp for <p',q'>: level, (ii), (iii) hold by the formulas above; s != 0. Untested.
+
+## R8-3. (B0): the identically vanishing entry  [rigorous as far as it goes; no contradiction, no candidate]
+ r = c = 0, entry (0,0) = 0 on L, ell(u) = u_00 on L^. (B0a): L = L_0 + L^0, L_0 cap L^0 = C x_0. Then (w, y) = (row 0, column 0) are free
+ coordinates and  L^ = {[[c, w],[y, M]] : M = c B + alpha(w) + beta(y) + lam x_0},   c perm_4(M) + y^T Pi(M) w = 120 c^5,
+ Pi(M)_ij = perm_3(M without row i, column j).
+ (a) perm_4(c B + beta(y) + lam x_0) = 120 c^4 and perm_4(c B + alpha(w) + lam x_0) = 120 c^4 (ZBF with the 1x4 zero blocks).
+ (b) LEMMA B0-1: Pi(x_0) = 0, i.e. all 3x3 subpermanents of the 4x4 block of x_0 vanish (lam^2-coefficient at c = 0; Pi is quadratic in M).
+     Known solutions: at most 2 nonzero rows; at most 2 nonzero columns; A (+) A' with perm A = perm A' = 0. Classification not done.
+ (c) Sketch for x_0 supported in two rows 3,4 with invertible B_x (B_x[j,l] = perm_2 of the two rows on the complementary columns):
+     lam^1-part gives B_x (y_1 beta_2(y) + y_2 beta_1(y)) = 0, so rows 1,2 of L_0 are y_1 (1,v), y_2 (1,-v), v^T B_x v = 0, and G_j = 0
+     forces v to have at least three zeros. [hand derivation, unchecked]
+ (d) By R8-2 (0) the (2,4) family does not occur in (B0a). Whether ANY (Q-r) solution has a 4-dim column projection is open
+     (census with the column forced: COMPUTE-stage2.md S7).
+
+## R8-4. Not reached: target (4) (z = 3 with isotropic m), the combination of (FO-r) with verifyfl's (SL_m), and FO2 on (B1) pairs.
+ Runs of this round: r8_caseB.py (5 s), r8_caseB2.py (15 s), 3 Singular runs of 100 s each (all timeouts, run one after another in the
+ background while nothing else ran). First STATUS of this round was stamped 20:13 by mistake and corrected to 20:03.
+STATUS 20:33: handover written (handover/HANDOVER-stage2.md); the 18 candidate arrays copied from /tmp to stage2/data/; COMPUTE-stage2.md
+ extended by S3' and S7. Round 8 ends here. Nothing is running.

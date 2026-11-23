@@ -986,7 +986,7 @@ STATUS 20:22: target (1) by hand not finished; reduction to strongly level PLANE
    h strongly level  <=>  column sums 0 and for every j:
         sum_i e_2(rho_i^(j)) = 0,   sum_i e_3(rho_i^(j)) = 0,   6 sum_i prod_{a != j} h_ia = g_ab g_cd + g_ac g_bd + g_ad g_bc  ({a,b,c,d} = [5] - j);
    equivalently (S2_j) <s - h_j, h_j> = 0, (S3_j) sum_i h_ij e_2(rho_i^(j)) = 0, (S4_j) 6 sum_i h_ij e_3(rho_i^(j)) = sum_{a != j} g_aj^2.
-   (perm_4 of four sum-zero vectors = sum of the three pairings - 6 sum_i x_i y_i z_w w_i.)  Consequences: a principal K on three columns
+   (perm_4 of four sum-zero vectors = sum of the three pairings - 6 sum_i x_i y_i z_i w_i.)  Consequences: a principal K on three columns
    a,b,c  <=>  B_a + B_b + B_c = 1 and sum_i (h_a h_b h_c)_i = 0 on K; its columns are pairwise orthogonal.  On four columns the Gram
    matrix has g_12 = g_34, g_13 = g_24, g_14 = g_23 with sum 0 (seen in all 4-column examples) and all four triple products vanish.
    In Walsh coordinates the triple product is 4 perm_3 of the coordinate vectors.

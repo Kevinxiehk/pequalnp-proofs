@@ -129,3 +129,37 @@ replace the prefix once:  `sed -i 's#/home/claude/work/L-gct-210/stage2#NEWDIR#g
  to the extension search with D = 9. No extra script.
 
 Return for every task: counts (#starts, #verified solutions per type), the tables above, and all .npy files of ALIVE solutions.
+
+## ADDED 20:32 (round 8, at the handover) -- two new exact tasks; S3 is replaced by S3'
+
+### S3' (replaces S3). Case B, sub-case (B1), of the (2,4) family: is Omega(X) = C^5 possible?   [notation: NOTES-stage2.md R8-2]
+ Parameters: mu and a maximal isotropic Y_0 (coordinates x1..x4), three charts (columns 1..4 may be permuted, so these are complete):
+   S1: p' = x1 (1, al2, al3, al4);  q' = sum_{i=1..3} x_{i+1} (sigma(n^i) 1' - 3 n^i),  n^1 = (-al2,1,0,0), n^2 = (-al3,0,1,0), n^3 = (-al4,0,0,1)
+   S2: p' = (x1, x2, a13 x1 + a23 x2, a14 x1 + a24 x2);  q' = x3 (sigma(n^1) 1' - 3 n^1) + x4 (sigma(n^2) 1' - 3 n^2),
+       n^1 = (-a13,-a23,1,0), n^2 = (-a14,-a24,0,1)
+   S3: p' = (x1, x2, x3, -n1 x1 - n2 x2 - n3 x3);  u = (-w12 x2 - w13 x3 + x4 n1, w12 x1 - w23 x3 + x4 n2, w13 x1 + w23 x2 + x4 n3, x4),
+       q' = sigma(u) 1' - 3 u      (w = 0: split case)
+ a = sum p', b = sum q', p_0 = -a - (1+mu) b, q_0 = (mu-1) a - b, s = (1-mu) a + (1+mu) b.
+ Linear system [CRIT] in the unknowns (v, e, x, y) in C^4 x C^4 x C x C: all coefficients (in x1..x4) of
+   g_e = sum_j e_j (2 p_j q_j - a q_j - b p_j)   and of
+   4 E_v + s (P_e + Q_e) - 2 p_0 Q_e - 2 q_0 P_e - s (x a + y b),  E_v = 2 sum_j v_j p_j q_j + (1-mu) a (2 P_v + Q_v) + (1+mu) b (P_v + 2 Q_v)
+ vanish: a 20 x 10 matrix S(parameters) = [S_v | S_exy].  dim Omega = 1 + (10 - rank S) - (6 - rank S_exy).
+ QUESTION: is there a parameter point with a, b linearly independent on Y_0 and  rank S = rank S_exy  (<=> Omega = C^5)?
+ Generator of the existential form (v = e_1, e_2, e_3; 18 unknowns): stage2/r8_gen.py STRATUM PRIME 3 -> Singular script. Here: std mod 32003
+ did not finish in 100 s (S1, S2, S3). Suggested: (i) msolve on the same ideal with the Rabinowitsch variable for one 2x2 minor of the
+ coefficient matrix of (a,b) (6 minors, each must give the unit ideal); (ii) or the closed necessary condition "all 6-minors of R S vanish"
+ for a few integer 6 x 20 matrices R; (iii) impose (iii) first: S3 split needs mu = -1 (3 parameters), S1 needs mu = 1 (3 parameters).
+ CALIBRATION (must be NON-unit): the same ideal with NV = 1 (v = e_1 only) in chart S3 with w = 0, mu = -1 has the solutions
+ n = (n1, 1, 1, 1) (dim Omega = 3 there, NOTES R8-2 (4)); numerical ground truth for 47 members: stage2/r8_caseB2.py.
+ DECISION: unit in all charts and all 6 minors, >= 3 primes  =>  Case B (B1) is dead at first order (dim L <= 8 by reg2's inequality).
+           non-unit  =>  list the components; a component with a, b independent and s != 0 is a NEW first-order survivor: run FO2 on it.
+ Also wanted: the same question for sub-case (B2) (a, b dependent on X; X need not contain xi_d), which is not parametrised yet.
+
+### S7. (B0a): (Q-r) solutions with a 4-dim column projection   [NOTES-stage2.md R8-3]
+ X = span{ [e_i | beta_i] (i = 1..4), [0 | x_0] }, beta_i, x_0 4x4 (80 complex unknowns), first column = coordinates y:
+ (i) N(J' + xi) = 120 and (ii) G_j(xi) = 0 (j = 0..4) on X; normalise |x_0| = 1.  Necessary by Lemma B0-1: all 3x3 subpermanents of x_0 vanish
+ (impose it as extra equations, or stratify: x_0 with two nonzero rows / two nonzero columns / A (+) A' with perm A = perm A' = 0).
+ Numerical: LM as in stage2/r6_census.py with fresh-point verification; report row/column projection dims, Omega (stage2/r7_FOrow.py), FO2.
+ DECISION: no solution in >= 200 starts per stratum (with a planted calibration: drop the condition "column 0 is 4-dim" and recover the
+ known (2,4)/(3,3) solutions at the usual rate) => (B0a) is numerically empty; any solution with all row projections <= 3 is a new (Q-r)
+ type and must go through (FO-r), FO2, (T2).

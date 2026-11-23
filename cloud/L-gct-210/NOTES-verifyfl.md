@@ -1212,3 +1212,4 @@ STATUS 20:03 (round 5 final): WARNING on numerics: r5_climb_I.py shows that di_e
 NOTE (process, round 5): STATUS timestamps of round 5 are accurate to about +-5 minutes (some were written a few minutes ahead of the clock); round 5 closed at 20:04 with 50 minutes of budget unused, so that the exact programme (COMPUTE-verifyfl.md, NEXT) can be queued at once.
 STATUS 20:20 (ROUND 6 started 20:09): exact control K_2 found; exactlib/gen_n1/gen_n1s written and tested by substitution; msolve available.
 STATUS 20:31 (round 6 closed on instruction): verdicts recorded (RESULT ROUND 6 H3); generators and README saved under verifyfl/exact/; writing handover/HANDOVER-verifyfl.md.
+STATUS 20:33 (final): handover/HANDOVER-verifyfl.md written (results by status, STATE OF (5,1) table, open problems ranked, pitfalls, files, pending compute tasks). No computation is running.
