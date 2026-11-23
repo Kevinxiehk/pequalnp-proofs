@@ -1,0 +1,201 @@
+def colL (m : Fin 5) : M45 →ₗ[ℂ] V4 := LinearMap.funLeft ℂ ℂ (fun i : Fin 4 => (i, m))
+
+theorem colL_apply (m : Fin 5) (Y : M45) : colL m Y = col Y m := rfl
+
+def phi (m : Fin 5) : M45 →ₗ[ℂ] V4 := (2 : ℂ) • colL m - rs
+
+theorem phi_apply (m : Fin 5) (Y : M45) (i : Fin 4) : phi m Y i = 2 * Y (i, m) - rs Y i := rfl
+
+theorem mem_Vs (v : V4) : v ∈ sumZero 4 ↔ tau v = 0 := by
+  rw [mem_sumZero, tau, Fin.sum_univ_four]
+
+theorem tau_rs (K : Submodule ℂ M45) (hK : SLev K) (Y : M45) (hY : Y ∈ K) : tau (rs Y) = 0 := by
+  have h0 := C1 K hK Y hY 0
+  have h1 := C1 K hK Y hY 1
+  have h2 := C1 K hK Y hY 2
+  have h3 := C1 K hK Y hY 3
+  have h4 := C1 K hK Y hY 4
+  simp only [tau, col] at h0 h1 h2 h3 h4
+  simp only [tau, rs_apply]
+  linear_combination h0 + h1 + h2 + h3 + h4
+
+theorem map_rs_le (K : Submodule ℂ M45) (hK : SLev K) : K.map rs ≤ sumZero 4 := by
+  rintro _ ⟨Y, hY, rfl⟩
+  rw [mem_Vs]
+  exact tau_rs K hK Y hY
+
+theorem tau_phi (K : Submodule ℂ M45) (hK : SLev K) (Y : M45) (hY : Y ∈ K) (m : Fin 5) :
+    tau (phi m Y) = 0 := by
+  have h1 := C1 K hK Y hY m
+  have h2 := tau_rs K hK Y hY
+  simp only [tau, col] at h1 h2
+  simp only [tau, phi_apply]
+  linear_combination 2 * h1 - h2
+
+theorem ip_phi (K : Submodule ℂ M45) (hK : SLev K) (Y Y' : M45) (hY : Y ∈ K) (hY' : Y' ∈ K)
+    (m : Fin 5) : ip (phi m Y) (phi m Y') = ip (rs Y) (rs Y') := by
+  have e := C2pol K hK Y Y' hY hY' m
+  simp only [ip, col] at e
+  simp only [ip, phi_apply]
+  linear_combination 2 * e
+
+theorem ip_col_phi (K : Submodule ℂ M45) (hK : SLev K) (Z Y : M45) (hZ : Z ∈ K) (hY : Y ∈ K)
+    (hZ0 : rs Z = 0) (m : Fin 5) : ip (col Z m) (phi m Y) = 0 := by
+  have e := C2pol K hK Z Y hZ hY m
+  rw [hZ0] at e
+  simp only [ip, col, Pi.zero_apply] at e
+  simp only [ip, col, phi_apply]
+  linear_combination e
+
+theorem nondeg (x : V4) (hx : tau x = 0) (h : ∀ v : V4, tau v = 0 → ip x v = 0) : x = 0 := by
+  have a1 : x 0 * 1 + x 1 * (-1) + x 2 * 0 + x 3 * 0 = 0 :=
+    h ![1, -1, 0, 0] (by norm_num [tau])
+  have a2 : x 0 * 0 + x 1 * 1 + x 2 * (-1) + x 3 * 0 = 0 :=
+    h ![0, 1, -1, 0] (by norm_num [tau])
+  have a3 : x 0 * 0 + x 1 * 0 + x 2 * 1 + x 3 * (-1) = 0 :=
+    h ![0, 0, 1, -1] (by norm_num [tau])
+  unfold tau at hx
+  funext i
+  fin_cases i
+  · show x 0 = 0
+    linear_combination (1 / 4 : ℂ) * hx + (3 / 4 : ℂ) * a1 + (1 / 2 : ℂ) * a2 + (1 / 4 : ℂ) * a3
+  · show x 1 = 0
+    linear_combination (1 / 4 : ℂ) * hx - (1 / 4 : ℂ) * a1 + (1 / 2 : ℂ) * a2 + (1 / 4 : ℂ) * a3
+  · show x 2 = 0
+    linear_combination (1 / 4 : ℂ) * hx - (1 / 4 : ℂ) * a1 - (1 / 2 : ℂ) * a2 + (1 / 4 : ℂ) * a3
+  · show x 3 = 0
+    linear_combination (1 / 4 : ℂ) * hx - (1 / 4 : ℂ) * a1 - (1 / 2 : ℂ) * a2 - (3 / 4 : ℂ) * a3
+
+theorem Bi (K : Submodule ℂ M45) (hK : SLev K) (hq : Module.finrank ℂ (K.map rs) = 3) :
+    (K ⊓ LinearMap.ker rs : Submodule ℂ M45) = ⊥ := by
+  have hV3 : Module.finrank ℂ (sumZero 4) ≤ 3 :=
+    (finrank_sumZero (n := 4) (by norm_num)).trans (by norm_num)
+  have hS : K.map rs ≤ sumZero 4 := map_rs_le K hK
+  have hSV : K.map rs = sumZero 4 :=
+    Submodule.eq_of_le_of_finrank_le hS (le_trans hV3 (le_of_eq hq.symm))
+  have hphi : ∀ m, K.map (phi m) = sumZero 4 := by
+    intro m
+    have hle : K.map (phi m) ≤ sumZero 4 := by
+      rintro _ ⟨Y, hY, rfl⟩
+      rw [mem_Vs]
+      exact tau_phi K hK Y hY m
+    have hker : (K ⊓ LinearMap.ker (phi m) : Submodule ℂ M45) ≤ K ⊓ LinearMap.ker rs := by
+      rintro Y ⟨hY, hY0⟩
+      refine ⟨hY, ?_⟩
+      rw [SetLike.mem_coe, LinearMap.mem_ker] at hY0 ⊢
+      apply nondeg
+      · exact tau_rs K hK Y hY
+      · intro v hv
+        have hv' : v ∈ K.map rs := by
+          rw [hSV, mem_Vs]
+          exact hv
+        obtain ⟨Y', hY', rfl⟩ := hv'
+        rw [← ip_phi K hK Y Y' hY hY' m, hY0]
+        simp [ip]
+    have r1 := rank_nullity K (phi m)
+    have r2 := rank_nullity K rs
+    have r3 := Submodule.finrank_mono hker
+    have hP3 : 3 ≤ Module.finrank ℂ (K.map (phi m)) := by omega
+    exact Submodule.eq_of_le_of_finrank_le hle (le_trans hV3 hP3)
+  rw [eq_bot_iff]
+  rintro Z ⟨hZ, hZ0⟩
+  rw [SetLike.mem_coe, LinearMap.mem_ker] at hZ0
+  rw [Submodule.mem_bot]
+  have hcol : ∀ m, col Z m = 0 := by
+    intro m
+    apply nondeg
+    · exact C1 K hK Z hZ m
+    · intro v hv
+      have hv' : v ∈ K.map (phi m) := by
+        rw [hphi m, mem_Vs]
+        exact hv
+      obtain ⟨Y, hY, rfl⟩ := hv'
+      exact ip_col_phi K hK Z Y hZ hY hZ0 m
+  funext ⟨i, j⟩
+  exact congrFun (hcol j) i
+
+def dotDual : V4 →ₗ[ℂ] Module.Dual ℂ V4 :=
+  LinearMap.mk₂ ℂ (fun v z => ∑ i, v i * z i)
+    (fun a b z => by simp only [Pi.add_apply, add_mul, sum_add_distrib])
+    (fun c a z => by simp only [Pi.smul_apply, smul_eq_mul, mul_assoc, ← mul_sum])
+    (fun v a b => by simp only [Pi.add_apply, mul_add, sum_add_distrib])
+    (fun c v a => by
+      simp only [Pi.smul_apply, smul_eq_mul, mul_sum]
+      exact sum_congr rfl fun i _ => by ring)
+
+theorem dotDual_apply (v z : V4) : dotDual v z = ∑ i, v i * z i := rfl
+
+theorem dotDual_injective : Function.Injective dotDual := by
+  classical
+  rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
+  intro v hv
+  funext j
+  have h := LinearMap.congr_fun hv (Pi.single j 1)
+  rw [dotDual_apply] at h
+  simpa [Pi.single_apply] using h
+
+theorem perp_bound (V W : Submodule ℂ V4) (h : ∀ v ∈ V, ∀ z ∈ W, ∑ i, v i * z i = 0) :
+    Module.finrank ℂ V + Module.finrank ℂ W ≤ Fintype.card (Fin 4) := by
+  have hle : V.map dotDual ≤ W.dualAnnihilator := by
+    rintro _ ⟨v, hv, rfl⟩
+    rw [Submodule.mem_dualAnnihilator]
+    intro z hz
+    exact h v hv z hz
+  have e1 : Module.finrank ℂ (V.map dotDual) = Module.finrank ℂ V :=
+    (LinearEquiv.finrank_eq (Submodule.equivMapOfInjective _ dotDual_injective V)).symm
+  have e2 := Subspace.finrank_add_finrank_dualAnnihilator_eq W
+  have e3 := Submodule.finrank_mono hle
+  rw [Module.finrank_fintype_fun_eq_card] at e2
+  omega
+
+theorem Q1 (W : Submodule ℂ V4) (hτ : ∀ x ∈ W, tau x = 0) (hI : ∀ x ∈ W, ∀ y ∈ W, ip x y = 0) :
+    Module.finrank ℂ W ≤ 1 := by
+  have hone : (1 : V4) ≠ 0 := by
+    intro h
+    have := congrFun h 0
+    simp at this
+  have hinf : W ⊓ Submodule.span ℂ {(1 : V4)} = ⊥ := by
+    rw [eq_bot_iff]
+    rintro x ⟨hx, hx1⟩
+    rw [SetLike.mem_coe, Submodule.mem_span_singleton] at hx1
+    obtain ⟨c, rfl⟩ := hx1
+    have h := hτ _ hx
+    have hc : c = 0 := by
+      simp only [tau, Pi.smul_apply, Pi.one_apply, smul_eq_mul, mul_one] at h
+      linear_combination (1 / 4 : ℂ) * h
+    rw [hc, zero_smul]
+    exact Submodule.zero_mem _
+  have hperp : ∀ v ∈ W, ∀ z ∈ W ⊔ Submodule.span ℂ {(1 : V4)}, ∑ i, v i * z i = 0 := by
+    intro v hv z hz
+    obtain ⟨w, hw, u, hu, rfl⟩ := Submodule.mem_sup.mp hz
+    obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.mp hu
+    have h1 := hI v hv w hw
+    have h2 := hτ v hv
+    simp only [ip, tau] at h1 h2
+    simp only [Fin.sum_univ_four, Pi.add_apply, Pi.smul_apply, Pi.one_apply, smul_eq_mul, mul_one]
+    linear_combination h1 + c * h2
+  have hb := perp_bound W (W ⊔ Submodule.span ℂ {(1 : V4)}) hperp
+  have hs := Submodule.finrank_sup_add_finrank_inf_eq W (Submodule.span ℂ {(1 : V4)})
+  rw [hinf, finrank_bot, finrank_span_singleton hone] at hs
+  rw [Fintype.card_fin] at hb
+  omega
+
+theorem N_iso (K : Submodule ℂ M45) (hK : SLev K) (Z Z' : M45)
+    (hZ : Z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45))
+    (hZ' : Z' ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45)) (m : Fin 5) :
+    ip (col Z m) (col Z' m) = 0 := by
+  have hz := Submodule.mem_inf.mp hZ
+  have hz' := Submodule.mem_inf.mp hZ'
+  have e := C2pol K hK Z Z' hz.1 hz'.1 m
+  rw [LinearMap.mem_ker.mp hz.2, LinearMap.mem_ker.mp hz'.2] at e
+  simp only [ip, col, Pi.zero_apply] at e ⊢
+  linear_combination (1 / 2 : ℂ) * e
+
+theorem N_col_dim (K : Submodule ℂ M45) (hK : SLev K) (m : Fin 5) :
+    Module.finrank ℂ ((K ⊓ LinearMap.ker rs : Submodule ℂ M45).map (colL m)) ≤ 1 := by
+  apply Q1
+  · rintro _ ⟨Z, hZ, rfl⟩
+    exact C1 K hK Z (Submodule.mem_inf.mp hZ).1 m
+  · rintro _ ⟨Z, hZ, rfl⟩ _ ⟨Z', hZ', rfl⟩
+    exact N_iso K hK Z Z' hZ hZ' m
+

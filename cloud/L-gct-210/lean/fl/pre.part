@@ -1,0 +1,135 @@
+import Mathlib
+import PEqualNP.Defs
+
+namespace PEqualNP.Gct.FL210
+
+open Finset
+
+noncomputable section
+
+abbrev M55 := Fin 5 × Fin 5 → ℂ
+
+abbrev M45 := Fin 4 × Fin 5 → ℂ
+
+abbrev V4 := Fin 4 → ℂ
+
+theorem sum_emb_perm {n k : ℕ} (σ : Equiv.Perm (Fin k)) (F : (Fin k ↪ Fin n) → ℂ) :
+    ∑ i : Fin k ↪ Fin n, F (σ.toEmbedding.trans i) = ∑ i : Fin k ↪ Fin n, F i := by
+  refine Fintype.sum_bijective (fun i => σ.toEmbedding.trans i)
+    ⟨fun i i' h => ?_, fun i => ⟨σ.symm.toEmbedding.trans i, ?_⟩⟩ _ _ (fun i => rfl)
+  · refine Function.Embedding.ext fun a => ?_
+    have h' := DFunLike.congr_fun h (σ.symm a)
+    simpa using h'
+  · ext a
+    simp
+
+theorem sum_emb_succ {n k : ℕ} (Φ : Fin n → (Fin k → Fin n) → ℂ) :
+    ∑ i : Fin (k + 1) ↪ Fin n, Φ (i 0) (fun b => i b.succ) =
+      ∑ e : Fin k ↪ Fin n, ∑ a ∈ univ.filter (fun a => ∀ b, e b ≠ a), Φ a e := by
+  classical
+  rw [← (Equiv.embeddingFinSucc k (Fin n)).symm.sum_comp, Fintype.sum_sigma]
+  refine Finset.sum_congr rfl fun e _ => ?_
+  symm
+  rw [Finset.sum_subtype (p := fun a => a ∉ Set.range e) (univ.filter (fun a => ∀ b, e b ≠ a))
+    (fun a => by simp [Set.mem_range]) (fun a => Φ a e)]
+  refine Fintype.sum_congr _ _ fun a => ?_
+  simp only [Equiv.coe_embeddingFinSucc_symm, Fin.cons_zero, Fin.cons_succ]
+
+theorem rank_nullity {U V : Type} [AddCommGroup U] [Module ℂ U] [FiniteDimensional ℂ U]
+    [AddCommGroup V] [Module ℂ V] (L : Submodule ℂ U) (f : U →ₗ[ℂ] V) :
+    Module.finrank ℂ L = Module.finrank ℂ (L ⊓ LinearMap.ker f : Submodule ℂ U) +
+      Module.finrank ℂ (L.map f) := by
+  have hrn : Module.finrank ℂ (L.map f) +
+      Module.finrank ℂ (L ⊓ LinearMap.ker f : Submodule ℂ U) = Module.finrank ℂ L := by
+    rw [← (Submodule.submoduleOfEquivInf _ _).finrank_eq,
+      ← (f.submoduleMap L).finrank_range_add_finrank_ker,
+      LinearMap.range_submoduleMap, LinearMap.ker_submoduleMap]
+    simp
+  omega
+
+def sumZero (n : ℕ) : Submodule ℂ (Fin n → ℂ) :=
+  LinearMap.ker (∑ i, (LinearMap.proj i : (Fin n → ℂ) →ₗ[ℂ] ℂ))
+
+theorem mem_sumZero {n : ℕ} (v : Fin n → ℂ) : v ∈ sumZero n ↔ ∑ i, v i = 0 := by
+  simp [sumZero, LinearMap.sum_apply]
+
+theorem finrank_sumZero {n : ℕ} (hn : 1 ≤ n) : Module.finrank ℂ (sumZero n) ≤ n - 1 := by
+  have hne : sumZero n ≠ ⊤ := by
+    intro h
+    have hm : (Pi.single (⟨0, hn⟩ : Fin n) (1 : ℂ)) ∈ sumZero n := h ▸ Submodule.mem_top
+    rw [mem_sumZero] at hm
+    simp at hm
+  have := Submodule.finrank_lt hne
+  rw [Module.finrank_fin_fun] at this
+  omega
+
+theorem fin5 (P : Fin 5 → Prop) (h0 : P 0) (h1 : P 1) (h2 : P 2) (h3 : P 3) (h4 : P 4) :
+    ∀ m, P m := by
+  intro m
+  fin_cases m
+  · exact h0
+  · exact h1
+  · exact h2
+  · exact h3
+  · exact h4
+
+abbrev T4 := Fin 5 × Fin 5 × Fin 5 × Fin 5
+
+def tup : T4 ≃ (Fin 4 → Fin 5) where
+  toFun p := ![p.1, p.2.1, p.2.2.1, p.2.2.2]
+  invFun z := (z 0, z 1, z 2, z 3)
+  left_inv _ := rfl
+  right_inv z := by
+    ext i
+    fin_cases i <;> rfl
+
+theorem emb4 (F : Fin 5 → Fin 5 → Fin 5 → Fin 5 → ℂ) :
+    ∑ e : Fin 4 ↪ Fin 5, F (e 0) (e 1) (e 2) (e 3) = ∑ j, ∑ l, ∑ m, ∑ n,
+      if j = l ∨ j = m ∨ j = n ∨ l = m ∨ l = n ∨ m = n then 0 else F j l m n := by
+  classical
+  let u (z : Fin 4 → Fin 5) : ℂ := F (z 0) (z 1) (z 2) (z 3)
+  have A : ∑ e : Fin 4 ↪ Fin 5, F (e 0) (e 1) (e 2) (e 3) =
+      ∑ z : Fin 4 → Fin 5, if Function.Injective z then u z else 0 := by
+    let E := Equiv.subtypeInjectiveEquivEmbedding (Fin 4) (Fin 5)
+    change (∑ e : Fin 4 ↪ Fin 5, u e) = _
+    rw [← E.sum_comp (fun e : Fin 4 ↪ Fin 5 => u e), ← Finset.sum_filter]
+    exact (Finset.sum_subtype _ (by simp) u).symm
+  rw [A, ← tup.sum_comp (fun z => if Function.Injective z then u z else 0)]
+  simp only [Fintype.sum_prod_type]
+  refine sum_congr rfl fun a _ => sum_congr rfl fun b _ => sum_congr rfl fun c _ =>
+    sum_congr rfl fun d _ => ?_
+  let z := tup (a, b, c, d)
+  have p : z 0 = a := rfl
+  have q : z 1 = b := rfl
+  have s : z 2 = c := rfl
+  have t : z 3 = d := rfl
+  have f : Function.Injective z ↔ ¬(a = b ∨ a = c ∨ a = d ∨ b = c ∨ b = d ∨ c = d) := by
+    constructor
+    · intro o
+      have h (i j : Fin 4) (g : i ≠ j) : z i ≠ z j := fun h => g (o h)
+      exact not_or_intro (h 0 1 (by decide)) (not_or_intro (h 0 2 (by decide))
+        (not_or_intro (h 0 3 (by decide)) (not_or_intro (h 1 2 (by decide))
+          (not_or_intro (h 1 3 (by decide)) (h 2 3 (by decide))))))
+    · intro g i j v
+      simp only [not_or] at g
+      fin_cases i <;> fin_cases j <;> first | rfl | grind
+  change (if Function.Injective z then u z else 0) = _
+  by_cases g : a = b ∨ a = c ∨ a = d ∨ b = c ∨ b = d ∨ c = d
+  · have k : ¬Function.Injective z := fun h => f.mp h g
+    rw [if_neg k, if_pos g]
+  · rw [if_pos (f.mpr g), if_neg g]
+    rfl
+
+def P4 (a : Fin 5) (N : M45) : ℂ :=
+  ∑ e : Fin 4 ↪ Fin 5, if (e 0 ≠ a ∧ e 1 ≠ a ∧ e 2 ≠ a ∧ e 3 ≠ a) then
+    N (0, e 0) * N (1, e 1) * N (2, e 2) * N (3, e 3) else 0
+
+theorem P4_eq (a : Fin 5) (N : M45) : P4 a N = ∑ j, ∑ l, ∑ m, ∑ n,
+    if j = l ∨ j = m ∨ j = n ∨ l = m ∨ l = n ∨ m = n then 0 else
+      if (j ≠ a ∧ l ≠ a ∧ m ≠ a ∧ n ≠ a) then N (0, j) * N (1, l) * N (2, m) * N (3, n) else 0 :=
+  emb4 (fun j l m n => if (j ≠ a ∧ l ≠ a ∧ m ≠ a ∧ n ≠ a) then
+    N (0, j) * N (1, l) * N (2, m) * N (3, n) else 0)
+
+def SLev (K : Submodule ℂ M45) : Prop :=
+  ∀ Y ∈ K, ∀ a : Fin 5, P4 a (fun p => 1 + Y p) = 24
+

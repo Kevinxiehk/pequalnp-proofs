@@ -1,0 +1,14 @@
+ R4.15 FIRST-ORDER CONSTRAINTS FROM SINGLE-ROW ELEMENTS (RIGOROUS; same computation as R4.14, any e).  Let L' be a 4 x 5 level space,
+   u in U_i (e_i u^T in L'), Y in L', c := c^(i)(Y) the column-sum vector of the three rows != i of Y.  Then D_i(Y) u is in C, and
+   its degree-1 part -2S u + 4 c o u - 2 (c.u) 1 is in C inside 1^perp; pairing with 1 gives -6 (c.u) = 0. Hence
+     (F1)  c^(i)(Y) . u = 0   and   c^(i)(Y) o u  in C        for all Y in L', u in U_i;
+     (F2)  U_i o U_k inside C  for i != k   [take Y = e_k u'^T];  (with U_i perp U_k this is new information when e >= 2:
+           for C = Cu + Cu' split over two rows, the five points (u_j, u'_j) lie on a conic (x - b)(y - a) = ab through 0);
+     (FS-DEC) if one row carries C (U_i = C), the diagonal operators c^(i)(Y) o . preserve C for every Y in L'; if moreover C is
+           nondegenerate and L' is extremal (d = e + 3), some c^(i)(Y) is not a multiple of 1 [N = ker gamma is 3-dim strongly level,
+           N cap {row i = 0} has dim <= 2 by SL_3, row i of N is -c^(i)(Y), and it is never -1], so C is DECOMPOSABLE:
+           C = sum over the blocks A of a partition of the columns into >= 2 blocks of (C cap V_A).
+           e = 1: m has a zero (R4.14).  e = 3: C = V_A + V_B with (|A|,|B|) = (4,1) [neutral column] or (3,2) [not excluded, never seen].
+           e = 2: C inside V_A with |A| = 4 [neutral column], or C = V_A (|A| = 3), or C = Cu + C(e_a - e_b), u in V_A, {a,b} = A^c.
+   Numerical check (rows/uiuk_chk.py, 87 extremal spaces, 70 pairs (u,u') from different rows): (F2) to 1.3e-7, (F1) to 5e-6
+   (LM-limited files; two files exceed only on vectors of norm 1e-6).

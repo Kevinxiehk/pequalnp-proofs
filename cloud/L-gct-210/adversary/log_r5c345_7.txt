@@ -1,0 +1,5 @@
+ start 0: res 8.287e-01 |X| 2.75e+00 it 228
+ start 1: res 8.273e-01 |X| 3.56e+00 it 159
+ start 2: res 7.882e-01 |X| 4.00e+00 it 141
+ start 3: res 8.298e-01 |X| 3.83e+00 it 198
+r5c345 17 d 7 best 0.7882281987003907

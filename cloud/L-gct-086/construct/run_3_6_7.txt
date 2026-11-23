@@ -1,0 +1,4 @@
+a=3 c=6 d=7 try 0: cost 1.168e+01
+a=3 c=6 d=7 try 1: cost 1.255e+01
+a=3 c=6 d=7 try 2: cost 5.747e+00
+BEST 3 6 7 5.747029234071011

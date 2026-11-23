@@ -1,0 +1,193 @@
+theorem line_form (N : Submodule ℂ M45) (z : M45)
+    (hmax : ∀ Z ∈ N, ∀ m, ∃ c : ℂ, col Z m = c • col z m) (m0 : Fin 5)
+    (hline : ∀ m, ∃ c : ℂ, col z m = c • col z m0) :
+    ∀ Z ∈ N, ∃ x : Fin 5 → ℂ, Z = outer (col z m0) x := by
+  intro Z hZ
+  have h : ∀ m, ∃ d : ℂ, col Z m = d • col z m0 := by
+    intro m
+    obtain ⟨c, hc⟩ := hmax Z hZ m
+    obtain ⟨c', hc'⟩ := hline m
+    exact ⟨c * c', by rw [hc, hc', smul_smul]⟩
+  choose x hx using h
+  refine ⟨x, ?_⟩
+  funext ⟨i, m⟩
+  have hh := congrFun (hx m) i
+  simp only [col, Pi.smul_apply, smul_eq_mul] at hh
+  simp only [outer, col]
+  rw [hh, mul_comm]
+
+theorem tricho (N : Submodule ℂ M45) (z : M45)
+    (hmax : ∀ Z ∈ N, ∀ m, ∃ c : ℂ, col Z m = c • col z m) :
+    (∃ a b c : Fin 5, a ≠ b ∧ a ≠ c ∧ b ≠ c ∧ ∀ s1 s2 s3 : ℂ,
+      s1 • col z a + s2 • col z b + s3 • col z c = 0 → s1 = 0 ∧ s2 = 0 ∧ s3 = 0)
+    ∨ (∃ a b : Fin 5, indep (col z a) (col z b) ∧
+      ∀ m, ∃ s t : ℂ, col z m = s • col z a + t • col z b)
+    ∨ (∃ m0 : Fin 5, col z m0 ≠ 0 ∧ ∀ Z ∈ N, ∃ x : Fin 5 → ℂ, Z = outer (col z m0) x)
+    ∨ N = ⊥ := by
+  by_cases h2 : ∃ a b : Fin 5, indep (col z a) (col z b)
+  · obtain ⟨a, b, hab⟩ := h2
+    by_cases h3 : ∃ c : Fin 5, ∀ s1 s2 s3 : ℂ,
+        s1 • col z a + s2 • col z b + s3 • col z c = 0 → s1 = 0 ∧ s2 = 0 ∧ s3 = 0
+    · obtain ⟨c, hc⟩ := h3
+      have hne_ab : a ≠ b := by
+        intro h
+        have h1 := (hab 1 (-1) (by rw [h]; simp)).1
+        exact one_ne_zero h1
+      have hne_ac : a ≠ c := by
+        intro h
+        have h1 := (hc 1 0 (-1) (by rw [h]; simp)).1
+        exact one_ne_zero h1
+      have hne_bc : b ≠ c := by
+        intro h
+        have h1 := (hc 0 1 (-1) (by rw [h]; simp)).2.1
+        exact one_ne_zero h1
+      exact Or.inl ⟨a, b, c, hne_ab, hne_ac, hne_bc, hc⟩
+    · refine Or.inr (Or.inl ⟨a, b, hab, ?_⟩)
+      intro m
+      by_contra hcon
+      apply h3
+      refine ⟨m, fun s1 s2 s3 h => ?_⟩
+      have hs3 : s3 = 0 := by
+        by_contra hne
+        apply hcon
+        refine ⟨-s1 * s3⁻¹, -s2 * s3⁻¹, ?_⟩
+        funext i
+        have hi := congrFun h i
+        have hinv := mul_inv_cancel₀ hne
+        simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at hi ⊢
+        linear_combination s3⁻¹ * hi - col z m i * hinv
+      rw [hs3, zero_smul, add_zero] at h
+      obtain ⟨t1, t2⟩ := hab s1 s2 h
+      exact ⟨t1, t2, hs3⟩
+  · by_cases hall : ∀ m, col z m = 0
+    · refine Or.inr (Or.inr (Or.inr ?_))
+      rw [eq_bot_iff]
+      intro Z hZ
+      rw [Submodule.mem_bot]
+      funext ⟨i, m⟩
+      obtain ⟨c, hc⟩ := hmax Z hZ m
+      have hh := congrFun hc i
+      rw [hall m] at hh
+      simpa [col] using hh
+    · obtain ⟨m0, hm0⟩ : ∃ m0, col z m0 ≠ 0 := by
+        by_contra h
+        apply hall
+        intro m
+        by_contra hm
+        exact h ⟨m, hm⟩
+      refine Or.inr (Or.inr (Or.inl ⟨m0, hm0, line_form N z hmax m0 ?_⟩))
+      intro m
+      by_contra hcon
+      apply h2
+      refine ⟨m0, m, fun s t h => ?_⟩
+      have ht : t = 0 := by
+        by_contra hne
+        apply hcon
+        refine ⟨-s * t⁻¹, ?_⟩
+        funext i
+        have hi := congrFun h i
+        have hinv := mul_inv_cancel₀ hne
+        simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at hi ⊢
+        linear_combination t⁻¹ * hi - col z m i * hinv
+      rw [ht, zero_smul, add_zero] at h
+      exact ⟨(smul_eq_zero.mp h).resolve_right hm0, ht⟩
+
+def HypS6 : Prop :=
+  ∀ N : Submodule ℂ M45, SLev N → (∀ Z ∈ N, rs Z = 0) → Module.finrank ℂ N = 2 →
+    ∀ z ∈ N, (∀ Z ∈ N, ∀ m, ∃ c : ℂ, col Z m = c • col z m) →
+    ∀ a b c : Fin 5, a ≠ b → a ≠ c → b ≠ c →
+    (∀ s1 s2 s3 : ℂ, s1 • col z a + s2 • col z b + s3 • col z c = 0 →
+      s1 = 0 ∧ s2 = 0 ∧ s3 = 0) → (∀ m, col z m ≠ 0) → False
+
+def HypS7 : Prop :=
+  ∀ K : Submodule ℂ M45, SLev K → Module.finrank ℂ (K.map rs) = 2 →
+    (∃ u ∈ K.map rs, u ≠ 0 ∧ ∀ s ∈ K.map rs, ip u s = 0) →
+    Module.finrank ℂ (K ⊓ LinearMap.ker rs : Submodule ℂ M45) = 2 →
+    ∀ z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45),
+    (∀ Z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45), ∀ m, ∃ c : ℂ, col Z m = c • col z m) →
+    ∀ σ : Equiv.Perm (Fin 5), indep (col z (σ 0)) (col z (σ 2)) →
+    col z (σ 1) = (-1 : ℂ) • col z (σ 0) → col z (σ 3) = (-1 : ℂ) • col z (σ 2) →
+    col z (σ 4) = 0 →
+    t3 (col z (σ 0)) (col z (σ 2)) (col z (σ 2)) = 0 →
+    t3 (col z (σ 0)) (col z (σ 0)) (col z (σ 2)) = 0 →
+    br (col z (σ 0)) (col z (σ 0)) (col z (σ 2)) (col z (σ 2)) = 0 → False
+
+def HypS8 : Prop :=
+  ∀ K : Submodule ℂ M45, SLev K → Module.finrank ℂ (K.map rs) = 2 →
+    Module.finrank ℂ (K ⊓ LinearMap.ker rs : Submodule ℂ M45) = 2 →
+    ∀ Yu ∈ K, rs Yu ≠ 0 → (∀ s ∈ K.map rs, ip (rs Yu) s = 0) →
+    ∀ v : V4, v ≠ 0 → tau v = 0 → ip v v = 0 → t3 v v v = 0 →
+    (∀ Z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45), ∃ x : Fin 5 → ℂ, Z = outer v x) →
+    ∀ σ : Equiv.Perm (Fin 5),
+    (∀ Z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45), col Z (σ 3) = 0) →
+    (∀ Z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45), col Z (σ 4) = 0) →
+    t3 v v (rs Yu) = 0 → t3 v v (phi (σ 3) Yu) = 0 → t3 v v (phi (σ 4) Yu) = 0 → False
+
+theorem No22 (H6 : HypS6) (H7 : HypS7) (H8 : HypS8) (K : Submodule ℂ M45) (hK : SLev K)
+    (hq : Module.finrank ℂ (K.map rs) = 2)
+    (hd : Module.finrank ℂ (K ⊓ LinearMap.ker rs : Submodule ℂ M45) = 2) : False := by
+  have hNs := SLev_N K hK
+  have hrs := rs_N K
+  have hne : (K ⊓ LinearMap.ker rs : Submodule ℂ M45) ≠ ⊥ := by
+    intro h0
+    rw [h0, finrank_bot] at hd
+    omega
+  have hu := Bii K hK hq hne
+  obtain ⟨z, hz, hmax⟩ := maxpt _ hNs hrs
+  rcases tricho _ z hmax with ⟨a, b, c, hab, hac, hbc, hind⟩ | ⟨a, b, hab, hspan⟩ |
+    ⟨m0, hm0, hform⟩ | hbot
+  · exact H6 _ hNs hrs hd z hz hmax a b c hab hac hbc hind
+      (S6_active _ hNs hrs hd z hmax a b c hab hac hbc hind)
+  · obtain ⟨σ, h0, h2, e1, e3, e4⟩ := two_line_pattern _ hNs hrs z hz a b hab hspan
+    subst h0
+    subst h2
+    have ids := typeII_ids _ hNs z hz σ (col z (σ 0)) (col z (σ 2)) rfl e1 rfl e3 e4
+    exact H7 K hK hq hu hd z hz hmax σ hab e1 e3 e4 ids.1 ids.2.1 ids.2.2
+  · by_cases h3 : t3 (col z m0) (col z m0) (col z m0) = 0
+    · have h4 : t4 (col z m0) (col z m0) (col z m0) (col z m0) ≠ 0 := fun h =>
+        hm0 (iso34 _ (C1 _ hNs z hz m0) (Niso _ hNs hrs z z hz hz m0) h3 h)
+      obtain ⟨j1, j2, hj, hcols⟩ := A1cols _ hNs hrs (col z m0) hm0 (C1 _ hNs z hz m0)
+        (Niso _ hNs hrs z z hz hz m0) hform h4
+      obtain ⟨σ, s3, s4⟩ := perm_two (3 : Fin 5) 4 j1 j2 (by decide) hj
+      obtain ⟨u, huS, hu0, huperp⟩ := hu
+      obtain ⟨Yu, hYu, rfl⟩ := huS
+      have huu : ip (rs Yu) (rs Yu) = 0 := huperp _ (Submodule.mem_map_of_mem hYu)
+      have c3 : ∀ Z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45), col Z (σ 3) = 0 :=
+        fun Z hZ => by
+          rw [s3]
+          exact (hcols Z hZ).1
+      have c4 : ∀ Z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45), col Z (σ 4) = 0 :=
+        fun Z hZ => by
+          rw [s4]
+          exact (hcols Z hZ).2
+      have st := S8_step1 K hK Yu hYu huu hd (col z m0) hm0 h3 hform σ c3 c4
+      exact H8 K hK hq hd Yu hYu hu0 huperp (col z m0) hm0 (C1 _ hNs z hz m0)
+        (Niso _ hNs hrs z z hz hz m0) h3 hform σ c3 c4 st.1 st.2.1 st.2.2
+    · have h1 := A1b _ hNs hrs (col z m0) hm0 (C1 _ hNs z hz m0)
+        (Niso _ hNs hrs z z hz hz m0) hform h3
+      omega
+  · exact hne hbot
+
+theorem SL_of (H6 : HypS6) (H7 : HypS7) (H8 : HypS8)
+    (K : Submodule ℂ M45) (hK : SLev K) : Module.finrank ℂ K ≤ 3 := by
+  have r := rank_nullity K rs
+  have hq := (Submodule.finrank_mono (map_rs_le K hK)).trans (finrank_sumZero (n := 4) (by norm_num))
+  have hd := LemA_proof _ (SLev_N K hK) (rs_N K)
+  by_cases h3 : Module.finrank ℂ (K.map rs) = 3
+  · have hb := Bi K hK h3
+    rw [hb, finrank_bot] at r
+    omega
+  · by_cases h2 : Module.finrank ℂ (K.map rs) = 2 ∧
+        Module.finrank ℂ (K ⊓ LinearMap.ker rs : Submodule ℂ M45) = 2
+    · exact (No22 H6 H7 H8 K hK h2.1 h2.2).elim
+    · omega
+
+theorem FL_of (HSL : ∀ K : Submodule ℂ M45, SLev K → Module.finrank ℂ K ≤ 3)
+    (L : Submodule ℂ M55)
+    (hL : ∀ t ∈ L, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120)
+    (r : Fin 5) (hF : ∀ w : Fin 5 → ℂ, ∑ j, w j = 0 → rowMat r w ∈ L) :
+    Module.finrank ℂ L ≤ 7 := by
+  obtain ⟨_, h2, h3⟩ := stageA L hL r hF
+  have h4 := HSL _ h2
+  omega
+

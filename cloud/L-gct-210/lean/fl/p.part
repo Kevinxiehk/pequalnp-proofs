@@ -1,0 +1,136 @@
+theorem col_outer (v : V4) (x : Fin 5 → ℂ) (m : Fin 5) : col (outer v x) m = x m • v := by
+  funext i
+  simp only [col, outer, Pi.smul_apply, smul_eq_mul]
+  ring
+
+def sw02 : Equiv.Perm (Fin 5) := Equiv.swap 0 2
+
+theorem sw02_0 : sw02 0 = 2 := by decide
+
+theorem sw02_3 : sw02 3 = 3 := by decide
+
+theorem sw02_4 : sw02 4 = 4 := by decide
+
+theorem S8_elem (N : Submodule ℂ M45) (hN : SLev N) (hrs : ∀ Z ∈ N, rs Z = 0)
+    (hd : Module.finrank ℂ N = 2) (v : V4) (hv : v ≠ 0)
+    (hform : ∀ Z ∈ N, ∃ x : Fin 5 → ℂ, Z = outer v x) (σ : Equiv.Perm (Fin 5))
+    (h3 : ∀ Z ∈ N, col Z (σ 3) = 0) (h4 : ∀ Z ∈ N, col Z (σ 4) = 0) :
+    ∃ W ∈ N, col W (σ 0) = v ∧ col W (σ 1) = (-1 : ℂ) • v ∧ col W (σ 2) = 0 ∧
+      col W (σ 3) = 0 ∧ col W (σ 4) = 0 := by
+  have p := peel N hN hrs (σ 2)
+  have hne : (N ⊓ LinearMap.ker (colL (σ 2)) : Submodule ℂ M45) ≠ ⊥ := by
+    intro h0
+    rw [h0, finrank_bot] at p
+    omega
+  obtain ⟨W0, hW0, hW0ne⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
+  have hw := Submodule.mem_inf.mp hW0
+  have hWN := hw.1
+  have a2 : col W0 (σ 2) = 0 := LinearMap.mem_ker.mp hw.2
+  have a3 := h3 W0 hWN
+  have a4 := h4 W0 hWN
+  obtain ⟨x, hx⟩ := hform W0 hWN
+  have b0 : col W0 (σ 0) = x (σ 0) • v := by rw [hx, col_outer]
+  have b1 : col W0 (σ 1) = x (σ 1) • v := by rw [hx, col_outer]
+  have hsum := sum_cols_perm σ W0
+  rw [b0, b1, a2, a3, a4, hrs W0 hWN, add_zero, add_zero, add_zero, ← add_smul] at hsum
+  have hx01 : x (σ 0) + x (σ 1) = 0 := (smul_eq_zero.mp hsum).resolve_right hv
+  have hx1 : x (σ 1) = -x (σ 0) := by linear_combination hx01
+  have hx0 : x (σ 0) ≠ 0 := by
+    intro h
+    apply hW0ne
+    apply cols_zero σ
+    apply fin5
+    · rw [b0, h, zero_smul]
+    · rw [b1, hx1, h, neg_zero, zero_smul]
+    · exact a2
+    · exact a3
+    · exact a4
+  refine ⟨(x (σ 0))⁻¹ • W0, N.smul_mem _ hWN, ?_, ?_, ?_, ?_, ?_⟩
+  · show (x (σ 0))⁻¹ • col W0 (σ 0) = v
+    rw [b0, smul_smul, inv_mul_cancel₀ hx0, one_smul]
+  · show (x (σ 0))⁻¹ • col W0 (σ 1) = (-1 : ℂ) • v
+    rw [b1, hx1, smul_smul, mul_neg, inv_mul_cancel₀ hx0]
+  · show (x (σ 0))⁻¹ • col W0 (σ 2) = 0
+    rw [a2, smul_zero]
+  · show (x (σ 0))⁻¹ • col W0 (σ 3) = 0
+    rw [a3, smul_zero]
+  · show (x (σ 0))⁻¹ • col W0 (σ 4) = 0
+    rw [a4, smul_zero]
+
+theorem S8_step1 (K : Submodule ℂ M45) (hK : SLev K) (Yu : M45) (hYu : Yu ∈ K)
+    (hu : ip (rs Yu) (rs Yu) = 0)
+    (hd : Module.finrank ℂ (K ⊓ LinearMap.ker rs : Submodule ℂ M45) = 2) (v : V4)
+    (hv : v ≠ 0) (hv3 : t3 v v v = 0)
+    (hform : ∀ Z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45), ∃ x : Fin 5 → ℂ,
+      Z = outer v x)
+    (σ : Equiv.Perm (Fin 5))
+    (h3 : ∀ Z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45), col Z (σ 3) = 0)
+    (h4 : ∀ Z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45), col Z (σ 4) = 0) :
+    t3 v v (rs Yu) = 0 ∧ t3 v v (phi (σ 3) Yu) = 0 ∧ t3 v v (phi (σ 4) Yu) = 0 := by
+  have hNs := SLev_N K hK
+  have hrsN := rs_N K
+  obtain ⟨W, hWN, w0, w1, w2, w3, w4⟩ := S8_elem _ hNs hrsN hd v hv hform σ h3 h4
+  have hWK : W ∈ K := (Submodule.mem_inf.mp hWN).1
+  have hKσ := SLev_perm σ K hK
+  have e0 : ∀ i, W (i, σ 0) = v i := fun i => congrFun w0 i
+  have e1 : ∀ i, W (i, σ 1) = -1 * v i := fun i => congrFun w1 i
+  have e2 : ∀ i, W (i, σ 2) = 0 := fun i => congrFun w2 i
+  have e3 : ∀ i, W (i, σ 3) = 0 := fun i => congrFun w3 i
+  have e4 : ∀ i, W (i, σ 4) = 0 := fun i => congrFun w4 i
+  have A : t3 v v (col Yu (σ 2)) + t3 v v (col Yu (σ 3)) = 0 := by
+    have kp := (C34 _ hKσ _ (Submodule.mem_map_of_mem (K.add_mem hYu hWK)) 4).2.1
+    have km := (C34 _ hKσ _ (Submodule.mem_map_of_mem (K.sub_mem hYu hWK)) 4).2.1
+    have k0 := (C34 _ hKσ _ (Submodule.mem_map_of_mem hYu) 4).2.1
+    rw [sa4.1, sa4.2.1, sa4.2.2.1, sa4.2.2.2] at kp km k0
+    simp only [t3, col, cperm_apply, Pi.add_apply, Pi.sub_apply, e0, e1, e2, e3, e4]
+      at kp km k0
+    simp only [t3, col]
+    linear_combination (-1 / 2 : ℂ) * (kp + km - 2 * k0)
+  have B : t3 v v (col Yu (σ 2)) + t3 v v (col Yu (σ 4)) = 0 := by
+    have kp := (C34 _ hKσ _ (Submodule.mem_map_of_mem (K.add_mem hYu hWK)) 3).2.1
+    have km := (C34 _ hKσ _ (Submodule.mem_map_of_mem (K.sub_mem hYu hWK)) 3).2.1
+    have k0 := (C34 _ hKσ _ (Submodule.mem_map_of_mem hYu) 3).2.1
+    rw [sa3.1, sa3.2.1, sa3.2.2.1, sa3.2.2.2] at kp km k0
+    simp only [t3, col, cperm_apply, Pi.add_apply, Pi.sub_apply, e0, e1, e2, e3, e4]
+      at kp km k0
+    simp only [t3, col]
+    linear_combination (-1 / 2 : ℂ) * (kp + km - 2 * k0)
+  have C : t3 v v (col Yu (σ 3)) + t3 v v (col Yu (σ 4)) = 0 := by
+    have kp := (C34 _ hKσ _ (Submodule.mem_map_of_mem (K.add_mem hYu hWK)) 2).2.1
+    have km := (C34 _ hKσ _ (Submodule.mem_map_of_mem (K.sub_mem hYu hWK)) 2).2.1
+    have k0 := (C34 _ hKσ _ (Submodule.mem_map_of_mem hYu) 2).2.1
+    rw [sa2.1, sa2.2.1, sa2.2.2.1, sa2.2.2.2] at kp km k0
+    simp only [t3, col, cperm_apply, Pi.add_apply, Pi.sub_apply, e0, e1, e2, e3, e4]
+      at kp km k0
+    simp only [t3, col]
+    linear_combination (-1 / 2 : ℂ) * (kp + km - 2 * k0)
+  obtain ⟨W', hW'N, w0', _, _, _, _⟩ := S8_elem _ hNs hrsN hd v hv hform (σ * sw02)
+    (fun Z hZ => by
+      rw [Equiv.Perm.mul_apply, sw02_3]
+      exact h3 Z hZ)
+    (fun Z hZ => by
+      rw [Equiv.Perm.mul_apply, sw02_4]
+      exact h4 Z hZ)
+  rw [Equiv.Perm.mul_apply, sw02_0] at w0'
+  have hne2 : col W' (σ 2) ≠ 0 := by
+    rw [w0']
+    exact hv
+  obtain ⟨c, hc⟩ := Biii K hK Yu hYu hu W' hW'N (σ 2) hne2
+  rw [w0'] at hc
+  have f2 : ∀ i, 2 * Yu (i, σ 2) - rs Yu i = c * v i := fun i => congrFun hc i
+  have f20 := f2 0
+  have f21 := f2 1
+  have f22 := f2 2
+  have f23 := f2 3
+  simp only [t3, col] at A B C hv3
+  refine ⟨?_, ?_, ?_⟩
+  · simp only [t3]
+    linear_combination A + B - C
+      - (v 0 * v 0 * f20 + v 1 * v 1 * f21 + v 2 * v 2 * f22 + v 3 * v 3 * f23) - c * hv3
+  · simp only [t3, phi_apply]
+    linear_combination (-2 : ℂ) * B + 2 * C
+      + (v 0 * v 0 * f20 + v 1 * v 1 * f21 + v 2 * v 2 * f22 + v 3 * v 3 * f23) + c * hv3
+  · simp only [t3, phi_apply]
+    linear_combination (-2 : ℂ) * A + 2 * C
+      + (v 0 * v 0 * f20 + v 1 * v 1 * f21 + v 2 * v 2 * f22 + v 3 * v 3 * f23) + c * hv3
+

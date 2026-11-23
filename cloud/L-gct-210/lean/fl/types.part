@@ -1,0 +1,18 @@
+def TypeI (N : Submodule ℂ M45) : Prop :=
+  ∃ (v : V4) (a b : Fin 5), a ≠ b ∧ v ≠ 0 ∧ tau v = 0 ∧ ip v v = 0 ∧ t3 v v v = 0 ∧
+    ∀ Z : M45, Z ∈ N ↔ ∃ x : Fin 5 → ℂ, x a = 0 ∧ x b = 0 ∧ ∑ j, x j = 0 ∧
+      Z = fun p => v p.1 * x p.2
+
+def TypeII (N : Submodule ℂ M45) : Prop :=
+  ∃ (v w : V4) (a b c d : Fin 5), a ≠ b ∧ a ≠ c ∧ a ≠ d ∧ b ≠ c ∧ b ≠ d ∧ c ≠ d ∧
+    tau v = 0 ∧ ip v v = 0 ∧ tau w = 0 ∧ ip w w = 0 ∧ indep v w ∧
+    ∀ Z : M45, Z ∈ N ↔ ∃ μ ν : ℂ, Z = fun p =>
+      μ * v p.1 * ((if p.2 = a then 1 else 0) - (if p.2 = b then 1 else 0))
+      + ν * w p.1 * ((if p.2 = c then 1 else 0) - (if p.2 = d then 1 else 0))
+
+def TypeIV (N : Submodule ℂ M45) : Prop :=
+  ∃ (v : Fin 5 → V4) (a b : Fin 5), a ≠ b ∧
+    (∀ m, v m ≠ 0 ∧ tau (v m) = 0 ∧ ip (v m) (v m) = 0) ∧
+    (∀ m n : Fin 5, m ≠ n → ¬(m = a ∧ n = b) → ¬(m = b ∧ n = a) → indep (v m) (v n)) ∧
+    ∀ Z : M45, Z ∈ N ↔ (rs Z = 0 ∧ ∀ m, ∃ c : ℂ, col Z m = c • v m)
+

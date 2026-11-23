@@ -1,0 +1,128 @@
+## DI5-R4 (round 4: the principal stratum; Theorem PR3; reformulation SL_m)
+
+ Notation as in DI5 / DI5-R3. L' is a level 4 x 5 space with C(Y) = 24*1 + thetahat(Y) m (m != 0, sum m = 0), P = supp m, columns outside P
+ are NEUTRAL (C_n == 24 on L'). c(Y) = kappa(Y) m are the column sums, s(Y) in V the row-sum vector (tau(s) = total sum = 0),
+ y_j^0 := y_j - (kappa m_j/4) 1 in V the centred columns, b_j(Y) := 2 y_j^0 - s(Y) in V.  thetahat_2 = degree-2 part of thetahat,
+ Theta its polar form.  sigma_k(X) = sum of the k x k subpermanents of a 4 x 4 matrix X, so perm(J+X) = 24 + 6 sigma_1 + 2 sigma_2 + sigma_3 + perm X,
+   sigma_2(X) = sum_{a<b} (tau(x_a)tau(x_b) - <x_a,x_b>),
+   sigma_3(X) = sum_{a<b<c} (tau_a tau_b tau_c - <x_a,x_b>tau_c - <x_a,x_c>tau_b - <x_b,x_c>tau_a + 2 tau(x_a x_b x_c)).
+
+ R4.1 LEMMA QB (quadratic normal form WITH defect; rigorous, valid on all of L', any m).
+   (a) sum_a <y_a,y_a> = <s,s> + kappa^2 <m,m>;
+   (b) <b_j(Y), b_j(Y)> = <s,s> + 3 kappa^2 m_j^2 - 2 thetahat_2(Y) m_j   for every column j = 1..5.
+   In particular for a neutral column n: b_n^* g = s^* g on L' (g = the form <,> on V), exactly as in Lemma B' of the blueprint.
+   Proof. Degree 2 of C_j - 24 = thetahat m_j is 2 sigma_2(Y^(j)) = thetahat_2 m_j.  With sum c = 0:
+   2 sum_{a<b != j} c_a c_b = kappa^2 (2 m_j^2 - <m,m>), 2 sum_{a<b != j} <y_a,y_b> = <s,s> - 2<s,y_j> + 2<y_j,y_j> - sum_a <y_a,y_a>.
+   Summing the five equations over j gives (a) (the right side sums to 0); substituting (a) gives
+   <y_j,y_j> - <s,y_j> - kappa^2 m_j^2 = -(thetahat_2/2) m_j, which is (b) after centring (<y_j,y_j> = <y_j^0,y_j^0> + kappa^2 m_j^2/4).  QED
+   General defect space C (any e): the same computation gives sum_a <y_a,y_a> = <s,s> + <c,c> and
+   <b_j,b_j> = <s,s> + 3 c_j(Y)^2 - 2 thetahat_2(Y)_j  (thetahat_2 now C-valued).
+
+ R4.2 REFORMULATION (rigorous, trivial but it is the cleanest target).  Call a space COLUMN-CENTRED if all column sums vanish.
+   (SL_m)  a column-centred 4 x 5 space whose deletion vectors lie in 24*1 + C m has dimension <= 3.
+   (SL_0) is Lemma SL.  If L' is a (5,1) space with line C m then ker kappa is a column-centred space of dim >= 4 with defect in C m; so
+       (SL_m) for every non-two-column m  ==>  (DI_5) at e = 1, split or not, isotropic or not   (with TC5 for two-column m).
+   Equivalently (Lemma SL): there is no column-centred (4,1) space with non-two-column m.  (SL_m) is FALSE for two-column m (exact7b and the
+   positive control of r4_z4.py), so a proof must use that m is not two-column.  This is exactly "Lemma SL with the extra form thetahat":
+   by QB the quadratic stage reads b_j^* g = s^* g - 2 m_j thetahat_2 (five forms of rank <= 3 in the pencil s^*g + x thetahat_2).
+
+ R4.3 THEOREM PS (principal stratum; rigorous, any m).  Let L' be a level space with defect in C m and suppose ker kappa contains a
+   3-dim STRONGLY LEVEL subspace H with s(H) = V ("H principal"; this is the type (3,0) of Lemma SL, the only type seen in the 35 known
+   (4,1) spaces with non-two-column m).  Let B_j := b_j o (s|_H)^{-1}, isometries of (V,g) (Lemma B'), and N := ker(s : L' -> V).  Then
+   (a) L' = H (+) N, and there is an injective linear map f : N -> V with
+          z_j = m_j ( (kappa(Z)/4) 1 - 2 B_j f_Z )   for all Z in N and all columns j   (so N is supported on the columns of P);
+   (b) <f_Z,f_Z> = (3/16) kappa(Z)^2 and thetahat_2(Z) = 0 for Z in N;  sum_{j in P} m_j B_j f_Z = 0;
+   (c) dim N <= 2, hence dim L' <= 5; and dim L' = 5 iff N = C Z (+) C Z_* with kappa(Z) = 1, kappa(Z_*) = 0, f_* := f_{Z_*} isotropic
+       and <f_Z,f_*> = 0.  Then ker kappa = H (+) C Z_*, Z_* is doubly centred with isotropic columns z^*_j = -2 m_j B_j f_* (all nonzero
+       for j in P), and thetahat_2(eta + t Z_*) = 4 t <f_*, s(eta)> is not identically 0 on ker kappa.
+   Proof. s|_H is onto V, so L' = H (+) N.  Polarise QB(b) between Y_0 in H (sigma = s(Y_0), kappa = 0) and Z in N (s(Z) = 0):
+   <B_j sigma, b_j(Z)> = -2 m_j Theta(Y_0,Z).  sigma -> Theta(Y_0(sigma),Z) is a linear form on V, = 2<f_Z,sigma> for a unique f_Z in V,
+   linear in Z; as B_j is an isometry onto V this gives b_j(Z) = 2 z_j^0 = -4 m_j B_j f_Z, which is (a) (f_Z = 0 forces kappa = 0 by (b)
+   and then Z = 0).  QB(b) for Z itself: 16 m_j^2 <f_Z,f_Z> = 3 kappa^2 m_j^2 - 2 thetahat_2(Z) m_j, i.e. (16<f_Z,f_Z> - 3 kappa^2) m_j =
+   -2 thetahat_2(Z) for all j in P; m is not constant on P (sum m = 0), so both sides vanish: (b); the last relation is s(Z) = 0.
+   (c): g restricted to f(N) is (3/16) kappa^2, of rank <= 1, and a totally isotropic subspace of the nondegenerate 3-dim (V,g) has
+   dim <= 1; so dim f(N) <= 2, with equality only in the stated form.  Theta(eta, Z_*) = 2<f_*, s(eta)>.  QED
+   [Check, r4_test1.py: on the 18 known split (4,1) spaces with principal ker kappa, Z = e_i m^T, the B_j are isometries (7e-14),
+    <f,f> = 3/16 (5e-16) and (1/4)1 - 2 B_j f = e_i (2e-14).]
+   So in the principal stratum everything is controlled by the plane N, "the N-problem":
+     a 2-dim space N of matrices supported on the columns of P, zero row sums, column sums in C m (kappa not == 0), level with defect in C m,
+     <y_j^0,y_j^0> = (3/4) kappa^2 m_j^2 on N, and every column map N -> V, Y -> y_j^0 (j in P) INJECTIVE.
+
+ R4.4 LEMMA PR-RED (rigorous).  If every (4,1) space with line C m and principal ker kappa is split (contains some e_i m^T) ["principal (NS4')"],
+   then no (5,1) space with line C m has a principal H in ker kappa.
+   Proof. In such a (5,1), L' = H (+) C Z (+) C Z_* (PS).  For each t, H (+) C(Z + t Z_*) is a 4-dim level space with defect in C m and
+   kappa != 0, hence not strongly level: a (4,1) space with principal ker kappa = H.  If it contains e_i m^T, then (kappa = 1, s = 0)
+   e_i m^T = Z + t Z_*.  Two values of t with the same row i give Z_* = 0.  QED
+   In the normal form: principal (NS4') says that h_j := (1/4)1 - 2 B_j f (tau(h_j) = 1, <h_j,h_j> = 1, sum m_j h_j = 0) is the SAME unit
+   vector e_i for all j in P.
+
+ R4.5 THEOREM PR3 (rigorous; uses only R4.1, R4.3 and the character table of Z/4).  Let m be non-isotropic with |supp m| = 3.
+   Then no (5,1) space with defect line C m has a principal 3-dim strongly level subspace in ker kappa.
+   [Equivalently: in a (5,1) space with such m, NO 3-dim subspace H of ker kappa with s(H) = V is strongly level.  Since every hyperplane
+    of a (5,1) other than ker kappa is a (4,1) space (Lemma HYP) whose ker kappa is a hyperplane of the 4-dim ker kappa, this says:
+    a (5,1) space with such m has no (4,1) hyperplane of the only kind known numerically.]
+   Proof. P = {a,b,c}.  Suppose L' = H (+) C Z (+) C Z_* as in PS(c).
+   (1) Z_* = chi_1 l^T up to a row permutation, l supported on P, all l_j != 0, sum l = 0.  Indeed z^*_a + z^*_b + z^*_c = 0 (s(Z_*) = 0)
+       with all three isotropic gives <z^*_j,z^*_k> = 0, so they span a totally isotropic subspace: z^*_j = l_j v, v isotropic, l_j != 0.
+       A neutral column n gives 24 = C_n(Z_*) = 24 + 2 sigma_2 + sigma_3 with sigma_2 = 0, sigma_3 = 2 l_a l_b l_c tau(v^3): tau(v^3) = 0.
+       So p_1(v) = p_2(v) = p_3(v) = 0, the entries of v are the four roots of x^4 = const (Newton): v is a multiple of a row permutation
+       of chi_1 = (1,i,-1,-i).  Row permutations preserve all hypotheses.
+   (2) Z = h_0 m^T + chi_1 alpha^T with h_0 = (1/4)1 + beta chi_2, beta = +-sqrt(3)/4, alpha supported on P, sum alpha = 0.
+       Indeed <z_j^0, z^*_j> = 4 m_j^2 <f_Z,f_*> = 0, so z_j^0 lies in chi_1^perp cap V = span(chi_1,chi_2): z_j^0 = m_j(alpha_j chi_1 +
+       beta_j chi_2), and <z_j^0,z_j^0> = 4 m_j^2 beta_j^2 = (3/4) m_j^2 gives beta_j = +-sqrt(3)/4.  s(Z) = 0 gives sum m_j beta_j = 0;
+       if the signs were not all equal this would read 2 m_j beta = 0 for one j in P.  So beta_j = beta for all j.
+   (3) Hence N = { Y = kappa h_0 m^T + chi_1 lam^T : (kappa, lam) in N' }, N' a plane in C x W_P (W_P = zero-sum vectors on P) not contained
+       in kappa = 0.  On the whole 3-dim family: <h_0,h_0> = 1, <h_0,chi_1> = 0, so <y_j,y_k> = kappa^2 m_j m_k (j != k in P), tau(y_j) = kappa m_j,
+       and for a neutral column n: sigma_2 = 0, perm = 0, sigma_3 = 2 (tau(y_a y_b y_c) - kappa^3 e_3(m)).  With tau(h_0^3) = 5/8,
+       tau(h_0^2 chi_1) = 0, tau(h_0 chi_1^2) = 4 beta, tau(chi_1^3) = 0:
+           C_n(Y) - 24 = 2 kappa ( 4 beta Q_m(lam) - (3/8) e_3(m) kappa^2 ),   Q_m(lam) := m_a lam_b lam_c + m_b lam_a lam_c + m_c lam_a lam_b,
+           C_a(Y) - 24 = -6 kappa m_a  (a in P)                                  [checked numerically, r4_pr3.py (1): 1e-14].
+   (4) C_n == 24 on N and kappa is not identically 0 on N', so the quadratic form G = 4 beta Q_m(lam) - (3/8) e_3 kappa^2 vanishes on the
+       plane N' of the 3-dim space C x W_P: rank G <= 2.  But G is block diagonal with e_3 = m_a m_b m_c != 0, beta != 0 and, in the
+       coordinates (lam_a, lam_b), Q_m = -m_b lam_a^2 - m_a lam_b^2 - 2(m_a+m_b) lam_a lam_b of determinant -(m_a^2 + m_a m_b + m_b^2) = -<m,m>/2.
+       So rank G = 3 unless <m,m> = 0.  QED
+   Remarks. (i) For ISOTROPIC m = (1,w,w^2,0,0) the proof shows instead: Q_m = -(lam_b - w^2 lam_a)^2, Z_* = chi_1 mbar^T with mbar = (1,w^2,w)
+   = 1/m, and N is one of the four explicit planes {lam_b - w^2 lam_a = xi kappa}, xi^2 = -3/(32 beta), beta = +-sqrt(3)/4.  These ARE 2-dim
+   level spaces with defect line C m (r4_pr3.py (2): 1e-13) - non-split, not containing any single-row matrix.  [NUMERICAL] they are maximal:
+   no one-vector extension with defect in C m in 60 calibrated starts, so there is numerically no principal (5,1) for this m either.
+   (ii) The N-problem for larger support [NUMERICAL, r4_n2.py, LM on Gr(2, 3|P|-2), calibrated by |P| = 3: good m 0 injective solutions
+   among 169 hits, isotropic m 50 among 243]: |P| = 4: (1,2,3,-6,0): 0 injective among 19 hits; isotropic (1,i,-1,-i,0): 0/20;
+   (1,2,-4,1,0) (a REPEATED entry): 8 injective among 38, none of which extends to dimension 3 (0/64 starts); |P| = 5: (1,2,3,-1,-5): 0/11,
+   isotropic fifth roots: 0/15.  So the N-problem seems to have no solution for m with distinct nonzero entries outside the isotropic
+   3-support case - a small polynomial system (two matrices on |P| columns), i.e. a finite exact computation for |P| = 4, 5.
+
+ R4.6 THE SUGGESTED TRICKS, AND WHY THEY DO NOT CLOSE THE CASE (rigorous remarks).
+   (a) m in two slots / isotropic split case.  If e_i m^T in L' and <m,m> = 0, pairing C(Y) = D_i(Y) l_i with m gives 0 = mu(Y) <m, y^i>,
+       and mu(0) = -6, so <m, y^i> = 0 on L' (row i of L' lies in m^perp); Per(.., m, .., m) = <m, D_i m> = 0.  But both are already
+       consequences of the LINEAR part of D_i(Y) m = mu m (which gives <c',m> = 0 and c'_j constant on P for the column sums c' of the other
+       three rows; then y^i = kappa m - c').  So the two-slot pairing carries no new information when m is isotropic; the non-isotropic
+       proof works only because <m,m> != 0 lets one solve for thetahat.  [r4_i2.py confirms both on the isotropic split examples.]
+   (b) Lemma EQ over all pairs = "merged columns".  For m_a != m_b, m_b C_a - m_a C_b = 24(m_b - m_a) says that the 4 x 4 space
+       { [ (m_b y_b - m_a y_a)/(m_b - m_a), y_k, y_l, y_n ] } is level.  The vectors m_b e_a - m_a e_b span m^perp, so all these identities
+       together are exactly <w, C(Y)> = 24 sum w for w in m^perp - the definition of the defect line.  No new information; what Lemma EQ adds
+       is the bound 3 for the FIXED subspaces {y_a = y_b}, which is compatible with dim 5 (two independent conditions per pair).
+   (c) Rows' R3.10 reduction (dim Pi_0 <= 2) suffices only for full-support isotropic m: for a (5,1), dim Pi = 4 and c' ranges over
+       span(1_P, e_n : n neutral), so dim Pi_0 >= |P| - 2; a contradiction needs dim Pi_0 <= |P| - 3.
+
+ R4.7 NUMERICS OF THIS ROUND (all flagged numerical).
+   r4_z4.py, Gr(4,15), column-centred 4-dim spaces with defect in C m [(SL_m)]: two-column control 3/49 converged (all genuinely defect 1);
+   isotropic (1,w,w^2,0,0) 0/36; isotropic (1,i,-1,-i,0) 0/36; isotropic fifth roots 0/60; (1,2,3,-1,-5) 0/60.  The control rate is low
+   (6%), so each line alone is weak evidence (probability about 0.1 - 0.03 of missing an equally frequent family).
+   r4_pr3.py, r4_n2.py, r4_climb.py: see R4.5.  r4_test1.py: R4.3 check and the cubic identity for column-centred spaces
+   (E_3 := sum_{a<b<c} tau(y_a y_b y_c) = 0 and tau((b_j+s)(2b_j^2 + 3s^2 - sum_k b_k^2)) = -16 theta_3 m_j, checked to 1e-10 on the four
+   genuine column-centred (3,1) spaces).
+
+ R4.8 WHAT IS LEFT OF (DI_5) AT e = 1, AND e = 2, 3.
+   NOT PROVED: (DI_5) at e = 1.  Proved so far: two-column m (TC5); split non-isotropic (SPLIT); principal with |supp m| = 3 non-isotropic (PR3).
+   Open, in decreasing order of evidence that they are empty:
+   (o1) principal (5,1) spaces for |supp m| >= 4 or m isotropic: by PS these are H (+) N with N a solution of the N-problem; numerically
+        the N-problem has no solution for distinct entries and |P| >= 4, and the solutions that exist do not extend.  Exact statement to prove:
+        "the N-problem has no solution" (|P| = 4, 5, distinct entries) and "N (+) C eta is never level with defect in C m" otherwise.
+   (o2) non-principal (5,1) spaces: ker kappa (4-dim, column-centred, defect line C m) contains no principal H.  By QB, for q = rank s|_ker kappa = 3
+        and a neutral column, ker kappa = H' (+) C Z_* with Z_* doubly centred and supported on P, but H' is not strongly level and the columns
+        of Z_* need not be isotropic (<z^*_j,z^*_j> = x m_j).  For q <= 2 the doubly centred part has dim >= 2.  No such 4-dim space is known
+        for non-two-column m; this is (SL_m) and needs the cubic/quartic analysis of blueprint S3-S8 with the extra form (not done).
+   e = 2, 3: the method of PS gives only the normal form.  If ker(c) contains a principal H then L' = H (+) N, N = ker s, and
+        z_j = (c_j(Z)/4) 1 - B_j (phi_Z)_j with phi_Z in V (x) C(L') (i.e. sum_j w_j (phi_Z)_j = 0 for w in C(L')^perp), and the vector
+        (4 <(phi_Z)_j,(phi_Z)_j> - 3 c_j(Z)^2)_j lies in C(L').  For e = 1 this forces dim N <= 2; for e >= 2 it gives no bound better than
+        dim N <= 3e, so (6,2) and (7,3) are NOT reached; rigorous there remain FS (one-row split, nondegenerate C) and TS only.

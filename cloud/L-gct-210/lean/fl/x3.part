@@ -1,0 +1,197 @@
+
+def dotL : (Fin 5 → ℂ) →ₗ[ℂ] Module.Dual ℂ (Fin 5 → ℂ) where
+  toFun c :=
+    { toFun := fun w => c 0 * w 0 + c 1 * w 1 + c 2 * w 2 + c 3 * w 3 + c 4 * w 4
+      map_add' := fun w w' => by
+        simp only [Pi.add_apply]
+        ring
+      map_smul' := fun k w => by
+        simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
+        ring }
+  map_add' c c' := by
+    apply LinearMap.ext
+    intro w
+    show (c + c') 0 * w 0 + (c + c') 1 * w 1 + (c + c') 2 * w 2 + (c + c') 3 * w 3
+      + (c + c') 4 * w 4 = (c 0 * w 0 + c 1 * w 1 + c 2 * w 2 + c 3 * w 3 + c 4 * w 4)
+      + (c' 0 * w 0 + c' 1 * w 1 + c' 2 * w 2 + c' 3 * w 3 + c' 4 * w 4)
+    simp only [Pi.add_apply]
+    ring
+  map_smul' k c := by
+    apply LinearMap.ext
+    intro w
+    show (k • c) 0 * w 0 + (k • c) 1 * w 1 + (k • c) 2 * w 2 + (k • c) 3 * w 3
+      + (k • c) 4 * w 4 = k * (c 0 * w 0 + c 1 * w 1 + c 2 * w 2 + c 3 * w 3 + c 4 * w 4)
+    simp only [Pi.smul_apply, smul_eq_mul]
+    ring
+
+theorem dotL_apply (c w : Fin 5 → ℂ) :
+    dotL c w = c 0 * w 0 + c 1 * w 1 + c 2 * w 2 + c 3 * w 3 + c 4 * w 4 := rfl
+
+theorem dotL_ker : LinearMap.ker dotL = ⊥ := by
+  rw [eq_bot_iff]
+  intro c hc
+  rw [Submodule.mem_bot]
+  have hc' : dotL c = 0 := LinearMap.mem_ker.mp hc
+  have t0 : dotL c (fun b => if b = (0 : Fin 5) then 1 else 0) = 0 := by
+    rw [hc']
+    rfl
+  have t1 : dotL c (fun b => if b = (1 : Fin 5) then 1 else 0) = 0 := by
+    rw [hc']
+    rfl
+  have t2 : dotL c (fun b => if b = (2 : Fin 5) then 1 else 0) = 0 := by
+    rw [hc']
+    rfl
+  have t3 : dotL c (fun b => if b = (3 : Fin 5) then 1 else 0) = 0 := by
+    rw [hc']
+    rfl
+  have t4 : dotL c (fun b => if b = (4 : Fin 5) then 1 else 0) = 0 := by
+    rw [hc']
+    rfl
+  rw [dotL_apply] at t0 t1 t2 t3 t4
+  simp at t0 t1 t2 t3 t4
+  funext a
+  exact fin5 (fun a => c a = 0) t0 t1 t2 t3 t4 a
+
+def defC (K : Submodule ℂ M45) : Submodule ℂ (Fin 5 → ℂ) :=
+  Submodule.span ℂ {c | ∃ Y ∈ K, c = fun a => P4 a (fun p => 1 + Y p)}
+
+theorem defC_mono {K K' : Submodule ℂ M45} (h : K ≤ K') : defC K ≤ defC K' :=
+  Submodule.span_mono (fun _ ⟨Y, hY, hc⟩ => ⟨Y, h hY, hc⟩)
+
+theorem defW_finrank (K : Submodule ℂ M45) :
+    Module.finrank ℂ (defW K) + Module.finrank ℂ (defC K) = 5 := by
+  have h1 := Subspace.finrank_add_finrank_dualCoannihilator_eq ((defC K).map dotL)
+  have e1 : ((defC K).map dotL).dualCoannihilator = defW K := by
+    ext w
+    rw [Submodule.mem_dualCoannihilator, mem_defW]
+    constructor
+    · intro h Y hY
+      have h2 := h (dotL (fun a => P4 a (fun p => 1 + Y p)))
+        (Submodule.mem_map_of_mem (Submodule.subset_span ⟨Y, hY, rfl⟩))
+      rw [dotL_apply] at h2
+      rw [Fin.sum_univ_five]
+      linear_combination h2
+    · intro h φ hφ
+      obtain ⟨c, hc, rfl⟩ := hφ
+      have hle : defC K ≤ LinearMap.ker (dotL.flip w) := by
+        refine Submodule.span_le.mpr ?_
+        rintro c ⟨Y, hY, rfl⟩
+        refine LinearMap.mem_ker.mpr ?_
+        show dotL (fun a => P4 a (fun p => 1 + Y p)) w = 0
+        rw [dotL_apply]
+        have h3 := h Y hY
+        rw [Fin.sum_univ_five] at h3
+        linear_combination h3
+      exact LinearMap.mem_ker.mp (hle hc)
+  rw [e1] at h1
+  have h3 := rank_nullity (defC K) dotL
+  have hk : (defC K ⊓ LinearMap.ker dotL : Submodule ℂ (Fin 5 → ℂ)) = ⊥ := by
+    rw [dotL_ker, inf_bot_eq]
+  rw [hk, finrank_bot] at h3
+  have h5 : Module.finrank ℂ (Fin 5 → ℂ) = 5 := by
+    rw [Module.finrank_fintype_fun_eq_card, Fintype.card_fin]
+  omega
+
+theorem defect_conv' (L : Submodule ℂ M55)
+    (hL : ∀ t ∈ L, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120) (r : Fin 5) :
+    Module.finrank ℂ L + Module.finrank ℂ (defC (L.map (del r))) ≤
+      Module.finrank ℂ (L.map (del r)) + 5 := by
+  have h1 := defect_conv L hL r
+  have h2 := defW_finrank (L.map (del r))
+  omega
+
+theorem defL_finrank' (r : Fin 5) (K : Submodule ℂ M45) :
+    Module.finrank ℂ (defL r K) + Module.finrank ℂ (defC K) = Module.finrank ℂ K + 5 := by
+  have h1 := defL_finrank r K
+  have h2 := defW_finrank K
+  omega
+
+theorem HyperplaneLemma (e : ℕ)
+    (hDI : ∀ K : Submodule ℂ M45, Lev45 K → Module.finrank ℂ (defC K) ≤ e →
+      Module.finrank ℂ K ≤ Module.finrank ℂ (defC K) + 2)
+    (L' : Submodule ℂ M45) (hL' : Lev45 L') (he : Module.finrank ℂ (defC L') = e + 1)
+    (K : Submodule ℂ M45) (hK : K ≤ L') :
+    defC K = defC L' ∨ Module.finrank ℂ K ≤ Module.finrank ℂ (defC K) + 2 := by
+  have hle := defC_mono hK
+  by_cases h : Module.finrank ℂ (defC K) ≤ e
+  · exact Or.inr (hDI K (fun Y hY => hL' Y (hK hY)) h)
+  · left
+    exact Submodule.eq_of_le_of_finrank_le hle (by omega)
+
+theorem HyperplaneCor (e : ℕ)
+    (hDI : ∀ K : Submodule ℂ M45, Lev45 K → Module.finrank ℂ (defC K) ≤ e →
+      Module.finrank ℂ K ≤ Module.finrank ℂ (defC K) + 2)
+    (L' : Submodule ℂ M45) (hL' : Lev45 L') (he : Module.finrank ℂ (defC L') = e + 1)
+    (K : Submodule ℂ M45) (hK : K ≤ L') (hdim : e + 3 ≤ Module.finrank ℂ K) :
+    defC K = defC L' := by
+  have hle := defC_mono hK
+  by_cases h : Module.finrank ℂ (defC K) ≤ e
+  · have h2 := hDI K (fun Y hY => hL' Y (hK hY)) h
+    omega
+  · exact Submodule.eq_of_le_of_finrank_le hle (by omega)
+
+theorem LemmaHYP_a (K H : Submodule ℂ M45) (m : Fin 5 → ℂ) (hdef : DefLine K m) (hH : H ≤ K)
+    (h4 : Module.finrank ℂ H = 4) : DefLine H m ∧ ¬ SLev H := by
+  refine ⟨fun Y hY => hdef Y (hH hY), fun hS => ?_⟩
+  have h := LemmaSL H hS
+  omega
+
+def colsumL (j : Fin 5) : M45 →ₗ[ℂ] ℂ where
+  toFun Y := ∑ k : Fin 4, Y (k, j)
+  map_add' Y Y' := by
+    simp only [Pi.add_apply, Finset.sum_add_distrib]
+  map_smul' c Y := by
+    simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply, Finset.mul_sum]
+
+theorem colsumL_apply (j : Fin 5) (Y : M45) : colsumL j Y = ∑ k : Fin 4, Y (k, j) := rfl
+
+theorem hyp4 (K : Submodule ℂ M45) (hK5 : Module.finrank ℂ K = 5) (ψ : M45 →ₗ[ℂ] ℂ)
+    (Z : M45) (hZ : Z ∈ K) (hψ : ψ Z ≠ 0) :
+    Module.finrank ℂ (K ⊓ LinearMap.ker ψ : Submodule ℂ M45) = 4 := by
+  have rn := rank_nullity K ψ
+  have h1 : Module.finrank ℂ (K.map ψ) ≤ 1 := by
+    have h := Submodule.finrank_le (K.map ψ)
+    rw [Module.finrank_self] at h
+    exact h
+  have h2 : Module.finrank ℂ (K.map ψ) ≠ 0 := by
+    intro h0
+    have hb := Submodule.finrank_eq_zero.mp h0
+    have hm : ψ Z ∈ K.map ψ := Submodule.mem_map_of_mem hZ
+    rw [hb, Submodule.mem_bot] at hm
+    exact hψ hm
+  omega
+
+theorem LemmaHYP_b (m : Fin 5 → ℂ) (hm0 : m ≠ 0)
+    (hdich : ∀ H : Submodule ℂ M45, DefLine H m → Module.finrank ℂ H = 4 →
+      ∃ i : Fin 4, (fun p : Fin 4 × Fin 5 => if p.1 = i then m p.2 else 0) ∈ H)
+    (K : Submodule ℂ M45) (hK : DefLine K m) : Module.finrank ℂ K ≠ 5 := by
+  intro hK5
+  obtain ⟨j0, hj0⟩ := Function.ne_iff.mp hm0
+  have hj0' : m j0 ≠ 0 := hj0
+  have hval : ∀ i : Fin 4,
+      colsumL j0 (fun p : Fin 4 × Fin 5 => if p.1 = i then m p.2 else 0) = m j0 := by
+    intro i
+    rw [colsumL_apply]
+    simp
+  by_cases hφ : ∃ Z ∈ K, colsumL j0 Z ≠ 0
+  · obtain ⟨Z, hZ, hZφ⟩ := hφ
+    have h4 := hyp4 K hK5 (colsumL j0) Z hZ hZφ
+    obtain ⟨i, hi⟩ := hdich _ (fun Y hY => hK Y (Submodule.mem_inf.mp hY).1) h4
+    have h0 := LinearMap.mem_ker.mp (Submodule.mem_inf.mp hi).2
+    rw [hval i] at h0
+    exact hj0' h0
+  · have hall : ∀ Z ∈ K, colsumL j0 Z = 0 := by
+      intro Z hZ
+      by_contra hne
+      exact hφ ⟨Z, hZ, hne⟩
+    have hne : K ≠ ⊥ := by
+      intro hb
+      rw [hb, finrank_bot] at hK5
+      omega
+    obtain ⟨Z, hZ, hZ0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
+    obtain ⟨p0, hp0⟩ := Function.ne_iff.mp hZ0
+    have h4 := hyp4 K hK5 (LinearMap.proj p0) Z hZ hp0
+    obtain ⟨i, hi⟩ := hdich _ (fun Y hY => hK Y (Submodule.mem_inf.mp hY).1) h4
+    have h0 := hall _ (Submodule.mem_inf.mp hi).1
+    rw [hval i] at h0
+    exact hj0' h0

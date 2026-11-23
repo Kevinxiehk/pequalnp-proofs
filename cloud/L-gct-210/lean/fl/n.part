@@ -1,0 +1,187 @@
+theorem t3_ip_r (x y z : V4) : t3 x y z = ip x (fun i => y i * z i : V4) := by
+  simp only [t3, ip]
+  ring
+
+theorem t3_ip_l (x y z : V4) : t3 x y z = ip (fun i => x i * y i : V4) z := by
+  simp only [t3, ip]
+
+theorem t4_ip (x y z w : V4) :
+    t4 x y z w = ip (fun i => x i * y i : V4) (fun i => z i * w i : V4) := by
+  simp only [t4, ip]
+  ring
+
+theorem IIa_pqr (p1 q1 r1 p2 q2 r2 : ℂ) (iv : 2 * p1 * r1 + q1 ^ 2 = 0)
+    (iw : 2 * p2 * r2 + q2 ^ 2 = 0)
+    (T1 : 2 * p1 * p2 * q2 + q1 * (p2 ^ 2 + r2 ^ 2) + 2 * r1 * q2 * r2 = 0)
+    (T2 : 2 * p2 * p1 * q1 + q2 * (p1 ^ 2 + r1 ^ 2) + 2 * r2 * q1 * r1 = 0)
+    (Bq : -24 * (4 * q1 * r1 * p2 * q2 + (p1 ^ 2 + r1 ^ 2) * (p2 ^ 2 + r2 ^ 2)
+      + 4 * p1 * q1 * q2 * r2) + 32 * (p1 * r2 + q1 * q2 + r1 * p2) ^ 2 = 0)
+    (hnp : ∀ s t : ℂ, s * p1 + t * p2 = 0 → s * q1 + t * q2 = 0 → s * r1 + t * r2 = 0 →
+      s = 0 ∧ t = 0) :
+    ∃ c : ℂ, 2 * q1 * r1 = c * p2 ∧ p1 ^ 2 + r1 ^ 2 = c * q2 ∧ 2 * p1 * q1 = c * r2 := by
+  by_cases hp1 : p1 = 0
+  · exfalso
+    subst hp1
+    have hq1 : q1 = 0 := by
+      have h : q1 ^ 2 = 0 := by linear_combination iv
+      exact (pow_eq_zero_iff (by norm_num)).mp h
+    subst hq1
+    have hr1 : r1 ≠ 0 := by
+      intro h
+      have h1 := (hnp 1 0 (by ring) (by ring) (by rw [h]; ring)).1
+      exact one_ne_zero h1
+    have hq2 : q2 = 0 := by
+      have h : q2 * r1 ^ 2 = 0 := by linear_combination T2
+      exact (mul_eq_zero.mp h).resolve_right (pow_ne_zero 2 hr1)
+    subst hq2
+    have hp2 : p2 ≠ 0 := by
+      intro h
+      have h1 := (hnp r2 (-r1) (by rw [h]; ring) (by ring) (by ring)).2
+      exact hr1 (neg_eq_zero.mp h1)
+    have hr2 : r2 = 0 := by
+      have h : p2 * r2 = 0 := by linear_combination (1 / 2 : ℂ) * iw
+      exact (mul_eq_zero.mp h).resolve_left hp2
+    subst hr2
+    have hB : r1 ^ 2 * p2 ^ 2 = 0 := by linear_combination (1 / 8 : ℂ) * Bq
+    exact mul_ne_zero (pow_ne_zero 2 hr1) (pow_ne_zero 2 hp2) hB
+  · by_cases hp2 : p2 = 0
+    · exfalso
+      subst hp2
+      have hq2 : q2 = 0 := by
+        have h : q2 ^ 2 = 0 := by linear_combination iw
+        exact (pow_eq_zero_iff (by norm_num)).mp h
+      subst hq2
+      have hr2 : r2 ≠ 0 := by
+        intro h
+        have h1 := (hnp 0 1 (by ring) (by ring) (by rw [h]; ring)).2
+        exact one_ne_zero h1
+      have hq1 : q1 = 0 := by
+        have h : q1 * r2 ^ 2 = 0 := by linear_combination T1
+        exact (mul_eq_zero.mp h).resolve_right (pow_ne_zero 2 hr2)
+      subst hq1
+      have hr1 : r1 = 0 := by
+        have h : p1 * r1 = 0 := by linear_combination (1 / 2 : ℂ) * iv
+        exact (mul_eq_zero.mp h).resolve_left hp1
+      subst hr1
+      have hB : p1 ^ 2 * r2 ^ 2 = 0 := by linear_combination (1 / 8 : ℂ) * Bq
+      exact mul_ne_zero (pow_ne_zero 2 hp1) (pow_ne_zero 2 hr2) hB
+    · obtain ⟨t, ht⟩ : ∃ t : ℂ, q1 = p1 * t :=
+        ⟨q1 * p1⁻¹, by linear_combination (-q1) * mul_inv_cancel₀ hp1⟩
+      obtain ⟨u, hu⟩ : ∃ u : ℂ, q2 = p2 * u :=
+        ⟨q2 * p2⁻¹, by linear_combination (-q2) * mul_inv_cancel₀ hp2⟩
+      subst ht
+      subst hu
+      have hr1 : r1 = -(p1 * t ^ 2) / 2 := by
+        have h : p1 * (2 * r1 + p1 * t ^ 2) = 0 := by linear_combination iv
+        have h' := (mul_eq_zero.mp h).resolve_left hp1
+        linear_combination (1 / 2 : ℂ) * h'
+      have hr2 : r2 = -(p2 * u ^ 2) / 2 := by
+        have h : p2 * (2 * r2 + p2 * u ^ 2) = 0 := by linear_combination iw
+        have h' := (mul_eq_zero.mp h).resolve_left hp2
+        linear_combination (1 / 2 : ℂ) * h'
+      subst hr1
+      subst hr2
+      have E1 : 2 * u + t + t * u ^ 4 / 4 + t ^ 2 * u ^ 3 / 2 = 0 := by
+        have h : p1 * p2 ^ 2 * (2 * u + t + t * u ^ 4 / 4 + t ^ 2 * u ^ 3 / 2) = 0 := by
+          linear_combination T1
+        exact (mul_eq_zero.mp h).resolve_left (mul_ne_zero hp1 (pow_ne_zero 2 hp2))
+      have E2 : 2 * t + u + u * t ^ 4 / 4 + u ^ 2 * t ^ 3 / 2 = 0 := by
+        have h : p1 ^ 2 * p2 * (2 * t + u + u * t ^ 4 / 4 + u ^ 2 * t ^ 3 / 2) = 0 := by
+          linear_combination T2
+        exact (mul_eq_zero.mp h).resolve_left (mul_ne_zero (pow_ne_zero 2 hp1) hp2)
+      have BB : 8 * (t - u) ^ 4
+          - 24 * ((1 + t ^ 4 / 4) * (1 + u ^ 4 / 4) - 2 * t * u * (t ^ 2 + u ^ 2)) = 0 := by
+        have h : p1 ^ 2 * p2 ^ 2 * (8 * (t - u) ^ 4
+            - 24 * ((1 + t ^ 4 / 4) * (1 + u ^ 4 / 4) - 2 * t * u * (t ^ 2 + u ^ 2))) = 0 := by
+          linear_combination Bq
+        exact (mul_eq_zero.mp h).resolve_left
+          (mul_ne_zero (pow_ne_zero 2 hp1) (pow_ne_zero 2 hp2))
+      have htu : t ≠ u := by
+        intro h
+        subst h
+        have h1 := (hnp p2 (-p1) (by ring) (by ring) (by ring)).1
+        exact hp2 h1
+      obtain ⟨hA, hb⟩ := IIa_tu t u htu E1 E2 BB
+      obtain ⟨c, hc⟩ : ∃ c : ℂ, c * p2 = -(p1 ^ 2 * t ^ 3) :=
+        ⟨-(p1 ^ 2 * t ^ 3) * p2⁻¹, by
+          linear_combination (-(p1 ^ 2 * t ^ 3)) * mul_inv_cancel₀ hp2⟩
+      refine ⟨c, ?_, ?_, ?_⟩
+      · linear_combination (-1 : ℂ) * hc
+      · linear_combination (p1 ^ 2 / 4) * hA - u * hc
+      · linear_combination (-(p1 ^ 2 * t) / 2) * hb + (u ^ 2 / 2) * hc
+
+theorem sq_Ps4 (j : ℂ) (hj : j * j = -1) (p1 q1 r1 p2 q2 r2 c : ℂ)
+    (iv : 2 * p1 * r1 + q1 ^ 2 = 0) (h1 : 2 * q1 * r1 = c * p2)
+    (h2 : p1 ^ 2 + r1 ^ 2 = c * q2) (h3 : 2 * p1 * q1 = c * r2) :
+    (fun i => Ps4 j 0 p1 q1 r1 i * Ps4 j 0 p1 q1 r1 i : V4) = c • Ps4 j 0 p2 q2 r2 := by
+  rw [Ps4_mul j hj]
+  funext i
+  fin_cases i
+  · show Ps4 j _ _ _ _ 0 = c * Ps4 j 0 p2 q2 r2 0
+    simp only [Ps4_0]
+    linear_combination iv + h1 + h2 + h3
+  · show Ps4 j _ _ _ _ 1 = c * Ps4 j 0 p2 q2 r2 1
+    simp only [Ps4_1]
+    linear_combination iv + j * h1 - h2 - j * h3
+  · show Ps4 j _ _ _ _ 2 = c * Ps4 j 0 p2 q2 r2 2
+    simp only [Ps4_2]
+    linear_combination iv - h1 + h2 - h3
+  · show Ps4 j _ _ _ _ 3 = c * Ps4 j 0 p2 q2 r2 3
+    simp only [Ps4_3]
+    linear_combination iv - j * h1 - h2 + j * h3
+
+theorem HypIIa_proof : HypIIa := by
+  unfold HypIIa
+  intro v w hv1 hv2 hw1 hw2 hind i1 i2 i3
+  have hj : Complex.I * Complex.I = -1 := Complex.I_mul_I
+  obtain ⟨p1, q1, r1, hv⟩ : ∃ p q r : ℂ, v = Ps4 Complex.I 0 p q r :=
+    ⟨_, _, _, Ps4_param Complex.I hj v hv1⟩
+  obtain ⟨p2, q2, r2, hw⟩ : ∃ p q r : ℂ, w = Ps4 Complex.I 0 p q r :=
+    ⟨_, _, _, Ps4_param Complex.I hj w hw1⟩
+  subst hv
+  subst hw
+  have hvv := Ps4_mul Complex.I hj 0 p1 q1 r1 0 p1 q1 r1
+  have hww := Ps4_mul Complex.I hj 0 p2 q2 r2 0 p2 q2 r2
+  rw [ip_Ps4 Complex.I hj] at hv2 hw2
+  rw [t3_ip_r, hww, ip_Ps4 Complex.I hj] at i1
+  rw [t3_ip_l, hvv, ip_Ps4 Complex.I hj] at i2
+  simp only [br] at i3
+  rw [t4_ip, hvv, hww] at i3
+  simp only [ip_Ps4 Complex.I hj] at i3
+  have iv : 2 * p1 * r1 + q1 ^ 2 = 0 := by linear_combination (1 / 4 : ℂ) * hv2
+  have iw : 2 * p2 * r2 + q2 ^ 2 = 0 := by linear_combination (1 / 4 : ℂ) * hw2
+  have T1 : 2 * p1 * p2 * q2 + q1 * (p2 ^ 2 + r2 ^ 2) + 2 * r1 * q2 * r2 = 0 := by
+    linear_combination (1 / 4 : ℂ) * i1
+  have T2 : 2 * p2 * p1 * q1 + q2 * (p1 ^ 2 + r1 ^ 2) + 2 * r2 * q1 * r1 = 0 := by
+    linear_combination (1 / 4 : ℂ) * i2
+  have Bq : -24 * (4 * q1 * r1 * p2 * q2 + (p1 ^ 2 + r1 ^ 2) * (p2 ^ 2 + r2 ^ 2)
+      + 4 * p1 * q1 * q2 * r2) + 32 * (p1 * r2 + q1 * q2 + r1 * p2) ^ 2 = 0 := by
+    linear_combination i3 + 8 * (2 * p2 * r2 + q2 ^ 2) * iv
+  have hnp : ∀ s t : ℂ, s * p1 + t * p2 = 0 → s * q1 + t * q2 = 0 → s * r1 + t * r2 = 0 →
+      s = 0 ∧ t = 0 := by
+    intro s t h1 h2 h3
+    apply hind
+    funext i
+    fin_cases i
+    · show s * Ps4 Complex.I 0 p1 q1 r1 0 + t * Ps4 Complex.I 0 p2 q2 r2 0 = 0
+      simp only [Ps4_0]
+      linear_combination h1 + h2 + h3
+    · show s * Ps4 Complex.I 0 p1 q1 r1 1 + t * Ps4 Complex.I 0 p2 q2 r2 1 = 0
+      simp only [Ps4_1]
+      linear_combination Complex.I * h1 - h2 - Complex.I * h3
+    · show s * Ps4 Complex.I 0 p1 q1 r1 2 + t * Ps4 Complex.I 0 p2 q2 r2 2 = 0
+      simp only [Ps4_2]
+      linear_combination (-1 : ℂ) * h1 + h2 - h3
+    · show s * Ps4 Complex.I 0 p1 q1 r1 3 + t * Ps4 Complex.I 0 p2 q2 r2 3 = 0
+      simp only [Ps4_3]
+      linear_combination (-Complex.I) * h1 - h2 + Complex.I * h3
+  obtain ⟨c, a1, a2, a3⟩ := IIa_pqr p1 q1 r1 p2 q2 r2 iv iw T1 T2 Bq hnp
+  obtain ⟨c', b1, b2, b3⟩ := IIa_pqr p2 q2 r2 p1 q1 r1 iw iv (by linear_combination T2)
+    (by linear_combination T1) (by linear_combination Bq)
+    (fun s t h1 h2 h3 => by
+      have h := hnp t s (by linear_combination h1) (by linear_combination h2)
+        (by linear_combination h3)
+      exact ⟨h.2, h.1⟩)
+  exact ⟨⟨c, sq_Ps4 Complex.I hj p1 q1 r1 p2 q2 r2 c iv a1 a2 a3⟩,
+    ⟨c', sq_Ps4 Complex.I hj p2 q2 r2 p1 q1 r1 c' iw b1 b2 b3⟩⟩
+

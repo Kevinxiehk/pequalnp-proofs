@@ -1,0 +1,95 @@
+
+theorem SL6 (H6 : HypS6) (K : Submodule ℂ M45) (hK : SLev K) : Module.finrank ℂ K ≤ 3 :=
+  SL_of H6 (HypS7_of (HypS7alg_of HypIIa_proof)) HypS8_proof K hK
+
+theorem emb_perm_bij : Function.Bijective (fun σ : Equiv.Perm (Fin 5) => σ.toEmbedding) :=
+  ⟨fun σ τ h => Equiv.ext fun x => DFunLike.congr_fun h x,
+    fun e => ⟨e.equivOfFiniteSelfEmbedding, e.toEmbedding_equivOfFiniteSelfEmbedding⟩⟩
+
+theorem gap_swap5 (t : M55) :
+    (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (f i, i))) =
+      ∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i)) := by
+  have h1 : ∑ σ : Equiv.Perm (Fin 5), ∏ i, (1 + t (σ i, i)) =
+      ∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (f i, i)) :=
+    Fintype.sum_bijective _ emb_perm_bij (fun σ : Equiv.Perm (Fin 5) => ∏ i, (1 + t (σ i, i)))
+      (fun f : Fin 5 ↪ Fin 5 => ∏ i, (1 + t (f i, i))) (fun σ => rfl)
+  have h2 : ∑ σ : Equiv.Perm (Fin 5), ∏ i, (1 + t (i, σ i)) =
+      ∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i)) :=
+    Fintype.sum_bijective _ emb_perm_bij (fun σ : Equiv.Perm (Fin 5) => ∏ i, (1 + t (i, σ i)))
+      (fun f : Fin 5 ↪ Fin 5 => ∏ i, (1 + t (i, f i))) (fun σ => rfl)
+  have h3 : ∑ σ : Equiv.Perm (Fin 5), ∏ i, (1 + t (i, σ⁻¹ i)) =
+      ∑ σ : Equiv.Perm (Fin 5), ∏ i, (1 + t (i, σ i)) :=
+    Equiv.sum_comp (Equiv.inv (Equiv.Perm (Fin 5)))
+      (fun σ : Equiv.Perm (Fin 5) => ∏ i, (1 + t (i, σ i)))
+  have h4 : ∀ σ : Equiv.Perm (Fin 5), ∏ i, (1 + t (σ i, i)) = ∏ i, (1 + t (i, σ⁻¹ i)) := by
+    intro σ
+    exact Fintype.prod_equiv σ (fun i => 1 + t (σ i, i)) (fun j => 1 + t (j, σ⁻¹ j))
+      (fun i => by simp)
+  rw [← h1, ← h2, ← h3]
+  exact Finset.sum_congr rfl (fun σ _ => h4 σ)
+
+def trE5 : M55 ≃ₗ[ℂ] M55 := LinearEquiv.funCongrLeft ℂ ℂ (Equiv.prodComm (Fin 5) (Fin 5))
+
+theorem trE5_apply (t : M55) (i j : Fin 5) : trE5 t (i, j) = t (j, i) := rfl
+
+def colMat (c : Fin 5) (w : Fin 5 → ℂ) : M55 := fun p => if p.2 = c then w p.1 else 0
+
+theorem FL_col_of (HSL : ∀ K : Submodule ℂ M45, SLev K → Module.finrank ℂ K ≤ 3)
+    (L : Submodule ℂ M55)
+    (hL : ∀ t ∈ L, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120)
+    (c : Fin 5) (hF : ∀ w : Fin 5 → ℂ, ∑ j, w j = 0 → colMat c w ∈ L) :
+    Module.finrank ℂ L ≤ 7 := by
+  have hL' : ∀ t ∈ L.map (trE5 : M55 →ₗ[ℂ] M55),
+      (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120 := by
+    rintro _ ⟨t, ht, rfl⟩
+    have h1 := gap_swap5 t
+    have h2 : (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + (trE5 t) (i, f i))) =
+        ∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (f i, i)) := rfl
+    exact h2.trans (h1.trans (hL t ht))
+  have hF' : ∀ w : Fin 5 → ℂ, ∑ j, w j = 0 →
+      rowMat c w ∈ L.map (trE5 : M55 →ₗ[ℂ] M55) := by
+    intro w hw
+    refine ⟨colMat c w, hF w hw, ?_⟩
+    funext ⟨i, j⟩
+    rfl
+  have h := FL_of HSL _ hL' c hF'
+  have h2 := LinearEquiv.finrank_map_eq trE5 L
+  omega
+
+theorem cor_row (HSL : ∀ K : Submodule ℂ M45, SLev K → Module.finrank ℂ K ≤ 3)
+    (L : Submodule ℂ M55) (r : Fin 5)
+    (hS : SLev ((L ⊓ LinearMap.ker (rowP r) : Submodule ℂ M55).map (del r))) :
+    Module.finrank ℂ L ≤ Module.finrank ℂ (L.map (rowP r)) + 3 := by
+  have h1 := rank_nullity L (rowP r)
+  have h4 := rank_nullity (L ⊓ LinearMap.ker (rowP r) : Submodule ℂ M55) (del r)
+  have h5 : ((L ⊓ LinearMap.ker (rowP r)) ⊓ LinearMap.ker (del r) : Submodule ℂ M55) = ⊥ := by
+    rw [eq_bot_iff]
+    rintro t ⟨⟨_, ht1⟩, ht2⟩
+    rw [Submodule.mem_bot]
+    rw [SetLike.mem_coe, LinearMap.mem_ker] at ht1 ht2
+    funext ⟨i, j⟩
+    by_cases hi : i = r
+    · have := congrFun ht1 j
+      rw [rowP_apply] at this
+      rw [hi]
+      exact this
+    · obtain ⟨k, hk⟩ := Fin.exists_succAbove_eq hi
+      have := congrFun ht2 (k, j)
+      rw [del_apply] at this
+      rw [← hk]
+      exact this
+  rw [h5, finrank_bot] at h4
+  have h6 := HSL _ hS
+  omega
+
+theorem cor_row7 (HSL : ∀ K : Submodule ℂ M45, SLev K → Module.finrank ℂ K ≤ 3)
+    (L : Submodule ℂ M55) (r : Fin 5)
+    (hS : SLev ((L ⊓ LinearMap.ker (rowP r) : Submodule ℂ M55).map (del r)))
+    (hrow : ∀ t ∈ L, ∑ j, t (r, j) = 0) : Module.finrank ℂ L ≤ 7 := by
+  have h1 := cor_row HSL L r hS
+  have h2 : L.map (rowP r) ≤ sumZero 5 := by
+    rintro v ⟨y, hy, rfl⟩
+    rw [mem_sumZero]
+    exact hrow y hy
+  have h3 := (Submodule.finrank_mono h2).trans (finrank_sumZero (n := 5) (by norm_num))
+  omega

@@ -1,0 +1,142 @@
+theorem blev_line {n : ℕ} {b : Fin n × Fin n → ℂ} {κ : ℂ}
+    {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : BLev b κ L) (c s : ℂ)
+    (t x : Fin n × Fin n → ℂ) (ht : t ∈ L) (hx : x ∈ L) :
+    pm (fun p => c * b p + t p + s * x p) = κ * c ^ n := by
+  have h := hL.2 c (t + s • x) (L.add_mem ht (L.smul_mem s hx))
+  have e : (fun p => c * b p + t p + s * x p) = (fun p => c * b p + (t + s • x) p) := by
+    funext p
+    simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+    ring
+  rw [e, h]
+
+theorem blev_mix {n : ℕ} {b : Fin n × Fin n → ℂ} {κ : ℂ}
+    {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : BLev b κ L) (c : ℂ)
+    (t x : Fin n × Fin n → ℂ) (ht : t ∈ L) (hx : x ∈ L) (m : ℕ) (hm1 : 1 ≤ m) (hmn : m ≤ n) :
+    mix m (fun p => c * b p + t p) x = 0 := by
+  refine poly_coeff_zero (fun m => mix m (fun p => c * b p + t p) x) n
+    (κ * c ^ n) (fun s => ?_) m hm1 hmn
+  show ∑ m ∈ range (n + 1), s ^ m * mix m (fun p => c * b p + t p) x = κ * c ^ n
+  rw [← pm_line_expand, ← blev_line hL c s t x ht hx]
+  congr 1
+
+theorem blev_rows {n : ℕ} {b : Fin n × Fin n → ℂ} {κ : ℂ}
+    {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : BLev b κ L)
+    (R : Finset (Fin n)) (hR : R.Nonempty) (x : Fin n × Fin n → ℂ) (hx : x ∈ L)
+    (hx0 : ∀ i, i ∉ R → ∀ j, x (i, j) = 0) (c : ℂ) (t : Fin n × Fin n → ℂ) (ht : t ∈ L) :
+    pm (fun p => if p.1 ∈ R then x p else c * b p + t p) = 0 := by
+  have h := blev_mix hL c t x ht hx R.card (Finset.card_pos.mpr hR) (by
+    have h1 := Finset.card_le_univ R
+    rwa [Fintype.card_fin] at h1)
+  rw [mix_eq_sum_pm, Finset.sum_eq_single R] at h
+  · exact h
+  · intro A hA hAR
+    have hcard : A.card = R.card := (Finset.mem_filter.mp hA).2
+    have hex : ∃ a ∈ A, a ∉ R := by
+      by_contra hcon
+      apply hAR
+      apply Finset.eq_of_subset_of_card_le
+      · intro a ha
+        by_contra haR
+        exact hcon ⟨a, ha, haR⟩
+      · exact le_of_eq hcard.symm
+    obtain ⟨a, ha, haR⟩ := hex
+    apply pm_zero_row _ a
+    intro j
+    show (if a ∈ A then x (a, j) else c * b (a, j) + t (a, j)) = 0
+    rw [if_pos ha]
+    exact hx0 a haR j
+  · intro hR'
+    exact (hR' (Finset.mem_filter.mpr ⟨Finset.mem_univ R, rfl⟩)).elim
+
+def maskAT {n : ℕ} (A T : Finset (Fin n)) (u : Fin n × Fin n → ℂ) : Fin n × Fin n → ℂ :=
+  fun p => if (p.1 ∈ A ↔ p.2 ∈ T) then u p else 0
+
+theorem pm_mask_term {n : ℕ} (A T : Finset (Fin n)) (u : Fin n × Fin n → ℂ)
+    (σ : Equiv.Perm (Fin n)) (hT : T ≠ A.map σ.toEmbedding) :
+    ∏ i, maskAT A T u (i, σ i) = 0 := by
+  have hex : ∃ i, ¬ (i ∈ A ↔ σ i ∈ T) := by
+    by_contra hcon
+    have hall : ∀ i, (i ∈ A ↔ σ i ∈ T) := by
+      intro i
+      by_contra h
+      exact hcon ⟨i, h⟩
+    apply hT
+    ext j
+    constructor
+    · intro hj
+      have h1 : σ.symm j ∈ A := (hall (σ.symm j)).mpr (by
+        rw [Equiv.apply_symm_apply]
+        exact hj)
+      exact Finset.mem_map.mpr ⟨σ.symm j, h1, Equiv.apply_symm_apply σ j⟩
+    · intro hj
+      obtain ⟨i, hi, rfl⟩ := Finset.mem_map.mp hj
+      exact (hall i).mp hi
+  obtain ⟨i, hi⟩ := hex
+  exact Finset.prod_eq_zero (Finset.mem_univ i) (if_neg hi)
+
+theorem pm_mask_sum {n : ℕ} (A : Finset (Fin n)) (u : Fin n × Fin n → ℂ) :
+    pm u = ∑ T : Finset (Fin n), pm (maskAT A T u) := by
+  simp_rw [pm_perm]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun σ _ => ?_
+  rw [Finset.sum_eq_single (A.map σ.toEmbedding)]
+  · refine Finset.prod_congr rfl fun i _ => ?_
+    have hc : (i ∈ A ↔ σ i ∈ A.map σ.toEmbedding) := (Finset.mem_map' σ.toEmbedding).symm
+    exact (if_pos hc).symm
+  · intro T _ hT
+    exact pm_mask_term A T u σ hT
+  · intro h
+    exact (h (Finset.mem_univ _)).elim
+
+theorem pm_mask_zero {n : ℕ} (A T : Finset (Fin n)) (u : Fin n × Fin n → ℂ)
+    (h : T.card ≠ A.card) : pm (maskAT A T u) = 0 := by
+  rw [pm_perm]
+  refine Finset.sum_eq_zero fun σ _ => pm_mask_term A T u σ ?_
+  rintro rfl
+  exact h (Finset.card_map _)
+
+theorem blk_congr {n : ℕ} {m : Type} [Fintype m] [DecidableEq m] (ρ κ : m → Fin n)
+    (u v : Fin n × Fin n → ℂ) (h : ∀ i j, u (ρ i, κ j) = v (ρ i, κ j)) :
+    blk ρ κ u = blk ρ κ v := by
+  unfold blk
+  congr 1
+  ext i j
+  exact h i j
+
+theorem pm_mask_factor {n : ℕ} (A Z : Finset (Fin n)) (u : Fin n × Fin n → ℂ)
+    (eS : {x // x ∈ A} ≃ {x // x ∉ Z}) (eZ : {x // x ∉ A} ≃ {x // x ∈ Z}) :
+    pm (maskAT A Zᶜ u) =
+      blk (fun a : {x // x ∈ A} => (a : Fin n)) (fun a => ((eS a : {x // x ∉ Z}) : Fin n)) u *
+        blk (fun a' : {x // x ∉ A} => (a' : Fin n))
+          (fun a' => ((eZ a' : {x // x ∈ Z}) : Fin n)) u := by
+  rw [pm_zero_block_sets (maskAT A Zᶜ u) A Z eS eZ
+    (fun i hi j hj => if_neg (fun h => (Finset.mem_compl.mp (h.mp hi)) hj))]
+  congr 1
+  · refine blk_congr _ _ _ _ fun i j => ?_
+    exact if_pos ⟨fun _ => Finset.mem_compl.mpr (eS j).2, fun _ => i.2⟩
+  · refine blk_congr _ _ _ _ fun i j => ?_
+    exact if_pos ⟨fun h => absurd h i.2, fun h => absurd (eZ j).2 (Finset.mem_compl.mp h)⟩
+
+theorem thG_masked {n : ℕ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : Lev n L)
+    (c1 c2 : ℂ) (t1 t2 : Fin n × Fin n → ℂ) (h1 : t1 ∈ L) (h2 : t2 ∈ L) (m : ℕ) (hmn : m ≤ n) :
+    ∑ A ∈ (univ : Finset (Finset (Fin n))).filter (fun A => A.card = m),
+      ∑ T : Finset (Fin n),
+        pm (maskAT A T (fun p => if p.1 ∈ A then c2 + t2 p else c1 + t1 p)) =
+      (Nat.factorial n : ℂ) * ((n.choose m : ℂ) * c1 ^ (n - m) * c2 ^ m) := by
+  rw [← lev_mix_hat hL c1 c2 t1 t2 h1 h2 m hmn, mix_eq_sum_pm]
+  refine Finset.sum_congr rfl fun A _ => ?_
+  exact (pm_mask_sum A _).symm
+
+theorem thG_term {n : ℕ} (A Z : Finset (Fin n)) (u v : Fin n × Fin n → ℂ)
+    (eS : {x // x ∈ A} ≃ {x // x ∉ Z}) (eZ : {x // x ∉ A} ≃ {x // x ∈ Z}) :
+    pm (maskAT A Zᶜ (fun p => if p.1 ∈ A then v p else u p)) =
+      blk (fun a : {x // x ∈ A} => (a : Fin n)) (fun a => ((eS a : {x // x ∉ Z}) : Fin n)) v *
+        blk (fun a' : {x // x ∉ A} => (a' : Fin n))
+          (fun a' => ((eZ a' : {x // x ∈ Z}) : Fin n)) u := by
+  rw [pm_mask_factor A Z _ eS eZ]
+  congr 1
+  · refine blk_congr _ _ _ _ fun i j => ?_
+    exact if_pos i.2
+  · refine blk_congr _ _ _ _ fun i j => ?_
+    exact if_neg i.2
+

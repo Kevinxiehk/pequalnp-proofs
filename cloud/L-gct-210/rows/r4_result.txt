@@ -1,0 +1,35 @@
+## RESULT, ROUND 4 (rows; final 19:10) -- (6,2), (7,3) and (D) NOT proved. Induction on e set up exactly; one new structural law
+## (NCOL, numerical, 0 exceptions in 120 spaces) reduces (DI_5) to 4 x 5 spaces with a neutral column = "double towers" over 4 x 4.
+ Details and proofs: section R4 (R4.1 - R4.13).  (d,e) space = 4 x 5 level space of dim d with defect space C of dim e; extremal: d = e + 3.
+ U1 [RIGOROUS, R4.1] HYPERPLANE LEMMA: if no (e'+4, e') space exists for e' < e, then in an (e+4, e) space every subspace K has
+    e(K) >= min(e, dim K - 3); every hyperplane is an EXTREMAL (e+3, e) space with the SAME defect space C.
+ U2 [RIGOROUS, R4.2/R4.3] single-row parts U_i: U_i in C, U_i perp U_k, cubic condition, u_i + u_k <= e + 1; LEMMA RS-HYP: the generic
+    hyperplane of a minimal (e+4, e) space is NOT fully row-split (sum_i U_i != C), e = 1, 2, 3 (e = 3 uses the checked L067).
+ U3 [RIGOROUS, R4.7] LIFTING LEMMA: a finite union of "polynomial identities hold on the subspace" properties that fails for L fails
+    for all subspaces through a suitable t in L.  D-UP: (D)_d => (D)_d+1; so (D) <=> (D)_7 and "(D) for dim >= 8" FOLLOWS from the
+    7-dim statement.  C-UP: under the induction hypothesis, any property of C common to all extremal (e+3,e) spaces holds for every
+    (e+4,e) space.   [(D)_8 itself: not proved; with (DI_5) it is equivalent to "no 8-dim level space" (R4.11).]
+ U4 [RIGOROUS, R4.10] transposed defect construction: if column n of L' is neutral (C in e_n^perp), then L' = {(q | x)} over the level
+    4 x 4 space Q = L' minus column n, C_j(Y) = (1+x).M^(j)(q), and dim L' <= dim Q + 3 - e^col(Q); PADDING LEMMA: a 4 x 4 level space
+    with e^col = 0 or e^row = 0 has dim <= 3; so "a 4 x 5 level space with a neutral column has dim <= 6" (which contains (7,3) in
+    the neutral case) follows from: no 4 x 4 level space with (dim, e^col) = (5,1), (6,2).
+ U5 [NUMERICAL, R4.4] answer to the question "are extremal spaces all split over rows?": NO. Of 68 extremal spaces, 53 are fully
+    row-split, 15 are not ((4,1): 2 with C = C(e_a - e_b); (5,2): 3 with C = V_S, |S| = 3; (6,3): 10 with C = V_S, |S| = 4).
+    What holds in all 68: (LAW) C = sum_i U_i + span{two-column vectors of C}.
+ U6 [NUMERICAL, R4.8 -- the main finding] (NCOL): EVERY extremal space has a NEUTRAL COLUMN (C lies in a coordinate hyperplane e_n^perp;
+    L' minus column n is a level 4 x 4 space).  87/87 of my extremal spaces; 33/33 seven-dim 5 x 5 level spaces of other agents
+    (after deleting their deletable line the rest has a neutral line of the other kind).  Direct calibrated test at e = 3 (R4.13):
+    defect space fixed = e_0^perp cap 1^perp: (6,3) found 4/19; defect space fixed generic: 0/46.  In 5 x 5 terms: every known
+    7-dim level space with deletable row r contains e_r(1 - 5e_n)^T, and is a DOUBLE TOWER
+          L = Q (+) [column n: 3 - e^col(Q) dims] (+) [row r: 4 - e^row(Q) dims],   dim Q = e^row(Q) + e^col(Q)   (R4.10, numerical),
+    so 7 comes out identically; no extremal space has a deletable ROW.
+ U7 [RIGOROUS reduction, R4.8/R4.12] by C-UP:   (DI_5)  <=  (NCOL_e) and (NC'_e), e = 1, 2, 3,
+    (NC'_e) := "a 4 x 5 level space with a neutral column and defect dimension e has dim <= e + 3".  This replaces (LAW) + the list of
+    mixed/degenerate patterns of R4.6 by one statement about C and moves the rest to the 4 x 4 world.
+ U8 [NUMERICAL, calibrated, R4.9] neutral columns: k = 2: dim 5 12/25, dim 6 0/22;  k = 1: dim 6 7/29, dim 7 0/25;  k = 1, e <= 1:
+    dim 4 5/11, dim 5 0/8;  k = 1, e <= 2: dim 5 3/5, dim 6 0/15.  (6,2) seeded at the three column-type (5,2) spaces: 0/17.
+ NEGATIVES: (i) "column-centred 4 x 5 level spaces have dim <= 3" is false (dim 4 exists), although the column-sum map is linear with
+    image in C; (ii) "dim L <= e_row(L) + e_col(L)" (true with equality for the 7-dim spaces) is false for the level line
+    C circ(1,i,-i,-1) padded (all ten deletions level); (iii) EQ-induction step (round 3).
+ OPEN (exact): (NCOL_e) and (NC'_e) for e = 1, 2, 3 [known: (NC'_1) for two-column m = TC5; one row carrying a nondegenerate C = FS];
+    equivalently for the gap: (D)_7 (or (D)_8) + these.  (6,2), (7,3), (5,1) remain unproved.

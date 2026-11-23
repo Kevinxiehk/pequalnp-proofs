@@ -1,0 +1,24 @@
+## RESULT, ROUND 3 (rows; final 18:20) -- upper floors NOT closed; two new rigorous theorems that cut down the split cases
+ Details and proofs: section R3 (R3.0 - R3.9).  (DI_5) remains open; the gap (with (D)) needs only "no (5,1) and no (6,2)".
+ T1 [RIGOROUS, hand proof, R3.8] LEMMA SL_3: a 3 x 5 space all of whose 3 x 4 column deletions are level has dim <= 2
+    (= (DI_4) at e = 0; sharp). Corollary: a 4 x 5 level space containing a full free row has dim <= 6.
+ T2 [RIGOROUS, R3.9] THEOREM FL2*: let U be a subspace of 1^perp with U cap U' = 0, U' = (U + C1)^perp. Every 5 x 5 level space
+    containing the split pair T_U = e_i (x) U (+) e_r (x) U' has  dim <= 10 - dim(U o U')  (U o U' = span of entrywise products).
+    So dim <= 7 as soon as dim(U o U') >= 3. Consequences for the defect table:
+      (a) NO (5,1) or (6,1) space contains e_i m^T with m non-isotropic and at most one zero entry   [split case of e = 1];
+      (b) no (6,2) / (7,2) space has a row carrying its whole defect plane C when C is nondegenerate and dim(C o W) >= 3;
+          no (7,3) space has a row carrying its whole defect space when w (W = Cw) is non-isotropic with <= 1 zero entry.
+    Open split cases at e = 1: m isotropic; m supported on exactly three columns (bound 8 only). (Two-column m: verifyfl's TC5.)
+    Sanity (numerical): fixed m = (1,2,-4,1,0): dim 7 found, dim 8 not; fixed full-support m: dim 6 found, dim 7 not; fixed
+    generic 2-dim U: dim 6 reached (slowly), dim 7 not; unknown U of dim 2: dim 7 found (U in a coordinate hyperplane), dim 8 not.
+ T3 [RIGOROUS, short] from the checked "4 x 5 level <= 7" (L_gct_215) via the defect construction (R3.1): every 3 x 5 level space has
+    dim <= e + 3; every 5 x 5 level space meets {row r = 0} in dim <= 7, so a 9-dim level space has all row/column projections
+    of rank >= 2 and (8,3), (8,4), (9,4) are excluded.  Lemma EC (R3.2): an equal-column level space M extends by e_i(e_a-e_b)^T
+    with defect C(M) + C(e_a-e_b).  Tower Lemma (R3.3): after an untwisted deletable row, the next free part lies in the radical
+    of the previous defect space.  Saturation principle for any row (R3.5).  Split-pair normal form FL2 (R3.6).
+ T4 [what L_gct_215 contains, R3.0] a contradiction proof for dim 8 by the single-row parts u_i and pair ranks; no classification
+    of 7-dim spaces; internal lemma: a 4 x 5 level space with two equal columns has dim <= 6.
+ NUMERICAL ONLY: no 7-dim 4 x 5 level space found (calibrated; so (7,3), (7,2) are probably vacuous, but "<= 6" is unproved);
+    (6,2): 0/37; EQ-induction census: the step "dim(L'/{y_a = y_b}) <= 1 for a suitable pair" FAILS on all four (6,3) examples
+    (min 2, once 3) and on one (5,2) example, so target (2) as posed does not work; only the trade-off = (DI_5) itself holds.
+ NOT DONE: (7,3), (6,2) in general; conjecture (D) for dim >= 8 (no progress beyond the saturation principle).

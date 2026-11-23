@@ -1,0 +1,245 @@
+
+def Lev45 (K : Submodule ℂ M45) : Prop := ∀ Y ∈ K, ∑ a, P4 a (fun p => 1 + Y p) = 120
+
+def DefLine (K : Submodule ℂ M45) (m : Fin 5 → ℂ) : Prop :=
+  ∀ Y ∈ K, ∃ θ : ℂ, ∀ a, P4 a (fun p => 1 + Y p) = 24 + θ * m a
+
+def defW (K : Submodule ℂ M45) : Submodule ℂ (Fin 5 → ℂ) where
+  carrier := {w | ∀ Y ∈ K, ∑ a, w a * P4 a (fun p => 1 + Y p) = 0}
+  add_mem' := by
+    intro w w' hw hw' Y hY
+    have h1 := hw Y hY
+    have h2 := hw' Y hY
+    rw [Fin.sum_univ_five] at h1 h2 ⊢
+    simp only [Pi.add_apply]
+    linear_combination h1 + h2
+  zero_mem' := by
+    intro Y hY
+    simp
+  smul_mem' := by
+    intro c w hw Y hY
+    have h1 := hw Y hY
+    rw [Fin.sum_univ_five] at h1 ⊢
+    simp only [Pi.smul_apply, smul_eq_mul]
+    linear_combination c * h1
+
+theorem mem_defW (K : Submodule ℂ M45) (w : Fin 5 → ℂ) :
+    w ∈ defW K ↔ ∀ Y ∈ K, ∑ a, w a * P4 a (fun p => 1 + Y p) = 0 := Iff.rfl
+
+theorem defW_sum (K : Submodule ℂ M45) (w : Fin 5 → ℂ) (hw : w ∈ defW K) : ∑ a, w a = 0 := by
+  have h := (mem_defW K w).mp hw 0 K.zero_mem
+  have e1 : (fun p : Fin 4 × Fin 5 => (1 : ℂ) + (0 : M45) p) = fun _ => 1 := by
+    funext p
+    simp
+  rw [e1] at h
+  simp only [P4_ones] at h
+  rw [← Finset.sum_mul] at h
+  exact (mul_eq_zero.mp h).resolve_right (by norm_num)
+
+theorem defW_le (K : Submodule ℂ M45) : defW K ≤ sumZero 5 := by
+  intro w hw
+  rw [mem_sumZero]
+  exact defW_sum K w hw
+
+theorem defW_SLev (K : Submodule ℂ M45) (hK : SLev K) : defW K = sumZero 5 := by
+  apply le_antisymm (defW_le K)
+  intro w hw
+  rw [mem_sumZero] at hw
+  refine (mem_defW K w).mpr (fun Y hY => ?_)
+  rw [Fin.sum_univ_five] at hw ⊢
+  rw [hK Y hY 0, hK Y hY 1, hK Y hY 2, hK Y hY 3, hK Y hY 4]
+  linear_combination 24 * hw
+
+def defL (r : Fin 5) (K : Submodule ℂ M45) : Submodule ℂ M55 :=
+  K.comap (del r) ⊓ (defW K).comap (rowP r)
+
+theorem defL_level (r : Fin 5) (K : Submodule ℂ M45) (hK : Lev45 K) :
+    ∀ t ∈ defL r K, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120 := by
+  intro t ht
+  obtain ⟨h1, h2⟩ := Submodule.mem_inf.mp ht
+  have hY : del r t ∈ K := h1
+  have hw : rowP r t ∈ defW K := h2
+  have h4 : (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) =
+      ∑ a, (1 + t (r, a)) * P4 a (fun p => 1 + t (r.succAbove p.1, p.2)) :=
+    perm5_row r (fun p => 1 + t p)
+  rw [h4]
+  have h5 : ∑ a, P4 a (fun p => 1 + t (r.succAbove p.1, p.2)) = 120 := hK _ hY
+  have h6 : ∑ a, t (r, a) * P4 a (fun p => 1 + t (r.succAbove p.1, p.2)) = 0 :=
+    (mem_defW K _).mp hw _ hY
+  rw [Fin.sum_univ_five] at h5 h6 ⊢
+  linear_combination h5 + h6
+
+theorem defL_deletable (r : Fin 5) (K : Submodule ℂ M45) (hK : Lev45 K) :
+    ∀ t ∈ defL r K, ∑ a, P4 a (fun p => 1 + t (r.succAbove p.1, p.2)) = 120 := by
+  intro t ht
+  have hY : del r t ∈ K := (Submodule.mem_inf.mp ht).1
+  exact hK _ hY
+
+def ins (r : Fin 5) (Y : M45) : M55 :=
+  fun p => @Fin.insertNth 4 (fun _ => ℂ) r (0 : ℂ) (fun k => Y (k, p.2)) p.1
+
+theorem del_ins (r : Fin 5) (Y : M45) : del r (ins r Y) = Y := by
+  funext ⟨k, j⟩
+  show @Fin.insertNth 4 (fun _ => ℂ) r (0 : ℂ) (fun k => Y (k, j)) (r.succAbove k) = Y (k, j)
+  rw [Fin.insertNth_apply_succAbove]
+
+theorem rowP_ins (r : Fin 5) (Y : M45) : rowP r (ins r Y) = 0 := by
+  funext j
+  show @Fin.insertNth 4 (fun _ => ℂ) r (0 : ℂ) (fun k => Y (k, j)) r = 0
+  rw [Fin.insertNth_apply_same]
+
+theorem del_rowMat (r : Fin 5) (w : Fin 5 → ℂ) : del r (rowMat r w) = 0 := by
+  funext p
+  simp [rowMat, del_apply, Fin.succAbove_ne]
+
+theorem rowP_rowMat (r : Fin 5) (w : Fin 5 → ℂ) : rowP r (rowMat r w) = w := by
+  funext j
+  simp [rowMat, rowP_apply]
+
+theorem del_row_bot (L : Submodule ℂ M55) (r : Fin 5) :
+    ((L ⊓ LinearMap.ker (del r)) ⊓ LinearMap.ker (rowP r) : Submodule ℂ M55) = ⊥ := by
+  rw [eq_bot_iff]
+  rintro t ⟨⟨_, ht2⟩, ht1⟩
+  rw [Submodule.mem_bot]
+  rw [SetLike.mem_coe, LinearMap.mem_ker] at ht1 ht2
+  funext ⟨i, j⟩
+  by_cases hi : i = r
+  · have := congrFun ht1 j
+    rw [rowP_apply] at this
+    rw [hi]
+    exact this
+  · obtain ⟨k, hk⟩ := Fin.exists_succAbove_eq hi
+    have := congrFun ht2 (k, j)
+    rw [del_apply] at this
+    rw [← hk]
+    exact this
+
+theorem defL_finrank (r : Fin 5) (K : Submodule ℂ M45) :
+    Module.finrank ℂ (defL r K) = Module.finrank ℂ K + Module.finrank ℂ (defW K) := by
+  have rn := rank_nullity (defL r K) (del r)
+  have rn2 := rank_nullity (defL r K ⊓ LinearMap.ker (del r) : Submodule ℂ M55) (rowP r)
+  have h5 := del_row_bot (defL r K) r
+  rw [h5, finrank_bot] at rn2
+  have e1 : (defL r K).map (del r) = K := by
+    apply le_antisymm
+    · rintro Y ⟨t, ht, rfl⟩
+      exact (Submodule.mem_inf.mp ht).1
+    · intro Y hY
+      refine ⟨ins r Y, Submodule.mem_inf.mpr ⟨?_, ?_⟩, del_ins r Y⟩
+      · show del r (ins r Y) ∈ K
+        rw [del_ins]
+        exact hY
+      · show rowP r (ins r Y) ∈ defW K
+        rw [rowP_ins]
+        exact (defW K).zero_mem
+  have e2 : (defL r K ⊓ LinearMap.ker (del r) : Submodule ℂ M55).map (rowP r) = defW K := by
+    apply le_antisymm
+    · rintro w ⟨t, ht, rfl⟩
+      exact (Submodule.mem_inf.mp (Submodule.mem_inf.mp ht).1).2
+    · intro w hw
+      refine ⟨rowMat r w, Submodule.mem_inf.mpr ⟨Submodule.mem_inf.mpr ⟨?_, ?_⟩, ?_⟩,
+        rowP_rowMat r w⟩
+      · show del r (rowMat r w) ∈ K
+        rw [del_rowMat]
+        exact K.zero_mem
+      · show rowP r (rowMat r w) ∈ defW K
+        rw [rowP_rowMat]
+        exact hw
+      · exact LinearMap.mem_ker.mpr (del_rowMat r w)
+  rw [e1] at rn
+  rw [e2] at rn2
+  omega
+
+theorem defect_conv (L : Submodule ℂ M55)
+    (hL : ∀ t ∈ L, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120) (r : Fin 5) :
+    Module.finrank ℂ L ≤
+      Module.finrank ℂ (L.map (del r)) + Module.finrank ℂ (defW (L.map (del r))) := by
+  have rn := rank_nullity L (del r)
+  have rn2 := rank_nullity (L ⊓ LinearMap.ker (del r) : Submodule ℂ M55) (rowP r)
+  have h5 := del_row_bot L r
+  rw [h5, finrank_bot] at rn2
+  have hle : (L ⊓ LinearMap.ker (del r) : Submodule ℂ M55).map (rowP r) ≤
+      defW (L.map (del r)) := by
+    rintro w ⟨u, hu, rfl⟩
+    refine (mem_defW _ _).mpr ?_
+    rintro Y ⟨z, hz, rfl⟩
+    obtain ⟨huL, hu0⟩ := Submodule.mem_inf.mp hu
+    have hu0' : del r u = 0 := LinearMap.mem_ker.mp hu0
+    have hz1 : ∑ a, (1 + z (r, a)) * P4 a (fun p => 1 + z (r.succAbove p.1, p.2)) = 120 :=
+      (perm5_row r (fun p => 1 + z p)).symm.trans (hL z hz)
+    have hzu : ∑ a, (1 + (z + u) (r, a)) *
+        P4 a (fun p => 1 + (z + u) (r.succAbove p.1, p.2)) = 120 :=
+      (perm5_row r (fun p => 1 + (z + u) p)).symm.trans (hL _ (L.add_mem hz huL))
+    have e : (fun p : Fin 4 × Fin 5 => 1 + (z + u) (r.succAbove p.1, p.2)) =
+        fun p => 1 + z (r.succAbove p.1, p.2) := by
+      funext p
+      have h0 : u (r.succAbove p.1, p.2) = 0 := congrFun hu0' p
+      simp only [Pi.add_apply, h0, add_zero]
+    rw [e] at hzu
+    show ∑ a, u (r, a) * P4 a (fun p => 1 + z (r.succAbove p.1, p.2)) = 0
+    rw [Fin.sum_univ_five] at hz1 hzu ⊢
+    simp only [Pi.add_apply] at hzu
+    linear_combination hzu - hz1
+  have h7 := Submodule.finrank_mono hle
+  omega
+
+theorem LemmaEQ (K : Submodule ℂ M45) (m : Fin 5 → ℂ) (hdef : DefLine K m)
+    (π : Equiv.Perm (Fin 5)) (j : Fin 5) (hj : m (π j) ≠ m j) :
+    SLev (K ⊓ LinearMap.eqLocus (cperm π) LinearMap.id) ∧
+      Module.finrank ℂ (K ⊓ LinearMap.eqLocus (cperm π) LinearMap.id : Submodule ℂ M45) ≤ 3 := by
+  have hS : SLev (K ⊓ LinearMap.eqLocus (cperm π) LinearMap.id) := by
+    intro Y hY a
+    obtain ⟨hYK, hfix⟩ := Submodule.mem_inf.mp hY
+    have hfix' : cperm π Y = Y := LinearMap.mem_eqLocus.mp hfix
+    obtain ⟨θ, hθ⟩ := hdef Y hYK
+    have hperm : ∀ b, P4 b (fun p => 1 + Y p) = P4 (π b) (fun p => 1 + Y p) := by
+      intro b
+      have h : P4 b (fun p => 1 + Y (p.1, π p.2)) = P4 (π b) (fun p => 1 + Y p) :=
+        P4_perm π b (fun p => 1 + Y p)
+      have e : (fun p : Fin 4 × Fin 5 => 1 + Y (p.1, π p.2)) = fun p => 1 + Y p := by
+        funext p
+        have h0 : Y (p.1, π p.2) = Y p := congrFun hfix' p
+        rw [h0]
+      rw [e] at h
+      exact h
+    have h1 := hθ j
+    have h2 := hθ (π j)
+    have h3 := hperm j
+    have hθ0 : θ = 0 := by
+      have h4 : θ * (m (π j) - m j) = 0 := by linear_combination h1 - h2 - h3
+      exact (mul_eq_zero.mp h4).resolve_right (sub_ne_zero.mpr hj)
+    rw [hθ a, hθ0]
+    ring
+  exact ⟨hS, LemmaSL _ hS⟩
+
+theorem LemmaEQ_cols (K : Submodule ℂ M45) (m : Fin 5 → ℂ) (hdef : DefLine K m)
+    (a b : Fin 5) (hab : m a ≠ m b) :
+    SLev (K ⊓ LinearMap.ker (colL a - colL b)) ∧
+      Module.finrank ℂ K ≤ 3 + Module.finrank ℂ (K.map (colL a - colL b)) := by
+  have hle : (K ⊓ LinearMap.ker (colL a - colL b) : Submodule ℂ M45) ≤
+      K ⊓ LinearMap.eqLocus (cperm (Equiv.swap a b)) LinearMap.id := by
+    intro Y hY
+    obtain ⟨hYK, hk⟩ := Submodule.mem_inf.mp hY
+    have hk' : (colL a - colL b) Y = 0 := LinearMap.mem_ker.mp hk
+    have hcol : ∀ i, Y (i, a) = Y (i, b) := by
+      intro i
+      have h0 := congrFun hk' i
+      simp only [LinearMap.sub_apply, colL_apply, Pi.sub_apply, col, Pi.zero_apply] at h0
+      linear_combination h0
+    refine Submodule.mem_inf.mpr ⟨hYK, LinearMap.mem_eqLocus.mpr ?_⟩
+    funext ⟨i, k⟩
+    show Y (i, Equiv.swap a b k) = Y (i, k)
+    rw [Equiv.swap_apply_def]
+    split_ifs with h1 h2
+    · rw [h1]
+      exact (hcol i).symm
+    · rw [h2]
+      exact hcol i
+    · rfl
+  have h := LemmaEQ K m hdef (Equiv.swap a b) a (by
+    rw [Equiv.swap_apply_left]
+    exact hab.symm)
+  have hS := SLev_mono h.1 hle
+  have rn := rank_nullity K (colL a - colL b)
+  have h3 := LemmaSL _ hS
+  exact ⟨hS, by omega⟩

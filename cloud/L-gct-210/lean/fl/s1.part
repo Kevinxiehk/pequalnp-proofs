@@ -1,0 +1,422 @@
+
+def r3 : Fin 3 → ℂ := ![Complex.I, -1, -Complex.I]
+
+def spv (π : Equiv.Perm (Fin 3)) : V4 := ![1, r3 (π 0), r3 (π 1), r3 (π 2)]
+
+theorem r3_pow (k : Fin 3) : r3 k ^ 4 = 1 := by
+  fin_cases k
+  · show Complex.I ^ 4 = 1
+    linear_combination (Complex.I * Complex.I - 1) * Complex.I_mul_I
+  · show (-1 : ℂ) ^ 4 = 1
+    norm_num
+  · show (-Complex.I) ^ 4 = 1
+    linear_combination (Complex.I * Complex.I - 1) * Complex.I_mul_I
+
+theorem r3_inj : Function.Injective r3 := by
+  have h1 : Complex.I ≠ -1 := by
+    intro h
+    have h' := congrArg Complex.im h
+    norm_num at h'
+  have h2 : Complex.I ≠ -Complex.I := by
+    intro h
+    have h' := congrArg Complex.im h
+    norm_num at h'
+  have h3 : (-1 : ℂ) ≠ -Complex.I := by
+    intro h
+    have h' := congrArg Complex.im h
+    norm_num at h'
+  intro a b h
+  fin_cases a <;> fin_cases b
+  · rfl
+  · exact absurd h h1
+  · exact absurd h h2
+  · exact absurd h.symm h1
+  · rfl
+  · exact absurd h h3
+  · exact absurd h.symm h2
+  · exact absurd h.symm h3
+  · rfl
+
+theorem r3_sums (π : Equiv.Perm (Fin 3)) :
+    r3 (π 0) + r3 (π 1) + r3 (π 2) = -1 ∧
+    r3 (π 0) * r3 (π 0) + r3 (π 1) * r3 (π 1) + r3 (π 2) * r3 (π 2) = -1 ∧
+    r3 (π 0) * r3 (π 0) * r3 (π 0) + r3 (π 1) * r3 (π 1) * r3 (π 1)
+      + r3 (π 2) * r3 (π 2) * r3 (π 2) = -1 := by
+  have h1 : r3 (π 0) + r3 (π 1) + r3 (π 2) = r3 0 + r3 1 + r3 2 := by
+    have h := Equiv.sum_comp π r3
+    rw [Fin.sum_univ_three, Fin.sum_univ_three] at h
+    exact h
+  have h2 : r3 (π 0) * r3 (π 0) + r3 (π 1) * r3 (π 1) + r3 (π 2) * r3 (π 2) =
+      r3 0 * r3 0 + r3 1 * r3 1 + r3 2 * r3 2 := by
+    have h := Equiv.sum_comp π (fun k => r3 k * r3 k)
+    rw [Fin.sum_univ_three, Fin.sum_univ_three] at h
+    exact h
+  have h3 : r3 (π 0) * r3 (π 0) * r3 (π 0) + r3 (π 1) * r3 (π 1) * r3 (π 1)
+      + r3 (π 2) * r3 (π 2) * r3 (π 2) =
+      r3 0 * r3 0 * r3 0 + r3 1 * r3 1 * r3 1 + r3 2 * r3 2 * r3 2 := by
+    have h := Equiv.sum_comp π (fun k => r3 k * r3 k * r3 k)
+    rw [Fin.sum_univ_three, Fin.sum_univ_three] at h
+    exact h
+  have e0 : r3 0 = Complex.I := rfl
+  have e1 : r3 1 = -1 := rfl
+  have e2 : r3 2 = -Complex.I := rfl
+  rw [e0, e1, e2] at h1 h2 h3
+  refine ⟨?_, ?_, ?_⟩
+  · linear_combination h1
+  · linear_combination h2 + 2 * Complex.I_mul_I
+  · linear_combination h3
+
+theorem spv_props (π : Equiv.Perm (Fin 3)) :
+    tau (spv π) = 0 ∧ ip (spv π) (spv π) = 0 ∧ t3 (spv π) (spv π) (spv π) = 0 ∧
+      ∀ i, spv π i ^ 4 = 1 := by
+  obtain ⟨h1, h2, h3⟩ := r3_sums π
+  have e0 : spv π 0 = 1 := rfl
+  have e1 : spv π 1 = r3 (π 0) := rfl
+  have e2 : spv π 2 = r3 (π 1) := rfl
+  have e3 : spv π 3 = r3 (π 2) := rfl
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · simp only [tau, e0, e1, e2, e3]
+    linear_combination h1
+  · simp only [ip, e0, e1, e2, e3]
+    linear_combination h2
+  · simp only [t3, e0, e1, e2, e3]
+    linear_combination h3
+  · intro i
+    fin_cases i
+    · show (1 : ℂ) ^ 4 = 1
+      norm_num
+    · exact r3_pow (π 0)
+    · exact r3_pow (π 1)
+    · exact r3_pow (π 2)
+
+theorem spv_inj (π π' : Equiv.Perm (Fin 3)) (h0 : r3 (π 0) = r3 (π' 0))
+    (h1 : r3 (π 1) = r3 (π' 1)) (h2 : r3 (π 2) = r3 (π' 2)) : π = π' := by
+  apply Equiv.ext
+  intro k
+  fin_cases k
+  · exact r3_inj h0
+  · exact r3_inj h1
+  · exact r3_inj h2
+
+theorem chart (c : Fin 5 → V4) (hc : ∀ m, c m ≠ 0) :
+    ∃ v : V4, tau v = 0 ∧ ip v v = 0 ∧ t3 v v v = 0 ∧ (∀ i, v i ^ 4 = 1) ∧
+      ∀ m, ∀ k : ℂ, c m ≠ k • v := by
+  by_contra hcon
+  have hall : ∀ π : Equiv.Perm (Fin 3), ∃ m, ∃ k : ℂ, c m = k • spv π := by
+    intro π
+    by_contra h
+    apply hcon
+    obtain ⟨p1, p2, p3, p4⟩ := spv_props π
+    exact ⟨spv π, p1, p2, p3, p4, fun m k hk => h ⟨m, k, hk⟩⟩
+  choose f g hg using hall
+  obtain ⟨π, π', hne, hff⟩ := Fintype.exists_ne_map_eq_of_card_lt f
+    (by rw [Fintype.card_perm, Fintype.card_fin, Fintype.card_fin]; decide)
+  have e := hg π
+  rw [hff, hg π'] at e
+  have q0 := congrFun e 0
+  have q1 := congrFun e 1
+  have q2 := congrFun e 2
+  have q3 := congrFun e 3
+  simp only [Pi.smul_apply, smul_eq_mul] at q0 q1 q2 q3
+  have a0 : ∀ ρ : Equiv.Perm (Fin 3), spv ρ 0 = 1 := fun ρ => rfl
+  have a1 : ∀ ρ : Equiv.Perm (Fin 3), spv ρ 1 = r3 (ρ 0) := fun ρ => rfl
+  have a2 : ∀ ρ : Equiv.Perm (Fin 3), spv ρ 2 = r3 (ρ 1) := fun ρ => rfl
+  have a3 : ∀ ρ : Equiv.Perm (Fin 3), spv ρ 3 = r3 (ρ 2) := fun ρ => rfl
+  rw [a0, a0] at q0
+  rw [a1, a1] at q1
+  rw [a2, a2] at q2
+  rw [a3, a3] at q3
+  have hgg : g π' = g π := by linear_combination q0
+  have hg0 : g π ≠ 0 := by
+    intro h0
+    apply hc (f π)
+    rw [hg π, h0, zero_smul]
+  apply hne
+  apply spv_inj
+  · apply mul_left_cancel₀ hg0
+    linear_combination -q1 + r3 (π' 0) * hgg
+  · apply mul_left_cancel₀ hg0
+    linear_combination -q2 + r3 (π' 1) * hgg
+  · apply mul_left_cancel₀ hg0
+    linear_combination -q3 + r3 (π' 2) * hgg
+
+def Uv (v : V4) (θ : ℂ) : V4 := Qv v 0 (-(θ ^ 2) / 2) θ 1
+
+def tt (a b c : ℂ) : ℂ := 4 * (a + b + c) + a * b * c * (a * b + b * c + c * a)
+
+def kk (x y : ℂ) : ℂ := 2 * x + 4 * y + x ^ 2 * y ^ 3 + x * y ^ 4 / 2
+
+def cc (x : ℂ) : ℂ := 12 * x + 3 * x ^ 5
+
+theorem iso_coords (v : V4) (hk : ∀ i, v i ^ 4 = 1) (h1 : tau v = 0) (h2 : ip v v = 0)
+    (h3 : t3 v v v = 0) (x : V4) (hx : tau x = 0) (hxx : ip x x = 0)
+    (hnp : ∀ k : ℂ, x ≠ k • v) : ∃ θ ζ : ℂ, ζ ≠ 0 ∧ x = ζ • Uv v θ := by
+  obtain ⟨p, q, r, rfl⟩ := Qv_V v 1 one_ne_zero hk h1 h2 h3 x hx
+  rw [ip_Qv v 1 hk h1 h2 h3] at hxx
+  have hr : r ≠ 0 := by
+    intro hr
+    rw [hr] at hxx
+    have hq : q = 0 := by
+      have hqq : q * q = 0 := by linear_combination (1 / 4 : ℂ) * hxx
+      exact mul_self_eq_zero.mp hqq
+    apply hnp p
+    funext i
+    simp only [Qv, Pi.smul_apply, smul_eq_mul, hr, hq]
+    ring
+  obtain ⟨θ, hθ⟩ : ∃ θ : ℂ, q = θ * r := ⟨q / r, (div_mul_cancel₀ q hr).symm⟩
+  have hp : 2 * p + θ ^ 2 * r = 0 := by
+    apply mul_left_cancel₀ hr
+    linear_combination (1 / 4 : ℂ) * hxx - (q + θ * r) * hθ
+  refine ⟨θ, r, hr, ?_⟩
+  funext i
+  simp only [Qv, Uv, Pi.smul_apply, smul_eq_mul]
+  linear_combination (v i / 2) * hp + (v i ^ 2) * hθ
+
+theorem ip_Uv (v : V4) (hk : ∀ i, v i ^ 4 = 1) (h1 : tau v = 0) (h2 : ip v v = 0)
+    (h3 : t3 v v v = 0) (θ : ℂ) : ip (Uv v θ) v = 4 := by
+  have hv' : v = Qv v 0 1 0 0 := by
+    funext i
+    simp only [Qv]
+    ring
+  have e : ip (Qv v 0 (-(θ ^ 2) / 2) θ 1) (Qv v 0 1 0 0) = 4 := by
+    rw [ip_Qv v 1 hk h1 h2 h3]
+    ring
+  rw [← hv'] at e
+  exact e
+
+theorem t3_smul3 (a b c : ℂ) (x y z : V4) : t3 (a • x) (b • y) (c • z) = a * b * c * t3 x y z := by
+  simp only [t3, Pi.smul_apply, smul_eq_mul]
+  ring
+
+theorem t3_Uv (v : V4) (hk : ∀ i, v i ^ 4 = 1) (h1 : tau v = 0) (h2 : ip v v = 0)
+    (h3 : t3 v v v = 0) (a b c : ℂ) : t3 (Uv v a) (Uv v b) (Uv v c) = tt a b c := by
+  simp only [Uv, tt]
+  rw [t3_ip_l, Qv_mul v 1 hk, ip_Qv v 1 hk h1 h2 h3]
+  ring
+
+def lamL (v : V4) : M45 →ₗ[ℂ] (Fin 5 → ℂ) where
+  toFun Z := fun m => ip (col Z m) v / 4
+  map_add' Z Z' := by
+    funext m
+    simp only [ip, col, Pi.add_apply]
+    ring
+  map_smul' c Z := by
+    funext m
+    simp only [ip, col, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
+    ring
+
+theorem lamL_apply (v : V4) (Z : M45) (m : Fin 5) : lamL v Z m = ip (col Z m) v / 4 := rfl
+
+theorem N_coords (N : Submodule ℂ M45) (z : M45)
+    (hmax : ∀ Z ∈ N, ∀ m, ∃ c : ℂ, col Z m = c • col z m)
+    (v : V4) (hk : ∀ i, v i ^ 4 = 1) (h1 : tau v = 0) (h2 : ip v v = 0) (h3 : t3 v v v = 0)
+    (θ ζ : Fin 5 → ℂ) (hz : ∀ m, col z m = ζ m • Uv v (θ m)) (Z : M45) (hZ : Z ∈ N)
+    (m : Fin 5) : col Z m = lamL v Z m • Uv v (θ m) := by
+  obtain ⟨c, hc⟩ := hmax Z hZ m
+  have e : lamL v Z m = c * ζ m := by
+    rw [lamL_apply, hc, hz m]
+    have h4 := ip_Uv v hk h1 h2 h3 (θ m)
+    simp only [ip, Pi.smul_apply, smul_eq_mul] at h4 ⊢
+    linear_combination (c * ζ m / 4) * h4
+  rw [e, hc, hz m, smul_smul]
+
+def Chart (N : Submodule ℂ M45) (v : V4) (θ : Fin 5 → ℂ) : Prop :=
+  (∀ i, v i ^ 4 = 1) ∧ tau v = 0 ∧ ip v v = 0 ∧ t3 v v v = 0 ∧
+    ∀ Z ∈ N, ∀ m, col Z m = lamL v Z m • Uv v (θ m)
+
+theorem Uv_sum (v : V4) (hk : ∀ i, v i ^ 4 = 1) (h1 : tau v = 0) (h2 : ip v v = 0)
+    (h3 : t3 v v v = 0) (L0 L1 L2 L3 L4 T0 T1 T2 T3 T4 : ℂ)
+    (e : L0 • Uv v T0 + L1 • Uv v T1 + L2 • Uv v T2 + L3 • Uv v T3 + L4 • Uv v T4 = 0) :
+    (L0 + L1 + L2 + L3 + L4 = 0) ∧ (L0 * T0 + L1 * T1 + L2 * T2 + L3 * T3 + L4 * T4 = 0) ∧
+      (L0 * T0 ^ 2 + L1 * T1 ^ 2 + L2 * T2 ^ 2 + L3 * T3 ^ 2 + L4 * T4 ^ 2 = 0) := by
+  have e' : Qv v 0 (-(L0 * T0 ^ 2 + L1 * T1 ^ 2 + L2 * T2 ^ 2 + L3 * T3 ^ 2 + L4 * T4 ^ 2) / 2)
+      (L0 * T0 + L1 * T1 + L2 * T2 + L3 * T3 + L4 * T4) (L0 + L1 + L2 + L3 + L4) =
+      Qv v 0 0 0 0 := by
+    funext i
+    have ei := congrFun e i
+    simp only [Uv, Qv, Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at ei ⊢
+    linear_combination ei
+  obtain ⟨_, q1, q2, q3⟩ := Qv_inj v 1 one_ne_zero hk h1 h2 h3 _ _ _ _ _ _ _ _ e'
+  exact ⟨q3, q2, by linear_combination (-2 : ℂ) * q1⟩
+
+theorem Lam_rel (N : Submodule ℂ M45) (hrs : ∀ Z ∈ N, rs Z = 0) (v : V4) (θ : Fin 5 → ℂ)
+    (hC : Chart N v θ) (Z : M45) (hZ : Z ∈ N) :
+    (∑ n, lamL v Z n = 0) ∧ (∑ n, lamL v Z n * θ n = 0) ∧
+      (∑ n, lamL v Z n * θ n ^ 2 = 0) := by
+  obtain ⟨hk, h1, h2, h3, hcol⟩ := hC
+  have e : col Z 0 + col Z 1 + col Z 2 + col Z 3 + col Z 4 = rs Z :=
+    sum_cols_perm (Equiv.refl (Fin 5)) Z
+  rw [hrs Z hZ, hcol Z hZ 0, hcol Z hZ 1, hcol Z hZ 2, hcol Z hZ 3, hcol Z hZ 4] at e
+  rw [Fin.sum_univ_five, Fin.sum_univ_five, Fin.sum_univ_five]
+  exact Uv_sum v hk h1 h2 h3 _ _ _ _ _ _ _ _ _ _ e
+
+theorem star_cert (L0 L1 L2 L3 L4 T0 T1 T2 T3 T4 : ℂ)
+    (r0 : L0 + L1 + L2 + L3 + L4 = 0)
+    (r1 : L0 * T0 + L1 * T1 + L2 * T2 + L3 * T3 + L4 * T4 = 0)
+    (r2 : L0 * T0 ^ 2 + L1 * T1 ^ 2 + L2 * T2 ^ 2 + L3 * T3 ^ 2 + L4 * T4 ^ 2 = 0)
+    (c0 : L1 * L2 * L3 * tt T1 T2 T3 + L1 * L2 * L4 * tt T1 T2 T4 + L1 * L3 * L4 * tt T1 T3 T4
+      + L2 * L3 * L4 * tt T2 T3 T4 = 0)
+    (c1 : L0 * L2 * L3 * tt T0 T2 T3 + L0 * L2 * L4 * tt T0 T2 T4 + L0 * L3 * L4 * tt T0 T3 T4
+      + L2 * L3 * L4 * tt T2 T3 T4 = 0)
+    (c2 : L0 * L1 * L3 * tt T0 T1 T3 + L0 * L1 * L4 * tt T0 T1 T4 + L0 * L3 * L4 * tt T0 T3 T4
+      + L1 * L3 * L4 * tt T1 T3 T4 = 0)
+    (c3 : L0 * L1 * L2 * tt T0 T1 T2 + L0 * L1 * L4 * tt T0 T1 T4 + L0 * L2 * L4 * tt T0 T2 T4
+      + L1 * L2 * L4 * tt T1 T2 T4 = 0)
+    (c4 : L0 * L1 * L2 * tt T0 T1 T2 + L0 * L1 * L3 * tt T0 T1 T3 + L0 * L2 * L3 * tt T0 T2 T3
+      + L1 * L2 * L3 * tt T1 T2 T3 = 0) :
+    L0 * (cc T0 * L0 ^ 2 - (L0 ^ 2 * kk T0 T0 + L1 ^ 2 * kk T0 T1 + L2 ^ 2 * kk T0 T2
+      + L3 ^ 2 * kk T0 T3 + L4 ^ 2 * kk T0 T4)) = 0 := by
+  simp only [tt] at c0 c1 c2 c3 c4
+  simp only [cc, kk]
+  linear_combination (1 / 2 : ℂ) * (c0 + c1 + c2 + c3 + c4) - c0
+    - L0 * ((2 * T0 * (L0 + L1 + L2 + L3 + L4)
+        + 4 * (L0 * T0 + L1 * T1 + L2 * T2 + L3 * T3 + L4 * T4) - 8 * L0 * T0) * r0
+      + (T0 ^ 2 * (L0 * T0 ^ 2 + L1 * T1 ^ 2 + L2 * T2 ^ 2 + L3 * T3 ^ 2 + L4 * T4 ^ 2)
+        - L0 * T0 ^ 4 - 4 * L0) * r1
+      + (T0 * (L0 * T0 ^ 2 + L1 * T1 ^ 2 + L2 * T2 ^ 2 + L3 * T3 ^ 2 + L4 * T4 ^ 2) / 2
+        - 2 * L0 * T0 ^ 3) * r2)
+
+theorem Lam_star (N : Submodule ℂ M45) (hN : SLev N) (hrs : ∀ Z ∈ N, rs Z = 0) (v : V4)
+    (θ : Fin 5 → ℂ) (hC : Chart N v θ) (Z : M45) (hZ : Z ∈ N) (σ : Equiv.Perm (Fin 5)) :
+    lamL v Z (σ 0) * (cc (θ (σ 0)) * lamL v Z (σ 0) ^ 2 -
+      (lamL v Z (σ 0) ^ 2 * kk (θ (σ 0)) (θ (σ 0)) + lamL v Z (σ 1) ^ 2 * kk (θ (σ 0)) (θ (σ 1))
+        + lamL v Z (σ 2) ^ 2 * kk (θ (σ 0)) (θ (σ 2))
+        + lamL v Z (σ 3) ^ 2 * kk (θ (σ 0)) (θ (σ 3))
+        + lamL v Z (σ 4) ^ 2 * kk (θ (σ 0)) (θ (σ 4)))) = 0 := by
+  obtain ⟨hk, h1, h2, h3, hcol⟩ := hC
+  have e := sum_cols_perm σ Z
+  rw [hrs Z hZ, hcol Z hZ (σ 0), hcol Z hZ (σ 1), hcol Z hZ (σ 2), hcol Z hZ (σ 3),
+    hcol Z hZ (σ 4)] at e
+  obtain ⟨r0, r1, r2⟩ := Uv_sum v hk h1 h2 h3 _ _ _ _ _ _ _ _ _ _ e
+  have hS := SLev_perm σ N hN
+  have hY : cperm σ Z ∈ N.map (cperm σ) := Submodule.mem_map_of_mem hZ
+  have c0 := (C34 _ hS _ hY 0).2.1
+  have c1 := (C34 _ hS _ hY 1).2.1
+  have c2 := (C34 _ hS _ hY 2).2.1
+  have c3 := (C34 _ hS _ hY 3).2.1
+  have c4 := (C34 _ hS _ hY 4).2.1
+  rw [sa0.1, sa0.2.1, sa0.2.2.1, sa0.2.2.2] at c0
+  rw [sa1.1, sa1.2.1, sa1.2.2.1, sa1.2.2.2] at c1
+  rw [sa2.1, sa2.2.1, sa2.2.2.1, sa2.2.2.2] at c2
+  rw [sa3.1, sa3.2.1, sa3.2.2.1, sa3.2.2.2] at c3
+  rw [sa4.1, sa4.2.1, sa4.2.2.1, sa4.2.2.2] at c4
+  have hc : ∀ k, col (cperm σ Z) k = lamL v Z (σ k) • Uv v (θ (σ k)) := fun k =>
+    hcol Z hZ (σ k)
+  simp only [hc, t3_smul3, t3_Uv v hk h1 h2 h3] at c0 c1 c2 c3 c4
+  exact star_cert _ _ _ _ _ _ _ _ _ _ r0 r1 r2 (by linear_combination c0)
+    (by linear_combination c1) (by linear_combination c2) (by linear_combination c3)
+    (by linear_combination c4)
+
+def Fq (θ : Fin 5 → ℂ) (m : Fin 5) (lam : Fin 5 → ℂ) : ℂ :=
+  cc (θ m) * lam m ^ 2 - ∑ n, lam n ^ 2 * kk (θ m) (θ n)
+
+theorem sum5 (σ : Equiv.Perm (Fin 5)) (f : Fin 5 → ℂ) :
+    f (σ 0) + f (σ 1) + f (σ 2) + f (σ 3) + f (σ 4) = ∑ n, f n := by
+  rw [← Equiv.sum_comp σ f, Fin.sum_univ_five]
+
+theorem Fq_sigma (θ lam : Fin 5 → ℂ) (m : Fin 5) (σ : Equiv.Perm (Fin 5)) :
+    Fq θ m lam = cc (θ m) * lam m ^ 2 - (lam (σ 0) ^ 2 * kk (θ m) (θ (σ 0))
+      + lam (σ 1) ^ 2 * kk (θ m) (θ (σ 1)) + lam (σ 2) ^ 2 * kk (θ m) (θ (σ 2))
+      + lam (σ 3) ^ 2 * kk (θ m) (θ (σ 3)) + lam (σ 4) ^ 2 * kk (θ m) (θ (σ 4))) := by
+  have e : lam (σ 0) ^ 2 * kk (θ m) (θ (σ 0))
+      + lam (σ 1) ^ 2 * kk (θ m) (θ (σ 1)) + lam (σ 2) ^ 2 * kk (θ m) (θ (σ 2))
+      + lam (σ 3) ^ 2 * kk (θ m) (θ (σ 3)) + lam (σ 4) ^ 2 * kk (θ m) (θ (σ 4)) =
+      ∑ n, lam n ^ 2 * kk (θ m) (θ n) := sum5 σ (fun n => lam n ^ 2 * kk (θ m) (θ n))
+  rw [e]
+  rfl
+
+theorem Lam_F (N : Submodule ℂ M45) (hN : SLev N) (hrs : ∀ Z ∈ N, rs Z = 0) (v : V4)
+    (θ : Fin 5 → ℂ) (hC : Chart N v θ) (z : M45) (hz : z ∈ N) (hz0 : ∀ m, lamL v z m ≠ 0)
+    (Z : M45) (hZ : Z ∈ N) (m : Fin 5) : Fq θ m (lamL v Z) = 0 := by
+  have star : ∀ Y ∈ N, lamL v Y m * Fq θ m (lamL v Y) = 0 := by
+    intro Y hY
+    have h := Lam_star N hN hrs v θ hC Y hY (Equiv.swap 0 m)
+    rw [Fq_sigma θ (lamL v Y) m (Equiv.swap 0 m)]
+    rw [Equiv.swap_apply_left] at h ⊢
+    exact h
+  by_cases h0 : lamL v Z m = 0
+  · have e1 := star (Z + z) (N.add_mem hZ hz)
+    have e2 := star (Z - z) (N.sub_mem hZ hz)
+    have e3 := star z hz
+    rw [map_add] at e1
+    rw [map_sub] at e2
+    have n1 : (lamL v Z + lamL v z) m ≠ 0 := by
+      rw [Pi.add_apply, h0, zero_add]
+      exact hz0 m
+    have n2 : (lamL v Z - lamL v z) m ≠ 0 := by
+      rw [Pi.sub_apply, h0, zero_sub]
+      exact neg_ne_zero.mpr (hz0 m)
+    have f1 := (mul_eq_zero.mp e1).resolve_left n1
+    have f2 := (mul_eq_zero.mp e2).resolve_left n2
+    have f3 := (mul_eq_zero.mp e3).resolve_left (hz0 m)
+    have par : Fq θ m (lamL v Z + lamL v z) + Fq θ m (lamL v Z - lamL v z) =
+        2 * Fq θ m (lamL v Z) + 2 * Fq θ m (lamL v z) := by
+      simp only [Fq, Pi.add_apply, Pi.sub_apply, Fin.sum_univ_five]
+      ring
+    linear_combination (1 / 2 : ℂ) * (f1 + f2) - f3 - (1 / 2 : ℂ) * par
+  · exact (mul_eq_zero.mp (star Z hZ)).resolve_left h0
+
+def AlgCore : Prop := ∀ (θ : Fin 5 → ℂ) (Lam : Submodule ℂ (Fin 5 → ℂ)),
+    2 ≤ Module.finrank ℂ Lam →
+    (∀ lam ∈ Lam, (∑ n, lam n = 0) ∧ (∑ n, lam n * θ n = 0) ∧ (∑ n, lam n * θ n ^ 2 = 0)) →
+    (∀ lam ∈ Lam, ∀ m, Fq θ m lam = 0) →
+    (∃ ζ ∈ Lam, ∀ m, ζ m ≠ 0) →
+    (∃ a b c : Fin 5, a ≠ b ∧ a ≠ c ∧ b ≠ c ∧ θ a ≠ θ b ∧ θ a ≠ θ c ∧ θ b ≠ θ c) → False
+
+theorem HypS6_of (HA : AlgCore) : HypS6 := by
+  unfold HypS6
+  intro N hN hrs hd z hz hmax a b c hab hac hbc hind hact
+  obtain ⟨v, h1, h2, h3, hk, hnp⟩ := chart (fun m => col z m) hact
+  have hzc : ∀ m, ∃ θ ζ : ℂ, ζ ≠ 0 ∧ col z m = ζ • Uv v θ := fun m =>
+    iso_coords v hk h1 h2 h3 (col z m) (C1 N hN z hz m) (Niso N hN hrs z z hz hz m) (hnp m)
+  choose θ ζ hζ hzθ using hzc
+  have hcol : ∀ Z ∈ N, ∀ m, col Z m = lamL v Z m • Uv v (θ m) := fun Z hZ m =>
+    N_coords N z hmax v hk h1 h2 h3 θ ζ hzθ Z hZ m
+  have hC : Chart N v θ := ⟨hk, h1, h2, h3, hcol⟩
+  have hz0 : ∀ m, lamL v z m ≠ 0 := by
+    intro m h0
+    apply hact m
+    rw [hcol z hz m, h0, zero_smul]
+  have nab : θ a ≠ θ b := by
+    intro h
+    have e : ζ b • col z a + (-ζ a) • col z b + (0 : ℂ) • col z c = 0 := by
+      rw [hzθ a, hzθ b, h]
+      funext i
+      simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
+      ring
+    exact hζ b (hind _ _ _ e).1
+  have nac : θ a ≠ θ c := by
+    intro h
+    have e : ζ c • col z a + (0 : ℂ) • col z b + (-ζ a) • col z c = 0 := by
+      rw [hzθ a, hzθ c, h]
+      funext i
+      simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
+      ring
+    exact hζ c (hind _ _ _ e).1
+  have nbc : θ b ≠ θ c := by
+    intro h
+    have e : (0 : ℂ) • col z a + ζ c • col z b + (-ζ b) • col z c = 0 := by
+      rw [hzθ b, hzθ c, h]
+      funext i
+      simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
+      ring
+    exact hζ c (hind _ _ _ e).2.1
+  have rn := rank_nullity N (lamL v)
+  have hker : (N ⊓ LinearMap.ker (lamL v) : Submodule ℂ M45) = ⊥ := by
+    rw [eq_bot_iff]
+    rintro Z ⟨hZ, hZk⟩
+    rw [Submodule.mem_bot]
+    rw [SetLike.mem_coe, LinearMap.mem_ker] at hZk
+    funext ⟨i, m⟩
+    have h := congrFun (hcol Z hZ m) i
+    rw [hZk, Pi.zero_apply, zero_smul] at h
+    exact h
+  rw [hker, finrank_bot] at rn
+  apply HA θ (N.map (lamL v))
+  · omega
+  · rintro lam ⟨Z, hZ, rfl⟩
+    exact Lam_rel N hrs v θ hC Z hZ
+  · rintro lam ⟨Z, hZ, rfl⟩ m
+    exact Lam_F N hN hrs v θ hC z hz hz0 Z hZ m
+  · exact ⟨lamL v z, Submodule.mem_map_of_mem hz, hz0⟩
+  · exact ⟨a, b, c, hab, hac, hbc, nab, nac, nbc⟩

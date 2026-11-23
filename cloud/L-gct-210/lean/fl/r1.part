@@ -1,0 +1,144 @@
+def Qv (v : V4) (a0 a1 a2 a3 : ℂ) : V4 := fun i => a0 + a1 * v i + a2 * v i ^ 2 + a3 * v i ^ 3
+
+theorem Qv_mul (v : V4) (kap : ℂ) (hk : ∀ i, v i ^ 4 = kap) (a0 a1 a2 a3 b0 b1 b2 b3 : ℂ) :
+    (fun i => Qv v a0 a1 a2 a3 i * Qv v b0 b1 b2 b3 i : V4) =
+      Qv v (a0 * b0 + kap * (a1 * b3 + a2 * b2 + a3 * b1))
+        (a0 * b1 + a1 * b0 + kap * (a2 * b3 + a3 * b2))
+        (a0 * b2 + a1 * b1 + a2 * b0 + kap * (a3 * b3)) (a0 * b3 + a1 * b2 + a2 * b1 + a3 * b0) := by
+  funext i
+  simp only [Qv]
+  linear_combination ((a1 * b3 + a2 * b2 + a3 * b1) + (a2 * b3 + a3 * b2) * v i
+    + a3 * b3 * v i ^ 2) * hk i
+
+theorem tau_Qv (v : V4) (h1 : tau v = 0) (h2 : ip v v = 0) (h3 : t3 v v v = 0)
+    (a0 a1 a2 a3 : ℂ) : tau (Qv v a0 a1 a2 a3) = 4 * a0 := by
+  simp only [tau, ip, t3] at h1 h2 h3
+  simp only [tau, Qv]
+  linear_combination a1 * h1 + a2 * h2 + a3 * h3
+
+theorem ip_Qv (v : V4) (kap : ℂ) (hk : ∀ i, v i ^ 4 = kap) (h1 : tau v = 0) (h2 : ip v v = 0)
+    (h3 : t3 v v v = 0) (a0 a1 a2 a3 b0 b1 b2 b3 : ℂ) :
+    ip (Qv v a0 a1 a2 a3) (Qv v b0 b1 b2 b3) =
+      4 * (a0 * b0 + kap * (a1 * b3 + a2 * b2 + a3 * b1)) := by
+  have e : ip (Qv v a0 a1 a2 a3) (Qv v b0 b1 b2 b3) =
+      tau (fun i => Qv v a0 a1 a2 a3 i * Qv v b0 b1 b2 b3 i : V4) := by
+    simp only [ip, tau]
+  rw [e, Qv_mul v kap hk, tau_Qv v h1 h2 h3]
+
+def Lv (v : V4) : V4 →ₗ[ℂ] V4 where
+  toFun a := Qv v (a 0) (a 1) (a 2) (a 3)
+  map_add' a b := by
+    funext i
+    simp only [Qv, Pi.add_apply]
+    ring
+  map_smul' c a := by
+    funext i
+    simp only [Qv, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
+    ring
+
+theorem Lv_apply (v a : V4) : Lv v a = Qv v (a 0) (a 1) (a 2) (a 3) := rfl
+
+theorem Qv_inj (v : V4) (kap : ℂ) (hkap : kap ≠ 0) (hk : ∀ i, v i ^ 4 = kap) (h1 : tau v = 0)
+    (h2 : ip v v = 0) (h3 : t3 v v v = 0) (a0 a1 a2 a3 b0 b1 b2 b3 : ℂ)
+    (h : Qv v a0 a1 a2 a3 = Qv v b0 b1 b2 b3) : a0 = b0 ∧ a1 = b1 ∧ a2 = b2 ∧ a3 = b3 := by
+  have e0 : ip (Qv v a0 a1 a2 a3) (Qv v 1 0 0 0) = ip (Qv v b0 b1 b2 b3) (Qv v 1 0 0 0) := by
+    rw [h]
+  have e1 : ip (Qv v a0 a1 a2 a3) (Qv v 0 0 0 1) = ip (Qv v b0 b1 b2 b3) (Qv v 0 0 0 1) := by
+    rw [h]
+  have e2 : ip (Qv v a0 a1 a2 a3) (Qv v 0 0 1 0) = ip (Qv v b0 b1 b2 b3) (Qv v 0 0 1 0) := by
+    rw [h]
+  have e3 : ip (Qv v a0 a1 a2 a3) (Qv v 0 1 0 0) = ip (Qv v b0 b1 b2 b3) (Qv v 0 1 0 0) := by
+    rw [h]
+  rw [ip_Qv v kap hk h1 h2 h3, ip_Qv v kap hk h1 h2 h3] at e0 e1 e2 e3
+  refine ⟨by linear_combination (1 / 4 : ℂ) * e0, ?_, ?_, ?_⟩
+  · apply mul_left_cancel₀ hkap
+    linear_combination (1 / 4 : ℂ) * e1
+  · apply mul_left_cancel₀ hkap
+    linear_combination (1 / 4 : ℂ) * e2
+  · apply mul_left_cancel₀ hkap
+    linear_combination (1 / 4 : ℂ) * e3
+
+theorem Qv_exists (v : V4) (kap : ℂ) (hkap : kap ≠ 0) (hk : ∀ i, v i ^ 4 = kap)
+    (h1 : tau v = 0) (h2 : ip v v = 0) (h3 : t3 v v v = 0) (x : V4) :
+    ∃ a0 a1 a2 a3 : ℂ, x = Qv v a0 a1 a2 a3 := by
+  have hinj : Function.Injective (Lv v) := by
+    intro a b hab
+    rw [Lv_apply, Lv_apply] at hab
+    obtain ⟨q0, q1, q2, q3⟩ := Qv_inj v kap hkap hk h1 h2 h3 _ _ _ _ _ _ _ _ hab
+    funext i
+    fin_cases i
+    · exact q0
+    · exact q1
+    · exact q2
+    · exact q3
+  obtain ⟨a, ha⟩ := (LinearMap.injective_iff_surjective.mp hinj) x
+  exact ⟨a 0, a 1, a 2, a 3, ha.symm⟩
+
+theorem Qv_V (v : V4) (kap : ℂ) (hkap : kap ≠ 0) (hk : ∀ i, v i ^ 4 = kap)
+    (h1 : tau v = 0) (h2 : ip v v = 0) (h3 : t3 v v v = 0) (x : V4) (hx : tau x = 0) :
+    ∃ p q r : ℂ, x = Qv v 0 p q r := by
+  obtain ⟨a0, a1, a2, a3, rfl⟩ := Qv_exists v kap hkap hk h1 h2 h3 x
+  rw [tau_Qv v h1 h2 h3] at hx
+  have h0 : a0 = 0 := by linear_combination (1 / 4 : ℂ) * hx
+  subst h0
+  exact ⟨a1, a2, a3, rfl⟩
+
+theorem vperp_coords (v : V4) (kap : ℂ) (hkap : kap ≠ 0) (hk : ∀ i, v i ^ 4 = kap)
+    (h1 : tau v = 0) (h2 : ip v v = 0) (h3 : t3 v v v = 0) (x : V4) (hx : tau x = 0)
+    (hi : ip x x = 0) (ht : t3 v v x = 0) : ∃ p r : ℂ, x = Qv v 0 p 0 r ∧ p * r = 0 := by
+  obtain ⟨p, q, r, rfl⟩ := Qv_V v kap hkap hk h1 h2 h3 x hx
+  have hvv : (fun i => v i * v i : V4) = Qv v 0 0 1 0 := by
+    funext i
+    simp only [Qv]
+    ring
+  rw [t3_ip_l, hvv, ip_Qv v kap hk h1 h2 h3] at ht
+  have hq : q = 0 := by
+    have h : kap * q = 0 := by linear_combination (1 / 4 : ℂ) * ht
+    exact (mul_eq_zero.mp h).resolve_left hkap
+  subst hq
+  rw [ip_Qv v kap hk h1 h2 h3] at hi
+  have hpr : p * r = 0 := by
+    have h : kap * (p * r) = 0 := by linear_combination (1 / 8 : ℂ) * hi
+    exact (mul_eq_zero.mp h).resolve_left hkap
+  exact ⟨p, r, rfl, hpr⟩
+
+theorem vperp1_coords (v : V4) (kap : ℂ) (hkap : kap ≠ 0) (hk : ∀ i, v i ^ 4 = kap)
+    (h1 : tau v = 0) (h2 : ip v v = 0) (h3 : t3 v v v = 0) (x : V4) (hx : tau x = 0)
+    (hi : ip v x = 0) : ∃ p q : ℂ, x = Qv v 0 p q 0 := by
+  obtain ⟨p, q, r, rfl⟩ := Qv_V v kap hkap hk h1 h2 h3 x hx
+  have hv' : v = Qv v 0 1 0 0 := by
+    funext i
+    simp only [Qv]
+    ring
+  have hi' : ip (Qv v 0 1 0 0) (Qv v 0 p q r) = 0 := by
+    rw [← hv']
+    exact hi
+  rw [ip_Qv v kap hk h1 h2 h3] at hi'
+  have hr : r = 0 := by
+    have h : kap * r = 0 := by linear_combination (1 / 4 : ℂ) * hi'
+    exact (mul_eq_zero.mp h).resolve_left hkap
+  subst hr
+  exact ⟨p, q, rfl⟩
+
+theorem br_13 (v : V4) (kap : ℂ) (hk : ∀ i, v i ^ 4 = kap) (h1 : tau v = 0) (h2 : ip v v = 0)
+    (h3 : t3 v v v = 0) (P1 R1 P2 R2 P3 R3 P4 R4 : ℂ) :
+    br (Qv v 0 P1 0 R1) (Qv v 0 P2 0 R2) (Qv v 0 P3 0 R3) (Qv v 0 P4 0 R4) =
+      -24 * kap * (P1 * P2 * P3 * P4) - 24 * kap ^ 3 * (R1 * R2 * R3 * R4)
+      + 8 * kap ^ 2 * (P1 * P2 * R3 * R4 + P1 * P3 * R2 * R4 + P1 * P4 * R2 * R3
+        + P2 * P3 * R1 * R4 + P2 * P4 * R1 * R3 + P3 * P4 * R1 * R2) := by
+  simp only [br]
+  rw [t4_ip, Qv_mul v kap hk, Qv_mul v kap hk]
+  simp only [ip_Qv v kap hk h1 h2 h3]
+  ring
+
+theorem t3_Qv2 (v : V4) (kap : ℂ) (hk : ∀ i, v i ^ 4 = kap) (h1 : tau v = 0) (h2 : ip v v = 0)
+    (h3 : t3 v v v = 0) (P1 k1 P2 k2 P3 k3 : ℂ) :
+    t3 (Qv v 0 P1 k1 0) (Qv v 0 P2 k2 0) (Qv v 0 P3 k3 0) =
+      4 * kap * (P1 * P2 * k3 + P1 * k2 * P3 + k1 * P2 * P3) := by
+  rw [t3_ip_l, Qv_mul v kap hk, ip_Qv v kap hk h1 h2 h3]
+  ring
+
+theorem sw02_1 : sw02 1 = 1 := by decide
+
+theorem sw02_2 : sw02 2 = 0 := by decide
+

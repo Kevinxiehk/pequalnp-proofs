@@ -1,0 +1,17 @@
+
+### R3.2' THEOREM TS (split over TWO rows, e = 2; RIGOROUS; identities checked on 6 examples to 1e-13, r3_test3.py)
+ Let L' be a 4x5 level space with 2-dim defect space C = C u (+) C u', where e_i u^T and e_k u'^T lie in L' for two rows i != k, and
+ <u,u> != 0 != <u',u'>.  Then <u,u'> = 0, and with the linear forms X(Y) := <y^i, u'>, X'(Y) := <y^k, u> and
+ D_ik(Y)(u,u') := (Per(.., u (slot i), .., u' (slot k), .., e_j))_j  (in C; it depends on the other two rows; D_ik(0)(u,u') = 4 u o u'):
+       c(Y) = X(Y) X'(Y) D_ik(Y)(u,u') / (<u,u><u',u'>)      for all Y with gamma(Y) = 0.
+ Consequently ker gamma cap ker X and ker gamma cap ker X' are strongly level, dim ker gamma <= 4 and dim L' <= 6 (= e + 4, one more than
+ (DI_5)); a (6,2) space of this kind is K (+) C e_i u^T (+) C e_k u'^T with K = ker gamma 4-dim, X X' not == 0 on K, and K contains
+ the 3-dim strongly level hyperplanes {X = 0}, {X' = 0}.   [(6,2) of this kind: NOT excluded.]
+ Proof. The tt' coefficient of c(t e_i u^T + t' e_k u'^T) is 2(2 u o u' - <u,u'> 1), which must lie in C inside 1^perp: <u,u'> = 0.
+ All of D_i(Y)u, D_k(Y)u', D_ik(Y)(u,u') lie in C (coefficients of c(Y + t e_i u^T + t' e_k u'^T)). By the symmetry of Per:
+   <u,c(Y)> = <y^i, D_i(Y)u>,  <u',c(Y)> = <y^k, D_k(Y)u'>,  <u', D_i(Y)u> = <y^k, D_ik(Y)(u,u')>,  <u, D_k(Y)u'> = <y^i, D_ik(Y)(u,u')>.
+ Degree 1 of the first two: <y^i,u> = <u,gamma(Y)>, <y^k,u'> = <u',gamma(Y)>. On ker gamma, writing D_i u = a u + a' u', D_k u' = b u + b' u',
+ D_ik(u,u') = d u + d' u':  <u,c> = a' X,  a' <u',u'> = d X',  <u',c> = b X',  b <u,u> = d' X.  QED
+ In the five nondegenerate two-row examples one of X, X' vanishes identically on ker gamma (so ker gamma is strongly level, dim 3).
+ The same bookkeeping works for any distribution of C over several rows (a product of cross pairings per extra row); it bounds dim L' by
+ e + 3 + (number of rows used - 1) and shows where the extra dimension would have to come from.

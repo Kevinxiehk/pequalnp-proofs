@@ -1,0 +1,314 @@
+
+
+namespace PEqualNP.Gct.F210
+
+open Finset PEqualNP.Gct.Helpers.Minc
+
+def Lev (n : ℕ) (L : Submodule ℂ (Fin n × Fin n → ℂ)) : Prop :=
+  ∀ t ∈ L, (∑ f : Fin n ↪ Fin n, ∏ i, (1 + t (i, f i))) = (Nat.factorial n : ℂ)
+
+theorem gap_eq_perm (n : ℕ) (t : Fin n × Fin n → ℂ) :
+    (∑ f : Fin n ↪ Fin n, ∏ i, (1 + t (i, f i))) =
+      MvPolynomial.eval (fun p => 1 + t p) (PEqualNP.Gct.permPoly ℂ n) := by
+  rw [PEqualNP.Gct.MethodCeiling.eval_permPoly, ← Matrix.permanent_transpose, Matrix.permanent]
+  have hb : Function.Bijective (fun σ : Equiv.Perm (Fin n) => σ.toEmbedding) :=
+    ⟨fun σ τ h => Equiv.ext fun x => DFunLike.congr_fun h x,
+      fun e => ⟨e.equivOfFiniteSelfEmbedding, e.toEmbedding_equivOfFiniteSelfEmbedding⟩⟩
+  rw [← Fintype.sum_bijective _ hb (fun σ : Equiv.Perm (Fin n) => ∏ i, (1 + t (i, σ i)))
+    (fun f : Fin n ↪ Fin n => ∏ i, (1 + t (i, f i))) (fun σ => rfl)]
+  simp [Matrix.transpose_apply]
+
+theorem lev_five (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ))
+    (hL : ∀ t ∈ L, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120) : Lev 5 L := by
+  intro t ht
+  rw [hL t ht]
+  norm_num [Nat.factorial]
+
+theorem lev_perm {n : ℕ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : Lev n L) :
+    ∀ t ∈ L, MvPolynomial.eval (fun p => 1 + t p) (PEqualNP.Gct.permPoly ℂ n) =
+      (Nat.factorial n : ℂ) := by
+  intro t ht
+  rw [← gap_eq_perm]
+  exact hL t ht
+
+theorem lev_Mk {n : ℕ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : Lev n L) :
+    ∀ t ∈ L, ∀ k : ℕ, 1 ≤ k → k ≤ n → Mk n k t = 0 :=
+  PEqualNP.Gct.Kit086.level_Mk_zero n L (lev_perm hL)
+
+theorem lev_inj {n : ℕ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : Lev n L) :
+    ∀ t ∈ L, ∀ k : ℕ, 1 ≤ k → k ≤ n →
+      ∑ i : Fin k ↪ Fin n, ∑ j : Fin k ↪ Fin n, ∏ a, t (i a, j a) = 0 :=
+  PEqualNP.Gct.Kit086.level_inj_zero n L (lev_perm hL)
+
+theorem lev_of_Mk {n : ℕ} (t : Fin n × Fin n → ℂ)
+    (h : ∀ k : ℕ, 1 ≤ k → k ≤ n → Mk n k t = 0) :
+    (∑ f : Fin n ↪ Fin n, ∏ i, (1 + t (i, f i))) = (Nat.factorial n : ℂ) := by
+  rw [gap_eq_perm]
+  exact PEqualNP.Gct.Kit086.level_of_Mk_zero n t h
+
+theorem lev_sum {n : ℕ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : Lev n L) (hn : 1 ≤ n) :
+    ∀ t ∈ L, ∑ p, t p = 0 := by
+  intro t ht
+  have h := lev_Mk hL t ht 1 le_rfl hn
+  rwa [Mk_one] at h
+
+theorem ite_zero_sub (p : Prop) [Decidable p] (X : ℂ) :
+    (if p then 0 else X) = X - if p then X else 0 := by
+  split_ifs <;> simp
+
+theorem offdiag_sum {n : ℕ} (F : Fin n → Fin n → ℂ) :
+    ∑ a, ∑ b, (if a = b then 0 else F a b) = ∑ a, ∑ b, F a b - ∑ a, F a a := by
+  simp_rw [ite_zero_sub, Finset.sum_sub_distrib, Finset.sum_ite_eq, Finset.mem_univ, ite_true]
+
+theorem inj_two_iff {n : ℕ} (f : Fin 2 → Fin n) : Function.Injective f ↔ f 0 ≠ f 1 := by
+  constructor
+  · intro h h01
+    exact absurd (h h01) (by decide)
+  · intro h x y hxy
+    fin_cases x <;> fin_cases y
+    · rfl
+    · exact absurd hxy h
+    · exact absurd hxy.symm h
+    · rfl
+
+theorem sum_emb_two {n : ℕ} (F : Fin n → Fin n → ℂ) :
+    ∑ i : Fin 2 ↪ Fin n, F (i 0) (i 1) =
+      ∑ a : Fin n, ∑ b : Fin n, if a = b then 0 else F a b := by
+  classical
+  rw [← (Equiv.subtypeInjectiveEquivEmbedding (Fin 2) (Fin n)).sum_comp]
+  have h1 : ∑ f : {f : Fin 2 → Fin n // Function.Injective f},
+      F ((Equiv.subtypeInjectiveEquivEmbedding (Fin 2) (Fin n)) f 0)
+        ((Equiv.subtypeInjectiveEquivEmbedding (Fin 2) (Fin n)) f 1) =
+      ∑ f ∈ univ.filter (fun f : Fin 2 → Fin n => Function.Injective f), F (f 0) (f 1) := by
+    rw [Finset.sum_subtype (p := fun f : Fin 2 → Fin n => Function.Injective f)
+      (univ.filter (fun f : Fin 2 → Fin n => Function.Injective f))
+      (fun f => by simp only [Finset.mem_filter, Finset.mem_univ, true_and])
+      (fun f => F (f 0) (f 1))]
+    rfl
+  rw [h1, Finset.sum_filter, ← (piFinTwoEquiv fun _ => Fin n).symm.sum_comp,
+    Fintype.sum_prod_type]
+  refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
+  have h0 : (piFinTwoEquiv fun _ => Fin n).symm (a, b) 0 = a := rfl
+  have h1' : (piFinTwoEquiv fun _ => Fin n).symm (a, b) 1 = b := rfl
+  by_cases hab : a = b
+  · rw [if_pos hab, if_neg]
+    intro hinj
+    exact (inj_two_iff _).mp hinj (h0.trans (hab.trans h1'.symm))
+  · rw [if_neg hab, if_pos ((inj_two_iff _).mpr (by rw [h0, h1']; exact hab)), h0, h1']
+
+theorem inj_two (n : ℕ) (t : Fin n × Fin n → ℂ) :
+    ∑ i : Fin 2 ↪ Fin n, ∑ j : Fin 2 ↪ Fin n, ∏ a, t (i a, j a) =
+      (∑ p, t p) ^ 2 - ∑ i, (∑ j, t (i, j)) ^ 2 - ∑ j, (∑ i, t (i, j)) ^ 2 + ∑ p, t p ^ 2 := by
+  have hin : ∀ i : Fin 2 ↪ Fin n, ∑ j : Fin 2 ↪ Fin n, ∏ a, t (i a, j a) =
+      ∑ c, ∑ d, if c = d then 0 else t (i 0, c) * t (i 1, d) := fun i =>
+    (Finset.sum_congr rfl fun j _ => Fin.prod_univ_two _).trans
+      (sum_emb_two (fun c d => t (i 0, c) * t (i 1, d)))
+  refine ((Finset.sum_congr rfl fun i _ => hin i).trans
+    (sum_emb_two (fun a b => ∑ c, ∑ d, if c = d then 0 else t (a, c) * t (b, d)))).trans ?_
+  simp only [offdiag_sum, Finset.sum_sub_distrib, Fintype.sum_prod_type]
+  have hA : ∑ a, ∑ b, ∑ c, ∑ d, t (a, c) * t (b, d) = (∑ a, ∑ c, t (a, c)) ^ 2 := by
+    rw [sq, Finset.sum_mul_sum]
+    refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
+    rw [Finset.sum_mul_sum]
+  have hB : ∑ a, ∑ b, ∑ c, t (a, c) * t (b, c) = ∑ c, (∑ a, t (a, c)) ^ 2 := by
+    calc ∑ a, ∑ b, ∑ c, t (a, c) * t (b, c) = ∑ a, ∑ c, ∑ b, t (a, c) * t (b, c) :=
+          Finset.sum_congr rfl fun a _ => Finset.sum_comm
+      _ = ∑ c, ∑ a, ∑ b, t (a, c) * t (b, c) := Finset.sum_comm
+      _ = ∑ c, (∑ a, t (a, c)) ^ 2 :=
+          Finset.sum_congr rfl fun c _ => by rw [sq, Finset.sum_mul_sum]
+  have hC : ∑ a, ∑ c, ∑ d, t (a, c) * t (a, d) = ∑ a, (∑ c, t (a, c)) ^ 2 :=
+    Finset.sum_congr rfl fun a _ => by rw [sq, Finset.sum_mul_sum]
+  have hD : ∑ a, ∑ c, t (a, c) * t (a, c) = ∑ a, ∑ c, t (a, c) ^ 2 :=
+    Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun c _ => (sq _).symm
+  rw [hA, hB, hC, hD]
+  ring
+
+noncomputable def rowSum (n : ℕ) : (Fin n × Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ) :=
+  LinearMap.pi fun i => ∑ j, LinearMap.proj (i, j)
+
+noncomputable def colSum (n : ℕ) : (Fin n × Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ) :=
+  LinearMap.pi fun j => ∑ i, LinearMap.proj (i, j)
+
+theorem rowSum_apply (n : ℕ) (t : Fin n × Fin n → ℂ) (i : Fin n) :
+    rowSum n t i = ∑ j, t (i, j) := by
+  simp [rowSum, LinearMap.sum_apply]
+
+theorem colSum_apply (n : ℕ) (t : Fin n × Fin n → ℂ) (j : Fin n) :
+    colSum n t j = ∑ i, t (i, j) := by
+  simp [colSum, LinearMap.sum_apply]
+
+noncomputable def DC (n : ℕ) : Submodule ℂ (Fin n × Fin n → ℂ) :=
+  LinearMap.ker ((rowSum n).prod (colSum n))
+
+theorem mem_DC_iff {n : ℕ} (t : Fin n × Fin n → ℂ) :
+    t ∈ DC n ↔ rowSum n t = 0 ∧ colSum n t = 0 := by
+  rw [DC, LinearMap.mem_ker]
+  exact Prod.ext_iff
+
+theorem mem_DC {n : ℕ} (t : Fin n × Fin n → ℂ) :
+    t ∈ DC n ↔ (∀ i, ∑ j, t (i, j) = 0) ∧ (∀ j, ∑ i, t (i, j) = 0) := by
+  rw [mem_DC_iff, funext_iff, funext_iff]
+  simp only [rowSum_apply, colSum_apply, Pi.zero_apply]
+
+noncomputable def sumZero (n : ℕ) : Submodule ℂ (Fin n → ℂ) :=
+  LinearMap.ker (∑ i, (LinearMap.proj i : (Fin n → ℂ) →ₗ[ℂ] ℂ))
+
+theorem mem_sumZero {n : ℕ} (v : Fin n → ℂ) : v ∈ sumZero n ↔ ∑ i, v i = 0 := by
+  simp [sumZero, LinearMap.sum_apply]
+
+theorem finrank_sumZero {n : ℕ} (hn : 1 ≤ n) : Module.finrank ℂ (sumZero n) ≤ n - 1 := by
+  have hne : sumZero n ≠ ⊤ := by
+    intro h
+    have hm : (Pi.single (⟨0, hn⟩ : Fin n) (1 : ℂ)) ∈ sumZero n := h ▸ Submodule.mem_top
+    rw [mem_sumZero] at hm
+    simp at hm
+  have := Submodule.finrank_lt hne
+  rw [Module.finrank_fin_fun] at this
+  omega
+
+theorem lev_two {n : ℕ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : Lev n L) (hn : 2 ≤ n) :
+    ∀ t ∈ L, ∑ p, t p ^ 2 = ∑ i, rowSum n t i ^ 2 + ∑ j, colSum n t j ^ 2 := by
+  intro t ht
+  have h2 := lev_inj hL t ht 2 (by norm_num) hn
+  have h1 := lev_sum hL (by omega) t ht
+  rw [inj_two, h1] at h2
+  simp only [rowSum_apply, colSum_apply]
+  linear_combination h2
+
+theorem sum_add_sq {ι : Type} [Fintype ι] (a b : ι → ℂ) :
+    ∑ i, (a i + b i) ^ 2 = ∑ i, a i ^ 2 + 2 * ∑ i, a i * b i + ∑ i, b i ^ 2 := by
+  have h : ∀ i, (a i + b i) ^ 2 = a i ^ 2 + 2 * (a i * b i) + b i ^ 2 := fun i => by ring
+  simp only [h, Finset.sum_add_distrib, ← Finset.mul_sum]
+
+theorem lev_two_pol {n : ℕ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : Lev n L) (hn : 2 ≤ n) :
+    ∀ t ∈ L, ∀ u ∈ L, ∑ p, t p * u p =
+      ∑ i, rowSum n t i * rowSum n u i + ∑ j, colSum n t j * colSum n u j := by
+  intro t ht u hu
+  have ht2 := lev_two hL hn t ht
+  have hu2 := lev_two hL hn u hu
+  have htu := lev_two hL hn (t + u) (L.add_mem ht hu)
+  simp only [map_add, Pi.add_apply] at htu
+  rw [sum_add_sq, sum_add_sq, sum_add_sq] at htu
+  linear_combination (1 / 2 : ℂ) * (htu - ht2 - hu2)
+
+theorem dc_orth {n : ℕ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : Lev n L) (hn : 2 ≤ n) :
+    ∀ d ∈ L ⊓ DC n, ∀ u ∈ L, ∑ p, d p * u p = 0 := by
+  intro d hd u hu
+  rw [lev_two_pol hL hn d hd.1 u hu]
+  have h0 := (mem_DC_iff d).mp hd.2
+  simp [h0.1, h0.2]
+
+theorem rowSum_mem {n : ℕ} (t : Fin n × Fin n → ℂ) (h : ∑ p, t p = 0) :
+    rowSum n t ∈ sumZero n := by
+  rw [mem_sumZero]
+  simp only [rowSum_apply]
+  rw [Fintype.sum_prod_type] at h
+  exact h
+
+theorem colSum_mem {n : ℕ} (t : Fin n × Fin n → ℂ) (h : ∑ p, t p = 0) :
+    colSum n t ∈ sumZero n := by
+  rw [mem_sumZero]
+  simp only [colSum_apply]
+  rw [Fintype.sum_prod_type_right] at h
+  exact h
+
+theorem map_rowSum_le {n : ℕ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : Lev n L)
+    (hn : 1 ≤ n) : L.map (rowSum n) ≤ sumZero n := by
+  rintro _ ⟨t, ht, rfl⟩
+  exact rowSum_mem t (lev_sum hL hn t ht)
+
+theorem map_colSum_le {n : ℕ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : Lev n L)
+    (hn : 1 ≤ n) : L.map (colSum n) ≤ sumZero n := by
+  rintro _ ⟨t, ht, rfl⟩
+  exact colSum_mem t (lev_sum hL hn t ht)
+
+theorem rA_le {n : ℕ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : Lev n L) (hn : 1 ≤ n) :
+    Module.finrank ℂ (L.map (rowSum n)) ≤ n - 1 :=
+  (Submodule.finrank_mono (map_rowSum_le hL hn)).trans (finrank_sumZero hn)
+
+theorem rB_le {n : ℕ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : Lev n L) (hn : 1 ≤ n) :
+    Module.finrank ℂ (L.map (colSum n)) ≤ n - 1 :=
+  (Submodule.finrank_mono (map_colSum_le hL hn)).trans (finrank_sumZero hn)
+
+theorem finrank_split {n : ℕ} (L : Submodule ℂ (Fin n × Fin n → ℂ)) :
+    Module.finrank ℂ L = Module.finrank ℂ (L ⊓ DC n : Submodule ℂ _) +
+      Module.finrank ℂ (L.map ((rowSum n).prod (colSum n))) := by
+  have hrn : Module.finrank ℂ (L.map ((rowSum n).prod (colSum n))) +
+      Module.finrank ℂ (L ⊓ LinearMap.ker ((rowSum n).prod (colSum n)) : Submodule ℂ _)
+      = Module.finrank ℂ L := by
+    rw [← (Submodule.submoduleOfEquivInf _ _).finrank_eq,
+      ← (((rowSum n).prod (colSum n)).submoduleMap L).finrank_range_add_finrank_ker,
+      LinearMap.range_submoduleMap, LinearMap.ker_submoduleMap]
+    simp
+  rw [DC]
+  omega
+
+theorem finrank_map_prod_le {n : ℕ} (L : Submodule ℂ (Fin n × Fin n → ℂ))
+    (f g : (Fin n × Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ)) :
+    Module.finrank ℂ (L.map (f.prod g)) ≤
+      Module.finrank ℂ (L.map f) + Module.finrank ℂ (L.map g) := by
+  have hle : L.map (f.prod g) ≤ (L.map f).map (LinearMap.inl ℂ (Fin n → ℂ) (Fin n → ℂ)) ⊔
+      (L.map g).map (LinearMap.inr ℂ (Fin n → ℂ) (Fin n → ℂ)) := by
+    rintro _ ⟨x, hx, rfl⟩
+    have he : (f.prod g) x = LinearMap.inl ℂ (Fin n → ℂ) (Fin n → ℂ) (f x) +
+        LinearMap.inr ℂ (Fin n → ℂ) (Fin n → ℂ) (g x) := by simp
+    rw [he]
+    exact Submodule.add_mem_sup (Submodule.mem_map_of_mem (Submodule.mem_map_of_mem hx))
+      (Submodule.mem_map_of_mem (Submodule.mem_map_of_mem hx))
+  calc Module.finrank ℂ (L.map (f.prod g))
+      ≤ Module.finrank ℂ ((L.map f).map (LinearMap.inl ℂ (Fin n → ℂ) (Fin n → ℂ)) ⊔
+          (L.map g).map (LinearMap.inr ℂ (Fin n → ℂ) (Fin n → ℂ)) : Submodule ℂ _) :=
+        Submodule.finrank_mono hle
+    _ ≤ Module.finrank ℂ ((L.map f).map (LinearMap.inl ℂ (Fin n → ℂ) (Fin n → ℂ))) +
+          Module.finrank ℂ ((L.map g).map (LinearMap.inr ℂ (Fin n → ℂ) (Fin n → ℂ))) :=
+        Submodule.finrank_add_le_finrank_add_finrank _ _
+    _ ≤ _ := add_le_add (Submodule.finrank_map_le _ _) (Submodule.finrank_map_le _ _)
+
+theorem dim_le {n : ℕ} (L : Submodule ℂ (Fin n × Fin n → ℂ)) :
+    Module.finrank ℂ L ≤ Module.finrank ℂ (L ⊓ DC n : Submodule ℂ _) +
+      Module.finrank ℂ (L.map (rowSum n)) + Module.finrank ℂ (L.map (colSum n)) := by
+  have h1 := finrank_split L
+  have h2 := finrank_map_prod_le L (rowSum n) (colSum n)
+  omega
+
+theorem skeleton_le (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ))
+    (hL : ∀ t ∈ L, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120) :
+    Module.finrank ℂ L ≤ Module.finrank ℂ (L ⊓ DC 5 : Submodule ℂ _) +
+      Module.finrank ℂ (L.map (rowSum 5)) + Module.finrank ℂ (L.map (colSum 5)) ∧
+    Module.finrank ℂ (L.map (rowSum 5)) ≤ 4 ∧ Module.finrank ℂ (L.map (colSum 5)) ≤ 4 :=
+  ⟨dim_le L, rA_le (lev_five L hL) (by norm_num), rB_le (lev_five L hL) (by norm_num)⟩
+
+theorem skeleton (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ))
+    (hL : ∀ t ∈ L, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120)
+    (hS : min (Module.finrank ℂ (L.map (rowSum 5))) (Module.finrank ℂ (L.map (colSum 5))) +
+      Module.finrank ℂ (L ⊓ DC 5 : Submodule ℂ _) ≤ 4) :
+    Module.finrank ℂ L ≤ 8 := by
+  obtain ⟨h1, h2, h3⟩ := skeleton_le L hL
+  rcases le_total (Module.finrank ℂ (L.map (rowSum 5))) (Module.finrank ℂ (L.map (colSum 5)))
+    with h | h
+  · rw [min_eq_left h] at hS
+    omega
+  · rw [min_eq_right h] at hS
+    omega
+
+theorem dc_zero (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ))
+    (hL : ∀ t ∈ L, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120)
+    (hd : L ⊓ DC 5 = ⊥) : Module.finrank ℂ L ≤ 8 := by
+  obtain ⟨h1, h2, h3⟩ := skeleton_le L hL
+  rw [hd, finrank_bot] at h1
+  omega
+
+theorem gap_of_S
+    (hS : ∀ L : Submodule ℂ (Fin 5 × Fin 5 → ℂ),
+      (∀ t ∈ L, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120) →
+      min (Module.finrank ℂ (L.map (rowSum 5))) (Module.finrank ℂ (L.map (colSum 5))) +
+        Module.finrank ℂ (L ⊓ DC 5 : Submodule ℂ _) ≤ 4) :
+    ∀ L : Submodule ℂ (Fin 5 × Fin 5 → ℂ),
+      (∀ t ∈ L, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120) →
+      Module.finrank ℂ L ≤ 8 :=
+  fun L hL => skeleton L hL (hS L hL)
+
+end PEqualNP.Gct.F210
+
+theorem PEqualNP.Outside.L_gct_210_frame : ∀ L : Submodule ℂ (Fin 5 × Fin 5 → ℂ), (∀ t ∈ L, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120) → L ⊓ PEqualNP.Gct.F210.DC 5 = ⊥ → Module.finrank ℂ L ≤ 8 :=
+  PEqualNP.Gct.F210.dc_zero

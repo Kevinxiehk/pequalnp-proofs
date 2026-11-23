@@ -1,0 +1,173 @@
+theorem finrank_sup_one (W : Submodule ℂ V4) (hτ : ∀ x ∈ W, tau x = 0) :
+    Module.finrank ℂ (W ⊔ Submodule.span ℂ {(1 : V4)} : Submodule ℂ V4) =
+      Module.finrank ℂ W + 1 := by
+  have hone : (1 : V4) ≠ 0 := by
+    intro h
+    have := congrFun h 0
+    simp at this
+  have hinf : W ⊓ Submodule.span ℂ {(1 : V4)} = ⊥ := by
+    rw [eq_bot_iff]
+    rintro x ⟨hx, hx1⟩
+    rw [SetLike.mem_coe, Submodule.mem_span_singleton] at hx1
+    obtain ⟨c, rfl⟩ := hx1
+    have h := hτ _ hx
+    have hc : c = 0 := by
+      simp only [tau, Pi.smul_apply, Pi.one_apply, smul_eq_mul, mul_one] at h
+      linear_combination (1 / 4 : ℂ) * h
+    rw [hc, zero_smul]
+    exact Submodule.zero_mem _
+  have hs := Submodule.finrank_sup_add_finrank_inf_eq W (Submodule.span ℂ {(1 : V4)})
+  rw [hinf, finrank_bot, finrank_span_singleton hone] at hs
+  omega
+
+theorem perp_sup_one (P W : Submodule ℂ V4) (hP : ∀ p ∈ P, tau p = 0)
+    (hW : ∀ w ∈ W, tau w = 0) (h : ∀ p ∈ P, ∀ w ∈ W, ip p w = 0) :
+    Module.finrank ℂ P + Module.finrank ℂ W + 1 ≤ 4 := by
+  have hperp : ∀ v ∈ P, ∀ z ∈ W ⊔ Submodule.span ℂ {(1 : V4)}, ∑ i, v i * z i = 0 := by
+    intro v hv z hz
+    obtain ⟨w, hw, u, hu, rfl⟩ := Submodule.mem_sup.mp hz
+    obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.mp hu
+    have h1 := h v hv w hw
+    have h2 := hP v hv
+    simp only [ip, tau] at h1 h2
+    simp only [Fin.sum_univ_four, Pi.add_apply, Pi.smul_apply, Pi.one_apply, smul_eq_mul, mul_one]
+    linear_combination h1 + c * h2
+  have hb := perp_bound P (W ⊔ Submodule.span ℂ {(1 : V4)}) hperp
+  have hs := finrank_sup_one W hW
+  rw [Fintype.card_fin] at hb
+  omega
+
+theorem Bii (K : Submodule ℂ M45) (hK : SLev K) (hq : Module.finrank ℂ (K.map rs) = 2)
+    (hN : (K ⊓ LinearMap.ker rs : Submodule ℂ M45) ≠ ⊥) :
+    ∃ u ∈ K.map rs, u ≠ 0 ∧ ∀ s ∈ K.map rs, ip u s = 0 := by
+  by_contra hcon
+  have hnd : ∀ u ∈ K.map rs, (∀ s ∈ K.map rs, ip u s = 0) → u = 0 := by
+    intro u hu hs
+    by_contra hne
+    exact hcon ⟨u, hu, hne, hs⟩
+  apply hN
+  rw [eq_bot_iff]
+  intro Z hZ
+  rw [Submodule.mem_bot]
+  have hz := Submodule.mem_inf.mp hZ
+  have hZ0 : rs Z = 0 := LinearMap.mem_ker.mp hz.2
+  have hcol : ∀ m, col Z m = 0 := by
+    intro m
+    by_contra hzm
+    have hker : (K ⊓ LinearMap.ker (phi m) : Submodule ℂ M45) ≤
+        ((K ⊓ LinearMap.ker rs : Submodule ℂ M45) ⊓ LinearMap.ker (colL m) :
+          Submodule ℂ M45) := by
+      intro Y hY
+      have hy := Submodule.mem_inf.mp hY
+      have hY0 : phi m Y = 0 := LinearMap.mem_ker.mp hy.2
+      have hrs : rs Y = 0 := by
+        apply hnd _ (Submodule.mem_map_of_mem hy.1)
+        rintro _ ⟨Y', hY', rfl⟩
+        rw [← ip_phi K hK Y Y' hy.1 hY' m, hY0]
+        simp [ip]
+      refine Submodule.mem_inf.mpr ⟨Submodule.mem_inf.mpr ⟨hy.1, LinearMap.mem_ker.mpr hrs⟩,
+        LinearMap.mem_ker.mpr ?_⟩
+      funext i
+      have h1 := congrFun hY0 i
+      rw [phi_apply, hrs] at h1
+      simp only [Pi.zero_apply, sub_zero] at h1
+      show Y (i, m) = 0
+      linear_combination (1 / 2 : ℂ) * h1
+    have r1 := rank_nullity K (phi m)
+    have r2 := rank_nullity K rs
+    have r3 := rank_nullity (K ⊓ LinearMap.ker rs : Submodule ℂ M45) (colL m)
+    have r4 := Submodule.finrank_mono hker
+    have r5 : 1 ≤ Module.finrank ℂ ((K ⊓ LinearMap.ker rs : Submodule ℂ M45).map (colL m)) := by
+      by_contra h0
+      have h00 : Module.finrank ℂ
+          ((K ⊓ LinearMap.ker rs : Submodule ℂ M45).map (colL m)) = 0 := by omega
+      rw [Submodule.finrank_eq_zero] at h00
+      have hmem : col Z m ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45).map (colL m) :=
+        Submodule.mem_map_of_mem hZ
+      rw [h00, Submodule.mem_bot] at hmem
+      exact hzm hmem
+    have hP3 : 3 ≤ Module.finrank ℂ (K.map (phi m)) := by omega
+    have h1 : Module.finrank ℂ (Submodule.span ℂ {col Z m}) = 1 := finrank_span_singleton hzm
+    have hb := perp_sup_one (K.map (phi m)) (Submodule.span ℂ {col Z m}) ?_ ?_ ?_
+    · omega
+    · rintro _ ⟨Y, hY, rfl⟩
+      exact tau_phi K hK Y hY m
+    · intro w hw
+      obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.mp hw
+      have ht := C1 K hK Z hz.1 m
+      simp only [tau, Pi.smul_apply, smul_eq_mul] at ht ⊢
+      linear_combination c * ht
+    · rintro _ ⟨Y, hY, rfl⟩ w hw
+      obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.mp hw
+      have ht := ip_col_phi K hK Z Y hz.1 hY hZ0 m
+      simp only [ip, Pi.smul_apply, smul_eq_mul] at ht ⊢
+      linear_combination c * ht
+  funext ⟨i, j⟩
+  exact congrFun (hcol j) i
+
+theorem Q4 (v x : V4) (hv : v ≠ 0) (hv1 : tau v = 0) (hv2 : ip v v = 0) (hx1 : tau x = 0)
+    (hx2 : ip x x = 0) (hvx : ip v x = 0) : ∃ c : ℂ, x = c • v := by
+  have hW : Module.finrank ℂ (Submodule.span ℂ {v, x}) ≤ 1 := by
+    apply Q1
+    · intro a ha
+      obtain ⟨s, t, rfl⟩ := Submodule.mem_span_pair.mp ha
+      simp only [tau, Pi.add_apply, Pi.smul_apply, smul_eq_mul] at hv1 hx1 ⊢
+      linear_combination s * hv1 + t * hx1
+    · intro a ha b hb
+      obtain ⟨s, t, rfl⟩ := Submodule.mem_span_pair.mp ha
+      obtain ⟨s', t', rfl⟩ := Submodule.mem_span_pair.mp hb
+      simp only [ip, Pi.add_apply, Pi.smul_apply, smul_eq_mul] at hv2 hx2 hvx ⊢
+      linear_combination s * s' * hv2 + t * t' * hx2 + (s * t' + t * s') * hvx
+  have hle : Submodule.span ℂ {v} ≤ Submodule.span ℂ {v, x} :=
+    Submodule.span_mono (by simp)
+  have h1 : Module.finrank ℂ (Submodule.span ℂ {v}) = 1 := finrank_span_singleton hv
+  have heq := Submodule.eq_of_le_of_finrank_le hle (le_trans hW (le_of_eq h1.symm))
+  have hx : x ∈ Submodule.span ℂ {v} := by
+    rw [heq]
+    exact Submodule.subset_span (by simp)
+  obtain ⟨c, hc⟩ := Submodule.mem_span_singleton.mp hx
+  exact ⟨c, hc.symm⟩
+
+theorem Biii (K : Submodule ℂ M45) (hK : SLev K) (Yu : M45) (hYu : Yu ∈ K)
+    (hu : ip (rs Yu) (rs Yu) = 0) (Z : M45)
+    (hZ : Z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45))
+    (m : Fin 5) (hzm : col Z m ≠ 0) : ∃ c : ℂ, phi m Yu = c • col Z m := by
+  have hz := Submodule.mem_inf.mp hZ
+  apply Q4 (col Z m) (phi m Yu) hzm (C1 K hK Z hz.1 m) (N_iso K hK Z Z hZ hZ m)
+    (tau_phi K hK Yu hYu m)
+  · rw [ip_phi K hK Yu Yu hYu hYu m]
+    exact hu
+  · exact ip_col_phi K hK Z Yu hz.1 hYu (LinearMap.mem_ker.mp hz.2) m
+
+theorem sum_phi (Y : M45) (i : Fin 4) :
+    phi 0 Y i + phi 1 Y i + phi 2 Y i + phi 3 Y i + phi 4 Y i = -3 * rs Y i := by
+  simp only [phi_apply, rs_apply]
+  ring
+
+theorem root4 (a b c d : ℂ) (h1 : a + b + c + d = 0) (h2 : a * a + b * b + c * c + d * d = 0)
+    (h3 : a * a * a + b * b * b + c * c * c + d * d * d = 0)
+    (h4 : a * a * a * a + b * b * b * b + c * c * c * c + d * d * d * d = 0) : a = 0 := by
+  have h : a ^ 4 = 0 := by
+    linear_combination
+      (a ^ 3 - (a + b + c + d) / 2 * a ^ 2 + (a + b + c + d) ^ 2 / 6 * a
+        - (a + b + c + d) ^ 3 / 24) * h1
+      + (a ^ 2 / 2 - (a + b + c + d) / 2 * a + (a + b + c + d) ^ 2 / 4
+        - (a * a + b * b + c * c + d * d) / 8) * h2
+      + (a / 3 - (a + b + c + d) / 3) * h3 + (1 / 4 : ℂ) * h4
+  exact (pow_eq_zero_iff (by norm_num)).mp h
+
+theorem iso34 (v : V4) (h1 : tau v = 0) (h2 : ip v v = 0) (h3 : t3 v v v = 0)
+    (h4 : t4 v v v v = 0) : v = 0 := by
+  simp only [tau, ip, t3, t4] at h1 h2 h3 h4
+  funext i
+  fin_cases i
+  · exact root4 (v 0) (v 1) (v 2) (v 3) h1 h2 h3 h4
+  · exact root4 (v 1) (v 0) (v 2) (v 3) (by linear_combination h1) (by linear_combination h2)
+      (by linear_combination h3) (by linear_combination h4)
+  · exact root4 (v 2) (v 0) (v 1) (v 3) (by linear_combination h1) (by linear_combination h2)
+      (by linear_combination h3) (by linear_combination h4)
+  · exact root4 (v 3) (v 0) (v 1) (v 2) (by linear_combination h1) (by linear_combination h2)
+      (by linear_combination h3) (by linear_combination h4)
+
+def indep (v w : V4) : Prop := ∀ s t : ℂ, s • v + t • w = 0 → s = 0 ∧ t = 0
+

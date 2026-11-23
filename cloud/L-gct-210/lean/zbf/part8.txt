@@ -1,0 +1,104 @@
+theorem dot_zero_of_row {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L) (e : Fin 5)
+    (hrank : 4 ≤ Module.finrank ℂ (L.map (rowMap e))) (μ : Fin 5 → ℂ)
+    (hμL : ∀ t ∈ L, dotL μ (rowMap e t) = 0) (hμ1 : dotL μ 1 = 0) : ∀ m, μ m = 0 := by
+  intro m
+  obtain ⟨t, ht, γ, hγ⟩ := row_onto (m := 3) hL e hrank (Pi.single m 1)
+  have hv : (Pi.single m 1 : Fin 5 → ℂ) = γ • (1 : Fin 5 → ℂ) + rowMap e t := by
+    funext j
+    rw [hγ j]
+    simp [rowMap_apply]
+  have h := dotL_single μ m
+  rw [hv, map_add, map_smul, hμ1, hμL t ht, smul_zero, add_zero] at h
+  exact h.symm
+
+theorem dotL_comb {n : ℕ} (α β : Fin n → ℂ) (s : ℂ) (z : Fin n → ℂ) :
+    dotL (fun m => α m + s * β m) z = dotL α z + s * dotL β z := by
+  rw [dotL_apply, dotL_apply, dotL_apply, Finset.mul_sum, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun m _ => ?_
+  ring
+
+theorem c7_rows_ind {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L) (r r' : Fin 5)
+    (hr : r ≠ r')
+    (hmin : Module.finrank ℂ L = Module.finrank ℂ (rowsZero L r r') + 7)
+    (ha : 4 ≤ Module.finrank ℂ (L.map (rowMap r)))
+    (ha' : 4 ≤ Module.finrank ℂ (L.map (rowMap r')))
+    (κ ω ρ ρ' : Fin 5 → ℂ) (hκ : ∀ j, κ j ≠ 0) (hω : ∀ j, ω j ≠ 0)
+    (hκL : ∀ t ∈ L, dotL κ (rowMap r t) = 0) (hκ1 : dotL κ 1 = 1)
+    (hκ'L : ∀ t ∈ L, dotL (fun m => ω m * κ m) (rowMap r' t) = 0)
+    (hκ'1 : dotL (fun m => ω m * κ m) 1 = 1)
+    (hνL : ∀ t ∈ L, dotL (fun m => ρ m * κ m) (rowMap r t) +
+      dotL (fun m => ρ' m * (ω m * κ m)) (rowMap r' t) = 0)
+    (hν1 : dotL (fun m => ρ m * κ m) 1 + dotL (fun m => ρ' m * (ω m * κ m)) 1 = 0)
+    (hind : ¬ ∃ s : ℂ, (∀ m, ρ m = s) ∧ ∀ m, ρ' m = -s) :
+    ∃ a b, ρ a ≠ ρ b ∧ ρ' a ≠ ρ' b ∧ ρ a + ρ' a = ρ b + ρ' b ∧
+      ∀ m, (ρ m = ρ a ∧ ρ' m = ρ' a ∧ ω m = ω a) ∨
+        (ρ m = ρ b ∧ ρ' m = ρ' b ∧ ω m = - ω a) ∨
+        (ρ m = ρ a ∧ ρ' m = ρ' b ∧ ρ a + ρ' a ≠ 0 ∧ ω m ^ 2 = - ω a ^ 2 ∧
+          (ρ a + ρ' b) ^ 2 = - (ρ a + ρ' a) ^ 2 ∧
+          ω a * (ρ a + ρ' a) + ω m * (ρ a + ρ' b) = 0) := by
+  have h1 : ∃ j l, ρ j ≠ ρ l := by
+    by_contra hno
+    have hc : ∀ m, ρ m = ρ 0 := fun m => by
+      by_contra hm
+      exact hno ⟨m, 0, hm⟩
+    have hνs : ∀ z, dotL (fun m => ρ m * κ m) z = ρ 0 * dotL κ z := by
+      intro z
+      rw [dotL_apply, dotL_apply, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun m _ => ?_
+      rw [hc m]
+      ring
+    have hL0 : ∀ t ∈ L, dotL (fun m => ρ' m * (ω m * κ m) + ρ 0 * (ω m * κ m))
+        (rowMap r' t) = 0 := by
+      intro t ht
+      have e := dotL_comb (fun m => ρ' m * (ω m * κ m)) (fun m => ω m * κ m) (ρ 0)
+        (rowMap r' t)
+      have h5 := hνL t ht
+      rw [hνs, hκL t ht, mul_zero, zero_add] at h5
+      exact e.trans (by rw [h5, hκ'L t ht, mul_zero, add_zero])
+    have h10 : dotL (fun m => ρ' m * (ω m * κ m) + ρ 0 * (ω m * κ m)) 1 = 0 := by
+      have e := dotL_comb (fun m => ρ' m * (ω m * κ m)) (fun m => ω m * κ m) (ρ 0) 1
+      have h5 := hν1
+      rw [hνs, hκ1, mul_one] at h5
+      exact e.trans (by rw [hκ'1, mul_one]; linear_combination h5)
+    apply hind
+    refine ⟨ρ 0, hc, fun m => ?_⟩
+    have hμ : ρ' m * (ω m * κ m) + ρ 0 * (ω m * κ m) = 0 :=
+      dot_zero_of_row hL r' ha' _ hL0 h10 m
+    have h6 : (ρ' m + ρ 0) * (ω m * κ m) = 0 := by linear_combination hμ
+    rcases mul_eq_zero.mp h6 with h7 | h7
+    · linear_combination h7
+    · exact absurd h7 (mul_ne_zero (hω m) (hκ m))
+  have h2 : ∃ j l, ρ' j ≠ ρ' l := by
+    by_contra hno
+    have hc : ∀ m, ρ' m = ρ' 0 := fun m => by
+      by_contra hm
+      exact hno ⟨m, 0, hm⟩
+    have hνs : ∀ z, dotL (fun m => ρ' m * (ω m * κ m)) z =
+        ρ' 0 * dotL (fun m => ω m * κ m) z := by
+      intro z
+      rw [dotL_apply, dotL_apply, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun m _ => ?_
+      rw [hc m]
+      ring
+    have hL0 : ∀ t ∈ L, dotL (fun m => ρ m * κ m + ρ' 0 * κ m) (rowMap r t) = 0 := by
+      intro t ht
+      have e := dotL_comb (fun m => ρ m * κ m) κ (ρ' 0) (rowMap r t)
+      have h5 := hνL t ht
+      rw [hνs, hκ'L t ht, mul_zero, add_zero] at h5
+      exact e.trans (by rw [h5, hκL t ht, mul_zero, add_zero])
+    have h10 : dotL (fun m => ρ m * κ m + ρ' 0 * κ m) 1 = 0 := by
+      have e := dotL_comb (fun m => ρ m * κ m) κ (ρ' 0) 1
+      have h5 := hν1
+      rw [hνs, hκ'1, mul_one] at h5
+      exact e.trans (by rw [hκ1, mul_one]; exact h5)
+    apply hind
+    refine ⟨-ρ' 0, fun m => ?_, fun m => ?_⟩
+    · have hμ : ρ m * κ m + ρ' 0 * κ m = 0 := dot_zero_of_row hL r ha _ hL0 h10 m
+      have h6 : (ρ m + ρ' 0) * κ m = 0 := by linear_combination hμ
+      rcases mul_eq_zero.mp h6 with h7 | h7
+      · linear_combination h7
+      · exact absurd h7 (hκ m)
+    · rw [neg_neg]
+      exact hc m
+  exact c7_rows_full hL r r' hr hmin κ ω ρ ρ' hκ hω hκL hκ1 hκ'L hκ'1 hνL hν1 h1 h2
+

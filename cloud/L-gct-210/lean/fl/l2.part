@@ -1,0 +1,200 @@
+theorem S7_elem (N : Submodule ℂ M45) (hN : SLev N) (hrs : ∀ Z ∈ N, rs Z = 0)
+    (hd : Module.finrank ℂ N = 2) (z : M45)
+    (hmax : ∀ Z ∈ N, ∀ m, ∃ c : ℂ, col Z m = c • col z m) (σ : Equiv.Perm (Fin 5)) (v w : V4)
+    (hi : indep v w) (c1 : col z (σ 1) = (-1 : ℂ) • v)
+    (c2 : col z (σ 2) = w) (c3 : col z (σ 3) = (-1 : ℂ) • w) (c4 : col z (σ 4) = 0) :
+    ∃ W ∈ N, col W (σ 0) = 0 ∧ col W (σ 1) = 0 ∧ col W (σ 2) = w ∧
+      col W (σ 3) = (-1 : ℂ) • w := by
+  have p := peel N hN hrs (σ 0)
+  have hne : (N ⊓ LinearMap.ker (colL (σ 0)) : Submodule ℂ M45) ≠ ⊥ := by
+    intro h0
+    rw [h0, finrank_bot] at p
+    omega
+  obtain ⟨W0, hW0, hW0ne⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
+  have hw := Submodule.mem_inf.mp hW0
+  have hWN := hw.1
+  have a0 : col W0 (σ 0) = 0 := LinearMap.mem_ker.mp hw.2
+  obtain ⟨k1, a1⟩ := hmax W0 hWN (σ 1)
+  obtain ⟨k2, a2⟩ := hmax W0 hWN (σ 2)
+  obtain ⟨k3, a3⟩ := hmax W0 hWN (σ 3)
+  obtain ⟨k4, a4⟩ := hmax W0 hWN (σ 4)
+  rw [c1] at a1
+  rw [c2] at a2
+  rw [c3] at a3
+  rw [c4, smul_zero] at a4
+  have hsum := sum_cols_perm σ W0
+  rw [a0, a1, a2, a3, a4, hrs W0 hWN] at hsum
+  have hk := hi (-k1) (k2 - k3) (by
+    funext i
+    have hi' := congrFun hsum i
+    simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at hi' ⊢
+    linear_combination hi')
+  have hk1 : k1 = 0 := neg_eq_zero.mp hk.1
+  have hk3 : k3 = k2 := (sub_eq_zero.mp hk.2).symm
+  have hk2 : k2 ≠ 0 := by
+    intro h
+    apply hW0ne
+    apply cols_zero σ
+    apply fin5
+    · exact a0
+    · rw [a1, hk1, zero_smul]
+    · rw [a2, h, zero_smul]
+    · rw [a3, hk3, h, zero_smul]
+    · exact a4
+  refine ⟨k2⁻¹ • W0, N.smul_mem _ hWN, ?_, ?_, ?_, ?_⟩
+  · show k2⁻¹ • col W0 (σ 0) = 0
+    rw [a0, smul_zero]
+  · show k2⁻¹ • col W0 (σ 1) = 0
+    rw [a1, hk1, zero_smul, smul_zero]
+  · show k2⁻¹ • col W0 (σ 2) = w
+    rw [a2, smul_smul, inv_mul_cancel₀ hk2, one_smul]
+  · show k2⁻¹ • col W0 (σ 3) = (-1 : ℂ) • w
+    rw [a3, hk3, smul_smul, inv_mul_cancel₀ hk2, one_smul]
+
+theorem S7_step (K : Submodule ℂ M45) (hK : SLev K) (Yu : M45) (hYu : Yu ∈ K)
+    (hu : ip (rs Yu) (rs Yu) = 0)
+    (hd : Module.finrank ℂ (K ⊓ LinearMap.ker rs : Submodule ℂ M45) = 2) (z : M45)
+    (hz : z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45))
+    (hmax : ∀ Z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45), ∀ m, ∃ c : ℂ,
+      col Z m = c • col z m)
+    (σ : Equiv.Perm (Fin 5)) (v w : V4) (hi : indep v w) (c0 : col z (σ 0) = v)
+    (c1 : col z (σ 1) = (-1 : ℂ) • v) (c2 : col z (σ 2) = w)
+    (c3 : col z (σ 3) = (-1 : ℂ) • w) (c4 : col z (σ 4) = 0) (hvww : t3 v w w = 0) :
+    t3 (rs Yu) w w = 0 := by
+  have hNs := SLev_N K hK
+  have hrsN := rs_N K
+  obtain ⟨W, hWN, w0, w1, w2, w3⟩ := S7_elem _ hNs hrsN hd z hmax σ v w hi c1 c2 c3 c4
+  have hWK : W ∈ K := (Submodule.mem_inf.mp hWN).1
+  have hKσ := SLev_perm σ K hK
+  have kp := (C34 _ hKσ _ (Submodule.mem_map_of_mem (K.add_mem hYu hWK)) 4).2.1
+  have km := (C34 _ hKσ _ (Submodule.mem_map_of_mem (K.sub_mem hYu hWK)) 4).2.1
+  have k0 := (C34 _ hKσ _ (Submodule.mem_map_of_mem hYu) 4).2.1
+  rw [sa4.1, sa4.2.1, sa4.2.2.1, sa4.2.2.2] at kp km k0
+  have e0 : ∀ i, W (i, σ 0) = 0 := fun i => congrFun w0 i
+  have e1 : ∀ i, W (i, σ 1) = 0 := fun i => congrFun w1 i
+  have e2 : ∀ i, W (i, σ 2) = w i := fun i => congrFun w2 i
+  have e3 : ∀ i, W (i, σ 3) = -1 * w i := fun i => congrFun w3 i
+  simp only [t3, col, cperm_apply, Pi.add_apply, Pi.sub_apply, e0, e1, e2, e3] at kp km k0
+  have hc : t3 (col Yu (σ 0)) w w + t3 (col Yu (σ 1)) w w = 0 := by
+    simp only [t3, col]
+    linear_combination (-1 / 2 : ℂ) * (kp + km - 2 * k0)
+  have hv0 : v ≠ 0 := by
+    intro h
+    have h1 := (hi 1 0 (by rw [h]; simp)).1
+    exact one_ne_zero h1
+  have hz0 : col z (σ 0) ≠ 0 := by
+    rw [c0]
+    exact hv0
+  have hz1 : col z (σ 1) ≠ 0 := by
+    rw [c1]
+    intro h
+    exact hv0 ((smul_eq_zero.mp h).resolve_left (by norm_num))
+  obtain ⟨β0, hβ0⟩ := Biii K hK Yu hYu hu z hz (σ 0) hz0
+  obtain ⟨β1, hβ1⟩ := Biii K hK Yu hYu hu z hz (σ 1) hz1
+  rw [c0] at hβ0
+  rw [c1] at hβ1
+  have f0 : ∀ i, 2 * Yu (i, σ 0) - rs Yu i = β0 * v i := fun i => congrFun hβ0 i
+  have f1 : ∀ i, 2 * Yu (i, σ 1) - rs Yu i = β1 * (-1 * v i) := fun i => congrFun hβ1 i
+  have f00 := f0 0
+  have f01 := f0 1
+  have f02 := f0 2
+  have f03 := f0 3
+  have f10 := f1 0
+  have f11 := f1 1
+  have f12 := f1 2
+  have f13 := f1 3
+  simp only [t3, col] at hc hvww ⊢
+  linear_combination hc
+    - (1 / 2 : ℂ) * (w 0 * w 0 * f00 + w 1 * w 1 * f01 + w 2 * w 2 * f02 + w 3 * w 3 * f03)
+    - (1 / 2 : ℂ) * (w 0 * w 0 * f10 + w 1 * w 1 * f11 + w 2 * w 2 * f12 + w 3 * w 3 * f13)
+    - ((β0 - β1) / 2) * hvww
+
+def HypS7alg : Prop :=
+  ∀ v w u : V4, tau v = 0 → ip v v = 0 → tau w = 0 → ip w w = 0 → indep v w →
+    t3 v w w = 0 → t3 v v w = 0 → br v v w w = 0 →
+    u ≠ 0 → tau u = 0 → ip u u = 0 → t3 u v v = 0 → t3 u w w = 0 → False
+
+theorem HypS7_of (h : HypS7alg) : HypS7 := by
+  unfold HypS7
+  intro K hK hq hu hd z hz hmax σ hind e1 e3 e4 i1 i2 i3
+  obtain ⟨u, huS, hu0, huperp⟩ := hu
+  obtain ⟨Yu, hYu, rfl⟩ := huS
+  have huu : ip (rs Yu) (rs Yu) = 0 := huperp _ (Submodule.mem_map_of_mem hYu)
+  have hzK := (Submodule.mem_inf.mp hz).1
+  have s1 := S7_step K hK Yu hYu huu hd z hz hmax σ (col z (σ 0)) (col z (σ 2)) hind rfl e1
+    rfl e3 e4 i1
+  have s2 := S7_step K hK Yu hYu huu hd z hz hmax (σ * swp) (col z (σ 2)) (col z (σ 0))
+    (indep_symm hind)
+    (by rw [Equiv.Perm.mul_apply, swp0])
+    (by rw [Equiv.Perm.mul_apply, swp1, e3])
+    (by rw [Equiv.Perm.mul_apply, swp2])
+    (by rw [Equiv.Perm.mul_apply, swp3, e1])
+    (by rw [Equiv.Perm.mul_apply, swp4, e4])
+    (by
+      simp only [t3] at i2 ⊢
+      linear_combination i2)
+  exact h (col z (σ 0)) (col z (σ 2)) (rs Yu) (C1 K hK z hzK (σ 0))
+    (N_iso K hK z z hz hz (σ 0)) (C1 K hK z hzK (σ 2)) (N_iso K hK z z hz hz (σ 2)) hind
+    i1 i2 i3 hu0 (tau_rs K hK Yu hYu) huu s2 s1
+
+def HypIIa : Prop :=
+  ∀ v w : V4, tau v = 0 → ip v v = 0 → tau w = 0 → ip w w = 0 → indep v w →
+    t3 v w w = 0 → t3 v v w = 0 → br v v w w = 0 →
+    (∃ c : ℂ, (fun i => v i * v i : V4) = c • w) ∧ (∃ c : ℂ, (fun i => w i * w i : V4) = c • v)
+
+theorem HypS7alg_of (h : HypIIa) : HypS7alg := by
+  unfold HypS7alg
+  intro v w u hv1 hv2 hw1 hw2 hind i1 i2 i3 hu0 hu1 hu2 j1 j2
+  obtain ⟨⟨c, hc⟩, ⟨c', hc'⟩⟩ := h v w hv1 hv2 hw1 hw2 hind i1 i2 i3
+  have hv0 : v ≠ 0 := by
+    intro h0
+    have h1 := (hind 1 0 (by rw [h0]; simp)).1
+    exact one_ne_zero h1
+  have hw0 : w ≠ 0 := by
+    intro h0
+    have h1 := (hind 0 1 (by rw [h0]; simp)).2
+    exact one_ne_zero h1
+  have hc0 : c ≠ 0 := by
+    intro h0
+    apply hv0
+    funext i
+    have hi := congrFun hc i
+    rw [h0, zero_smul] at hi
+    exact mul_self_eq_zero.mp hi
+  have hc0' : c' ≠ 0 := by
+    intro h0
+    apply hw0
+    funext i
+    have hi := congrFun hc' i
+    rw [h0, zero_smul] at hi
+    exact mul_self_eq_zero.mp hi
+  have huw : ip u w = 0 := by
+    have e : c * ip u w = 0 := by
+      have q0 := congrFun hc 0
+      have q1 := congrFun hc 1
+      have q2 := congrFun hc 2
+      have q3 := congrFun hc 3
+      simp only [Pi.smul_apply, smul_eq_mul] at q0 q1 q2 q3
+      simp only [t3, ip] at j1 ⊢
+      linear_combination j1 - u 0 * q0 - u 1 * q1 - u 2 * q2 - u 3 * q3
+    exact (mul_eq_zero.mp e).resolve_left hc0
+  have huv : ip u v = 0 := by
+    have e : c' * ip u v = 0 := by
+      have q0 := congrFun hc' 0
+      have q1 := congrFun hc' 1
+      have q2 := congrFun hc' 2
+      have q3 := congrFun hc' 3
+      simp only [Pi.smul_apply, smul_eq_mul] at q0 q1 q2 q3
+      simp only [t3, ip] at j2 ⊢
+      linear_combination j2 - u 0 * q0 - u 1 * q1 - u 2 * q2 - u 3 * q3
+    exact (mul_eq_zero.mp e).resolve_left hc0'
+  obtain ⟨k, hk⟩ := Q4 u v hu0 hu1 hu2 hv1 hv2 huv
+  obtain ⟨k', hk'⟩ := Q4 u w hu0 hu1 hu2 hw1 hw2 huw
+  have hkk := hind k' (-k) (by
+    rw [hk, hk']
+    funext i
+    simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
+    ring)
+  apply hw0
+  rw [hk', hkk.1, zero_smul]
+

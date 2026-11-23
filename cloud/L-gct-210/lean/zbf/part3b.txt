@@ -1,0 +1,478 @@
+theorem pm_rel (ρ κ : Equiv.Perm (Fin 3)) (u : Fin 3 × Fin 3 → ℂ) :
+    pm (fun p => u (ρ p.1, κ p.2)) = pm u := by
+  unfold pm
+  exact perm_submatrix_equiv (Matrix.of fun i j => u (i, j)) ρ κ
+
+theorem bad_rel {b W Y : Fin 3 × Fin 3 → ℂ} (h : Bad b W Y) (ρ κ : Equiv.Perm (Fin 3)) :
+    Bad (fun p => b (ρ p.1, κ p.2)) (fun p => W (ρ p.1, κ p.2)) (fun p => Y (ρ p.1, κ p.2)) := by
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · rw [pm_rel ρ κ b]
+    exact h.1
+  · intro α β
+    have h1 := pm_rel ρ κ (fun q : Fin 3 × Fin 3 =>
+      b q + α (ρ.symm q.1) * W q + β (κ.symm q.2) * Y q)
+    simp only [Equiv.symm_apply_apply] at h1
+    refine h1.trans ?_
+    rw [pm_rel ρ κ b]
+    exact h.2.1 (fun i => α (ρ.symm i)) (fun j => β (κ.symm j))
+  · intro r
+    obtain ⟨j, hj⟩ := h.2.2.1 (ρ r)
+    exact ⟨κ.symm j, by simpa using hj⟩
+  · intro j
+    obtain ⟨i, hi⟩ := h.2.2.2 (κ j)
+    exact ⟨ρ.symm i, by simpa using hi⟩
+
+theorem bad_tr {b W Y : Fin 3 × Fin 3 → ℂ} (h : Bad b W Y) :
+    Bad (fun p => b (p.2, p.1)) (fun p => Y (p.2, p.1)) (fun p => W (p.2, p.1)) := by
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · rw [pm_tr b]
+    exact h.1
+  · intro α β
+    have h1 : pm (fun p : Fin 3 × Fin 3 =>
+        b (p.2, p.1) + β p.2 * W (p.2, p.1) + α p.1 * Y (p.2, p.1)) =
+        pm (fun q : Fin 3 × Fin 3 => b q + β q.1 * W q + α q.2 * Y q) :=
+      pm_tr (fun q : Fin 3 × Fin 3 => b q + β q.1 * W q + α q.2 * Y q)
+    have h2 := h.2.1 β α
+    show pm (fun p : Fin 3 × Fin 3 =>
+      b (p.2, p.1) + α p.1 * Y (p.2, p.1) + β p.2 * W (p.2, p.1)) =
+      pm (fun p : Fin 3 × Fin 3 => b (p.2, p.1))
+    rw [pm_tr b, ← h2, ← h1]
+    congr 1
+    funext p
+    ring
+  · intro r
+    obtain ⟨i, hi⟩ := h.2.2.2 r
+    exact ⟨i, hi⟩
+  · intro j
+    obtain ⟨i, hi⟩ := h.2.2.1 j
+    exact ⟨i, hi⟩
+
+theorem fin3_two (a b c i : Fin 3) (hab : a ≠ b) (hac : a ≠ c) (hbc : b ≠ c) (hi : i ≠ c) :
+    i = a ∨ i = b := by
+  revert a b c i
+  decide
+
+theorem fin3_third (a b : Fin 3) : ∃ m : Fin 3, m ≠ a ∧ m ≠ b := by
+  revert a b
+  decide
+
+theorem perm3_two (ρ : Equiv.Perm (Fin 3)) : ρ 2 ≠ ρ 0 ∧ ρ 2 ≠ ρ 1 :=
+  ⟨fun hh => absurd (ρ.injective hh) (by decide), fun hh => absurd (ρ.injective hh) (by decide)⟩
+
+theorem bad_X4 {b W Y : Fin 3 × Fin 3 → ℂ} (h : Bad b W Y) (r0 j0 i i' l m : Fin 3)
+    (hcell : W (r0, j0) ≠ 0) (hrow : ∀ j, j ≠ j0 → W (r0, j) = 0) (hi : i ≠ r0) (hi' : i' ≠ r0)
+    (hii : i ≠ i') (hl : l ≠ j0) (hm : m ≠ j0) (hlm : l ≠ m) : W (i, l) * Y (i', m) = 0 := by
+  obtain ⟨ρ, hρ0, hρ1⟩ : ∃ ρ : Equiv.Perm (Fin 3), ρ 0 = r0 ∧ ρ 1 = i :=
+    exists_perm2 (m := 1) r0 i (Ne.symm hi)
+  obtain ⟨κ, hκ0, hκ1⟩ : ∃ κ : Equiv.Perm (Fin 3), κ 0 = j0 ∧ κ 1 = l :=
+    exists_perm2 (m := 1) j0 l (Ne.symm hl)
+  have hρ2 : ρ 2 = i' := by
+    have h2 := perm3_two ρ
+    rw [hρ0, hρ1] at h2
+    exact fin3_pigeon r0 i (ρ 2) i' (Ne.symm hi) h2.1 h2.2 hi' (Ne.symm hii)
+  have hκ2 : κ 2 = m := by
+    have h2 := perm3_two κ
+    rw [hκ0, hκ1] at h2
+    exact fin3_pigeon j0 l (κ 2) m (Ne.symm hl) h2.1 h2.2 hm (Ne.symm hlm)
+  have h1 : W (ρ 1, κ 1) * Y (ρ 2, κ 2) = 0 := bad_X4c (bad_rel h ρ κ)
+    (by
+      show W (ρ 0, κ 1) = 0
+      rw [hρ0, hκ1]
+      exact hrow l hl)
+    (by
+      show W (ρ 0, κ 2) = 0
+      rw [hρ0, hκ2]
+      exact hrow m hm)
+    (by
+      show W (ρ 0, κ 0) ≠ 0
+      rw [hρ0, hκ0]
+      exact hcell)
+  rw [hρ1, hκ1, hρ2, hκ2] at h1
+  exact h1
+
+theorem bad_X1 {b W Y : Fin 3 × Fin 3 → ℂ} (h : Bad b W Y) (r j l : Fin 3) (hjl : j ≠ l)
+    (hj : ∀ i, i ≠ r → Y (i, j) = 0) (hl : ∀ i, i ≠ r → Y (i, l) = 0) : False := by
+  obtain ⟨κ, hκ0, hκ1⟩ : ∃ κ : Equiv.Perm (Fin 3), κ 0 = j ∧ κ 1 = l :=
+    exists_perm2 (m := 1) j l hjl
+  have hρ : ∀ x : Fin 3, x ≠ 0 → (Equiv.swap (0 : Fin 3) r) x ≠ r := by
+    intro x hx hh
+    have h2 : (Equiv.swap (0 : Fin 3) r) x = (Equiv.swap (0 : Fin 3) r) 0 := by
+      rw [hh, Equiv.swap_apply_left]
+    exact hx ((Equiv.swap (0 : Fin 3) r).injective h2)
+  exact bad_X1c (bad_rel h (Equiv.swap (0 : Fin 3) r) κ)
+    (by
+      show Y ((Equiv.swap (0 : Fin 3) r) 1, κ 0) = 0
+      rw [hκ0]
+      exact hj _ (hρ 1 (by decide)))
+    (by
+      show Y ((Equiv.swap (0 : Fin 3) r) 2, κ 0) = 0
+      rw [hκ0]
+      exact hj _ (hρ 2 (by decide)))
+    (by
+      show Y ((Equiv.swap (0 : Fin 3) r) 1, κ 1) = 0
+      rw [hκ1]
+      exact hl _ (hρ 1 (by decide)))
+    (by
+      show Y ((Equiv.swap (0 : Fin 3) r) 2, κ 1) = 0
+      rw [hκ1]
+      exact hl _ (hρ 2 (by decide)))
+
+theorem bad_XX {b W Y : Fin 3 × Fin 3 → ℂ} (h : Bad b W Y) (r0 r1 j0 j1 : Fin 3) (hr : r0 ≠ r1)
+    (h0 : ∀ j, j ≠ j0 → W (r0, j) = 0) (h1 : ∀ j, j ≠ j1 → W (r1, j) = 0) : False := by
+  by_cases hj : j0 = j1
+  · exact bad_X1 (bad_tr h) j0 r0 r1 hr (fun i hi => h0 i hi) (fun i hi => by
+      rw [hj] at hi
+      exact h1 i hi)
+  · obtain ⟨ρ, hρ0, hρ1⟩ : ∃ ρ : Equiv.Perm (Fin 3), ρ 0 = r0 ∧ ρ 1 = r1 :=
+      exists_perm2 (m := 1) r0 r1 hr
+    obtain ⟨κ, hκ0, hκ1⟩ : ∃ κ : Equiv.Perm (Fin 3), κ 0 = j0 ∧ κ 1 = j1 :=
+      exists_perm2 (m := 1) j0 j1 hj
+    have h2 := perm3_two κ
+    rw [hκ0, hκ1] at h2
+    exact bad_X3c (bad_rel h ρ κ)
+      (by
+        show W (ρ 0, κ 1) = 0
+        rw [hρ0, hκ1]
+        exact h0 j1 (Ne.symm hj))
+      (by
+        show W (ρ 0, κ 2) = 0
+        rw [hρ0]
+        exact h0 _ h2.1)
+      (by
+        show W (ρ 1, κ 0) = 0
+        rw [hρ1, hκ0]
+        exact h1 j0 hj)
+      (by
+        show W (ρ 1, κ 2) = 0
+        rw [hρ1]
+        exact h1 _ h2.2)
+
+def SE (W Y : Fin 3 × Fin 3 → ℂ) (c : Fin 3) : Prop :=
+  ∃ j, W (c, j) ≠ 0 ∧ (∀ l, l ≠ j → W (c, l) = 0) ∧ ∀ i, i ≠ c → Y (i, j) = 0
+
+theorem n3_SE2 {b W Y : Fin 3 × Fin 3 → ℂ} (h : Bad b W Y)
+    (K : Submodule ℂ ((Fin 3 → ℂ) × (Fin 3 → ℂ)))
+    (hK : ∀ k ∈ K, ∀ r j, k.1 r * W (r, j) = k.2 j * Y (r, j))
+    (k k' : (Fin 3 → ℂ) × (Fin 3 → ℂ)) (hk : k ∈ K) (hk' : k' ∈ K) (a b' c : Fin 3)
+    (hab : a ≠ b') (hac : a ≠ c) (hbc : b' ≠ c) (hc : k.1 c ≠ 0) (hc' : k'.1 c ≠ 0)
+    (hb0 : k.1 b' = 0) (ha0 : k'.1 a = 0) : SE W Y c := by
+  have hcol : ∀ j, W (c, j) ≠ 0 → ∀ i, i ≠ c → Y (i, j) = 0 := by
+    intro j hj i hi
+    have hβ : k.2 j ≠ 0 := by
+      intro h0
+      have h1 := hK k hk c j
+      rw [h0, zero_mul] at h1
+      rcases mul_eq_zero.mp h1 with h2 | h2
+      · exact hc h2
+      · exact hj h2
+    have hβ' : k'.2 j ≠ 0 := by
+      intro h0
+      have h1 := hK k' hk' c j
+      rw [h0, zero_mul] at h1
+      rcases mul_eq_zero.mp h1 with h2 | h2
+      · exact hc' h2
+      · exact hj h2
+    rcases fin3_two a b' c i hab hac hbc hi with h3 | h3
+    · rw [h3]
+      have h1 := hK k' hk' a j
+      rw [ha0, zero_mul] at h1
+      rcases mul_eq_zero.mp h1.symm with h2 | h2
+      · exact absurd h2 hβ'
+      · exact h2
+    · rw [h3]
+      have h1 := hK k hk b' j
+      rw [hb0, zero_mul] at h1
+      rcases mul_eq_zero.mp h1.symm with h2 | h2
+      · exact absurd h2 hβ
+      · exact h2
+  obtain ⟨j, hj⟩ := h.2.2.1 c
+  refine ⟨j, hj, fun l hl => ?_, hcol j hj⟩
+  by_contra hl0
+  exact bad_X1 h c j l (Ne.symm hl) (hcol j hj) (hcol l hl0)
+
+theorem n3_XX {b W Y : Fin 3 × Fin 3 → ℂ} (h : Bad b W Y) (c c' : Fin 3) (hcc : c ≠ c')
+    (s : SE W Y c) (s' : SE W Y c') : False := by
+  obtain ⟨j, _, h0, _⟩ := s
+  obtain ⟨j', _, h1, _⟩ := s'
+  exact bad_XX h c c' j j' hcc h0 h1
+
+theorem n3_block {b W Y : Fin 3 × Fin 3 → ℂ} (h : Bad b W Y)
+    (K : Submodule ℂ ((Fin 3 → ℂ) × (Fin 3 → ℂ)))
+    (hK : ∀ k ∈ K, ∀ r j, k.1 r * W (r, j) = k.2 j * Y (r, j))
+    (k : (Fin 3 → ℂ) × (Fin 3 → ℂ)) (hk : k ∈ K) (c a b' : Fin 3) (hca : c ≠ a) (hcb : c ≠ b')
+    (hab : a ≠ b') (s : SE W Y c) (hc0 : k.1 c = 0) (ha : k.1 a ≠ 0) (hb : k.1 b' ≠ 0) :
+    False := by
+  obtain ⟨j0, hcell1, hcell2, hcell3⟩ := s
+  have hY0 : Y (c, j0) ≠ 0 := by
+    obtain ⟨i, hi⟩ := h.2.2.2 j0
+    by_cases hic : i = c
+    · rw [← hic]
+      exact hi
+    · exact absurd (hcell3 i hic) hi
+  have hβ0 : k.2 j0 = 0 := by
+    have h1 := hK k hk c j0
+    rw [hc0, zero_mul] at h1
+    rcases mul_eq_zero.mp h1.symm with h2 | h2
+    · exact h2
+    · exact absurd h2 hY0
+  have hWa0 : W (a, j0) = 0 := by
+    have h1 := hK k hk a j0
+    rw [hβ0, zero_mul] at h1
+    rcases mul_eq_zero.mp h1 with h2 | h2
+    · exact absurd h2 ha
+    · exact h2
+  have hWb0 : W (b', j0) = 0 := by
+    have h1 := hK k hk b' j0
+    rw [hβ0, zero_mul] at h1
+    rcases mul_eq_zero.mp h1 with h2 | h2
+    · exact absurd h2 hb
+    · exact h2
+  have hKb : ∀ i, k.1 i ≠ 0 → ∀ j, W (i, j) ≠ 0 → Y (i, j) ≠ 0 := by
+    intro i hi j hj h0
+    have h1 := hK k hk i j
+    rw [h0, mul_zero] at h1
+    rcases mul_eq_zero.mp h1 with h2 | h2
+    · exact hi h2
+    · exact hj h2
+  obtain ⟨l, hl⟩ := h.2.2.1 a
+  have hlj0 : l ≠ j0 := by
+    rintro rfl
+    exact hl hWa0
+  obtain ⟨m, hm1, hm2⟩ := fin3_third j0 l
+  have h1 := bad_X4 h c j0 b' a m l hcell1 hcell2 (Ne.symm hcb) (Ne.symm hca) (Ne.symm hab)
+    hm1 hlj0 hm2
+  have hWbm : W (b', m) = 0 := by
+    rcases mul_eq_zero.mp h1 with h2 | h2
+    · exact h2
+    · exact absurd h2 (hKb a ha l hl)
+  obtain ⟨j', hj'⟩ := h.2.2.1 b'
+  have hj'l : j' = l := fin3_pigeon j0 m j' l (Ne.symm hm1)
+    (by
+      rintro rfl
+      exact hj' hWb0)
+    (by
+      rintro rfl
+      exact hj' hWbm) hlj0 (Ne.symm hm2)
+  rw [hj'l] at hj'
+  have h2 := bad_X4 h c j0 a b' m l hcell1 hcell2 (Ne.symm hca) (Ne.symm hcb) hab hm1 hlj0 hm2
+  have hWam : W (a, m) = 0 := by
+    rcases mul_eq_zero.mp h2 with h3 | h3
+    · exact h3
+    · exact absurd h3 (hKb b' hb l hj')
+  refine bad_XX h c a j0 l hca hcell2 (fun j hj => ?_)
+  rcases fin3_two j0 m l j (Ne.symm hm1) (Ne.symm hlj0) hm2 hj with h3 | h3
+  · rw [h3]
+    exact hWa0
+  · rw [h3]
+    exact hWam
+
+noncomputable def relMap (W Y : Fin 3 × Fin 3 → ℂ) :
+    ((Fin 3 → ℂ) × (Fin 3 → ℂ)) →ₗ[ℂ] (Fin 3 × Fin 3 → ℂ) where
+  toFun k := fun p => k.1 p.1 * W p - k.2 p.2 * Y p
+  map_add' x y := by
+    funext p
+    simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply]
+    ring
+  map_smul' a x := by
+    funext p
+    simp only [Prod.smul_fst, Prod.smul_snd, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
+    ring
+
+def N3Alg : Prop :=
+  ∀ (b W Y : Fin 3 × Fin 3 → ℂ) (K : Submodule ℂ ((Fin 3 → ℂ) × (Fin 3 → ℂ))),
+    Bad b W Y → 2 ≤ Module.finrank ℂ K →
+    (∀ k ∈ K, ∀ r j, k.1 r * W (r, j) = k.2 j * Y (r, j)) → False
+
+theorem n3alg : N3Alg := by
+  intro b W Y K h hK2 hK
+  have hKa : ∀ k ∈ K, k ≠ 0 → k.1 ≠ 0 := by
+    intro k hk hk0 h1
+    apply hk0
+    refine Prod.ext h1 ?_
+    funext j
+    obtain ⟨i, hi⟩ := h.2.2.2 j
+    have h2 := hK k hk i j
+    rw [h1, Pi.zero_apply, zero_mul] at h2
+    rcases mul_eq_zero.mp h2.symm with h3 | h3
+    · exact h3
+    · exact absurd h3 hi
+  have hex : ∀ r : Fin 3, ∃ k ∈ K, k ≠ 0 ∧ k.1 r = 0 := by
+    intro r
+    have h1 := rank_nullity K
+      ((LinearMap.proj r).comp (LinearMap.fst ℂ (Fin 3 → ℂ) (Fin 3 → ℂ)))
+    have h2 := Submodule.finrank_le
+      (K.map ((LinearMap.proj r).comp (LinearMap.fst ℂ (Fin 3 → ℂ) (Fin 3 → ℂ))))
+    rw [Module.finrank_self] at h2
+    have hpos : 0 < Module.finrank ℂ (K ⊓ LinearMap.ker
+        ((LinearMap.proj r).comp (LinearMap.fst ℂ (Fin 3 → ℂ) (Fin 3 → ℂ))) :
+          Submodule ℂ ((Fin 3 → ℂ) × (Fin 3 → ℂ))) := by omega
+    obtain ⟨⟨k, hk⟩, hk0⟩ := Module.finrank_pos_iff_exists_ne_zero.mp hpos
+    have hk' := Submodule.mem_inf.mp hk
+    exact ⟨k, hk'.1, fun h0 => hk0 (Subtype.ext h0), LinearMap.mem_ker.mp hk'.2⟩
+  obtain ⟨k0, hk0, hne0, hz0⟩ := hex 0
+  obtain ⟨k1, hk1, hne1, hz1⟩ := hex 1
+  obtain ⟨k2, hk2, hne2, hz2⟩ := hex 2
+  have N0 : k0.1 1 ≠ 0 ∨ k0.1 2 ≠ 0 := by
+    by_contra hcon
+    rw [not_or, not_not, not_not] at hcon
+    apply hKa k0 hk0 hne0
+    funext i
+    rcases fin3_cases i with rfl | rfl | rfl
+    · exact hz0
+    · exact hcon.1
+    · exact hcon.2
+  have N1 : k1.1 0 ≠ 0 ∨ k1.1 2 ≠ 0 := by
+    by_contra hcon
+    rw [not_or, not_not, not_not] at hcon
+    apply hKa k1 hk1 hne1
+    funext i
+    rcases fin3_cases i with rfl | rfl | rfl
+    · exact hcon.1
+    · exact hz1
+    · exact hcon.2
+  have N2 : k2.1 0 ≠ 0 ∨ k2.1 1 ≠ 0 := by
+    by_contra hcon
+    rw [not_or, not_not, not_not] at hcon
+    apply hKa k2 hk2 hne2
+    funext i
+    rcases fin3_cases i with rfl | rfl | rfl
+    · exact hcon.1
+    · exact hcon.2
+    · exact hz2
+  have A0 : k1.1 0 ≠ 0 → k2.1 0 ≠ 0 → SE W Y 0 := fun q1 q2 =>
+    n3_SE2 h K hK k1 k2 hk1 hk2 2 1 0 (by decide) (by decide) (by decide) q1 q2 hz1 hz2
+  have U01 : k0.1 1 ≠ 0 → k0.1 2 = 0 → SE W Y 1 := fun q1 q2 =>
+    n3_SE2 h K hK k0 k0 hk0 hk0 2 0 1 (by decide) (by decide) (by decide) q1 q1 hz0 q2
+  have U02 : k0.1 2 ≠ 0 → k0.1 1 = 0 → SE W Y 2 := fun q1 q2 =>
+    n3_SE2 h K hK k0 k0 hk0 hk0 1 0 2 (by decide) (by decide) (by decide) q1 q1 hz0 q2
+  have U10 : k1.1 0 ≠ 0 → k1.1 2 = 0 → SE W Y 0 := fun q1 q2 =>
+    n3_SE2 h K hK k1 k1 hk1 hk1 2 1 0 (by decide) (by decide) (by decide) q1 q1 hz1 q2
+  have U12 : k1.1 2 ≠ 0 → k1.1 0 = 0 → SE W Y 2 := fun q1 q2 =>
+    n3_SE2 h K hK k1 k1 hk1 hk1 0 1 2 (by decide) (by decide) (by decide) q1 q1 hz1 q2
+  have U20 : k2.1 0 ≠ 0 → k2.1 1 = 0 → SE W Y 0 := fun q1 q2 =>
+    n3_SE2 h K hK k2 k2 hk2 hk2 1 2 0 (by decide) (by decide) (by decide) q1 q1 hz2 q2
+  have U21 : k2.1 1 ≠ 0 → k2.1 0 = 0 → SE W Y 1 := fun q1 q2 =>
+    n3_SE2 h K hK k2 k2 hk2 hk2 0 2 1 (by decide) (by decide) (by decide) q1 q1 hz2 q2
+  have hS : SE W Y 0 ∨ SE W Y 1 ∨ SE W Y 2 := by
+    by_cases q10 : k1.1 0 = 0
+    · right
+      right
+      exact U12 (N1.resolve_left (not_not.mpr q10)) q10
+    · by_cases q20 : k2.1 0 = 0
+      · right
+        left
+        exact U21 (N2.resolve_left (not_not.mpr q20)) q20
+      · left
+        exact A0 q10 q20
+  rcases hS with s0 | s1 | s2
+  · by_cases q01 : k0.1 1 = 0
+    · exact n3_XX h 0 2 (by decide) s0 (U02 (N0.resolve_left (not_not.mpr q01)) q01)
+    · by_cases q02 : k0.1 2 = 0
+      · exact n3_XX h 0 1 (by decide) s0 (U01 q01 q02)
+      · exact n3_block h K hK k0 hk0 0 1 2 (by decide) (by decide) (by decide) s0 hz0 q01 q02
+  · by_cases q10 : k1.1 0 = 0
+    · exact n3_XX h 1 2 (by decide) s1 (U12 (N1.resolve_left (not_not.mpr q10)) q10)
+    · by_cases q12 : k1.1 2 = 0
+      · exact n3_XX h 0 1 (by decide) (U10 q10 q12) s1
+      · exact n3_block h K hK k1 hk1 1 0 2 (by decide) (by decide) (by decide) s1 hz1 q10 q12
+  · by_cases q20 : k2.1 0 = 0
+    · exact n3_XX h 1 2 (by decide) (U21 (N2.resolve_left (not_not.mpr q20)) q20) s2
+    · by_cases q21 : k2.1 1 = 0
+      · exact n3_XX h 0 2 (by decide) (U20 q20 q21) s2
+      · exact n3_block h K hK k2 hk2 2 0 1 (by decide) (by decide) (by decide) s2 hz2 q20 q21
+
+theorem n3core_of_alg (halg : N3Alg) : N3Core := by
+  intro b V0 hb h hd hrow hcol
+  choose x hxV hx0 hxs using hrow
+  choose y hyV hy0 hys using hcol
+  have hsx : ∀ (α : Fin 3 → ℂ) (i j : Fin 3), (∑ r, α r • x r) (i, j) = α i * x i (i, j) := by
+    intro α i j
+    rw [Finset.sum_apply, Finset.sum_eq_single i]
+    · rfl
+    · intro r _ hr
+      rw [Pi.smul_apply, hxs r i j (Ne.symm hr), smul_zero]
+    · intro hne
+      exact (hne (Finset.mem_univ _)).elim
+  have hsy : ∀ (β : Fin 3 → ℂ) (i j : Fin 3), (∑ c, β c • y c) (i, j) = β j * y j (i, j) := by
+    intro β i j
+    rw [Finset.sum_apply, Finset.sum_eq_single j]
+    · rfl
+    · intro c _ hc
+      rw [Pi.smul_apply, hys c i j (Ne.symm hc), smul_zero]
+    · intro hne
+      exact (hne (Finset.mem_univ _)).elim
+  have hbad : Bad b (fun p => x p.1 p) (fun p => y p.2 p) := by
+    refine ⟨hb, ?_, ?_, ?_⟩
+    · intro α β
+      have hη : (∑ r, α r • x r) + (∑ c, β c • y c) ∈ V0 :=
+        V0.add_mem (V0.sum_mem fun r _ => V0.smul_mem _ (hxV r))
+          (V0.sum_mem fun c _ => V0.smul_mem _ (hyV c))
+      have h1 := h _ hη
+      have e : (fun p : Fin 3 × Fin 3 => b p + α p.1 * x p.1 p + β p.2 * y p.2 p) =
+          b + ((∑ r, α r • x r) + ∑ c, β c • y c) := by
+        funext p
+        obtain ⟨i, j⟩ := p
+        rw [Pi.add_apply, Pi.add_apply, hsx, hsy]
+        ring
+      show pm (fun p : Fin 3 × Fin 3 => b p + α p.1 * x p.1 p + β p.2 * y p.2 p) = pm b
+      rw [e, h1]
+    · intro r
+      have h1 : ∃ p, x r p ≠ 0 := by
+        by_contra hc
+        apply hx0 r
+        funext p
+        by_contra hp
+        exact hc ⟨p, hp⟩
+      obtain ⟨⟨i, j⟩, hp⟩ := h1
+      have hi : i = r := by
+        by_contra hi
+        exact hp (hxs r i j hi)
+      rw [hi] at hp
+      exact ⟨j, hp⟩
+    · intro c
+      have h1 : ∃ p, y c p ≠ 0 := by
+        by_contra hc'
+        apply hy0 c
+        funext p
+        by_contra hp
+        exact hc' ⟨p, hp⟩
+      obtain ⟨⟨i, j⟩, hp⟩ := h1
+      have hj : j = c := by
+        by_contra hj
+        exact hp (hys c i j hj)
+      rw [hj] at hp
+      exact ⟨i, hp⟩
+  have hrange : LinearMap.range (relMap (fun p => x p.1 p) (fun p => y p.2 p)) ≤ V0 := by
+    rintro _ ⟨k, rfl⟩
+    have e : relMap (fun p => x p.1 p) (fun p => y p.2 p) k =
+        (∑ r, k.1 r • x r) - ∑ c, k.2 c • y c := by
+      funext p
+      obtain ⟨i, j⟩ := p
+      rw [Pi.sub_apply, hsx, hsy]
+      rfl
+    rw [e]
+    exact V0.sub_mem (V0.sum_mem fun r _ => V0.smul_mem _ (hxV r))
+      (V0.sum_mem fun c _ => V0.smul_mem _ (hyV c))
+  have h1 := LinearMap.finrank_range_add_finrank_ker
+    (relMap (fun p => x p.1 p) (fun p => y p.2 p))
+  have h2 := Submodule.finrank_mono hrange
+  have h3 : Module.finrank ℂ ((Fin 3 → ℂ) × (Fin 3 → ℂ)) = 6 := by
+    rw [Module.finrank_prod, Module.finrank_fintype_fun_eq_card, Fintype.card_fin]
+  refine halg b (fun p => x p.1 p) (fun p => y p.2 p)
+    (LinearMap.ker (relMap (fun p => x p.1 p) (fun p => y p.2 p))) hbad (by omega) ?_
+  intro k hk r j
+  have h4 := congrFun (LinearMap.mem_ker.mp hk) (r, j)
+  exact sub_eq_zero.mp h4
+
+theorem n3prime (b : Fin 3 × Fin 3 → ℂ) (V0 : Submodule ℂ (Fin 3 × Fin 3 → ℂ))
+    (hb : pm b ≠ 0) (h : ∀ η ∈ V0, pm (b + η) = pm b) : Module.finrank ℂ V0 ≤ 3 :=
+  n3prime_of_core (n3core_of_alg n3alg) b V0 hb h
+
+theorem n3prime_L_full {α : Type} [Fintype α] [DecidableEq α] {n : ℕ}
+    {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : Lev n L) (r c : α ⊕ Fin 3 ≃ Fin n)
+    (u0 : ℂ × (Fin n × Fin n → ℂ)) (hu0 : u0 ∈ blockSpace L r c) (h0 : u0.1 = 1) :
+    Module.finrank ℂ (blockSpace L r c ⊓
+        LinearMap.ker (LinearMap.fst ℂ ℂ (Fin n × Fin n → ℂ)) : Submodule ℂ _) ≤
+      3 + Module.finrank ℂ (colsOff L c) :=
+  n3prime_L n3prime hL r c u0 hu0 h0
+

@@ -1,0 +1,3 @@
+k=4 column-centred, m two-column (control)            : 3/49 converged (50s); strongly level: 0, genuinely defect 1: 3
+k=4 column-centred, m isotropic (1,w,w^2,0,0)         : 0/36 converged (52s); strongly level: 0, genuinely defect 1: 0
+k=4 column-centred, m isotropic (1,i,-1,-i,0)         : 0/36 converged (52s); strongly level: 0, genuinely defect 1: 0

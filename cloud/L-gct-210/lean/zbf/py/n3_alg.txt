@@ -1,0 +1,59 @@
+theorem fin3_cases (a : Fin 3) : a = 0 ∨ a = 1 ∨ a = 2 := by
+  revert a
+  decide
+
+theorem n3_rowsum (x : Fin 3 × Fin 3 → ℂ) (r3 : Fin 3) (hx : ∀ i j, i ≠ r3 → x (i, j) = 0)
+    (h1 : pm (fun p => 1 + x p) = 6) : x (r3, 0) + x (r3, 1) + x (r3, 2) = 0 := by
+  simp only [pm, permanent_three, Matrix.of_apply] at h1
+  rcases fin3_cases r3 with rfl | rfl | rfl
+  · simp only [hx 1 0 (by decide), hx 1 1 (by decide), hx 1 2 (by decide), hx 2 0 (by decide), hx 2 1 (by decide), hx 2 2 (by decide), add_zero] at h1
+    linear_combination h1 / 2
+  · simp only [hx 0 0 (by decide), hx 0 1 (by decide), hx 0 2 (by decide), hx 2 0 (by decide), hx 2 1 (by decide), hx 2 2 (by decide), add_zero] at h1
+    linear_combination h1 / 2
+  · simp only [hx 0 0 (by decide), hx 0 1 (by decide), hx 0 2 (by decide), hx 1 0 (by decide), hx 1 1 (by decide), hx 1 2 (by decide), add_zero] at h1
+    linear_combination h1 / 2
+
+theorem n3_colsum (y : Fin 3 × Fin 3 → ℂ) (c3 : Fin 3) (hy : ∀ i j, j ≠ c3 → y (i, j) = 0)
+    (h2 : pm (fun p => 1 + y p) = 6) : y (0, c3) + y (1, c3) + y (2, c3) = 0 := by
+  simp only [pm, permanent_three, Matrix.of_apply] at h2
+  rcases fin3_cases c3 with rfl | rfl | rfl
+  · simp only [hy 0 1 (by decide), hy 0 2 (by decide), hy 1 1 (by decide), hy 1 2 (by decide), hy 2 1 (by decide), hy 2 2 (by decide), add_zero] at h2
+    linear_combination h2 / 2
+  · simp only [hy 0 0 (by decide), hy 0 2 (by decide), hy 1 0 (by decide), hy 1 2 (by decide), hy 2 0 (by decide), hy 2 2 (by decide), add_zero] at h2
+    linear_combination h2 / 2
+  · simp only [hy 0 0 (by decide), hy 0 1 (by decide), hy 1 0 (by decide), hy 1 1 (by decide), hy 2 0 (by decide), hy 2 1 (by decide), add_zero] at h2
+    linear_combination h2 / 2
+
+theorem n3_alg (x y : Fin 3 × Fin 3 → ℂ) (r3 c3 : Fin 3) (hx : ∀ i j, i ≠ r3 → x (i, j) = 0)
+    (hy : ∀ i j, j ≠ c3 → y (i, j) = 0) (h1 : pm (fun p => 1 + x p) = 6)
+    (h2 : pm (fun p => 1 + y p) = 6) (h3 : pm (fun p => 1 + x p + y p) = 6) :
+    x (r3, c3) * y (r3, c3) = 0 := by
+  simp only [pm, permanent_three, Matrix.of_apply] at h1 h2 h3
+  rcases fin3_cases r3 with rfl | rfl | rfl <;> rcases fin3_cases c3 with rfl | rfl | rfl
+  · simp only [hx 1 0 (by decide), hx 1 1 (by decide), hx 1 2 (by decide), hx 2 0 (by decide), hx 2 1 (by decide), hx 2 2 (by decide), add_zero] at h1 h3
+    simp only [hy 0 1 (by decide), hy 0 2 (by decide), hy 1 1 (by decide), hy 1 2 (by decide), hy 2 1 (by decide), hy 2 2 (by decide), add_zero] at h2 h3
+    linear_combination h3 - (1 + (y (0, 0) + y (1, 0) + y (2, 0)) / 2 - y (0, 0) / 2) * h1 - (1 - x (0, 0) / 2) * h2
+  · simp only [hx 1 0 (by decide), hx 1 1 (by decide), hx 1 2 (by decide), hx 2 0 (by decide), hx 2 1 (by decide), hx 2 2 (by decide), add_zero] at h1 h3
+    simp only [hy 0 0 (by decide), hy 0 2 (by decide), hy 1 0 (by decide), hy 1 2 (by decide), hy 2 0 (by decide), hy 2 2 (by decide), add_zero] at h2 h3
+    linear_combination h3 - (1 + (y (0, 1) + y (1, 1) + y (2, 1)) / 2 - y (0, 1) / 2) * h1 - (1 - x (0, 1) / 2) * h2
+  · simp only [hx 1 0 (by decide), hx 1 1 (by decide), hx 1 2 (by decide), hx 2 0 (by decide), hx 2 1 (by decide), hx 2 2 (by decide), add_zero] at h1 h3
+    simp only [hy 0 0 (by decide), hy 0 1 (by decide), hy 1 0 (by decide), hy 1 1 (by decide), hy 2 0 (by decide), hy 2 1 (by decide), add_zero] at h2 h3
+    linear_combination h3 - (1 + (y (0, 2) + y (1, 2) + y (2, 2)) / 2 - y (0, 2) / 2) * h1 - (1 - x (0, 2) / 2) * h2
+  · simp only [hx 0 0 (by decide), hx 0 1 (by decide), hx 0 2 (by decide), hx 2 0 (by decide), hx 2 1 (by decide), hx 2 2 (by decide), add_zero] at h1 h3
+    simp only [hy 0 1 (by decide), hy 0 2 (by decide), hy 1 1 (by decide), hy 1 2 (by decide), hy 2 1 (by decide), hy 2 2 (by decide), add_zero] at h2 h3
+    linear_combination h3 - (1 + (y (0, 0) + y (1, 0) + y (2, 0)) / 2 - y (1, 0) / 2) * h1 - (1 - x (1, 0) / 2) * h2
+  · simp only [hx 0 0 (by decide), hx 0 1 (by decide), hx 0 2 (by decide), hx 2 0 (by decide), hx 2 1 (by decide), hx 2 2 (by decide), add_zero] at h1 h3
+    simp only [hy 0 0 (by decide), hy 0 2 (by decide), hy 1 0 (by decide), hy 1 2 (by decide), hy 2 0 (by decide), hy 2 2 (by decide), add_zero] at h2 h3
+    linear_combination h3 - (1 + (y (0, 1) + y (1, 1) + y (2, 1)) / 2 - y (1, 1) / 2) * h1 - (1 - x (1, 1) / 2) * h2
+  · simp only [hx 0 0 (by decide), hx 0 1 (by decide), hx 0 2 (by decide), hx 2 0 (by decide), hx 2 1 (by decide), hx 2 2 (by decide), add_zero] at h1 h3
+    simp only [hy 0 0 (by decide), hy 0 1 (by decide), hy 1 0 (by decide), hy 1 1 (by decide), hy 2 0 (by decide), hy 2 1 (by decide), add_zero] at h2 h3
+    linear_combination h3 - (1 + (y (0, 2) + y (1, 2) + y (2, 2)) / 2 - y (1, 2) / 2) * h1 - (1 - x (1, 2) / 2) * h2
+  · simp only [hx 0 0 (by decide), hx 0 1 (by decide), hx 0 2 (by decide), hx 1 0 (by decide), hx 1 1 (by decide), hx 1 2 (by decide), add_zero] at h1 h3
+    simp only [hy 0 1 (by decide), hy 0 2 (by decide), hy 1 1 (by decide), hy 1 2 (by decide), hy 2 1 (by decide), hy 2 2 (by decide), add_zero] at h2 h3
+    linear_combination h3 - (1 + (y (0, 0) + y (1, 0) + y (2, 0)) / 2 - y (2, 0) / 2) * h1 - (1 - x (2, 0) / 2) * h2
+  · simp only [hx 0 0 (by decide), hx 0 1 (by decide), hx 0 2 (by decide), hx 1 0 (by decide), hx 1 1 (by decide), hx 1 2 (by decide), add_zero] at h1 h3
+    simp only [hy 0 0 (by decide), hy 0 2 (by decide), hy 1 0 (by decide), hy 1 2 (by decide), hy 2 0 (by decide), hy 2 2 (by decide), add_zero] at h2 h3
+    linear_combination h3 - (1 + (y (0, 1) + y (1, 1) + y (2, 1)) / 2 - y (2, 1) / 2) * h1 - (1 - x (2, 1) / 2) * h2
+  · simp only [hx 0 0 (by decide), hx 0 1 (by decide), hx 0 2 (by decide), hx 1 0 (by decide), hx 1 1 (by decide), hx 1 2 (by decide), add_zero] at h1 h3
+    simp only [hy 0 0 (by decide), hy 0 1 (by decide), hy 1 0 (by decide), hy 1 1 (by decide), hy 2 0 (by decide), hy 2 1 (by decide), add_zero] at h2 h3
+    linear_combination h3 - (1 + (y (0, 2) + y (1, 2) + y (2, 2)) / 2 - y (2, 2) / 2) * h1 - (1 - x (2, 2) / 2) * h2

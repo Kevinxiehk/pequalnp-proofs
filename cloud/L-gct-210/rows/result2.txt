@@ -1,0 +1,23 @@
+## RESULT, ROUND 2 (rows; task "prove (DI)"; written 15:32) -- (DI) PROVED for p = 3; for p = 4, 5 only on the orthogonal part
+ (DI_p): for a (p-1) x q level space L', dim L' <= dim C(L') + p - 2.  (p = 5, q = 5 is what the gap needs, with (D).)
+ R6 [RIGOROUS; section DI] THEOREM DI_3: every 2 x q level space L' has dim L' <= dim C(L') + 1; hence a 3 x q level space with a
+    deletable row has dim <= q (sharp; the checked L156 gives q + 1). Proof: on the hyperplane of zero row sums the level
+    conditions and the defect are DIAGONAL (columnwise elementary symmetric functions), then Rado (checked L171 / L157).
+ R7 [RIGOROUS; new tools, any number of rows]
+    LEMMA D: a linear space V of p x q matrices with sum_j prod_i (1 + x_ij) = q on V has dim <= q - 1 (Rado induction of the
+       checked ThreeRowRado file, verbatim for p rows).  COROLLARY: in ANY 5 x 5 level space, a linear subspace all of whose
+       elements have zero row sums and pairwise orthogonal rows has dim <= 4 (same for columns).
+    THEOREM DDI: if sum_j e_i(col_j(Y)) = 0 on a linear space M of k x q matrices (i = 1..k) then
+       dim M <= dim span{ (e_i(col_j Y))_j : Y in M, i <= k }.
+    DELETION FORMULA (I1): C(Y)_j = sum_{S} (-1)^{|S|}|S|! N^{(R-S)}(J+Y) prod_{i in S}(1 + Y_ij); exact p_k formulas (I3).
+    PROPOSITION O: for a 3- or 4-row level space L' and a linear M in L' with zero row sums and pairwise orthogonal rows (4 rows:
+       also zero triple sums), dim M <= dim C(L'); so dim L' <= dim C(L') + codim M.
+    All identities checked exactly in rational arithmetic (rows/di_ident.py).
+ R8 [numerical census of the 29 example spaces, rows/orth_chk.py] 26 of 29 have row-sum rank q_s = 3 and L'_s := L' cap {row
+    sums 0} of dimension exactly e with pairwise orthogonal rows and zero triple sums: for these Proposition O PROVES
+    dim L' <= e + 3 (tight). The 3 others have non-orthogonal L'_s: (d,e,q_s,dim L'_s) = (4,1,2,2), (5,2,2,3), (6,3,3,3).
+    Uniform form of the conjecture:  (DI_5')  dim L'_s <= e + 3 - q_s.
+ NOT PROVED: (DI_4), (DI_5) in general; (DI_5) for e = 1 (no (5,1)). Reason, precisely: for p = 5, e = 0 the statement IS
+    Lemma SL, whose non-orthogonal DC parts (types I, II) need the cubic/quartic case analysis; the Rado/diagonal method
+    cannot see the pairing terms (y_a.y_b)(y_c.y_d) of P_4. Exact set-up of the e = 1 case and of the split-free-row sub-case:
+    section DI, "WHAT IS NOT PROVED".

@@ -1,0 +1,4 @@
+### DI5.3 THEOREM TC5: a 4x5 space L' with defect line inside C(e_a - e_b) has dim L' <= 4.
+ STATUS OF THE PROOF: every branch is rigorous except ONE sub-branch (R') of the last case, which is excluded only numerically
+ (a system of 14 polynomial equations in 5 unknowns without solutions; calibrated solver). So: no (5,1) space with a two-column
+ defect line, i.e. no 8-dim level space with a deletable row whose defect line is e_a - e_b -- rigorous modulo (R').

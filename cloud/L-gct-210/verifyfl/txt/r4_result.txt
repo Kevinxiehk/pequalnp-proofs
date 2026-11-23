@@ -1,0 +1,27 @@
+## RESULT ROUND 4 (verifyfl, 18:20-19:50; details in section DI5-R4)
+
+ (DI_5) AT e = 1 IS STILL NOT PROVED.  New this round (R = rigorous, N = numerical only):
+ F1 (R) Lemma QB: the quadratic normal form with defect, on all of L' and for any m:
+        <b_j,b_j> = <s,s> + 3 kappa^2 m_j^2 - 2 thetahat_2 m_j (j = 1..5), sum_a <y_a,y_a> = <s,s> + kappa^2 <m,m>.  [R4.1; general e stated]
+ F2 (R) Theorem PS (principal stratum): if ker kappa contains a 3-dim strongly level H with s(H) = V (the only kind of ker kappa seen in the
+        35 known (4,1) spaces with non-two-column m), then L' = H (+) N, N = ker s, with z_j = m_j((kappa/4)1 - 2 B_j f_Z), f : N -> V injective,
+        <f_Z,f_Z> = (3/16) kappa(Z)^2; hence dim N <= 2 and dim L' <= 5, and a (5,1) is H (+) C Z (+) C Z_* with f_* isotropic, <f,f_*> = 0. [R4.3]
+ F3 (R) Lemma PR-RED: "every (4,1) with principal ker kappa is split" => no (5,1) with a principal H.  [R4.4]
+ F4 (R) THEOREM PR3: for m NON-ISOTROPIC with |supp m| = 3 there is NO (5,1) space whose ker kappa contains a principal H.
+        Proof by hand: Z_* = chi_1 l^T, Z = h_0 m^T + chi_1 alpha^T, h_0 = (1/4)1 +- (sqrt 3/4) chi_2, and the neutral deletion gives
+        kappa (4 beta Q_m(lam) - (3/8) e_3(m) kappa^2) = 0 on a plane; the quadratic form has rank 3 unless <m,m> = 0.  [R4.5]
+        For ISOTROPIC m = (1,w,w^2,0,0) the same computation produces four explicit non-split 2-dim level spaces N with defect line C m
+        (Z_* = chi_1 (1/m)^T); (N) they have no extension at all (0/60 calibrated starts).
+ F5 (R) Clean target (SL_m): "a column-centred 4 x 5 space with deletion vectors in 24*1 + C m has dim <= 3" for non-two-column m implies
+        (DI_5) at e = 1 in ALL remaining cases (split, non-split, isotropic), because ker kappa of a (5,1) is such a space of dim 4.
+        False for two-column m.  [R4.2]   (N) Gr(4,15) searches: 0 hits for four further m (isotropic with 3, 4, 5 support; full-support
+        good), positive control 3/49 only - weak evidence per line.  [R4.7]
+ F6 (R) The suggested tricks give nothing new: m in two slots (isotropic split) reproduces only the linear conditions; Lemma EQ over all column
+        pairs is equivalent to the definition of the defect line; rows' "dim Pi_0 <= 2" suffices only for full-support isotropic m.  [R4.6]
+ F7 (N) The N-problem (R4.3) for |supp m| = 4, 5: no solution found for distinct entries (0 injective among 19, 20, 11, 15 hits); for
+        (1,2,-4,1,0) (repeated entry) solutions exist but do not extend to dimension 3 (0/64).  Calibrated by |P| = 3 (PR3: 0/169 vs 50/243).
+ OPEN: (o1) principal (5,1) for |supp m| >= 4 or isotropic m (reduced to the N-problem, a small exact computation, plus "N does not extend");
+       (o2) non-principal (5,1) = (SL_m) outside the principal stratum (needs the cubic/quartic case analysis with the extra form; not done).
+ e = 2, 3: only the normal form of PS generalises (R4.8); it gives no bound for (6,2), (7,3).  FS and TS remain the only rigorous results there.
+ Round 3's hand-back was cut off; its results are RESULT ROUND 3 below (unchanged).
+

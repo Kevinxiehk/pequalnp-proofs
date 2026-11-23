@@ -1,0 +1,276 @@
+
+def Good5 (T L : Fin 5 → ℂ) : Prop :=
+  (L 0 + L 1 + L 2 + L 3 + L 4 = 0) ∧
+  (L 0 * T 0 + L 1 * T 1 + L 2 * T 2 + L 3 * T 3 + L 4 * T 4 = 0) ∧
+  (L 0 * T 0 ^ 2 + L 1 * T 1 ^ 2 + L 2 * T 2 ^ 2 + L 3 * T 3 ^ 2 + L 4 * T 4 ^ 2 = 0) ∧
+  ∀ j, cc (T j) * L j ^ 2 - (L 0 ^ 2 * kk (T j) (T 0) + L 1 ^ 2 * kk (T j) (T 1)
+    + L 2 ^ 2 * kk (T j) (T 2) + L 3 ^ 2 * kk (T j) (T 3) + L 4 ^ 2 * kk (T j) (T 4)) = 0
+
+theorem singA (Z0 Z1 Z2 Z3 Z4 T0 T1 T2 T3 T4 : ℂ) (r0 : Z0 + Z1 + Z2 + Z3 + Z4 = 0)
+    (r1 : Z0 * T0 + Z1 * T1 + Z2 * T2 + Z3 * T3 + Z4 * T4 = 0)
+    (r2 : Z0 * T0 ^ 2 + Z1 * T1 ^ 2 + Z2 * T2 ^ 2 + Z3 * T3 ^ 2 + Z4 * T4 ^ 2 = 0)
+    (hZ : Z0 ≠ 0) (h1 : T0 ≠ T1) (h2 : T0 ≠ T2) (h3 : T3 = T1 ∨ T3 = T2)
+    (h4 : T4 = T1 ∨ T4 = T2) : False := by
+  have p3 : (T3 - T1) * (T3 - T2) = 0 := by
+    rcases h3 with h | h
+    · rw [h]
+      ring
+    · rw [h]
+      ring
+  have p4 : (T4 - T1) * (T4 - T2) = 0 := by
+    rcases h4 with h | h
+    · rw [h]
+      ring
+    · rw [h]
+      ring
+  have key : Z0 * ((T0 - T1) * (T0 - T2)) = 0 := by
+    linear_combination r2 - (T1 + T2) * r1 + T1 * T2 * r0 - Z3 * p3 - Z4 * p4
+  rcases mul_eq_zero.mp key with h | h
+  · exact hZ h
+  · rcases mul_eq_zero.mp h with h' | h'
+    · exact h1 (sub_eq_zero.mp h')
+    · exact h2 (sub_eq_zero.mp h')
+
+theorem pairB (La Lb Lm Lx Ly Ta Tb Tm Tx Ty : ℂ) (r0 : La + Lb + Lm + Lx + Ly = 0)
+    (r1 : La * Ta + Lb * Tb + Lm * Tm + Lx * Tx + Ly * Ty = 0)
+    (r2 : La * Ta ^ 2 + Lb * Tb ^ 2 + Lm * Tm ^ 2 + Lx * Tx ^ 2 + Ly * Ty ^ 2 = 0)
+    (hLm : Lm = 0) (hne : ¬(La = 0 ∧ Lb = 0 ∧ Lx = 0 ∧ Ly = 0)) (eab : Ta = Tb)
+    (d1 : Tb ≠ Tx) (d2 : Tb ≠ Ty) (d3 : Tx ≠ Ty) (d4 : Tm ≠ Tx) (d5 : Tm ≠ Ty)
+    (Fm : cc Tm * Lm ^ 2 - (La ^ 2 * kk Tm Ta + Lb ^ 2 * kk Tm Tb + Lm ^ 2 * kk Tm Tm
+      + Lx ^ 2 * kk Tm Tx + Ly ^ 2 * kk Tm Ty) = 0)
+    (Fx : cc Tx * Lx ^ 2 - (La ^ 2 * kk Tx Ta + Lb ^ 2 * kk Tx Tb + Lm ^ 2 * kk Tx Tm
+      + Lx ^ 2 * kk Tx Tx + Ly ^ 2 * kk Tx Ty) = 0)
+    (Fy : cc Ty * Ly ^ 2 - (La ^ 2 * kk Ty Ta + Lb ^ 2 * kk Ty Tb + Lm ^ 2 * kk Ty Tm
+      + Lx ^ 2 * kk Ty Tx + Ly ^ 2 * kk Ty Ty) = 0) : False := by
+  have kx : Lx * ((Tx - Tb) * (Tx - Ty)) = 0 := by
+    linear_combination r2 - (Tb + Ty) * r1 + Tb * Ty * r0 - La * (Ta - Ty) * eab
+      - (Tm - Tb) * (Tm - Ty) * hLm
+  have ky : Ly * ((Ty - Tb) * (Ty - Tx)) = 0 := by
+    linear_combination r2 - (Tb + Tx) * r1 + Tb * Tx * r0 - La * (Ta - Tx) * eab
+      - (Tm - Tb) * (Tm - Tx) * hLm
+  have hx : Lx = 0 := by
+    rcases mul_eq_zero.mp kx with h | h
+    · exact h
+    · rcases mul_eq_zero.mp h with h' | h'
+      · exact (d1 (sub_eq_zero.mp h').symm).elim
+      · exact (d3 (sub_eq_zero.mp h')).elim
+  have hy : Ly = 0 := by
+    rcases mul_eq_zero.mp ky with h | h
+    · exact h
+    · rcases mul_eq_zero.mp h with h' | h'
+      · exact (d2 (sub_eq_zero.mp h').symm).elim
+      · exact (d3 (sub_eq_zero.mp h').symm).elim
+  have hb : Lb = -La := by linear_combination r0 - hLm - hx - hy
+  have hLa : La ≠ 0 := by
+    intro h
+    exact hne ⟨h, by rw [hb, h, neg_zero], hx, hy⟩
+  have gm : La ^ 2 * kk Tm Tb = 0 := by
+    rw [hLm, hx, hy, hb, eab] at Fm
+    linear_combination (-1 / 2 : ℂ) * Fm
+  have gx : La ^ 2 * kk Tx Tb = 0 := by
+    rw [hLm, hx, hy, hb, eab] at Fx
+    linear_combination (-1 / 2 : ℂ) * Fx
+  have gy : La ^ 2 * kk Ty Tb = 0 := by
+    rw [hLm, hx, hy, hb, eab] at Fy
+    linear_combination (-1 / 2 : ℂ) * Fy
+  have km := (mul_eq_zero.mp gm).resolve_left (pow_ne_zero 2 hLa)
+  have kx' := (mul_eq_zero.mp gx).resolve_left (pow_ne_zero 2 hLa)
+  have ky' := (mul_eq_zero.mp gy).resolve_left (pow_ne_zero 2 hLa)
+  simp only [kk] at km kx' ky'
+  have hA : Tb * (Tb * Tb) * ((Tm - Tx) * (Tm - Ty) * (Tx - Ty)) = 0 := by
+    linear_combination (Tx - Ty) * km - (Tm - Ty) * kx' + (Tm - Tx) * ky'
+  rcases mul_eq_zero.mp hA with h | h
+  · have hs : Tb = 0 := by
+      rcases mul_eq_zero.mp h with h' | h'
+      · exact h'
+      · exact mul_self_eq_zero.mp h'
+    rw [hs] at km kx'
+    have h2 : (Tm - Tx) * 2 = 0 := by linear_combination km - kx'
+    rcases mul_eq_zero.mp h2 with h' | h'
+    · exact d4 (sub_eq_zero.mp h')
+    · exact two_ne_zero h'
+  · rcases mul_eq_zero.mp h with h' | h'
+    · rcases mul_eq_zero.mp h' with h'' | h''
+      · exact d4 (sub_eq_zero.mp h'')
+      · exact d5 (sub_eq_zero.mp h'')
+    · exact d3 (sub_eq_zero.mp h')
+
+theorem inj5 (T : Fin 5 → ℂ) (h01 : T 0 ≠ T 1) (h02 : T 0 ≠ T 2) (h03 : T 0 ≠ T 3)
+    (h04 : T 0 ≠ T 4) (h12 : T 1 ≠ T 2) (h13 : T 1 ≠ T 3) (h14 : T 1 ≠ T 4) (h23 : T 2 ≠ T 3)
+    (h24 : T 2 ≠ T 4) (h34 : T 3 ≠ T 4) : Function.Injective T := by
+  intro a b h
+  fin_cases a <;> fin_cases b <;>
+    first
+    | rfl
+    | exact absurd h h01
+    | exact absurd h.symm h01
+    | exact absurd h h02
+    | exact absurd h.symm h02
+    | exact absurd h h03
+    | exact absurd h.symm h03
+    | exact absurd h h04
+    | exact absurd h.symm h04
+    | exact absurd h h12
+    | exact absurd h.symm h12
+    | exact absurd h h13
+    | exact absurd h.symm h13
+    | exact absurd h h14
+    | exact absurd h.symm h14
+    | exact absurd h h23
+    | exact absurd h.symm h23
+    | exact absurd h h24
+    | exact absurd h.symm h24
+    | exact absurd h h34
+    | exact absurd h.symm h34
+
+theorem Lam_peel (Lam : Submodule ℂ (Fin 5 → ℂ)) (hfr : 2 ≤ Module.finrank ℂ Lam) (m : Fin 5) :
+    ∃ lam ∈ Lam, lam m = 0 ∧ lam ≠ 0 := by
+  have rn := rank_nullity Lam (LinearMap.proj m : (Fin 5 → ℂ) →ₗ[ℂ] ℂ)
+  have h1 : Module.finrank ℂ (Lam.map (LinearMap.proj m : (Fin 5 → ℂ) →ₗ[ℂ] ℂ)) ≤ 1 := by
+    have h := Submodule.finrank_le (Lam.map (LinearMap.proj m : (Fin 5 → ℂ) →ₗ[ℂ] ℂ))
+    rw [Module.finrank_self] at h
+    exact h
+  have hne : (Lam ⊓ LinearMap.ker (LinearMap.proj m : (Fin 5 → ℂ) →ₗ[ℂ] ℂ) :
+      Submodule ℂ (Fin 5 → ℂ)) ≠ ⊥ := by
+    intro h
+    rw [h, finrank_bot] at rn
+    omega
+  obtain ⟨lam, hlam, hne0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
+  have hw := Submodule.mem_inf.mp hlam
+  exact ⟨lam, hw.1, LinearMap.mem_ker.mp hw.2, hne0⟩
+
+theorem core5 (T : Fin 5 → ℂ) (P : (Fin 5 → ℂ) → Prop)
+    (hgood : ∀ L, P L → Good5 T L)
+    (hpeel : ∀ k : Fin 5, ∃ L, P L ∧ L k = 0 ∧ ¬ (∀ j, L j = 0))
+    (hζ : ∃ L, P L ∧ ∀ j, L j ≠ 0)
+    (h01 : T 0 ≠ T 1) (h02 : T 0 ≠ T 2) (h12 : T 1 ≠ T 2)
+    (hC : Function.Injective T → False) : False := by
+  obtain ⟨Z, hPZ, hZ⟩ := hζ
+  obtain ⟨z0, z1, z2, _⟩ := hgood Z hPZ
+  have tA0 : (T 3 = T 1 ∨ T 3 = T 2) → (T 4 = T 1 ∨ T 4 = T 2) → False := fun h3 h4 =>
+    singA (Z 0) (Z 1) (Z 2) (Z 3) (Z 4) (T 0) (T 1) (T 2) (T 3) (T 4) z0 z1 z2 (hZ 0) h01 h02
+      h3 h4
+  have tA1 : (T 3 = T 0 ∨ T 3 = T 2) → (T 4 = T 0 ∨ T 4 = T 2) → False := fun h3 h4 =>
+    singA (Z 1) (Z 0) (Z 2) (Z 3) (Z 4) (T 1) (T 0) (T 2) (T 3) (T 4)
+      (by linear_combination z0) (by linear_combination z1) (by linear_combination z2) (hZ 1)
+      h01.symm h12 h3 h4
+  have tA2 : (T 3 = T 0 ∨ T 3 = T 1) → (T 4 = T 0 ∨ T 4 = T 1) → False := fun h3 h4 =>
+    singA (Z 2) (Z 0) (Z 1) (Z 3) (Z 4) (T 2) (T 0) (T 1) (T 3) (T 4)
+      (by linear_combination z0) (by linear_combination z1) (by linear_combination z2) (hZ 2)
+      h02.symm h12.symm h3 h4
+  obtain ⟨A, hPA, hA0, hAnz⟩ := hpeel 0
+  obtain ⟨a0, a1, a2, aF⟩ := hgood A hPA
+  obtain ⟨B, hPB, hB1, hBnz⟩ := hpeel 1
+  obtain ⟨b0, b1, b2, bF⟩ := hgood B hPB
+  by_cases m3 : T 3 = T 0 ∨ T 3 = T 1 ∨ T 3 = T 2
+  · by_cases m4 : T 4 = T 0 ∨ T 4 = T 1 ∨ T 4 = T 2
+    · rcases m3 with e3 | e3 | e3 <;> rcases m4 with e4 | e4 | e4
+      · exact tA1 (Or.inl e3) (Or.inl e4)
+      · exact tA2 (Or.inl e3) (Or.inr e4)
+      · exact tA1 (Or.inl e3) (Or.inr e4)
+      · exact tA2 (Or.inr e3) (Or.inl e4)
+      · exact tA0 (Or.inl e3) (Or.inl e4)
+      · exact tA0 (Or.inl e3) (Or.inr e4)
+      · exact tA1 (Or.inr e3) (Or.inl e4)
+      · exact tA0 (Or.inr e3) (Or.inl e4)
+      · exact tA0 (Or.inr e3) (Or.inr e4)
+    · have n40 : T 4 ≠ T 0 := fun h => m4 (Or.inl h)
+      have n41 : T 4 ≠ T 1 := fun h => m4 (Or.inr (Or.inl h))
+      have n42 : T 4 ≠ T 2 := fun h => m4 (Or.inr (Or.inr h))
+      rcases m3 with e3 | e3 | e3
+      · exact pairB (B 3) (B 0) (B 1) (B 2) (B 4) (T 3) (T 0) (T 1) (T 2) (T 4)
+          (by linear_combination b0) (by linear_combination b1) (by linear_combination b2) hB1
+          (fun h => hBnz (fin5 (fun j => B j = 0) h.2.1 hB1 h.2.2.1 h.1 h.2.2.2))
+          e3 h02 n40.symm n42.symm h12 n41.symm
+          (by linear_combination bF 1) (by linear_combination bF 2) (by linear_combination bF 4)
+      · exact pairB (A 3) (A 1) (A 0) (A 2) (A 4) (T 3) (T 1) (T 0) (T 2) (T 4)
+          (by linear_combination a0) (by linear_combination a1) (by linear_combination a2) hA0
+          (fun h => hAnz (fin5 (fun j => A j = 0) hA0 h.2.1 h.2.2.1 h.1 h.2.2.2))
+          e3 h12 n41.symm n42.symm h02 n40.symm
+          (by linear_combination aF 0) (by linear_combination aF 2) (by linear_combination aF 4)
+      · exact pairB (A 3) (A 2) (A 0) (A 1) (A 4) (T 3) (T 2) (T 0) (T 1) (T 4)
+          (by linear_combination a0) (by linear_combination a1) (by linear_combination a2) hA0
+          (fun h => hAnz (fin5 (fun j => A j = 0) hA0 h.2.2.1 h.2.1 h.1 h.2.2.2))
+          e3 h12.symm n42.symm n41.symm h01 n40.symm
+          (by linear_combination aF 0) (by linear_combination aF 1) (by linear_combination aF 4)
+  · have n30 : T 3 ≠ T 0 := fun h => m3 (Or.inl h)
+    have n31 : T 3 ≠ T 1 := fun h => m3 (Or.inr (Or.inl h))
+    have n32 : T 3 ≠ T 2 := fun h => m3 (Or.inr (Or.inr h))
+    by_cases m4 : T 4 = T 0 ∨ T 4 = T 1 ∨ T 4 = T 2
+    · rcases m4 with e4 | e4 | e4
+      · exact pairB (B 4) (B 0) (B 1) (B 2) (B 3) (T 4) (T 0) (T 1) (T 2) (T 3)
+          (by linear_combination b0) (by linear_combination b1) (by linear_combination b2) hB1
+          (fun h => hBnz (fin5 (fun j => B j = 0) h.2.1 hB1 h.2.2.1 h.2.2.2 h.1))
+          e4 h02 n30.symm n32.symm h12 n31.symm
+          (by linear_combination bF 1) (by linear_combination bF 2) (by linear_combination bF 3)
+      · exact pairB (A 4) (A 1) (A 0) (A 2) (A 3) (T 4) (T 1) (T 0) (T 2) (T 3)
+          (by linear_combination a0) (by linear_combination a1) (by linear_combination a2) hA0
+          (fun h => hAnz (fin5 (fun j => A j = 0) hA0 h.2.1 h.2.2.1 h.2.2.2 h.1))
+          e4 h12 n31.symm n32.symm h02 n30.symm
+          (by linear_combination aF 0) (by linear_combination aF 2) (by linear_combination aF 3)
+      · exact pairB (A 4) (A 2) (A 0) (A 1) (A 3) (T 4) (T 2) (T 0) (T 1) (T 3)
+          (by linear_combination a0) (by linear_combination a1) (by linear_combination a2) hA0
+          (fun h => hAnz (fin5 (fun j => A j = 0) hA0 h.2.2.1 h.2.1 h.2.2.2 h.1))
+          e4 h12.symm n32.symm n31.symm h01 n30.symm
+          (by linear_combination aF 0) (by linear_combination aF 1) (by linear_combination aF 3)
+    · have n40 : T 4 ≠ T 0 := fun h => m4 (Or.inl h)
+      have n41 : T 4 ≠ T 1 := fun h => m4 (Or.inr (Or.inl h))
+      have n42 : T 4 ≠ T 2 := fun h => m4 (Or.inr (Or.inr h))
+      by_cases e34 : T 3 = T 4
+      · exact pairB (A 3) (A 4) (A 0) (A 1) (A 2) (T 3) (T 4) (T 0) (T 1) (T 2)
+          (by linear_combination a0) (by linear_combination a1) (by linear_combination a2) hA0
+          (fun h => hAnz (fin5 (fun j => A j = 0) hA0 h.2.2.1 h.2.2.2 h.1 h.2.1))
+          e34 n41 n42 h12 h01 h02
+          (by linear_combination aF 0) (by linear_combination aF 1) (by linear_combination aF 2)
+      · exact hC (inj5 T h01 h02 n30.symm n40.symm h12 n31.symm n41.symm n32.symm n42.symm e34)
+
+def HypS6C : Prop := ∀ (θ : Fin 5 → ℂ) (Lam : Submodule ℂ (Fin 5 → ℂ)),
+    Function.Injective θ → 2 ≤ Module.finrank ℂ Lam →
+    (∀ lam ∈ Lam, (∑ n, lam n = 0) ∧ (∑ n, lam n * θ n = 0) ∧ (∑ n, lam n * θ n ^ 2 = 0)) →
+    (∀ lam ∈ Lam, ∀ m, Fq θ m lam = 0) → False
+
+theorem AlgCore_of (HC : HypS6C) : AlgCore := by
+  unfold AlgCore
+  intro θ Lam hfr hrel hF hζ habc
+  obtain ⟨a, b, c, hab, hac, hbc, tab, tac, tbc⟩ := habc
+  obtain ⟨σ, s0, s1, s2⟩ := perm_three a b c hab hac hbc
+  apply core5 (fun k => θ (σ k)) (fun L => ∃ lam ∈ Lam, L = fun k => lam (σ k))
+  · rintro L ⟨lam, hlam, rfl⟩
+    obtain ⟨R0, R1, R2⟩ := hrel lam hlam
+    refine ⟨?_, ?_, ?_, ?_⟩
+    · exact (sum5 σ lam).trans R0
+    · exact (sum5 σ (fun n => lam n * θ n)).trans R1
+    · exact (sum5 σ (fun n => lam n * θ n ^ 2)).trans R2
+    · intro j
+      have h := hF lam hlam (σ j)
+      rw [Fq_sigma θ lam (σ j) σ] at h
+      exact h
+  · intro k
+    obtain ⟨lam, hlam, hk0, hne⟩ := Lam_peel Lam hfr (σ k)
+    refine ⟨fun j => lam (σ j), ⟨lam, hlam, rfl⟩, hk0, ?_⟩
+    intro hall
+    apply hne
+    funext n
+    have h2 : lam (σ (σ.symm n)) = 0 := hall (σ.symm n)
+    rw [Equiv.apply_symm_apply] at h2
+    exact h2
+  · obtain ⟨ζ, hζL, hζ0⟩ := hζ
+    exact ⟨fun j => ζ (σ j), ⟨ζ, hζL, rfl⟩, fun j => hζ0 (σ j)⟩
+  · show θ (σ 0) ≠ θ (σ 1)
+    rw [s0, s1]
+    exact tab
+  · show θ (σ 0) ≠ θ (σ 2)
+    rw [s0, s2]
+    exact tac
+  · show θ (σ 1) ≠ θ (σ 2)
+    rw [s1, s2]
+    exact tbc
+  · intro hT
+    have hθ : Function.Injective θ := by
+      intro n n' h
+      have h' : (fun k => θ (σ k)) (σ.symm n) = (fun k => θ (σ k)) (σ.symm n') := by
+        show θ (σ (σ.symm n)) = θ (σ (σ.symm n'))
+        rw [Equiv.apply_symm_apply, Equiv.apply_symm_apply]
+        exact h
+      exact σ.symm.injective (hT h')
+    exact HC θ Lam hθ hfr hrel hF

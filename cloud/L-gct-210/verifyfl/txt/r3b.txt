@@ -1,0 +1,48 @@
+
+### R3.4 The isotropic defect line: Theorem SPLIT is sharp, the split case stays open there
+ For <m,m> = 0 (sum m = 0 and sum m_j^2 = 0; e.g. (1,w,w^2,0,0), (1,i,-1,-i,0)) step (2) of R3.1 degenerates to <m,y^i> = 0 and gives
+ no information on thetahat.  The CONCLUSION of R3.1 is then FALSE in low dimension [NUMERICAL, 1e-14, verifyfl/r3_iso.py, saved in
+ r3_iso_counterexample.npy]: for m = (1,w,w^2,0,0) there are 2-dim spaces span(e_3 m^T, Y_0) with defect line C m, kappa(Y_0) = 0 and
+ thetahat(Y_0) = 0.27 + 0.27i != 0 (D m = mu m to 4e-15).  So "ker kappa strongly level" needs <m,m> != 0.
+ Split (5,1) with isotropic m: NOT excluded by proof.  Numerically (r3_split_search.py: start from e_3 m^T, add one vector at a time, m fixed):
+ m = (1,w,w^2,0,0) and (1,i,-1,-i,0) reach dimension 4 easily (2/10, 4/10, 8/10, 1/10 at the last step, ker kappa strongly level there) and
+ never dimension 5 (0/10 in each of 4 runs); the non-isotropic control (1,2,-3,0,0) behaves the same (dimension 4 reached, 5 never).
+ Remark: for isotropic m the 5x5 space L(L') contains e_5 m^T as well (m lies in {1,m}^perp), a structural difference not yet exploited.
+
+### R3.5 Where (DI_5) at e = 1 stands after rounds 2 and 3
+ PROVED: no (5,1) space (i) with two-column defect line (TC5); (ii) containing a single-row element, if <m,m> != 0 (R3.1).
+ By rows' (H1) every single-row element of L' is a multiple of some e_i m^T; so a (5,1) space with <m,m> != 0 has NO single-row elements,
+ and by R3.3 none of its 4-dim subspaces has one.
+ REMAINING (exact statements, each sufficient together with the above):
+   (NS4')  every (4,1) space with non-two-column defect line contains some e_i m^T          [=> no (5,1) with that m, by R3.3(b)];
+   (K4)    in every (4,1) space with non-two-column m and kappa != 0, ker kappa is strongly level
+           [=> no (5,1) with kappa != 0: all hyperplanes of the 4-dim ker kappa would be strongly level, hence ker kappa itself];
+   (K4')   a (4,1) space with kappa == 0 has a two-column defect line   [the kappa == 0 half];
+   (ISO)   the isotropic case of the split statement.
+ [NUMERICAL] all 35 known (4,1) spaces with non-two-column m (rows' 22 + 13 found here with m fixed: (1,2,-3,0,0) 8x, (1,1,-2,0,0) 4x,
+ (1,2,-4,1,0) 1x) satisfy (NS4') and (K4), with ker kappa strongly level of type (3,0) (q = 3); for m without neutral column, (1,2,3,-1,-5),
+ no (4,1) space was found at all (0/39).  (K4) is FALSE for two-column m (third-kind example) and in dimension <= 2 (R3.4), so any proof
+ must use dim >= 4 and m not two-column.
+ Quadratic normal form in the observed situation (rigorous, short; not yet a proof of (NS4')): let L' be a (4,1) space, kappa != 0, with
+ K := ker kappa strongly level and s(K) = V. Then L' = K (+) C Z with s(Z) = 0, kappa(Z) = 1, Z vanishing on the neutral columns, and
+     Z = sum_{j in P} m_j h_j e_j^T,   tau(h_j) = 1, <h_j,h_j> = 1 (Q(h_j) = 0),   sum_{j in P} m_j h_j = 0,   h_j = 1/4 - 2 B_j f,
+ where B_j in O(V) are the isometries of K (blueprint S5), f in V is fixed with <f,f> = 3/16, and theta_2(Z) = 0.
+ [Lemma B' polarised between K and Z gives <B_j sigma, z_j^0> = -2 m_j phi(sigma) with ONE linear form phi; its norm identity
+  16 m_j^2 <f,f> = 3 m_j^2 - 4 theta_2(Z) m_j for two different values of m_j gives <f,f> = 3/16 and theta_2(Z) = 0.]
+ L' is split iff all h_j equal one unit vector e_i. For |P| = 3 the three h_j are collinear points of the quadric {tau = 1, <h,h> = 1}:
+ either they coincide (Z = h m^T of rank one) or they lie on an isotropic affine line. Deciding these with the cubic cross conditions is
+ the natural next computation (same size as one branch of TC5).
+
+### R3.6 stage3's family N2 (NOTES-stage3, (N2-h)): what the tools of rounds 2-3 give
+ (N2-h) produces, given (N2-unit), a TRANSPOSED (5,1) or (6,1) space L^j with explicit defect line eta (5 entries, indexed by the rows of L).
+ It is excluded (i) by TC5 if eta = e_r - e_r' mod 1 (already noted by stage3); (ii) by R3.1 (transposed) if, after normalising sum eta = 0,
+ <eta,eta> != 0 and L^j contains a single-COLUMN element with column vector eta in some column j' != j; (iii) by R3.3 + R3.1 if merely every
+ 4-dim subspace of L^j with defect contains such an element.  Whether (ii) holds for N2 is not decided by the data in section 18 of
+ NOTES-stage3 (the known single-column elements Z^j e_j^T sit in the deletable column j itself); eta has two entries fixed by rho_a^j, rho_b^j
+ and three by zeta(a_i), so generically it is neither two-column nor isotropic.  So N2 needs the non-split case of (5,1) -- i.e. (NS4')/(K4).
+
+### R3.7 Numerics of this round (verifyfl/r3_*.py; every run <= 2 min CPU)
+ r3_test1: thetahat = kappa mu and the three steps of R3.1 on 24 split examples.   r3_test2: e = 2, 3 examples (single-row parts, ker gamma).
+ r3_look: structure of the split examples (ker kappa has column ranks (3,2), (2,1,2), (1,1,1), (2,1), ...: no uniform column shape).
+ r3_gr, r3_gr2: Gr(k,17) searches with fixed general m (dimension 3: non-split common; dimension 4: 13 hits, all split).
+ r3_split_search: climbing from e_3 m^T for isotropic and non-isotropic m.   r3_iso: isotropic counterexample to "ker kappa strongly level".

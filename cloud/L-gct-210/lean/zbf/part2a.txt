@@ -1,0 +1,570 @@
+theorem pm_smul {n : ℕ} (a : ℂ) (u : Fin n × Fin n → ℂ) : pm (a • u) = a ^ n * pm u := by
+  have h := blk_smul (m := Fin n) (fun i => i) (fun j => j) a u
+  rw [Fintype.card_fin] at h
+  exact h
+
+def BLev {n : ℕ} (b : Fin n × Fin n → ℂ) (κ : ℂ) (L : Submodule ℂ (Fin n × Fin n → ℂ)) : Prop :=
+  κ ≠ 0 ∧ ∀ c : ℂ, ∀ t ∈ L, pm (fun p => c * b p + t p) = κ * c ^ n
+
+theorem blev_of_lev {n : ℕ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : Lev n L) :
+    BLev (fun _ => (1 : ℂ)) (Nat.factorial n : ℂ) L := by
+  refine ⟨Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero n), fun c t ht => ?_⟩
+  have h := lev_scale hL c t ht
+  simpa using h
+
+theorem blev_of_const {n : ℕ} (b : Fin n × Fin n → ℂ) (L : Submodule ℂ (Fin n × Fin n → ℂ))
+    (hb : pm b ≠ 0) (h : ∀ t ∈ L, pm (b + t) = pm b) : BLev b (pm b) L := by
+  refine ⟨hb, fun c t ht => ?_⟩
+  have key : ∀ a : ℂ, a ≠ 0 → pm (fun p => a * b p + t p) = pm b * a ^ n := by
+    intro a ha
+    have h1 := h (a⁻¹ • t) (L.smul_mem _ ht)
+    have e : (fun p => a * b p + t p) = a • (b + a⁻¹ • t) := by
+      funext p
+      simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
+      rw [mul_add, ← mul_assoc, mul_inv_cancel₀ ha, one_mul]
+    rw [e, pm_smul, h1]
+    ring
+  have hP : ∀ a : ℂ, (∑ σ : Equiv.Perm (Fin n),
+      ∏ i, (Polynomial.X * Polynomial.C (b (i, σ i)) + Polynomial.C (t (i, σ i))) -
+        Polynomial.C (pm b) * Polynomial.X ^ n).eval a =
+      pm (fun p => a * b p + t p) - pm b * a ^ n := by
+    intro a
+    rw [pm_perm (fun p => a * b p + t p)]
+    simp only [Polynomial.eval_sub, Polynomial.eval_finsetSum, Polynomial.eval_prod,
+      Polynomial.eval_add, Polynomial.eval_X, Polynomial.eval_C, Polynomial.eval_mul,
+      Polynomial.eval_pow]
+  have hP0 := poly_zero_of_ne _ (fun a ha => by rw [hP a, key a ha, sub_self])
+  have h4 := hP c
+  rw [hP0, Polynomial.eval_zero] at h4
+  exact sub_eq_zero.mp h4.symm
+
+theorem blev_mono {n : ℕ} {b : Fin n × Fin n → ℂ} {κ : ℂ}
+    {L K : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : BLev b κ L) (hK : K ≤ L) : BLev b κ K :=
+  ⟨hL.1, fun c t ht => hL.2 c t (hK ht)⟩
+
+noncomputable def hatB {n : ℕ} (b : Fin n × Fin n → ℂ) :
+    ℂ × (Fin n × Fin n → ℂ) →ₗ[ℂ] (Fin n × Fin n → ℂ) where
+  toFun w := fun p => w.1 * b p + w.2 p
+  map_add' x y := by
+    funext p
+    simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply]
+    ring
+  map_smul' a x := by
+    funext p
+    simp only [Prod.smul_fst, Prod.smul_snd, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
+    ring
+
+theorem hatB_eq {n : ℕ} (b : Fin n × Fin n → ℂ) (w : ℂ × (Fin n × Fin n → ℂ)) :
+    hatB b w = fun p => w.1 * b p + w.2 p := rfl
+
+def blockSpaceB {n : ℕ} {α β : Type} (b : Fin n × Fin n → ℂ)
+    (L : Submodule ℂ (Fin n × Fin n → ℂ)) (r c : α ⊕ β ≃ Fin n) :
+    Submodule ℂ (ℂ × (Fin n × Fin n → ℂ)) where
+  carrier := {w | w.2 ∈ L ∧ ∀ a a', w.1 * b (r (Sum.inl a), c (Sum.inr a')) +
+    w.2 (r (Sum.inl a), c (Sum.inr a')) = 0}
+  add_mem' := by
+    rintro x y ⟨hx1, hx2⟩ ⟨hy1, hy2⟩
+    refine ⟨L.add_mem hx1 hy1, fun a a' => ?_⟩
+    simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply]
+    linear_combination hx2 a a' + hy2 a a'
+  zero_mem' := ⟨L.zero_mem, fun a a' => by simp⟩
+  smul_mem' := by
+    rintro k x ⟨hx1, hx2⟩
+    refine ⟨L.smul_mem k hx1, fun a a' => ?_⟩
+    simp only [Prod.smul_fst, Prod.smul_snd, Pi.smul_apply, smul_eq_mul]
+    linear_combination k * hx2 a a'
+
+theorem mem_blockSpaceB {n : ℕ} {α β : Type} (b : Fin n × Fin n → ℂ)
+    (L : Submodule ℂ (Fin n × Fin n → ℂ)) (r c : α ⊕ β ≃ Fin n)
+    (w : ℂ × (Fin n × Fin n → ℂ)) :
+    w ∈ blockSpaceB b L r c ↔ w.2 ∈ L ∧ ∀ a a', w.1 * b (r (Sum.inl a), c (Sum.inr a')) +
+      w.2 (r (Sum.inl a), c (Sum.inr a')) = 0 := Iff.rfl
+
+theorem zbf_prodB {n : ℕ} {α β : Type} [Fintype α] [DecidableEq α] [Fintype β] [DecidableEq β]
+    {b : Fin n × Fin n → ℂ} {κ : ℂ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : BLev b κ L)
+    (r c : α ⊕ β ≃ Fin n) (w : ℂ × (Fin n × Fin n → ℂ)) (hw : w ∈ blockSpaceB b L r c) :
+    blk (fun a => r (Sum.inl a)) (fun a => c (Sum.inl a)) (hatB b w) *
+      blk (fun a' => r (Sum.inr a')) (fun a' => c (Sum.inr a')) (hatB b w) =
+      κ * (LinearMap.fst ℂ ℂ (Fin n × Fin n → ℂ) w) ^ n := by
+  have hw' := (mem_blockSpaceB b L r c w).mp hw
+  rw [← pm_zero_block (hatB b w) r c (fun a a' => hw'.2 a a'), hatB_eq]
+  exact hL.2 w.1 w.2 hw'.1
+
+theorem zbf_ufdB {n : ℕ} {α β : Type} [Fintype α] [DecidableEq α] [Fintype β] [DecidableEq β]
+    {b : Fin n × Fin n → ℂ} {κ : ℂ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : BLev b κ L)
+    (r c : α ⊕ β ≃ Fin n) (u0 : ℂ × (Fin n × Fin n → ℂ)) (hu0 : u0 ∈ blockSpaceB b L r c)
+    (h0 : u0.1 = 1) (w : ℂ × (Fin n × Fin n → ℂ)) (hw : w ∈ blockSpaceB b L r c) :
+    blk (fun a => r (Sum.inl a)) (fun a => c (Sum.inl a)) (hatB b w) =
+        blk (fun a => r (Sum.inl a)) (fun a => c (Sum.inl a)) (hatB b u0) *
+          w.1 ^ Fintype.card α ∧
+      blk (fun a' => r (Sum.inr a')) (fun a' => c (Sum.inr a')) (hatB b w) =
+        blk (fun a' => r (Sum.inr a')) (fun a' => c (Sum.inr a')) (hatB b u0) *
+          w.1 ^ Fintype.card β := by
+  have hpA : PolyLine (fun x : ℂ × (Fin n × Fin n → ℂ) =>
+      blk (fun a => r (Sum.inl a)) (fun a => c (Sum.inl a)) (hatB b x)) :=
+    polyLine_comp (hatB b) _ (polyLine_blk _ _)
+  have hpB : PolyLine (fun x : ℂ × (Fin n × Fin n → ℂ) =>
+      blk (fun a' => r (Sum.inr a')) (fun a' => c (Sum.inr a')) (hatB b x)) :=
+    polyLine_comp (hatB b) _ (polyLine_blk _ _)
+  constructor
+  · exact ufd_unit (blockSpaceB b L r c) (LinearMap.fst ℂ ℂ (Fin n × Fin n → ℂ))
+      (fun x => blk (fun a => r (Sum.inl a)) (fun a => c (Sum.inl a)) (hatB b x))
+      (fun x => blk (fun a' => r (Sum.inr a')) (fun a' => c (Sum.inr a')) (hatB b x))
+      hpA hpB (Fintype.card α) n
+      (fun a x => by rw [map_smul]; exact blk_smul _ _ a _)
+      κ hL.1 (fun x hx => zbf_prodB hL r c x hx) u0 hu0 h0 w hw
+  · exact ufd_unit (blockSpaceB b L r c) (LinearMap.fst ℂ ℂ (Fin n × Fin n → ℂ))
+      (fun x => blk (fun a' => r (Sum.inr a')) (fun a' => c (Sum.inr a')) (hatB b x))
+      (fun x => blk (fun a => r (Sum.inl a)) (fun a => c (Sum.inl a)) (hatB b x))
+      hpB hpA (Fintype.card β) n
+      (fun a x => by rw [map_smul]; exact blk_smul _ _ a _)
+      κ hL.1
+      (fun x hx => by rw [mul_comm]; exact zbf_prodB hL r c x hx) u0 hu0 h0 w hw
+
+theorem zbf_zeroB {n : ℕ} (hn : n ≠ 0) {α β : Type} [Fintype α] [DecidableEq α] [Fintype β]
+    [DecidableEq β] {b : Fin n × Fin n → ℂ} {κ : ℂ} {L : Submodule ℂ (Fin n × Fin n → ℂ)}
+    (hL : BLev b κ L) (r c : α ⊕ β ≃ Fin n) (hU : ∀ w ∈ blockSpaceB b L r c, w.1 = 0) :
+    (∀ w ∈ blockSpaceB b L r c,
+        blk (fun a => r (Sum.inl a)) (fun a => c (Sum.inl a)) (hatB b w) = 0) ∨
+      (∀ w ∈ blockSpaceB b L r c,
+        blk (fun a' => r (Sum.inr a')) (fun a' => c (Sum.inr a')) (hatB b w) = 0) := by
+  refine ufd_zero (blockSpaceB b L r c)
+    (fun x => blk (fun a => r (Sum.inl a)) (fun a => c (Sum.inl a)) (hatB b x))
+    (fun x => blk (fun a' => r (Sum.inr a')) (fun a' => c (Sum.inr a')) (hatB b x))
+    (polyLine_comp (hatB b) _ (polyLine_blk _ _)) (polyLine_comp (hatB b) _ (polyLine_blk _ _))
+    (fun x hx => ?_)
+  have h1 := zbf_prodB hL r c x hx
+  rw [LinearMap.fst_apply, hU x hx, zero_pow hn, mul_zero] at h1
+  exact h1
+
+noncomputable def blockProjB {n : ℕ} {β : Type} (b : Fin n × Fin n → ℂ)
+    (r c : Fin 2 ⊕ β ≃ Fin n) : ℂ × (Fin n × Fin n → ℂ) →ₗ[ℂ] (Fin 2 × Fin 2 → ℂ) where
+  toFun w := fun p => w.1 * b (r (Sum.inl p.1), c (Sum.inl p.2)) +
+    w.2 (r (Sum.inl p.1), c (Sum.inl p.2))
+  map_add' x y := by
+    funext p
+    simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply]
+    ring
+  map_smul' a x := by
+    funext p
+    simp only [Prod.smul_fst, Prod.smul_snd, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
+    ring
+
+theorem blk_twoB {n : ℕ} {β : Type} (b : Fin n × Fin n → ℂ) (r c : Fin 2 ⊕ β ≃ Fin n)
+    (w : ℂ × (Fin n × Fin n → ℂ)) :
+    blk (fun a : Fin 2 => r (Sum.inl a)) (fun a => c (Sum.inl a)) (hatB b w) =
+      q0 (blockProjB b r c w) := by
+  unfold blk
+  rw [permanent_two]
+  rfl
+
+theorem thB_quadB {n : ℕ} {β : Type} [Fintype β] [DecidableEq β] {b : Fin n × Fin n → ℂ}
+    {κ : ℂ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : BLev b κ L) (r c : Fin 2 ⊕ β ≃ Fin n)
+    (u0 : ℂ × (Fin n × Fin n → ℂ)) (hu0 : u0 ∈ blockSpaceB b L r c) (h0 : u0.1 = 1) :
+    q0 (blockProjB b r c u0) ≠ 0 ∧
+      ∀ w ∈ blockSpaceB b L r c,
+        q0 (blockProjB b r c w) = q0 (blockProjB b r c u0) * w.1 ^ 2 := by
+  constructor
+  · intro hz
+    have h1 := zbf_prodB hL r c u0 hu0
+    rw [blk_twoB, hz, zero_mul, LinearMap.fst_apply, h0, one_pow, mul_one] at h1
+    exact hL.1 h1.symm
+  · intro w hw
+    have h1 := (zbf_ufdB hL r c u0 hu0 h0 w hw).1
+    rw [blk_twoB, blk_twoB] at h1
+    simpa using h1
+
+theorem thB_kerB {n : ℕ} {β : Type} [Fintype β] [DecidableEq β] {b : Fin n × Fin n → ℂ}
+    {κ : ℂ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : BLev b κ L) (r c : Fin 2 ⊕ β ≃ Fin n)
+    (u0 : ℂ × (Fin n × Fin n → ℂ)) (hu0 : u0 ∈ blockSpaceB b L r c) (h0 : u0.1 = 1)
+    (w : ℂ × (Fin n × Fin n → ℂ)) (hw : w ∈ blockSpaceB b L r c)
+    (hk : blockProjB b r c w = 0) :
+    w.1 = 0 ∧ w.2 ∈ rowsZero L (r (Sum.inl 0)) (r (Sum.inl 1)) := by
+  obtain ⟨hκ, hq⟩ := thB_quadB hL r c u0 hu0 h0
+  have h1 := hq w hw
+  rw [hk] at h1
+  have hq00 : q0 (0 : Fin 2 × Fin 2 → ℂ) = 0 := by simp [q0]
+  rw [hq00] at h1
+  have hw1 : w.1 = 0 := by
+    by_contra hne
+    rcases mul_eq_zero.mp h1.symm with h2 | h2
+    · exact hκ h2
+    · exact (pow_ne_zero 2 hne) h2
+  refine ⟨hw1, ?_⟩
+  have hw' := (mem_blockSpaceB b L r c w).mp hw
+  rw [mem_rowsZero]
+  refine ⟨hw'.1, fun j => ?_, fun j => ?_⟩
+  · obtain ⟨x, rfl⟩ := c.surjective j
+    rcases x with a | a'
+    · have h3 : w.1 * b (r (Sum.inl 0), c (Sum.inl a)) +
+          w.2 (r (Sum.inl 0), c (Sum.inl a)) = 0 := congrFun hk (0, a)
+      rw [hw1, zero_mul, zero_add] at h3
+      exact h3
+    · have h3 := hw'.2 0 a'
+      rw [hw1, zero_mul, zero_add] at h3
+      exact h3
+  · obtain ⟨x, rfl⟩ := c.surjective j
+    rcases x with a | a'
+    · have h3 : w.1 * b (r (Sum.inl 1), c (Sum.inl a)) +
+          w.2 (r (Sum.inl 1), c (Sum.inl a)) = 0 := congrFun hk (1, a)
+      rw [hw1, zero_mul, zero_add] at h3
+      exact h3
+    · have h3 := hw'.2 1 a'
+      rw [hw1, zero_mul, zero_add] at h3
+      exact h3
+
+theorem thB_imgB {n : ℕ} {β : Type} [Fintype β] [DecidableEq β] {b : Fin n × Fin n → ℂ}
+    {κ : ℂ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : BLev b κ L) (r c : Fin 2 ⊕ β ≃ Fin n)
+    (u0 : ℂ × (Fin n × Fin n → ℂ)) (hu0 : u0 ∈ blockSpaceB b L r c) (h0 : u0.1 = 1) :
+    Module.finrank ℂ ((blockSpaceB b L r c).map (blockProjB b r c)) ≤ 2 := by
+  obtain ⟨hκ, hq⟩ := thB_quadB hL r c u0 hu0 h0
+  have hperp : ∀ v ∈ (blockSpaceB b L r c ⊓
+        LinearMap.ker (LinearMap.fst ℂ ℂ (Fin n × Fin n → ℂ))).map (blockProjB b r c),
+      ∀ z ∈ (blockSpaceB b L r c).map (blockProjB b r c), bDual v z = 0 := by
+    rintro _ ⟨w, ⟨hwU, hwk⟩, rfl⟩ _ ⟨w', hw'U, rfl⟩
+    have hw1 : w.1 = 0 := LinearMap.mem_ker.mp hwk
+    rw [← q0_polar, ← map_add, hq w hwU, hq w' hw'U,
+      hq (w + w') ((blockSpaceB b L r c).add_mem hwU hw'U), Prod.fst_add, hw1]
+    ring
+  have h1 := b_perp_bound _ _ hperp
+  have hsup : (blockSpaceB b L r c).map (blockProjB b r c) ≤
+      (blockSpaceB b L r c ⊓
+        LinearMap.ker (LinearMap.fst ℂ ℂ (Fin n × Fin n → ℂ))).map (blockProjB b r c) ⊔
+        Submodule.span ℂ {blockProjB b r c u0} := by
+    rintro _ ⟨w, hwU, rfl⟩
+    have hd : blockProjB b r c w =
+        blockProjB b r c (w - w.1 • u0) + w.1 • blockProjB b r c u0 := by
+      rw [← map_smul, ← map_add, sub_add_cancel]
+    rw [hd]
+    refine Submodule.add_mem_sup (Submodule.mem_map_of_mem ⟨(blockSpaceB b L r c).sub_mem hwU
+      ((blockSpaceB b L r c).smul_mem _ hu0), ?_⟩)
+      (Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self _))
+    show (LinearMap.fst ℂ ℂ (Fin n × Fin n → ℂ)) (w - w.1 • u0) = 0
+    rw [map_sub, map_smul, LinearMap.fst_apply, LinearMap.fst_apply, h0,
+      smul_eq_mul, mul_one, sub_self]
+  have h2 := Submodule.finrank_mono hsup
+  have h3 := Submodule.finrank_add_le_finrank_add_finrank
+    ((blockSpaceB b L r c ⊓
+      LinearMap.ker (LinearMap.fst ℂ ℂ (Fin n × Fin n → ℂ))).map (blockProjB b r c))
+    (Submodule.span ℂ {blockProjB b r c u0})
+  have h4 := finrank_span_one_le (blockProjB b r c u0)
+  omega
+
+theorem thB_dimB {n : ℕ} {β : Type} [Fintype β] [DecidableEq β] {b : Fin n × Fin n → ℂ}
+    {κ : ℂ} {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : BLev b κ L) (r c : Fin 2 ⊕ β ≃ Fin n)
+    (u0 : ℂ × (Fin n × Fin n → ℂ)) (hu0 : u0 ∈ blockSpaceB b L r c) (h0 : u0.1 = 1) :
+    Module.finrank ℂ (blockSpaceB b L r c) ≤
+      2 + Module.finrank ℂ (rowsZero L (r (Sum.inl 0)) (r (Sum.inl 1))) := by
+  have hrn := rank_nullity (blockSpaceB b L r c) (blockProjB b r c)
+  have himg := thB_imgB hL r c u0 hu0 h0
+  have hrn2 := rank_nullity (blockSpaceB b L r c ⊓ LinearMap.ker (blockProjB b r c))
+    (LinearMap.snd ℂ ℂ (Fin n × Fin n → ℂ))
+  have hbot : (blockSpaceB b L r c ⊓ LinearMap.ker (blockProjB b r c)) ⊓
+      LinearMap.ker (LinearMap.snd ℂ ℂ (Fin n × Fin n → ℂ)) = ⊥ := by
+    rw [eq_bot_iff]
+    rintro w ⟨⟨hwU, hwk⟩, hws⟩
+    have hw1 := (thB_kerB hL r c u0 hu0 h0 w hwU (LinearMap.mem_ker.mp hwk)).1
+    have hw2 : w.2 = 0 := LinearMap.mem_ker.mp hws
+    rw [Submodule.mem_bot]
+    exact Prod.ext hw1 hw2
+  have hle : (blockSpaceB b L r c ⊓ LinearMap.ker (blockProjB b r c)).map
+      (LinearMap.snd ℂ ℂ (Fin n × Fin n → ℂ)) ≤ rowsZero L (r (Sum.inl 0)) (r (Sum.inl 1)) := by
+    rintro _ ⟨w, ⟨hwU, hwk⟩, rfl⟩
+    exact (thB_kerB hL r c u0 hu0 h0 w hwU (LinearMap.mem_ker.mp hwk)).2
+  have h5 := Submodule.finrank_mono hle
+  rw [hbot, finrank_bot, zero_add] at hrn2
+  omega
+
+noncomputable def zeroMapB {n : ℕ} {α β : Type} (b : Fin n × Fin n → ℂ)
+    (r c : α ⊕ β ≃ Fin n) : ℂ × (Fin n × Fin n → ℂ) →ₗ[ℂ] (α × β → ℂ) where
+  toFun w := fun p => w.1 * b (r (Sum.inl p.1), c (Sum.inr p.2)) +
+    w.2 (r (Sum.inl p.1), c (Sum.inr p.2))
+  map_add' x y := by
+    funext p
+    simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply]
+    ring
+  map_smul' a x := by
+    funext p
+    simp only [Prod.smul_fst, Prod.smul_snd, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
+    ring
+
+theorem blockSpaceB_finrank_ge {n : ℕ} {α β : Type} [Fintype α] [Fintype β]
+    (b : Fin n × Fin n → ℂ) (L : Submodule ℂ (Fin n × Fin n → ℂ)) (r c : α ⊕ β ≃ Fin n) :
+    Module.finrank ℂ L + 1 ≤
+      Module.finrank ℂ (blockSpaceB b L r c) + Fintype.card α * Fintype.card β := by
+  have hφ : Function.Injective
+      (LinearMap.prodMap (LinearMap.id : ℂ →ₗ[ℂ] ℂ) L.subtype) := by
+    intro x y hxy
+    have h1 := congrArg Prod.fst hxy
+    have h2 := congrArg Prod.snd hxy
+    exact Prod.ext h1 (Subtype.ext h2)
+  have h1 := rank_nullity
+    (LinearMap.range (LinearMap.prodMap (LinearMap.id : ℂ →ₗ[ℂ] ℂ) L.subtype)) (zeroMapB b r c)
+  have h2 : Module.finrank ℂ
+      (LinearMap.range (LinearMap.prodMap (LinearMap.id : ℂ →ₗ[ℂ] ℂ) L.subtype)) =
+      Module.finrank ℂ L + 1 := by
+    rw [LinearMap.finrank_range_of_inj hφ, Module.finrank_prod, Module.finrank_self]
+    omega
+  have h3 : Module.finrank ℂ
+      ((LinearMap.range (LinearMap.prodMap (LinearMap.id : ℂ →ₗ[ℂ] ℂ) L.subtype)).map
+        (zeroMapB b r c)) ≤ Fintype.card α * Fintype.card β := by
+    have h6 := Submodule.finrank_le
+      ((LinearMap.range (LinearMap.prodMap (LinearMap.id : ℂ →ₗ[ℂ] ℂ) L.subtype)).map
+        (zeroMapB b r c))
+    rw [Module.finrank_fintype_fun_eq_card, Fintype.card_prod] at h6
+    exact h6
+  have h4 : LinearMap.range (LinearMap.prodMap (LinearMap.id : ℂ →ₗ[ℂ] ℂ) L.subtype) ⊓
+      LinearMap.ker (zeroMapB b r c) ≤ blockSpaceB b L r c := by
+    rintro w ⟨⟨x, rfl⟩, hk⟩
+    rw [mem_blockSpaceB]
+    refine ⟨x.2.2, fun a a' => ?_⟩
+    exact congrFun (LinearMap.mem_ker.mp hk) (a, a')
+  have h5 := Submodule.finrank_mono h4
+  omega
+
+theorem blev_FK_row {n : ℕ} {b : Fin n × Fin n → ℂ} {κ : ℂ}
+    {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : BLev b κ L) (c : ℂ)
+    (t : Fin n × Fin n → ℂ) (ht : t ∈ L) (r : Fin n)
+    (h : ∀ j, c * b (r, j) + t (r, j) = 0) : c = 0 := by
+  have h1 := hL.2 c t ht
+  rw [pm_zero_row _ r h] at h1
+  by_contra hc
+  rcases mul_eq_zero.mp h1.symm with h2 | h2
+  · exact hL.1 h2
+  · exact (pow_ne_zero n hc) h2
+
+theorem row_not_mem {n : ℕ} {b : Fin n × Fin n → ℂ} {κ : ℂ}
+    {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : BLev b κ L)
+    (A : Submodule ℂ (Fin n × Fin n → ℂ)) (hA : A ≤ L) (r : Fin n) :
+    rowMap r b ∉ A.map (rowMap r) := by
+  rintro ⟨t, ht, h1⟩
+  have h2 := blev_FK_row hL (-1) t (hA ht) r (fun j => by
+    have h3 := congrFun h1 j
+    rw [rowMap_apply, rowMap_apply] at h3
+    rw [h3]
+    ring)
+  norm_num at h2
+
+theorem finrank_sup_vec {V : Type} [AddCommGroup V] [Module ℂ V] [Module.Finite ℂ V]
+    (W : Submodule ℂ V) (v : V) (h1 : v ∉ W) :
+    Module.finrank ℂ (W ⊔ Submodule.span ℂ {v} : Submodule ℂ V) = Module.finrank ℂ W + 1 := by
+  have hne : v ≠ 0 := by
+    rintro rfl
+    exact h1 W.zero_mem
+  have hinf : W ⊓ Submodule.span ℂ {v} = ⊥ := by
+    rw [eq_bot_iff]
+    intro x ⟨hxW, hx1⟩
+    obtain ⟨k, rfl⟩ := Submodule.mem_span_singleton.1 hx1
+    rw [Submodule.mem_bot]
+    by_contra hk
+    have hk' : k ≠ 0 := by
+      rintro rfl
+      exact hk (zero_smul _ _)
+    apply h1
+    have h2 := W.smul_mem k⁻¹ hxW
+    rwa [smul_smul, inv_mul_cancel₀ hk', one_smul] at h2
+  have h := Submodule.finrank_sup_add_finrank_inf_eq W (Submodule.span ℂ {v})
+  rw [hinf, finrank_bot, add_zero, finrank_span_singleton hne] at h
+  exact h
+
+theorem row_surjB {m : ℕ} {b : Fin (m + 2) × Fin (m + 2) → ℂ} {κ : ℂ}
+    {L : Submodule ℂ (Fin (m + 2) × Fin (m + 2) → ℂ)} (hL : BLev b κ L)
+    (r1 r2 : Fin (m + 2))
+    (hd : Module.finrank ℂ (rowsZero L r1 r2) + (2 * m + 2) ≤ Module.finrank ℂ L)
+    (v : Fin (m + 2) → ℂ) :
+    ∃ a ∈ L, (∀ j, a (r2, j) = 0) ∧ ∃ γ : ℂ, ∀ j, v j = a (r1, j) + γ * b (r1, j) := by
+  have h5 : Module.finrank ℂ (Fin (m + 2) → ℂ) = m + 2 := by
+    rw [Module.finrank_fintype_fun_eq_card, Fintype.card_fin]
+  have hW2 : Module.finrank ℂ (L.map (rowMap r2)) ≤ m + 1 := by
+    have h1 := finrank_sup_vec _ _ (row_not_mem hL L le_rfl r2)
+    have h2 := Submodule.finrank_le
+      (L.map (rowMap r2) ⊔ Submodule.span ℂ {rowMap r2 b})
+    rw [h5] at h2
+    omega
+  have hA := rank_nullity L (rowMap r2)
+  have hA2 := rank_nullity (L ⊓ LinearMap.ker (rowMap r2)) (rowMap r1)
+  have hX : (L ⊓ LinearMap.ker (rowMap r2)) ⊓ LinearMap.ker (rowMap r1) = rowsZero L r1 r2 := by
+    unfold rowsZero
+    exact inf_right_comm _ _ _
+  rw [hX] at hA2
+  have h1 := finrank_sup_vec _ _
+    (row_not_mem hL (L ⊓ LinearMap.ker (rowMap r2)) inf_le_left r1)
+  have h2 := Submodule.finrank_le ((L ⊓ LinearMap.ker (rowMap r2)).map (rowMap r1) ⊔
+    Submodule.span ℂ {rowMap r1 b})
+  rw [h5] at h2
+  have htop : (L ⊓ LinearMap.ker (rowMap r2)).map (rowMap r1) ⊔
+      Submodule.span ℂ {rowMap r1 b} = ⊤ := by
+    apply Submodule.eq_top_of_finrank_eq
+    rw [h5]
+    omega
+  have hv : v ∈ (L ⊓ LinearMap.ker (rowMap r2)).map (rowMap r1) ⊔
+      Submodule.span ℂ {rowMap r1 b} := by
+    rw [htop]
+    exact Submodule.mem_top
+  obtain ⟨y, hy, z, hz, hyz⟩ := Submodule.mem_sup.mp hv
+  obtain ⟨a, ha, rfl⟩ := hy
+  obtain ⟨γ, rfl⟩ := Submodule.mem_span_singleton.mp hz
+  have ha' := Submodule.mem_inf.mp ha
+  refine ⟨a, ha'.1, fun j => congrFun (LinearMap.mem_ker.mp ha'.2) j, γ, fun j => ?_⟩
+  rw [← hyz]
+  simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, rowMap_apply]
+
+theorem exists_colB {m : ℕ} {b : Fin (m + 2) × Fin (m + 2) → ℂ} {κ : ℂ}
+    {L : Submodule ℂ (Fin (m + 2) × Fin (m + 2) → ℂ)} (hL : BLev b κ L)
+    (r1 r2 : Fin (m + 2))
+    (hd : Module.finrank ℂ (rowsZero L r1 r2) + (2 * m + 2) ≤ Module.finrank ℂ L) :
+    ∃ k : Fin (m + 2), ∃ a ∈ L, (∀ j, a (r2, j) = 0) ∧
+      ∀ j, j ≠ k → b (r1, j) + a (r1, j) = 0 := by
+  by_contra hcon
+  have hall : ∀ k : Fin (m + 2), ∃ a ∈ L, (∀ j, a (r2, j) = 0) ∧
+      ∀ j, (Pi.single k 1 : Fin (m + 2) → ℂ) j = a (r1, j) := by
+    intro k
+    obtain ⟨a, haL, ha2, γ, hγ⟩ := row_surjB hL r1 r2 hd (Pi.single k 1)
+    by_cases hg : γ = 0
+    · exact ⟨a, haL, ha2, fun j => by rw [hγ j, hg, zero_mul, add_zero]⟩
+    · exfalso
+      apply hcon
+      refine ⟨k, γ⁻¹ • a, L.smul_mem _ haL, fun j => by simp [ha2 j], fun j hj => ?_⟩
+      have h1 := hγ j
+      rw [Pi.single_apply, if_neg hj] at h1
+      have h3 : a (r1, j) = -(γ * b (r1, j)) := by linear_combination -h1
+      simp only [Pi.smul_apply, smul_eq_mul]
+      rw [h3, mul_neg, ← mul_assoc, inv_mul_cancel₀ hg, one_mul]
+      ring
+  choose a haL ha2 ha1 using hall
+  have h2 := blev_FK_row hL (-1) (∑ k, b (r1, k) • a k)
+    (L.sum_mem fun k _ => L.smul_mem _ (haL k)) r1 (fun j => by
+    rw [Finset.sum_apply]
+    have h4 : ∑ k, (b (r1, k) • a k) (r1, j) =
+        ∑ k, b (r1, k) * (Pi.single k 1 : Fin (m + 2) → ℂ) j :=
+      Finset.sum_congr rfl fun k _ => by rw [Pi.smul_apply, smul_eq_mul, ha1 k j]
+    rw [h4]
+    simp [Pi.single_apply])
+  norm_num at h2
+
+theorem lemmaC_genB {m : ℕ} {b : Fin (m + 2) × Fin (m + 2) → ℂ} {κ : ℂ}
+    {L : Submodule ℂ (Fin (m + 2) × Fin (m + 2) → ℂ)} (hL : BLev b κ L)
+    (r1 r2 : Fin (m + 2)) (hr : r1 ≠ r2) :
+    Module.finrank ℂ L ≤ Module.finrank ℂ (rowsZero L r1 r2) + (2 * m + 1) := by
+  by_contra hcon
+  have hd : Module.finrank ℂ (rowsZero L r1 r2) + (2 * m + 2) ≤ Module.finrank ℂ L := by omega
+  have hd' : Module.finrank ℂ (rowsZero L r2 r1) + (2 * m + 2) ≤ Module.finrank ℂ L := by
+    rw [rowsZero_comm]
+    exact hd
+  obtain ⟨k1, a, haL, ha2, ha1⟩ := exists_colB hL r1 r2 hd
+  obtain ⟨k2, a2, hbL, hb1, hb2⟩ := exists_colB hL r2 r1 hd'
+  obtain ⟨ρ, hρ0, hρ1⟩ := exists_perm2 r1 r2 hr
+  obtain ⟨κ', hκ⟩ := exists_col_perm k1 k2
+  have hr0 : ((e2m m).trans ρ) (Sum.inl 0) = r1 := by
+    rw [Equiv.trans_apply, e2m_inl0, hρ0]
+  have hr1 : ((e2m m).trans ρ) (Sum.inl 1) = r2 := by
+    rw [Equiv.trans_apply, e2m_inl1, hρ1]
+  have hu0 : ((1 : ℂ), a + a2) ∈ blockSpaceB b L ((e2m m).trans ρ) ((e2m m).trans κ') := by
+    rw [mem_blockSpaceB]
+    refine ⟨L.add_mem haL hbL, fun a' b' => ?_⟩
+    have hc1 : ((e2m m).trans κ') (Sum.inr b') ≠ k1 := by
+      intro h1
+      exact e2m_inr m b' (hκ (e2m m (Sum.inr b')) (Or.inl h1))
+    have hc2 : ((e2m m).trans κ') (Sum.inr b') ≠ k2 := by
+      intro h1
+      exact e2m_inr m b' (hκ (e2m m (Sum.inr b')) (Or.inr h1))
+    have hboth : ∀ a'' : Fin 2, (1 : ℂ) *
+        b (((e2m m).trans ρ) (Sum.inl a''), ((e2m m).trans κ') (Sum.inr b')) +
+        (a + a2) (((e2m m).trans ρ) (Sum.inl a''), ((e2m m).trans κ') (Sum.inr b')) = 0 := by
+      rw [Fin.forall_fin_two]
+      constructor
+      · rw [hr0, Pi.add_apply, hb1, add_zero, one_mul]
+        exact ha1 _ hc1
+      · rw [hr1, Pi.add_apply, ha2, zero_add, one_mul]
+        exact hb2 _ hc2
+    exact hboth a'
+  have hB := thB_dimB hL ((e2m m).trans ρ) ((e2m m).trans κ') (1, a + a2) hu0 rfl
+  rw [hr0, hr1] at hB
+  have hlow := blockSpaceB_finrank_ge b L ((e2m m).trans ρ) ((e2m m).trans κ')
+  simp only [Fintype.card_fin] at hlow
+  omega
+
+theorem blev_tr {n : ℕ} {b : Fin n × Fin n → ℂ} {κ : ℂ}
+    {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : BLev b κ L) :
+    BLev (trE n b) κ (L.map (trE n : (Fin n × Fin n → ℂ) →ₗ[ℂ] (Fin n × Fin n → ℂ))) := by
+  refine ⟨hL.1, ?_⟩
+  rintro c _ ⟨t, ht, rfl⟩
+  have h1 := pm_tr (fun p => c * b p + t p)
+  rw [← hL.2 c t ht, ← h1]
+  rfl
+
+theorem lemmaC_col_genB {m : ℕ} {b : Fin (m + 2) × Fin (m + 2) → ℂ} {κ : ℂ}
+    {L : Submodule ℂ (Fin (m + 2) × Fin (m + 2) → ℂ)} (hL : BLev b κ L)
+    (c1 c2 : Fin (m + 2)) (hc : c1 ≠ c2) :
+    Module.finrank ℂ L ≤ Module.finrank ℂ (colsZero L c1 c2) + (2 * m + 1) := by
+  have h1 := lemmaC_genB (blev_tr hL) c1 c2 hc
+  have h2 := LinearEquiv.finrank_map_eq (trE (m + 2)) L
+  have h3 := LinearEquiv.finrank_map_eq (trE (m + 2)) (colsZero L c1 c2)
+  have h4 : rowsZero (L.map (trE (m + 2) :
+      (Fin (m + 2) × Fin (m + 2) → ℂ) →ₗ[ℂ] (Fin (m + 2) × Fin (m + 2) → ℂ))) c1 c2 ≤
+      (colsZero L c1 c2).map (trE (m + 2) :
+        (Fin (m + 2) × Fin (m + 2) → ℂ) →ₗ[ℂ] (Fin (m + 2) × Fin (m + 2) → ℂ)) := by
+    intro t' ht'
+    obtain ⟨⟨t, ht, rfl⟩, hz1, hz2⟩ := (mem_rowsZero _ c1 c2 t').mp ht'
+    refine Submodule.mem_map_of_mem ((mem_colsZero L c1 c2 t).mpr ⟨ht, fun i => ?_, fun i => ?_⟩)
+    · exact hz1 i
+    · exact hz2 i
+  have h5 := Submodule.finrank_mono h4
+  omega
+
+theorem exists_sub_finrank {V : Type} [AddCommGroup V] [Module ℂ V] [Module.Finite ℂ V]
+    (W : Submodule ℂ V) (k : ℕ) (hk : k ≤ Module.finrank ℂ W) :
+    ∃ W' : Submodule ℂ V, W' ≤ W ∧ Module.finrank ℂ W' = k := by
+  obtain ⟨f, hf⟩ := exists_linearIndependent_of_le_finrank hk
+  refine ⟨(Submodule.span ℂ (Set.range f)).map W.subtype, Submodule.map_subtype_le W _, ?_⟩
+  rw [Submodule.finrank_map_subtype_eq, finrank_span_eq_card hf, Fintype.card_fin]
+
+theorem n3p_row {b : Fin 3 × Fin 3 → ℂ} {κ : ℂ} {V0 : Submodule ℂ (Fin 3 × Fin 3 → ℂ)}
+    (hL : BLev b κ V0) (h4 : 4 ≤ Module.finrank ℂ V0) (r3 : Fin 3) :
+    ∃ x ∈ V0, x ≠ 0 ∧ ∀ i j, i ≠ r3 → x (i, j) = 0 := by
+  obtain ⟨r1, r2, h12, hall⟩ := n3_others r3
+  have h : Module.finrank ℂ V0 ≤ Module.finrank ℂ (rowsZero V0 r1 r2) + 3 :=
+    lemmaC_genB (m := 1) hL r1 r2 h12
+  have hpos : 0 < Module.finrank ℂ (rowsZero V0 r1 r2) := by omega
+  obtain ⟨⟨x, hxm⟩, hx0⟩ := Module.finrank_pos_iff_exists_ne_zero.mp hpos
+  obtain ⟨hxL, hx1, hx2⟩ := (mem_rowsZero V0 r1 r2 x).mp hxm
+  refine ⟨x, hxL, ?_, fun i j hi => ?_⟩
+  · intro h0
+    apply hx0
+    exact Subtype.ext h0
+  · rcases hall i hi with rfl | rfl
+    · exact hx1 j
+    · exact hx2 j
+
+theorem n3p_col {b : Fin 3 × Fin 3 → ℂ} {κ : ℂ} {V0 : Submodule ℂ (Fin 3 × Fin 3 → ℂ)}
+    (hL : BLev b κ V0) (h4 : 4 ≤ Module.finrank ℂ V0) (c3 : Fin 3) :
+    ∃ y ∈ V0, y ≠ 0 ∧ ∀ i j, j ≠ c3 → y (i, j) = 0 := by
+  obtain ⟨c1, c2, h12, hall⟩ := n3_others c3
+  have h : Module.finrank ℂ V0 ≤ Module.finrank ℂ (colsZero V0 c1 c2) + 3 :=
+    lemmaC_col_genB (m := 1) hL c1 c2 h12
+  have hpos : 0 < Module.finrank ℂ (colsZero V0 c1 c2) := by omega
+  obtain ⟨⟨y, hym⟩, hy0⟩ := Module.finrank_pos_iff_exists_ne_zero.mp hpos
+  obtain ⟨hyL, hy1, hy2⟩ := (mem_colsZero V0 c1 c2 y).mp hym
+  refine ⟨y, hyL, ?_, fun i j hj => ?_⟩
+  · intro h0
+    apply hy0
+    exact Subtype.ext h0
+  · rcases hall j hj with rfl | rfl
+    · exact hy1 i
+    · exact hy2 i
+
+def N3Core : Prop :=
+  ∀ (b : Fin 3 × Fin 3 → ℂ) (V0 : Submodule ℂ (Fin 3 × Fin 3 → ℂ)), pm b ≠ 0 →
+    (∀ η ∈ V0, pm (b + η) = pm b) → Module.finrank ℂ V0 = 4 →
+    (∀ r : Fin 3, ∃ x ∈ V0, x ≠ 0 ∧ ∀ i j, i ≠ r → x (i, j) = 0) →
+    (∀ c : Fin 3, ∃ y ∈ V0, y ≠ 0 ∧ ∀ i j, j ≠ c → y (i, j) = 0) → False
+
+theorem n3prime_of_core (hcore : N3Core) (b : Fin 3 × Fin 3 → ℂ)
+    (V0 : Submodule ℂ (Fin 3 × Fin 3 → ℂ)) (hb : pm b ≠ 0)
+    (h : ∀ η ∈ V0, pm (b + η) = pm b) : Module.finrank ℂ V0 ≤ 3 := by
+  by_contra hcon
+  obtain ⟨V1, hV1, hd⟩ := exists_sub_finrank V0 4 (by omega)
+  have h1 : ∀ η ∈ V1, pm (b + η) = pm b := fun η hη => h η (hV1 hη)
+  have hL := blev_of_const b V1 hb h1
+  exact hcore b V1 hb h1 hd (fun r => n3p_row hL (by omega) r) (fun c => n3p_col hL (by omega) c)
+

@@ -1,0 +1,16 @@
+end
+
+end PEqualNP.Gct.FL210
+
+theorem PEqualNP.Outside.L_gct_210_fl
+    (H6 : PEqualNP.Gct.FL210.HypS6) (H8 : PEqualNP.Gct.FL210.HypS8)
+    (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ))
+    (hL : ∀ t ∈ L, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120)
+    (r : Fin 5)
+    (hF : ∀ w : Fin 5 → ℂ, ∑ j, w j = 0 →
+      (fun p : Fin 5 × Fin 5 => if p.1 = r then w p.2 else 0) ∈ L) :
+    Module.finrank ℂ L ≤ 7 :=
+  PEqualNP.Gct.FL210.FL_of
+    (PEqualNP.Gct.FL210.SL_of H6
+      (PEqualNP.Gct.FL210.HypS7_of
+        (PEqualNP.Gct.FL210.HypS7alg_of PEqualNP.Gct.FL210.HypIIa_proof)) H8) L hL r hF

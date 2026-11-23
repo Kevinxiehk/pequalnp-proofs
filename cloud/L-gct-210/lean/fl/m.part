@@ -1,0 +1,86 @@
+theorem IIa_tu (t u : ℂ) (htu : t ≠ u)
+    (E1 : 2 * u + t + t * u ^ 4 / 4 + t ^ 2 * u ^ 3 / 2 = 0)
+    (E2 : 2 * t + u + u * t ^ 4 / 4 + u ^ 2 * t ^ 3 / 2 = 0)
+    (B : 8 * (t - u) ^ 4
+      - 24 * ((1 + t ^ 4 / 4) * (1 + u ^ 4 / 4) - 2 * t * u * (t ^ 2 + u ^ 2)) = 0) :
+    4 + t ^ 4 + 4 * t ^ 3 * u = 0 ∧ t ^ 2 * u ^ 2 = 4 := by
+  have hD : (u - t) * (4 + (t + u) ^ 2 * (t * u) + (t * u) ^ 2) = 0 := by
+    linear_combination 4 * E1 - 4 * E2
+  have h1 : 4 + (t + u) ^ 2 * (t * u) + (t * u) ^ 2 = 0 :=
+    (mul_eq_zero.mp hD).resolve_left (sub_ne_zero.mpr (Ne.symm htu))
+  have hS : (t + u) * (12 + (t + u) ^ 2 * (t * u) - (t * u) ^ 2) = 0 := by
+    linear_combination 4 * E1 + 4 * E2
+  rcases mul_eq_zero.mp hS with ha | h2
+  · exfalso
+    have hu : u = -t := by linear_combination ha
+    subst hu
+    have h128 : (128 : ℂ) = 0 := by
+      linear_combination (-1 : ℂ) * B + (32 - (3 / 2 : ℂ) * (t ^ 4 + 4)) * h1
+    norm_num at h128
+  · have hb : t ^ 2 * u ^ 2 = 4 := by
+      linear_combination (1 / 2 : ℂ) * h1 - (1 / 2 : ℂ) * h2
+    refine ⟨?_, hb⟩
+    linear_combination (1 / 4 : ℂ) * (t * u) * t ^ 2 * h1
+      - ((3 / 4 : ℂ) * (t * u) * t ^ 2 + (1 / 4 : ℂ) * (t ^ 4 + (t * u) ^ 2 + 4)) * hb
+
+def Ps4 (j a0 a1 a2 a3 : ℂ) : V4 :=
+  ![a0 + a1 + a2 + a3, a0 + a1 * j - a2 - a3 * j, a0 - a1 + a2 - a3, a0 - a1 * j - a2 + a3 * j]
+
+theorem Ps4_0 (j a0 a1 a2 a3 : ℂ) : Ps4 j a0 a1 a2 a3 0 = a0 + a1 + a2 + a3 := rfl
+
+theorem Ps4_1 (j a0 a1 a2 a3 : ℂ) : Ps4 j a0 a1 a2 a3 1 = a0 + a1 * j - a2 - a3 * j := rfl
+
+theorem Ps4_2 (j a0 a1 a2 a3 : ℂ) : Ps4 j a0 a1 a2 a3 2 = a0 - a1 + a2 - a3 := rfl
+
+theorem Ps4_3 (j a0 a1 a2 a3 : ℂ) : Ps4 j a0 a1 a2 a3 3 = a0 - a1 * j - a2 + a3 * j := rfl
+
+theorem tau_Ps4 (j a0 a1 a2 a3 : ℂ) : tau (Ps4 j a0 a1 a2 a3) = 4 * a0 := by
+  simp only [tau, Ps4_0, Ps4_1, Ps4_2, Ps4_3]
+  ring
+
+theorem Ps4_mul (j : ℂ) (hj : j * j = -1) (a0 a1 a2 a3 b0 b1 b2 b3 : ℂ) :
+    (fun i => Ps4 j a0 a1 a2 a3 i * Ps4 j b0 b1 b2 b3 i : V4) =
+      Ps4 j (a0 * b0 + a1 * b3 + a2 * b2 + a3 * b1) (a0 * b1 + a1 * b0 + a2 * b3 + a3 * b2)
+        (a0 * b2 + a1 * b1 + a2 * b0 + a3 * b3) (a0 * b3 + a1 * b2 + a2 * b1 + a3 * b0) := by
+  funext i
+  fin_cases i
+  · show Ps4 j a0 a1 a2 a3 0 * Ps4 j b0 b1 b2 b3 0 = Ps4 j _ _ _ _ 0
+    simp only [Ps4_0]
+    ring
+  · show Ps4 j a0 a1 a2 a3 1 * Ps4 j b0 b1 b2 b3 1 = Ps4 j _ _ _ _ 1
+    simp only [Ps4_1]
+    linear_combination (a1 - a3) * (b1 - b3) * hj
+  · show Ps4 j a0 a1 a2 a3 2 * Ps4 j b0 b1 b2 b3 2 = Ps4 j _ _ _ _ 2
+    simp only [Ps4_2]
+    ring
+  · show Ps4 j a0 a1 a2 a3 3 * Ps4 j b0 b1 b2 b3 3 = Ps4 j _ _ _ _ 3
+    simp only [Ps4_3]
+    linear_combination (a1 - a3) * (b1 - b3) * hj
+
+theorem ip_Ps4 (j : ℂ) (hj : j * j = -1) (a0 a1 a2 a3 b0 b1 b2 b3 : ℂ) :
+    ip (Ps4 j a0 a1 a2 a3) (Ps4 j b0 b1 b2 b3) =
+      4 * (a0 * b0 + a1 * b3 + a2 * b2 + a3 * b1) := by
+  have e : ip (Ps4 j a0 a1 a2 a3) (Ps4 j b0 b1 b2 b3) =
+      tau (fun i => Ps4 j a0 a1 a2 a3 i * Ps4 j b0 b1 b2 b3 i : V4) := by
+    simp only [ip, tau]
+  rw [e, Ps4_mul j hj, tau_Ps4]
+
+theorem Ps4_param (j : ℂ) (hj : j * j = -1) (v : V4) (hv : tau v = 0) :
+    v = Ps4 j 0 ((v 0 - j * v 1 - v 2 + j * v 3) / 4) ((v 0 - v 1 + v 2 - v 3) / 4)
+      ((v 0 + j * v 1 - v 2 - j * v 3) / 4) := by
+  simp only [tau] at hv
+  funext i
+  fin_cases i
+  · show v 0 = Ps4 j _ _ _ _ 0
+    simp only [Ps4_0]
+    linear_combination (1 / 4 : ℂ) * hv
+  · show v 1 = Ps4 j _ _ _ _ 1
+    simp only [Ps4_1]
+    linear_combination (1 / 4 : ℂ) * hv - ((v 3 - v 1) / 2) * hj
+  · show v 2 = Ps4 j _ _ _ _ 2
+    simp only [Ps4_2]
+    linear_combination (1 / 4 : ℂ) * hv
+  · show v 3 = Ps4 j _ _ _ _ 3
+    simp only [Ps4_3]
+    linear_combination (1 / 4 : ℂ) * hv + ((v 3 - v 1) / 2) * hj
+

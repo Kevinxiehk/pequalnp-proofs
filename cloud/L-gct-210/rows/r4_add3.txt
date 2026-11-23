@@ -1,0 +1,32 @@
+ R4.14 THEOREM NCOL-S (RIGOROUS; (NCOL_1) in the split non-isotropic case).  Let L' be a 4 x 5 level space with 1-dim defect space C m,
+   <m,m> != 0, containing a single-row element e_i m^T.
+     (a) If m has no zero entry, then dim L' <= 3.   [So a split (4,1) space with non-isotropic m HAS A NEUTRAL COLUMN.]
+     (b) In general: for every Y in L' the column sums c_j(Y'') of the three rows != i are equal for all j with m_j != 0; and on
+         N := L' cap {<y^i, m> = 0} (strongly level, verifyfl's THEOREM SPLIT) row i is supported on the zero set of m when m has
+         exactly one zero n; then N cap {row i = 0} is a strongly level 3 x 5 space of dim exactly 2 if dim L' = 4.
+   Proof. Notation of verifyfl R3.1: <w, C(Y)> = Per(1+y^1,..,1+y^4, w) (symmetric 5-linear), D_i(Y) the symmetric zero-diagonal matrix
+   with (D_i)_jk = perm_3((J+Y) minus row i, columns j,k); it depends only on Y'' (rows != i). Since Y + lambda e_i m^T is in L' and
+   C(.) - 24*1 is in C m:  D_i(Y) m = mu(Y) m on L';  <m, C(Y)> = mu(Y) <y^i, m>, so N is strongly level, dim N >= dim L' - 1.
+   Degree-1 part (Y -> tY): D^(1)(Y) m is in C m, and (exact formula, rows/fl2_ident.py)  D^(1)(Y) m = -2S m + 4 c o m - 2(c.m) 1,
+   S, c = total sum and column sums of Y''.  Hence  4 c_j m_j - 2(c.m) = (mu_1 + 2S) m_j  for all j.            (*)
+   (a) m_j != 0 for all j: multiply (*) by 1, sum over j after dividing... directly: c_j = alpha + (c.m)/(2 m_j), alpha := (mu_1+2S)/4;
+   then c.m = alpha sum m_j + 5 (c.m)/2 = 5(c.m)/2, so c.m = 0 and c(Y'') = alpha(Y) 1 on L' (alpha a linear form).  On N all column
+   sums of Y vanish (the linear part of C(tY) = 24*1), so y^i = -c(Y'') = -alpha(Y) 1.  If alpha != 0 on N, take Y_1 in N with
+   alpha(Y_1) = 1: row i of J + Y_1 is zero, all 4 x 4 column-deletion permanents vanish, contradicting C(Y_1) = 24*1.  So row i
+   vanishes on N, and then C_j(Y) = N_{3x4}((J+Y'') minus column j) = 24: N is a strongly level 3 x 5 space, dim N <= 2 by Lemma SL_3
+   (R3.8).  dim L' <= 3.
+   (b) If m_n = 0, (*) at j = n gives c.m = 0 and (*) at j != n (m_j != 0) gives c_j = alpha. If n is the only zero: y^i = -alpha 1 - delta e_n
+   on N; alpha(Y_1) = 1 would make row i of J + Y_1 a multiple of e_n and C_n(Y_1) = 0: so alpha = 0 on N, row i of N lies in C e_n,
+   and N cap {row i = 0} has dim >= dim N - 1 and <= 2 (SL_3).  QED
+   Numerical confirmation of every step (rows/ncol1_chk.py): on all 27 split non-isotropic (4,1) spaces (1, 2 or 3 zeros of m) the column
+   sums of Y'' lie in span(1, e_n : m_n = 0) and row i of N is supported on the zeros of m, to 1e-10 or better (mostly 1e-15).
+   Sharpness: split (3,1) spaces with full-support m exist (round 3: fixed m of full support reaches dim 6 = 3 + 3 for L, not 7).
+   REMARK (FS type, any e; same proof): if e_i (x) C lies in L', C nondegenerate, then c(Y'') o C is inside C + C1 for all Y in L',
+   and on N = ker gamma: y^i = -c(Y'') in C^perp, the set G = {c(Y'') : Y in N} satisfies 1 not in G + C e_n for every n, and
+   dim G >= dim N - 2.  So an EXTREMAL FS-type space needs c in C^perp, not in C1, with c o C inside C + C1.  e = 1: m has a zero (above).
+   e = 3 (C = w^perp cap 1^perp): w takes exactly two values, i.e. w ~ 1 - 5e_n [neutral column; then row i of N lies in C e_n] or
+   w ~ (3,3,-2,-2,-2) [not excluded here; never seen].
+   WHAT IS LEFT OF (NCOL_1): (4,1) spaces without single-row element (both known ones have a two-column defect line, 3 neutral
+   columns) and isotropic m.  With verifyfl's (NS4') ["every (4,1) space with non-two-column m is split"], (NCOL_1) follows for
+   all non-isotropic m.
+STATUS 19:17 (round 4 final, updated): Theorem NCOL-S (R4.14) added; RESULT ROUND 4 at the top updated (U9).

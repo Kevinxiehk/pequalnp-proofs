@@ -1,0 +1,85 @@
+noncomputable def dS (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)) (ρ : Equiv.Perm (Fin 5))
+    (S : Finset (Fin 5)) : ℕ :=
+  Module.finrank ℂ (rowsZeroS L (S.map ρ.toEmbedding))
+
+theorem dS_submodular (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)) (ρ : Equiv.Perm (Fin 5))
+    (S S' : Finset (Fin 5)) :
+    dS L ρ S + dS L ρ S' ≤ dS L ρ (S ∩ S') + dS L ρ (S ∪ S') := by
+  unfold dS
+  rw [Finset.map_inter, Finset.map_union]
+  exact rows_submodular L _ _
+
+theorem dS_inj_bound (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)) (ρ : Equiv.Perm (Fin 5))
+    (S S' : Finset (Fin 5)) (c : Fin 5) (hSS : S' ⊆ S) (h0 : dS L ρ (insert c S) = 0) :
+    dS L ρ S + dS L ρ (insert c S') ≤ dS L ρ S' := by
+  unfold dS at h0 ⊢
+  rw [Finset.map_insert] at h0 ⊢
+  have hbot : rowsZeroS L (insert (ρ.toEmbedding c) (S.map ρ.toEmbedding)) = ⊥ :=
+    Submodule.finrank_eq_zero.mp h0
+  exact rows_inj_bound L _ _ _ (Finset.map_subset_map.mpr hSS) hbot
+
+theorem dS_disjoint_bound (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)) (ρ : Equiv.Perm (Fin 5))
+    (S S' : Finset (Fin 5)) (h0 : dS L ρ (S ∪ S') = 0) :
+    dS L ρ S + dS L ρ S' ≤ dS L ρ (S ∩ S') := by
+  have h := dS_submodular L ρ S S'
+  omega
+
+theorem stage3_G2 (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)) (ρ : Equiv.Perm (Fin 5))
+    (ha : ∀ i : Fin 5, dS L ρ {i} = 5)
+    (hz : ∀ S : Finset (Fin 5), S.card = 4 → dS L ρ S = 0)
+    (hlam : ∀ S : Finset (Fin 5), S.card = 2 → 3 ≤ dS L ρ S)
+    (h4 : 4 ≤ dS L ρ {0, 1}) :
+    dS L ρ {0, 1, 4} = 2 ∧ dS L ρ {0, 1, 3} = 2 ∧ dS L ρ {0, 1, 2} = 2 ∧
+      ∀ S : Finset (Fin 5), S.card = 2 → S ≠ {0, 1} → dS L ρ S = 3 := by
+  have hl4 := dS_submodular L ρ {0, 1} {0, 4}
+  rw [show (({0, 1} : Finset (Fin 5)) ∩ {0, 4}) = {0} by decide,
+    show (({0, 1} : Finset (Fin 5)) ∪ {0, 4}) = {0, 1, 4} by decide] at hl4
+  have hp4 := hlam {0, 4} (by decide)
+  have hl3 := dS_submodular L ρ {0, 1} {0, 3}
+  rw [show (({0, 1} : Finset (Fin 5)) ∩ {0, 3}) = {0} by decide,
+    show (({0, 1} : Finset (Fin 5)) ∪ {0, 3}) = {0, 1, 3} by decide] at hl3
+  have hp3 := hlam {0, 3} (by decide)
+  have hl2 := dS_submodular L ρ {0, 1} {0, 2}
+  rw [show (({0, 1} : Finset (Fin 5)) ∩ {0, 2}) = {0} by decide,
+    show (({0, 1} : Finset (Fin 5)) ∪ {0, 2}) = {0, 1, 2} by decide] at hl2
+  have hp2 := hlam {0, 2} (by decide)
+  have ha0 := ha 0
+  have hi1 := dS_inj_bound L ρ {0, 1, 4} {0} 2 (by decide) (hz _ (by decide))
+  have hq1 := hlam (insert 2 {0}) (by decide)
+  have hr1 := ha 0
+  have hi2 := dS_inj_bound L ρ {0, 1, 4} {1} 2 (by decide) (hz _ (by decide))
+  have hq2 := hlam (insert 2 {1}) (by decide)
+  have hr2 := ha 1
+  have hi3 := dS_inj_bound L ρ {0, 1, 4} {4} 2 (by decide) (hz _ (by decide))
+  have hq3 := hlam (insert 2 {4}) (by decide)
+  have hr3 := ha 4
+  have hi4 := dS_inj_bound L ρ {0, 1, 4} {0} 3 (by decide) (hz _ (by decide))
+  have hq4 := hlam (insert 3 {0}) (by decide)
+  have hr4 := ha 0
+  have hi5 := dS_inj_bound L ρ {0, 1, 4} {1} 3 (by decide) (hz _ (by decide))
+  have hq5 := hlam (insert 3 {1}) (by decide)
+  have hr5 := ha 1
+  have hi6 := dS_inj_bound L ρ {0, 1, 4} {4} 3 (by decide) (hz _ (by decide))
+  have hq6 := hlam (insert 3 {4}) (by decide)
+  have hr6 := ha 4
+  have hi7 := dS_inj_bound L ρ {0, 1, 3} {3} 2 (by decide) (hz _ (by decide))
+  have hq7 := hlam (insert 2 {3}) (by decide)
+  have hr7 := ha 3
+  have hi8 := dS_inj_bound L ρ {0, 1, 3} {0} 4 (by decide) (hz _ (by decide))
+  have hq8 := hlam (insert 4 {0}) (by decide)
+  have hr8 := ha 0
+  have hi9 := dS_inj_bound L ρ {0, 1, 3} {1} 4 (by decide) (hz _ (by decide))
+  have hq9 := hlam (insert 4 {1}) (by decide)
+  have hr9 := ha 1
+  have hi10 := dS_inj_bound L ρ {0, 1, 3} {3} 4 (by decide) (hz _ (by decide))
+  have hq10 := hlam (insert 4 {3}) (by decide)
+  have hr10 := ha 3
+  have hi11 := dS_inj_bound L ρ {0, 1, 2} {2} 4 (by decide) (hz _ (by decide))
+  have hq11 := hlam (insert 4 {2}) (by decide)
+  have hr11 := ha 2
+  refine ⟨by omega, by omega, by omega, fun S hS hne => ?_⟩
+  have hcases : S = insert 2 {0} ∨ S = insert 2 {1} ∨ S = insert 2 {4} ∨ S = insert 3 {0} ∨ S = insert 3 {1} ∨ S = insert 3 {4} ∨ S = insert 2 {3} ∨ S = insert 4 {0} ∨ S = insert 4 {1} ∨ S = insert 4 {3} ∨ S = insert 4 {2} := by
+    revert S
+    decide
+  rcases hcases with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> omega
+

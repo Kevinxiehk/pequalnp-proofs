@@ -1,0 +1,31 @@
+ di_test4: all closed forms used in (P3), (P4) (to 3e-14).   di_resid: the residual system (R') (see DI5.3).
+ di_gr [NUMERICAL ONLY]: LM on Gr(k,17) with m = e_0 - e_1 fixed: k = 3: 9/10 converge, all (q, dim Nbar, dim zeta) = (3,0,0);
+   k = 4: 9/61 converge: types (3,0,1) (7x) and (2,1,1) (2x) -- exactly the types the proof leaves room for (plus the exact (1,1,2));
+   k = 5: 0/84 (calibrated by the 15% rate at k = 4: moderate evidence).
+
+### DI5.6 General m (e = 1) and e = 2, 3: what carries over, what does not (assessment; nothing here is a theorem unless marked)
+ RIGOROUS for every m: (G1) Lemma EQ.  (G2) every neutral column j (m_j = 0) has an exact C2: q_j = 0 on ALL of L' (also when kappa != 0),
+   so B_j is isometric on S and the neutral columns of N' = {s = 0} are isotropic lines, 0 if q = 3 or S is a nondegenerate plane (Lemma NB);
+   the deletion of a neutral column is a 4x4 level space.  (G3) symmetrisation in ANY pair (a,b), u = (y_a+y_b)/2, d = (y_a-y_b)/2:
+     perm(J_4 + [u,y_k,y_l,y_n]) = 24 + thetahat (m_a+m_b)/2,   perm[d,1+y_k,1+y_l,1+y_n] = thetahat (m_b-m_a)/2,
+     perm(J_4 + [u,u,y_k,y_l]) - perm[d,d,1+y_k,1+y_l] = 24 + thetahat m_j      (j not in {a,b}).
+ What is special about m = e_a - e_b and fails otherwise: (1) thetahat drops out of all equations except one (three neutral columns and
+   m_a + m_b = 0), so the symmetrised space has corrections QUADRATIC in d only; for general m the symmetrised space keeps the linear
+   term thetahat m^sym and one must carry the unknown forms theta_2, theta_3, theta_4;  (2) zeta_ab = {z : z(e_a-e_b)^T in L'} is at most
+   1-dim (an isotropic line of V) unless m is in span(e_a - e_b, 1 - e_a - e_b), so the mechanism "Lagrangian zeta" (third-kind example)
+   is specific to two-column m;  (3) the examples with general m (22 of 24) all contain the split free row e_i m^T, have kappa != 0 and
+   ker kappa strongly level of type (3,0) -- for them the natural route is rows' 3-row formulation (their (E1), (E2)), not this one.
+ FALSE shortcut (DI5.4): "kappa != 0 => ker kappa strongly level".   OPEN: is every e = 1 space either split (contains e_i m^T) or
+   two-column?  [All known (4,1) spaces are: 22 numerical split ones, and the two-column ones: rows' exact7b, t6, t22 (approx.), my third kind,
+   and the 9 LM hits of di_gr.]  If yes, TC5 plus the split case (rows' claim "3-row projection has dim <= 3") would give (DI_5) at e = 1.
+ e = 2, 3: Lemma EQ becomes  C(L'^pi) inside C(L')^pi; for a transposition with C(L') not inside {c_a = c_b} the fixed space
+   L'_ab = {y_a = y_b} has defect dimension <= e - 1.  So an INDUCTION ON e would follow from a bound on D_ab = {y_a - y_b}:
+     dim L' = dim L'_ab + dim D_ab <= (e - 1) + 3 + dim D_ab   (given (DI_5) for e - 1).
+   The needed statement "dim D_ab <= 1 for a suitable pair" is FALSE as stated already at e = 1 (third-kind example: dim L'' = 2, dim D = 2;
+   rows' exact7b: dim L'' = 3, dim D = 1): the correct invariant is the pair, and what TC5's proof establishes is exactly the trade-off
+     dim L'' + dim D <= 4   via   dim L' = q + dim Nbar + dim zeta   with   [dim zeta = 2 => dim L'' <= 2],  [q = 3 or S nondegenerate => Nbar = 0],
+     dim Nbar <= 2,  and the exclusion of (2,2,1).
+   A uniform argument would have to prove this trade-off for the symmetrised pair (Lbar, Qbar) with defect C cap {c_a = c_b}; the quadratic
+   stage (isometries of the neutral columns, Lagrangian zeta) is uniform, the cubic/quartic stage is not (it uses the explicit conic).
+   I do not see a uniform proof; for e = 2, 3 the realistic plan is: (a) neutral columns exist in all known examples (rows: C(L') = sum-zero
+   vectors on 3 columns for (5,2)), use (G2) there; (b) prove first the case where C(L') is spanned by two-column vectors.

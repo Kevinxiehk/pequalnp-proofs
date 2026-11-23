@@ -1,0 +1,157 @@
+
+def repl (i : Fin 4) (u : Fin 5 → ℂ) (N : M45) : M45 := fun p => if p.1 = i then u p.2 else N p
+
+theorem repl_at (i : Fin 4) (u : Fin 5 → ℂ) (N : M45) (j : Fin 5) : repl i u N (i, j) = u j := by
+  show (if i = i then u j else N (i, j)) = u j
+  rw [if_pos rfl]
+
+theorem repl_ne (i k : Fin 4) (hk : k ≠ i) (u : Fin 5 → ℂ) (N : M45) (j : Fin 5) :
+    repl i u N (k, j) = N (k, j) := by
+  show (if k = i then u j else N (k, j)) = N (k, j)
+  rw [if_neg hk]
+
+theorem P4_prod (a : Fin 5) (M : M45) : P4 a M = ∑ e : Fin 4 ↪ Fin 5,
+    if (e 0 ≠ a ∧ e 1 ≠ a ∧ e 2 ≠ a ∧ e 3 ≠ a) then ∏ k, M (k, e k) else 0 := by
+  unfold P4
+  refine Finset.sum_congr rfl (fun e _ => ?_)
+  rw [Fin.prod_univ_four]
+
+theorem repl_prod (i : Fin 4) (u : Fin 5 → ℂ) (N : M45) (e : Fin 4 ↪ Fin 5) :
+    ∏ k, repl i u N (k, e k) = u (e i) * ∏ k ∈ Finset.univ \ {i}, N (k, e k) := by
+  refine (Finset.prod_congr rfl (fun k _ => ?_)).trans
+    (Finset.prod_update_of_mem (Finset.mem_univ i) (fun k => N (k, e k)) (u (e i)))
+  by_cases h1 : k = i
+  · rw [h1, repl_at, Function.update_self]
+  · rw [repl_ne i k h1, Function.update_of_ne h1]
+
+theorem P4_repl_add (a : Fin 5) (i : Fin 4) (x y : Fin 5 → ℂ) (N : M45) :
+    P4 a (repl i (x + y) N) = P4 a (repl i x N) + P4 a (repl i y N) := by
+  rw [P4_prod, P4_prod, P4_prod, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl (fun e _ => ?_)
+  rw [repl_prod, repl_prod, repl_prod]
+  split_ifs
+  · simp only [Pi.add_apply]
+    ring
+  · ring
+
+theorem repl_self (i : Fin 4) (N : M45) : repl i (fun j => N (i, j)) N = N := by
+  funext ⟨k, j⟩
+  by_cases h : k = i
+  · rw [h, repl_at]
+  · rw [repl_ne i k h]
+
+def stk (r : Fin 5) (N : M45) (w : Fin 5 → ℂ) : M55 := ins r N + rowMat r w
+
+theorem stk_r (r : Fin 5) (N : M45) (w : Fin 5 → ℂ) (j : Fin 5) : stk r N w (r, j) = w j := by
+  have h1 : ins r N (r, j) = 0 := congrFun (rowP_ins r N) j
+  have h2 : rowMat r w (r, j) = w j := congrFun (rowP_rowMat r w) j
+  show ins r N (r, j) + rowMat r w (r, j) = w j
+  rw [h1, h2, zero_add]
+
+theorem stk_s (r : Fin 5) (N : M45) (w : Fin 5 → ℂ) (k : Fin 4) (j : Fin 5) :
+    stk r N w (r.succAbove k, j) = N (k, j) := by
+  have h1 : ins r N (r.succAbove k, j) = N (k, j) := congrFun (del_ins r N) (k, j)
+  have h2 : rowMat r w (r.succAbove k, j) = 0 := congrFun (del_rowMat r w) (k, j)
+  show ins r N (r.succAbove k, j) + rowMat r w (r.succAbove k, j) = N (k, j)
+  rw [h1, h2, add_zero]
+
+theorem per_stk (r : Fin 5) (N : M45) (w : Fin 5 → ℂ) :
+    ∑ f : Fin 5 ↪ Fin 5, ∏ k, stk r N w (k, f k) = ∑ a, w a * P4 a N := by
+  have h := perm5_row r (stk r N w)
+  have e : (fun p : Fin 4 × Fin 5 => stk r N w (r.succAbove p.1, p.2)) = N := by
+    funext p
+    exact stk_s r N w p.1 p.2
+  rw [e] at h
+  rw [h]
+  refine Finset.sum_congr rfl (fun a _ => ?_)
+  rw [stk_r]
+
+theorem per_rows (σ : Equiv.Perm (Fin 5)) (M : M55) :
+    ∑ f : Fin 5 ↪ Fin 5, ∏ k, M (σ k, f k) = ∑ f : Fin 5 ↪ Fin 5, ∏ k, M (k, f k) := by
+  refine (Finset.sum_congr rfl (fun f _ => ?_)).trans
+    (sum_emb_perm σ⁻¹ (fun f : Fin 5 ↪ Fin 5 => ∏ k, M (k, f k)))
+  exact Fintype.prod_equiv σ (fun k => M (σ k, f k))
+    (fun k => M (k, (σ⁻¹.toEmbedding.trans f) k)) (fun k => by simp)
+
+theorem P4_sym (r : Fin 5) (i : Fin 4) (w u : Fin 5 → ℂ) (N : M45) :
+    ∑ a, w a * P4 a (repl i u N) = ∑ a, u a * P4 a (repl i w N) := by
+  rw [← per_stk r (repl i u N) w, ← per_stk r (repl i w N) u,
+    ← per_rows (Equiv.swap r (r.succAbove i)) (stk r (repl i u N) w)]
+  refine Finset.sum_congr rfl (fun f _ => Finset.prod_congr rfl (fun k _ => ?_))
+  have hne : r.succAbove i ≠ r := Fin.succAbove_ne r i
+  by_cases hk : k = r
+  · rw [hk, Equiv.swap_apply_left, stk_s, stk_r, repl_at]
+  · obtain ⟨k', hk'⟩ := Fin.exists_succAbove_eq hk
+    rw [← hk']
+    by_cases hi : k' = i
+    · rw [hi, Equiv.swap_apply_right, stk_r, stk_s, repl_at]
+    · have h1 : r.succAbove k' ≠ r := Fin.succAbove_ne r k'
+      have h2 : r.succAbove k' ≠ r.succAbove i := fun h => hi (Fin.succAbove_right_injective h)
+      rw [Equiv.swap_apply_of_ne_of_ne h1 h2, stk_s, stk_s, repl_ne i k' hi, repl_ne i k' hi]
+
+def phiRow (i : Fin 4) (m : Fin 5 → ℂ) : M45 →ₗ[ℂ] ℂ where
+  toFun Y := m 0 * Y (i, 0) + m 1 * Y (i, 1) + m 2 * Y (i, 2) + m 3 * Y (i, 3) + m 4 * Y (i, 4)
+  map_add' Y Y' := by
+    simp only [Pi.add_apply]
+    ring
+  map_smul' c Y := by
+    simp only [Pi.smul_apply, smul_eq_mul, RingHom.id_apply]
+    ring
+
+theorem phiRow_apply (i : Fin 4) (m : Fin 5 → ℂ) (Y : M45) : phiRow i m Y =
+    m 0 * Y (i, 0) + m 1 * Y (i, 1) + m 2 * Y (i, 2) + m 3 * Y (i, 3) + m 4 * Y (i, 4) := rfl
+
+theorem ThmSplit (K : Submodule ℂ M45) (m : Fin 5 → ℂ) (hdef : DefLine K m)
+    (hm : ∑ a, m a = 0) (hmm : ∑ a, m a * m a ≠ 0) (i : Fin 4)
+    (hsplit : (fun p : Fin 4 × Fin 5 => if p.1 = i then m p.2 else 0) ∈ K) :
+    SLev (K ⊓ LinearMap.ker (phiRow i m)) ∧ Module.finrank ℂ K ≤ 4 := by
+  have hS : SLev (K ⊓ LinearMap.ker (phiRow i m)) := by
+    intro Y hY a
+    obtain ⟨hYK, hYφ⟩ := Submodule.mem_inf.mp hY
+    have hφ : m 0 * Y (i, 0) + m 1 * Y (i, 1) + m 2 * Y (i, 2) + m 3 * Y (i, 3)
+        + m 4 * Y (i, 4) = 0 := LinearMap.mem_ker.mp hYφ
+    obtain ⟨θ, hθ⟩ := hdef Y hYK
+    obtain ⟨θ1, hθ1⟩ := hdef _ (K.add_mem hYK hsplit)
+    have eN : repl i (fun j => 1 + Y (i, j)) (fun p => 1 + Y p) = fun p => 1 + Y p :=
+      repl_self i (fun p => 1 + Y p)
+    have eN1 : (fun p : Fin 4 × Fin 5 =>
+        1 + (Y + fun p : Fin 4 × Fin 5 => if p.1 = i then m p.2 else 0) p) =
+        repl i ((fun j => 1 + Y (i, j)) + m) (fun p => 1 + Y p) := by
+      funext ⟨k, j⟩
+      by_cases h : k = i
+      · rw [h, repl_at]
+        show 1 + (Y (i, j) + if i = i then m j else 0) = 1 + Y (i, j) + m j
+        rw [if_pos rfl]
+        ring
+      · rw [repl_ne i k h]
+        show 1 + (Y (k, j) + if k = i then m j else 0) = 1 + Y (k, j)
+        rw [if_neg h]
+        ring
+    have h0 : ∀ b, P4 b (repl i (fun j => 1 + Y (i, j)) (fun p => 1 + Y p)) = 24 + θ * m b := by
+      intro b
+      rw [eN]
+      exact hθ b
+    have hD : ∀ b, P4 b (repl i m (fun p => 1 + Y p)) = (θ1 - θ) * m b := by
+      intro b
+      have h1 := hθ1 b
+      rw [eN1] at h1
+      have hadd := P4_repl_add b i (fun j => 1 + Y (i, j)) m (fun p => 1 + Y p)
+      linear_combination h1 - h0 b - hadd
+    have hs := P4_sym 0 i m (fun j => 1 + Y (i, j)) (fun p => 1 + Y p)
+    rw [Fin.sum_univ_five, Fin.sum_univ_five] at hs
+    rw [h0 0, h0 1, h0 2, h0 3, h0 4, hD 0, hD 1, hD 2, hD 3, hD 4] at hs
+    rw [Fin.sum_univ_five] at hm hmm
+    have hθ0 : θ = 0 := by
+      have h4 : θ * (m 0 * m 0 + m 1 * m 1 + m 2 * m 2 + m 3 * m 3 + m 4 * m 4) = 0 := by
+        linear_combination hs + (θ1 - θ - 24) * hm + (θ1 - θ) * hφ
+      exact (mul_eq_zero.mp h4).resolve_right hmm
+    rw [hθ a, hθ0]
+    ring
+  refine ⟨hS, ?_⟩
+  have rn := rank_nullity K (phiRow i m)
+  have h1 : Module.finrank ℂ (K.map (phiRow i m)) ≤ 1 := by
+    have h := Submodule.finrank_le (K.map (phiRow i m))
+    rw [Module.finrank_self] at h
+    exact h
+  have h3 := LemmaSL _ hS
+  omega

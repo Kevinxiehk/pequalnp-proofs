@@ -1,0 +1,235 @@
+def tau (z : V4) : ℂ := z 0 + z 1 + z 2 + z 3
+
+def ip (x y : V4) : ℂ := x 0 * y 0 + x 1 * y 1 + x 2 * y 2 + x 3 * y 3
+
+def t3 (x y z : V4) : ℂ := x 0 * y 0 * z 0 + x 1 * y 1 * z 1 + x 2 * y 2 * z 2 + x 3 * y 3 * z 3
+
+def t4 (x y z w : V4) : ℂ :=
+  x 0 * y 0 * z 0 * w 0 + x 1 * y 1 * z 1 * w 1 + x 2 * y 2 * z 2 * w 2 + x 3 * y 3 * z 3 * w 3
+
+def br (x y z w : V4) : ℂ :=
+  -6 * t4 x y z w + ip x y * ip z w + ip x z * ip y w + ip x w * ip y z
+
+def col (N : M45) (m : Fin 5) : V4 := fun i => N (i, m)
+
+def pc (z1 z2 z3 z4 : V4) : ℂ :=
+  ∑ i, ∑ j, ∑ k, ∑ l, if i = j ∨ i = k ∨ i = l ∨ j = k ∨ j = l ∨ k = l then 0
+    else z1 i * z2 j * z3 k * z4 l
+
+theorem P4_c0 (N : M45) : P4 0 N = pc (col N 1) (col N 2) (col N 3) (col N 4) := by
+  rw [P4_eq]
+  simp (config := {decide := true}) only [pc, col, Fin.sum_univ_five, Fin.sum_univ_four,
+    ite_true, ite_false, add_zero, zero_add]
+  ring
+
+theorem P4_c1 (N : M45) : P4 1 N = pc (col N 0) (col N 2) (col N 3) (col N 4) := by
+  rw [P4_eq]
+  simp (config := {decide := true}) only [pc, col, Fin.sum_univ_five, Fin.sum_univ_four,
+    ite_true, ite_false, add_zero, zero_add]
+  ring
+
+theorem P4_c2 (N : M45) : P4 2 N = pc (col N 0) (col N 1) (col N 3) (col N 4) := by
+  rw [P4_eq]
+  simp (config := {decide := true}) only [pc, col, Fin.sum_univ_five, Fin.sum_univ_four,
+    ite_true, ite_false, add_zero, zero_add]
+  ring
+
+theorem P4_c3 (N : M45) : P4 3 N = pc (col N 0) (col N 1) (col N 2) (col N 4) := by
+  rw [P4_eq]
+  simp (config := {decide := true}) only [pc, col, Fin.sum_univ_five, Fin.sum_univ_four,
+    ite_true, ite_false, add_zero, zero_add]
+  ring
+
+theorem P4_c4 (N : M45) : P4 4 N = pc (col N 0) (col N 1) (col N 2) (col N 3) := by
+  rw [P4_eq]
+  simp (config := {decide := true}) only [pc, col, Fin.sum_univ_five, Fin.sum_univ_four,
+    ite_true, ite_false, add_zero, zero_add]
+  ring
+
+theorem sa0 : (0 : Fin 5).succAbove (0 : Fin 4) = 1 ∧ (0 : Fin 5).succAbove (1 : Fin 4) = 2 ∧
+    (0 : Fin 5).succAbove (2 : Fin 4) = 3 ∧ (0 : Fin 5).succAbove (3 : Fin 4) = 4 := by decide
+
+theorem sa1 : (1 : Fin 5).succAbove (0 : Fin 4) = 0 ∧ (1 : Fin 5).succAbove (1 : Fin 4) = 2 ∧
+    (1 : Fin 5).succAbove (2 : Fin 4) = 3 ∧ (1 : Fin 5).succAbove (3 : Fin 4) = 4 := by decide
+
+theorem sa2 : (2 : Fin 5).succAbove (0 : Fin 4) = 0 ∧ (2 : Fin 5).succAbove (1 : Fin 4) = 1 ∧
+    (2 : Fin 5).succAbove (2 : Fin 4) = 3 ∧ (2 : Fin 5).succAbove (3 : Fin 4) = 4 := by decide
+
+theorem sa3 : (3 : Fin 5).succAbove (0 : Fin 4) = 0 ∧ (3 : Fin 5).succAbove (1 : Fin 4) = 1 ∧
+    (3 : Fin 5).succAbove (2 : Fin 4) = 2 ∧ (3 : Fin 5).succAbove (3 : Fin 4) = 4 := by decide
+
+theorem sa4 : (4 : Fin 5).succAbove (0 : Fin 4) = 0 ∧ (4 : Fin 5).succAbove (1 : Fin 4) = 1 ∧
+    (4 : Fin 5).succAbove (2 : Fin 4) = 2 ∧ (4 : Fin 5).succAbove (3 : Fin 4) = 3 := by decide
+
+theorem P4_cols (m : Fin 5) (N : M45) : P4 m N = pc (col N (m.succAbove 0)) (col N (m.succAbove 1))
+    (col N (m.succAbove 2)) (col N (m.succAbove 3)) := by
+  revert m
+  apply fin5
+  · rw [sa0.1, sa0.2.1, sa0.2.2.1, sa0.2.2.2]
+    exact P4_c0 N
+  · rw [sa1.1, sa1.2.1, sa1.2.2.1, sa1.2.2.2]
+    exact P4_c1 N
+  · rw [sa2.1, sa2.2.1, sa2.2.2.1, sa2.2.2.2]
+    exact P4_c2 N
+  · rw [sa3.1, sa3.2.1, sa3.2.2.1, sa3.2.2.2]
+    exact P4_c3 N
+  · rw [sa4.1, sa4.2.1, sa4.2.2.1, sa4.2.2.2]
+    exact P4_c4 N
+
+theorem pc_tau (z1 z2 z3 z4 : V4) : pc z1 z2 z3 z4 =
+    tau z1 * tau z2 * tau z3 * tau z4
+    - (ip z1 z2 * tau z3 * tau z4 + ip z1 z3 * tau z2 * tau z4 + ip z1 z4 * tau z2 * tau z3
+      + ip z2 z3 * tau z1 * tau z4 + ip z2 z4 * tau z1 * tau z3 + ip z3 z4 * tau z1 * tau z2)
+    + 2 * (tau z1 * t3 z2 z3 z4 + tau z2 * t3 z1 z3 z4 + tau z3 * t3 z1 z2 z4
+      + tau z4 * t3 z1 z2 z3)
+    + br z1 z2 z3 z4 := by
+  simp (config := {decide := true}) only [pc, tau, ip, t3, t4, br, Fin.sum_univ_four,
+    ite_true, ite_false, add_zero, zero_add]
+  ring
+
+theorem pc_expand (z1 z2 z3 z4 : V4) (c : ℂ) :
+    pc (fun i => 1 + c * z1 i) (fun i => 1 + c * z2 i) (fun i => 1 + c * z3 i)
+      (fun i => 1 + c * z4 i) =
+    24 + c * (6 * (tau z1 + tau z2 + tau z3 + tau z4))
+    + c ^ 2 * (2 * (tau z1 * tau z2 + tau z1 * tau z3 + tau z1 * tau z4 + tau z2 * tau z3
+        + tau z2 * tau z4 + tau z3 * tau z4)
+      - 2 * (ip z1 z2 + ip z1 z3 + ip z1 z4 + ip z2 z3 + ip z2 z4 + ip z3 z4))
+    + c ^ 3 * ((tau z1 * tau z2 * tau z3 - tau z1 * ip z2 z3 - tau z2 * ip z1 z3
+          - tau z3 * ip z1 z2 + 2 * t3 z1 z2 z3)
+        + (tau z1 * tau z2 * tau z4 - tau z1 * ip z2 z4 - tau z2 * ip z1 z4
+          - tau z4 * ip z1 z2 + 2 * t3 z1 z2 z4)
+        + (tau z1 * tau z3 * tau z4 - tau z1 * ip z3 z4 - tau z3 * ip z1 z4
+          - tau z4 * ip z1 z3 + 2 * t3 z1 z3 z4)
+        + (tau z2 * tau z3 * tau z4 - tau z2 * ip z3 z4 - tau z3 * ip z2 z4
+          - tau z4 * ip z2 z3 + 2 * t3 z2 z3 z4))
+    + c ^ 4 * pc z1 z2 z3 z4 := by
+  simp (config := {decide := true}) only [pc, tau, ip, t3, Fin.sum_univ_four,
+    ite_true, ite_false, add_zero, zero_add]
+  ring
+
+theorem coeffs (z1 z2 z3 z4 : V4)
+    (h : ∀ c : ℂ, pc (fun i => 1 + c * z1 i) (fun i => 1 + c * z2 i) (fun i => 1 + c * z3 i)
+      (fun i => 1 + c * z4 i) = 24) :
+    tau z1 + tau z2 + tau z3 + tau z4 = 0 ∧
+    (2 * (tau z1 * tau z2 + tau z1 * tau z3 + tau z1 * tau z4 + tau z2 * tau z3
+        + tau z2 * tau z4 + tau z3 * tau z4)
+      - 2 * (ip z1 z2 + ip z1 z3 + ip z1 z4 + ip z2 z3 + ip z2 z4 + ip z3 z4) = 0) ∧
+    ((tau z1 * tau z2 * tau z3 - tau z1 * ip z2 z3 - tau z2 * ip z1 z3
+          - tau z3 * ip z1 z2 + 2 * t3 z1 z2 z3)
+        + (tau z1 * tau z2 * tau z4 - tau z1 * ip z2 z4 - tau z2 * ip z1 z4
+          - tau z4 * ip z1 z2 + 2 * t3 z1 z2 z4)
+        + (tau z1 * tau z3 * tau z4 - tau z1 * ip z3 z4 - tau z3 * ip z1 z4
+          - tau z4 * ip z1 z3 + 2 * t3 z1 z3 z4)
+        + (tau z2 * tau z3 * tau z4 - tau z2 * ip z3 z4 - tau z3 * ip z2 z4
+          - tau z4 * ip z2 z3 + 2 * t3 z2 z3 z4) = 0) ∧
+    pc z1 z2 z3 z4 = 0 := by
+  have e1 := h 1
+  have e2 := h (-1)
+  have e3 := h 2
+  have e4 := h (-2)
+  rw [pc_expand] at e1 e2 e3 e4
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · linear_combination (1 / 9 : ℂ) * (e1 - e2) - (1 / 72 : ℂ) * (e3 - e4)
+  · linear_combination (2 / 3 : ℂ) * (e1 + e2) - (1 / 24 : ℂ) * (e3 + e4)
+  · linear_combination (1 / 12 : ℂ) * (e3 - e4) - (1 / 6 : ℂ) * (e1 - e2)
+  · linear_combination (1 / 24 : ℂ) * (e3 + e4) - (1 / 6 : ℂ) * (e1 + e2)
+
+theorem coeffs0 (z1 z2 z3 z4 : V4)
+    (h : ∀ c : ℂ, pc (fun i => 1 + c * z1 i) (fun i => 1 + c * z2 i) (fun i => 1 + c * z3 i)
+      (fun i => 1 + c * z4 i) = 24)
+    (h1 : tau z1 = 0) (h2 : tau z2 = 0) (h3 : tau z3 = 0) (h4 : tau z4 = 0) :
+    ip z1 z2 + ip z1 z3 + ip z1 z4 + ip z2 z3 + ip z2 z4 + ip z3 z4 = 0 ∧
+    t3 z1 z2 z3 + t3 z1 z2 z4 + t3 z1 z3 z4 + t3 z2 z3 z4 = 0 ∧
+    br z1 z2 z3 z4 = 0 := by
+  obtain ⟨_, a2, a3, a4⟩ := coeffs z1 z2 z3 z4 h
+  rw [pc_tau] at a4
+  rw [h1, h2, h3, h4] at a2 a3 a4
+  refine ⟨?_, ?_, ?_⟩
+  · linear_combination (-1 / 2 : ℂ) * a2
+  · linear_combination (1 / 2 : ℂ) * a3
+  · linear_combination a4
+
+theorem sl_cols (K : Submodule ℂ M45) (hK : SLev K) (Y : M45) (hY : Y ∈ K) (m : Fin 5) (c : ℂ) :
+    pc (fun i => 1 + c * col Y (m.succAbove 0) i) (fun i => 1 + c * col Y (m.succAbove 1) i)
+      (fun i => 1 + c * col Y (m.succAbove 2) i) (fun i => 1 + c * col Y (m.succAbove 3) i) = 24 := by
+  have h := hK (c • Y) (K.smul_mem c hY) m
+  rw [P4_cols] at h
+  exact h
+
+def rs : M45 →ₗ[ℂ] V4 :=
+  LinearMap.pi fun i => ∑ j, LinearMap.proj (i, j)
+
+theorem rs_apply (Y : M45) (i : Fin 4) :
+    rs Y i = Y (i, 0) + Y (i, 1) + Y (i, 2) + Y (i, 3) + Y (i, 4) := by
+  simp [rs, LinearMap.sum_apply, Fin.sum_univ_five]
+
+theorem C1 (K : Submodule ℂ M45) (hK : SLev K) (Y : M45) (hY : Y ∈ K) :
+    ∀ m, tau (col Y m) = 0 := by
+  have a0 := (coeffs _ _ _ _ (sl_cols K hK Y hY 0)).1
+  have a1 := (coeffs _ _ _ _ (sl_cols K hK Y hY 1)).1
+  have a2 := (coeffs _ _ _ _ (sl_cols K hK Y hY 2)).1
+  have a3 := (coeffs _ _ _ _ (sl_cols K hK Y hY 3)).1
+  have a4 := (coeffs _ _ _ _ (sl_cols K hK Y hY 4)).1
+  rw [sa0.1, sa0.2.1, sa0.2.2.1, sa0.2.2.2] at a0
+  rw [sa1.1, sa1.2.1, sa1.2.2.1, sa1.2.2.2] at a1
+  rw [sa2.1, sa2.2.1, sa2.2.2.1, sa2.2.2.2] at a2
+  rw [sa3.1, sa3.2.1, sa3.2.2.1, sa3.2.2.2] at a3
+  rw [sa4.1, sa4.2.1, sa4.2.2.1, sa4.2.2.2] at a4
+  apply fin5
+  · linear_combination (1 / 4 : ℂ) * (a0 + a1 + a2 + a3 + a4) - a0
+  · linear_combination (1 / 4 : ℂ) * (a0 + a1 + a2 + a3 + a4) - a1
+  · linear_combination (1 / 4 : ℂ) * (a0 + a1 + a2 + a3 + a4) - a2
+  · linear_combination (1 / 4 : ℂ) * (a0 + a1 + a2 + a3 + a4) - a3
+  · linear_combination (1 / 4 : ℂ) * (a0 + a1 + a2 + a3 + a4) - a4
+
+theorem C34 (K : Submodule ℂ M45) (hK : SLev K) (Y : M45) (hY : Y ∈ K) (m : Fin 5) :
+    ip (col Y (m.succAbove 0)) (col Y (m.succAbove 1))
+      + ip (col Y (m.succAbove 0)) (col Y (m.succAbove 2))
+      + ip (col Y (m.succAbove 0)) (col Y (m.succAbove 3))
+      + ip (col Y (m.succAbove 1)) (col Y (m.succAbove 2))
+      + ip (col Y (m.succAbove 1)) (col Y (m.succAbove 3))
+      + ip (col Y (m.succAbove 2)) (col Y (m.succAbove 3)) = 0 ∧
+    t3 (col Y (m.succAbove 0)) (col Y (m.succAbove 1)) (col Y (m.succAbove 2))
+      + t3 (col Y (m.succAbove 0)) (col Y (m.succAbove 1)) (col Y (m.succAbove 3))
+      + t3 (col Y (m.succAbove 0)) (col Y (m.succAbove 2)) (col Y (m.succAbove 3))
+      + t3 (col Y (m.succAbove 1)) (col Y (m.succAbove 2)) (col Y (m.succAbove 3)) = 0 ∧
+    br (col Y (m.succAbove 0)) (col Y (m.succAbove 1)) (col Y (m.succAbove 2))
+      (col Y (m.succAbove 3)) = 0 :=
+  coeffs0 _ _ _ _ (sl_cols K hK Y hY m) (C1 K hK Y hY _) (C1 K hK Y hY _) (C1 K hK Y hY _)
+    (C1 K hK Y hY _)
+
+theorem C2 (K : Submodule ℂ M45) (hK : SLev K) (Y : M45) (hY : Y ∈ K) :
+    ∀ m, ip (col Y m) (col Y m) = ip (rs Y) (col Y m) := by
+  have b0 := (C34 K hK Y hY 0).1
+  have b1 := (C34 K hK Y hY 1).1
+  have b2 := (C34 K hK Y hY 2).1
+  have b3 := (C34 K hK Y hY 3).1
+  have b4 := (C34 K hK Y hY 4).1
+  rw [sa0.1, sa0.2.1, sa0.2.2.1, sa0.2.2.2] at b0
+  rw [sa1.1, sa1.2.1, sa1.2.2.1, sa1.2.2.2] at b1
+  rw [sa2.1, sa2.2.1, sa2.2.2.1, sa2.2.2.2] at b2
+  rw [sa3.1, sa3.2.1, sa3.2.2.1, sa3.2.2.2] at b3
+  rw [sa4.1, sa4.2.1, sa4.2.2.1, sa4.2.2.2] at b4
+  simp only [ip, col] at b0 b1 b2 b3 b4
+  apply fin5
+  · simp only [ip, col, rs_apply]
+    linear_combination b0 - (1 / 3 : ℂ) * (b0 + b1 + b2 + b3 + b4)
+  · simp only [ip, col, rs_apply]
+    linear_combination b1 - (1 / 3 : ℂ) * (b0 + b1 + b2 + b3 + b4)
+  · simp only [ip, col, rs_apply]
+    linear_combination b2 - (1 / 3 : ℂ) * (b0 + b1 + b2 + b3 + b4)
+  · simp only [ip, col, rs_apply]
+    linear_combination b3 - (1 / 3 : ℂ) * (b0 + b1 + b2 + b3 + b4)
+  · simp only [ip, col, rs_apply]
+    linear_combination b4 - (1 / 3 : ℂ) * (b0 + b1 + b2 + b3 + b4)
+
+theorem C2pol (K : Submodule ℂ M45) (hK : SLev K) (Y Y' : M45) (hY : Y ∈ K) (hY' : Y' ∈ K)
+    (m : Fin 5) :
+    2 * ip (col Y m) (col Y' m) = ip (rs Y) (col Y' m) + ip (rs Y') (col Y m) := by
+  have e1 := C2 K hK Y hY m
+  have e2 := C2 K hK Y' hY' m
+  have e3 := C2 K hK (Y + Y') (K.add_mem hY hY') m
+  rw [map_add] at e3
+  simp only [ip, col, Pi.add_apply] at e1 e2 e3 ⊢
+  linear_combination e3 - e1 - e2
+

@@ -1,0 +1,32 @@
+   (c2) k = 3, lines (v,v,v') on columns (3,4,5), v != v'. Put a := l_3+l_4, b := l_5, t_3 := tau(v^3), t_21 := tau(v^2 v'),
+     t_12 := tau(v v'^2), t_03 := tau(v'^3), g := <v,v'> != 0; u = -(a v + b v')/2, Qbar = a b g/2 on Nbar. Closed forms (checked, di_test4.py):
+       -2 Tbar_1 = l_3 l_4 (a t_3 - b t_21) + a b (a t_21 + b t_12),      [u,z_3,z_4,z_5] = l_3 l_4 b ( 3 tau(v^3 v') a + (3 tau(v^2 v'^2) - g^2) b ),
+       Tbar_5 = a tau(u^2 v) + 2 l_3 l_4 tau(u v^2),   Tbar_3 = l_4 tau(u^2 v) + b tau(u^2 v') + 2 l_4 b tau(u v v'),   Tbar_4 = same with l_3,
+       tau(u^2 v) = (a^2 t_3 + 2ab t_21 + b^2 t_12)/4, tau(u^2 v') = (a^2 t_21 + 2ab t_12 + b^2 t_03)/4, tau(u v^2) = -(a t_3 + b t_21)/2,
+       tau(u v v') = -(a t_21 + b t_12)/2;     (C3'):  Tbar_5 = a F_v(d),  Tbar_3 = l_4 F_v(d) + b F_{v'}(d),  Tbar_4 = l_3 F_v(d) + b F_{v'}(d).
+     (c2-i) a, b independent on Nbar. Then Qbar has rank 2 and d : N' -> zeta^perp is bijective, so F_v, F_{v'} are quadratic forms in N'.
+       If l_3 - l_4 is not == 0: Tbar_4 - Tbar_3 gives F_v = (a^2 t_3 - 2ab t_21 - 3 b^2 t_12)/4; with Tbar_5 = a F_v:
+       l_3 l_4 (a t_3 + b t_21) = a b (a t_21 + b t_12); with Tbar_1 = 0: 2 a l_3 l_4 t_3 = 0, so t_3 = 0, v = chi_1; then
+       (a^2 - l_3 l_4) t_21 + a b t_12 = 0 with a^2 - l_3 l_4 = (3a^2 + (l_3-l_4)^2)/4 forces t_12 = 0 and (t_21 = 0 or (l_3-l_4)^2 = -3a^2);
+       t_12 = tau(chi_1 v'^2) = 0 with t_21 = <chi_2,v'> != 0 is impossible (v' = v(th): 8 th), so t_21 = 0, v' = chi_3, F_{chi_1} = 0 on zeta^perp.
+       If l_3 = l_4 on Nbar: F_v = b(a t_21 + b t_12)/4 and b F_{v'} = a^3 t_3/8 - a^2 b t_21/8 + b^3 t_03/4, so t_3 = 0; Tbar_1 = 0 gives
+       (3/4) a^2 b t_21 + a b^2 t_12 = 0, so t_21 = t_12 = 0, v' = chi_3, F_{chi_1} = 0 on zeta^perp.  Both contradict the nondegeneracy of F_{chi_1}.
+     (c2-ii) Nbar = {l_3 + l_4 = c l_5}, c != 0 (coordinates b, l_3 - l_4): the same two steps give t_3 = 0, then Tbar_1 = 0 gives
+       t_21 = t_12 = 0, so (v,v') = (chi_1,chi_3), and the bracket of the u-deletion is l_3 l_4 b^2 (3 tau(chi_1^2 chi_3^2) - 16) = -4 l_3 l_4 b^2. Contradiction.
+     (c2-iii) Nbar = {l_3 + l_4 = 0} = {[-b v'/2, -b v'/2, l v, -l v, b v']}: Tbar_1 = 0 and the u-bracket give t_21 = 0 and 3 tau(v^2 v'^2) = g^2
+       (equivalently [v,v,v',v'] = 0); Qbar = 0 on Nbar, so D_N is Q-isotropic; (C3') gives F_v(d) = -(3/4) t_12 b^2, F_{v'}(d) = (t_03/4) b^2.
+       - D_N = zeta: Nbar = N'' would be a DC strongly level plane of type III (classes {3,4} and {1,2,5}): excluded by (G23).
+       - D_N Lagrangian: d(Z) = (t + lam l) z + b d_b (if the l-direction of d were not in C z, F_v = F_{v'} = 0 on D_N, so v, v' would both be
+         orthogonal to E_{D_N}, of dim >= 2). By (Z2) v and v' are orthogonal to E(z) and E(z,d_b); so these two span at most a line.
+         tau(z) = 0 (z = z_0): E(z_0) = z_0^2 and E(z_0,z_1) proportional force the M_2 shape (LAG proof), z_0^2 isotropic, v = v'. Contradiction.
+         tau(z) = 1, E(z,z_0) = 0: then z = (1,1,1,-1)/2 = h/2 on a zero-row z_0, E(z) = (-1,-1,-1,3)/4, {v,v'} = {zeta_0, conj zeta_0}, and
+           (Z2) requires perm[z,z,v,v'] = 0, but perm[h,h,zeta_0,conj zeta_0] = 6. Contradiction.
+         (R') tau(z) = 1, E(z,z_0) != 0, E(z) in C E(z,z_0):  NOT EXCLUDED BY HAND.  Necessary conditions: with B := b_0^2 != 0,
+           e1: tau(v^2 v') = 0;  e2: 3 tau(v^2 v'^2) = <v,v'>^2;  e3-e6: v, v' orthogonal to E(z,z_0) and E(z);
+           e7: <v,z_0^2> = -(3/4) tau(v v'^2) B;  e8: <v',z_0^2> = (tau(v'^3)/4) B;
+           e9-e12: perm[z,z,v,v] = perm[z,z,v,v'] = perm[z_0,z,v,v] = perm[z_0,z,v,v'] = 0;
+           e13: perm[z_0,z_0,v,v] = 0;  e14: perm[z_0,z_0,v,v'] = -(3/2) B tau(v v'^3)       (5 unknowns: th_v, th_v', th_0, alpha, B).
+           [NUMERICAL ONLY, verifyfl/di_resid.py: 1782 LM starts on e1..e14: no zero at all (best residual 9.3); the same solver solves the
+            calibrating subsystems (e1..e6: 89 solutions in 432 starts, ALL of the M_2 shape excluded above by e10; two square subsystems:
+            17/96 and 53/147).  So (R') is empty numerically; a hand proof needs "e1-e6 imply E(z,z_0) = 0".]
+ QED (rigorous except for the sub-branch (R'), which is excluded numerically only)

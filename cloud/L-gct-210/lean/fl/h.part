@@ -1,0 +1,289 @@
+def cperm (σ : Equiv.Perm (Fin 5)) : M45 →ₗ[ℂ] M45 :=
+  LinearMap.funLeft ℂ ℂ (fun p : Fin 4 × Fin 5 => (p.1, σ p.2))
+
+theorem cperm_apply (σ : Equiv.Perm (Fin 5)) (Y : M45) (p : Fin 4 × Fin 5) :
+    cperm σ Y p = Y (p.1, σ p.2) := rfl
+
+theorem P4_perm (σ : Equiv.Perm (Fin 5)) (a : Fin 5) (N : M45) :
+    P4 a (fun p => N (p.1, σ p.2)) = P4 (σ a) N := by
+  have h := (Equiv.embeddingCongr (Equiv.refl (Fin 4)) σ).sum_comp
+    (fun e : Fin 4 ↪ Fin 5 => if (e 0 ≠ σ a ∧ e 1 ≠ σ a ∧ e 2 ≠ σ a ∧ e 3 ≠ σ a) then
+      N (0, e 0) * N (1, e 1) * N (2, e 2) * N (3, e 3) else 0)
+  unfold P4
+  rw [← h]
+  refine Finset.sum_congr rfl fun e _ => ?_
+  simp [Equiv.embeddingCongr_apply]
+
+theorem SLev_perm (σ : Equiv.Perm (Fin 5)) (N : Submodule ℂ M45) (hN : SLev N) :
+    SLev (N.map (cperm σ)) := by
+  intro Y hY a
+  obtain ⟨Y0, hY0, rfl⟩ := hY
+  have h := P4_perm σ a (fun p => 1 + Y0 p)
+  exact h.trans (hN Y0 hY0 (σ a))
+
+theorem pattern23 (N : Submodule ℂ M45) (hN : SLev N) (z : M45) (hz : z ∈ N)
+    (σ : Equiv.Perm (Fin 5)) (v w : V4) (hv1 : tau v = 0) (hv2 : ip v v = 0)
+    (hw1 : tau w = 0) (hw2 : ip w w = 0) (hi : indep v w) (μ ν1 ν2 ν3 : ℂ) (hμ : μ ≠ 0)
+    (h1 : ν1 ≠ 0) (h2 : ν2 ≠ 0) (h3 : ν3 ≠ 0) (c0 : col z (σ 0) = μ • v)
+    (c1 : col z (σ 1) = (-μ) • v) (c2 : col z (σ 2) = ν1 • w) (c3 : col z (σ 3) = ν2 • w)
+    (c4 : col z (σ 4) = ν3 • w) : False := by
+  have hNσ := SLev_perm σ N hN
+  have hzσ : cperm σ z ∈ N.map (cperm σ) := Submodule.mem_map_of_mem hz
+  have k0 := C34 _ hNσ _ hzσ 0
+  have k1 := C34 _ hNσ _ hzσ 1
+  have k2 := C34 _ hNσ _ hzσ 2
+  rw [sa0.1, sa0.2.1, sa0.2.2.1, sa0.2.2.2] at k0
+  rw [sa1.1, sa1.2.1, sa1.2.2.1, sa1.2.2.2] at k1
+  rw [sa2.1, sa2.2.1, sa2.2.2.1, sa2.2.2.2] at k2
+  have d0 : col (cperm σ z) 0 = μ • v := c0
+  have d1 : col (cperm σ z) 1 = (-μ) • v := c1
+  have d2 : col (cperm σ z) 2 = ν1 • w := c2
+  have d3 : col (cperm σ z) 3 = ν2 • w := c3
+  have d4 : col (cperm σ z) 4 = ν3 • w := c4
+  rw [d1, d2, d3, d4] at k0
+  rw [d0, d2, d3, d4] at k1
+  rw [d0, d1, d3, d4] at k2
+  exact G23 v w hv1 hv2 hw1 hw2 hi μ ν1 ν2 ν3 hμ h1 h2 h3 k0.2.1 k1.2.1 k0.2.2 k2.2.2
+
+theorem indep_symm {v w : V4} (h : indep v w) : indep w v := fun s t e => by
+  have h1 := h t s (by rw [add_comm]; exact e)
+  exact ⟨h1.2, h1.1⟩
+
+theorem sum_cols (Z : M45) : ∑ m, col Z m = rs Z := by
+  funext i
+  rw [Finset.sum_apply, Fin.sum_univ_five, rs_apply]
+  rfl
+
+theorem perm_four (a b c d : Fin 5) (hab : a ≠ b) (hac : a ≠ c) (had : a ≠ d) (hbc : b ≠ c)
+    (hbd : b ≠ d) (hcd : c ≠ d) :
+    ∃ σ : Equiv.Perm (Fin 5), σ 0 = a ∧ σ 1 = b ∧ σ 2 = c ∧ σ 3 = d := by
+  obtain ⟨σ1, h0, h1, h2⟩ := perm_three a b c hab hac hbc
+  have hd0 : (0 : Fin 5) ≠ σ1.symm d := by
+    intro h
+    apply had
+    rw [← h0, h, Equiv.apply_symm_apply]
+  have hd1 : (1 : Fin 5) ≠ σ1.symm d := by
+    intro h
+    apply hbd
+    rw [← h1, h, Equiv.apply_symm_apply]
+  have hd2 : (2 : Fin 5) ≠ σ1.symm d := by
+    intro h
+    apply hcd
+    rw [← h2, h, Equiv.apply_symm_apply]
+  refine ⟨σ1 * Equiv.swap 3 (σ1.symm d), ?_, ?_, ?_, ?_⟩
+  · rw [Equiv.Perm.mul_apply, Equiv.swap_apply_of_ne_of_ne (by decide) hd0, h0]
+  · rw [Equiv.Perm.mul_apply, Equiv.swap_apply_of_ne_of_ne (by decide) hd1, h1]
+  · rw [Equiv.Perm.mul_apply, Equiv.swap_apply_of_ne_of_ne (by decide) hd2, h2]
+  · rw [Equiv.Perm.mul_apply, Equiv.swap_apply_left, Equiv.apply_symm_apply]
+
+def swp : Equiv.Perm (Fin 5) := Equiv.swap 0 2 * Equiv.swap 1 3
+
+theorem swp0 : swp 0 = 2 := by decide
+
+theorem swp1 : swp 1 = 3 := by decide
+
+theorem swp2 : swp 2 = 0 := by decide
+
+theorem swp3 : swp 3 = 1 := by decide
+
+theorem swp4 : swp 4 = 4 := by decide
+
+theorem LemA2_proof : LemA2 := by
+  intro N hN hrs z hz hmax a b hab hspan
+  have hua1 := C1 N hN z hz a
+  have hua2 := Niso N hN hrs z z hz hz a
+  have hub1 := C1 N hN z hz b
+  have hub2 := Niso N hN hrs z z hz hz b
+  choose sc tc hst using hspan
+  have hua0 : col z a ≠ 0 := by
+    intro h
+    have h1 := (hab 1 0 (by rw [h]; simp)).1
+    exact one_ne_zero h1
+  have hh : ip (col z a) (col z b) ≠ 0 := by
+    intro h
+    obtain ⟨c, hc⟩ := Q4 (col z a) (col z b) hua0 hua1 hua2 hub1 hub2 h
+    have h1 := (hab c (-1) (by rw [hc]; simp)).2
+    norm_num at h1
+  have F1 : ∀ m, sc m * tc m = 0 := by
+    intro m
+    have e := Niso N hN hrs z z hz hz m
+    rw [hst m] at e
+    have e2 : 2 * (sc m * tc m) * ip (col z a) (col z b) = 0 := by
+      simp only [ip, Pi.add_apply, Pi.smul_apply, smul_eq_mul] at e hua2 hub2 ⊢
+      linear_combination e - sc m ^ 2 * hua2 - tc m ^ 2 * hub2
+    rcases mul_eq_zero.mp e2 with h | h
+    · rcases mul_eq_zero.mp h with h' | h'
+      · norm_num at h'
+      · exact h'
+    · exact absurd h hh
+  have F2a : sc a = 1 ∧ tc a = 0 := by
+    have e := hst a
+    have h := hab (sc a - 1) (tc a) (by
+      funext i
+      have hi := congrFun e i
+      simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at hi ⊢
+      linear_combination (-1 : ℂ) * hi)
+    exact ⟨sub_eq_zero.mp h.1, h.2⟩
+  have F2b : sc b = 0 ∧ tc b = 1 := by
+    have e := hst b
+    have h := hab (sc b) (tc b - 1) (by
+      funext i
+      have hi := congrFun e i
+      simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at hi ⊢
+      linear_combination (-1 : ℂ) * hi)
+    exact ⟨h.1, sub_eq_zero.mp h.2⟩
+  have F3 : (∑ m, sc m) = 0 ∧ (∑ m, tc m) = 0 := by
+    apply hab
+    funext i
+    simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply]
+    have e1 : ∑ m, col z m i = 0 := by
+      have h := congrFun (sum_cols z) i
+      rw [Finset.sum_apply, hrs z hz] at h
+      exact h
+    have e2 : ∑ m, col z m i = (∑ m, sc m) * col z a i + (∑ m, tc m) * col z b i := by
+      rw [Finset.sum_mul, Finset.sum_mul, ← Finset.sum_add_distrib]
+      refine Finset.sum_congr rfl fun m _ => ?_
+      have h := congrFun (hst m) i
+      simpa only [Pi.add_apply, Pi.smul_apply, smul_eq_mul] using h
+    rw [← e2]
+    exact e1
+  obtain ⟨a', ha'a, hsa'⟩ : ∃ a', a' ≠ a ∧ sc a' ≠ 0 := by
+    by_contra hcon
+    have hz0 : ∀ m, m ≠ a → sc m = 0 := by
+      intro m hm
+      by_contra h
+      exact hcon ⟨m, hm, h⟩
+    have h1 : ∑ m, sc m = sc a :=
+      Finset.sum_eq_single a (fun m _ hm => hz0 m hm) (fun h => absurd (Finset.mem_univ a) h)
+    rw [F3.1, F2a.1] at h1
+    exact zero_ne_one h1
+  obtain ⟨b', hb'b, htb'⟩ : ∃ b', b' ≠ b ∧ tc b' ≠ 0 := by
+    by_contra hcon
+    have hz0 : ∀ m, m ≠ b → tc m = 0 := by
+      intro m hm
+      by_contra h
+      exact hcon ⟨m, hm, h⟩
+    have h1 : ∑ m, tc m = tc b :=
+      Finset.sum_eq_single b (fun m _ hm => hz0 m hm) (fun h => absurd (Finset.mem_univ b) h)
+    rw [F3.2, F2b.2] at h1
+    exact zero_ne_one h1
+  have hta' : tc a' = 0 := (mul_eq_zero.mp (F1 a')).resolve_left hsa'
+  have hsb' : sc b' = 0 := (mul_eq_zero.mp (F1 b')).resolve_right htb'
+  have hne_ab : a ≠ b := by
+    intro h
+    apply one_ne_zero (α := ℂ)
+    rw [← F2a.1, h, F2b.1]
+  have hne_ab' : a ≠ b' := by
+    intro h
+    apply htb'
+    rw [← h, F2a.2]
+  have hne_a'b : a' ≠ b := by
+    intro h
+    apply hsa'
+    rw [h, F2b.1]
+  have hne_a'b' : a' ≠ b' := by
+    intro h
+    apply htb'
+    rw [← h, hta']
+  obtain ⟨σ, h0, h1, h2, h3⟩ := perm_four a a' b b' ha'a.symm hne_ab hne_ab' hne_a'b hne_a'b'
+    hb'b.symm
+  have hSs : sc a + sc a' + sc b + sc b' + sc (σ 4) = 0 := by
+    have h : ∑ j, sc (σ j) = ∑ m, sc m := Equiv.sum_comp σ sc
+    rw [Fin.sum_univ_five, F3.1, h0, h1, h2, h3] at h
+    exact h
+  have hSt : tc a + tc a' + tc b + tc b' + tc (σ 4) = 0 := by
+    have h : ∑ j, tc (σ j) = ∑ m, tc m := Equiv.sum_comp σ tc
+    rw [Fin.sum_univ_five, F3.2, h0, h1, h2, h3] at h
+    exact h
+  rw [F2a.1, F2b.1, hsb'] at hSs
+  rw [F2a.2, F2b.2, hta'] at hSt
+  have za : col z a' = sc a' • col z a := by
+    rw [hst a', hta', zero_smul, add_zero]
+  have zb : col z b' = tc b' • col z b := by
+    rw [hst b', hsb', zero_smul, zero_add]
+  by_cases hse : sc (σ 4) = 0
+  · by_cases hte : tc (σ 4) = 0
+    · have ze : col z (σ 4) = 0 := by
+        rw [hst (σ 4), hse, hte, zero_smul, zero_smul, add_zero]
+      have hN1 : SLev (N ⊓ LinearMap.ker (colL a) : Submodule ℂ M45) :=
+        SLev_mono hN inf_le_left
+      have hrs1 : ∀ Z ∈ (N ⊓ LinearMap.ker (colL a) : Submodule ℂ M45), rs Z = 0 :=
+        fun Z hZ => hrs Z (Submodule.mem_inf.mp hZ).1
+      have p1 := peel N hN hrs a
+      have p2 := peel _ hN1 hrs1 b
+      have hbot : ((N ⊓ LinearMap.ker (colL a) : Submodule ℂ M45) ⊓
+          LinearMap.ker (colL b) : Submodule ℂ M45) = ⊥ := by
+        rw [eq_bot_iff]
+        intro Z hZ
+        rw [Submodule.mem_bot]
+        have hz2 := Submodule.mem_inf.mp hZ
+        have hz1 := Submodule.mem_inf.mp hz2.1
+        have hZN := hz1.1
+        have ca : col Z a = 0 := LinearMap.mem_ker.mp hz1.2
+        have cb : col Z b = 0 := LinearMap.mem_ker.mp hz2.2
+        obtain ⟨k1, e1⟩ := hmax Z hZN a'
+        obtain ⟨k2, e2⟩ := hmax Z hZN b'
+        obtain ⟨k3, e3⟩ := hmax Z hZN (σ 4)
+        rw [za] at e1
+        rw [zb] at e2
+        rw [ze, smul_zero] at e3
+        have hsum := sum_cols_perm σ Z
+        rw [h0, h1, h2, h3, hrs Z hZN, ca, cb, e1, e2, e3] at hsum
+        have hk := hab (k1 * sc a') (k2 * tc b') (by
+          funext i
+          have hi := congrFun hsum i
+          simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at hi ⊢
+          linear_combination hi)
+        have hk1 : k1 = 0 := (mul_eq_zero.mp hk.1).resolve_right hsa'
+        have hk2 : k2 = 0 := (mul_eq_zero.mp hk.2).resolve_right htb'
+        have hcol : ∀ j, col Z (σ j) = 0 := by
+          apply fin5
+          · rw [h0]
+            exact ca
+          · rw [h1, e1, hk1, zero_smul]
+          · rw [h2]
+            exact cb
+          · rw [h3, e2, hk2, zero_smul]
+          · exact e3
+        funext ⟨i, m⟩
+        have hh2 := congrFun (hcol (σ.symm m)) i
+        rw [Equiv.apply_symm_apply] at hh2
+        exact hh2
+      rw [hbot, finrank_bot] at p2
+      omega
+    · exfalso
+      have hsa'1 : sc a' = -1 := by linear_combination hSs - hse
+      have c0 : col z (σ 0) = (1 : ℂ) • col z a := by rw [h0, one_smul]
+      have c1 : col z (σ 1) = (-1 : ℂ) • col z a := by rw [h1, za, hsa'1]
+      have c2 : col z (σ 2) = (1 : ℂ) • col z b := by rw [h2, one_smul]
+      have c3 : col z (σ 3) = tc b' • col z b := by rw [h3, zb]
+      have c4 : col z (σ 4) = tc (σ 4) • col z b := by
+        rw [hst (σ 4), hse, zero_smul, zero_add]
+      exact pattern23 N hN z hz σ (col z a) (col z b) hua1 hua2 hub1 hub2 hab 1 1 (tc b')
+        (tc (σ 4)) one_ne_zero one_ne_zero htb' hte c0 c1 c2 c3 c4
+  · exfalso
+    have hte : tc (σ 4) = 0 := (mul_eq_zero.mp (F1 (σ 4))).resolve_left hse
+    have htb'1 : tc b' = -1 := by linear_combination hSt - hte
+    have c0 : col z ((σ * swp) 0) =
+        (1 : ℂ) • col z b := by
+      rw [Equiv.Perm.mul_apply, swp0, h2, one_smul]
+    have c1 : col z ((σ * swp) 1) =
+        (-1 : ℂ) • col z b := by
+      rw [Equiv.Perm.mul_apply, swp1, h3, zb, htb'1]
+    have c2 : col z ((σ * swp) 2) =
+        (1 : ℂ) • col z a := by
+      rw [Equiv.Perm.mul_apply, swp2, h0, one_smul]
+    have c3 : col z ((σ * swp) 3) =
+        sc a' • col z a := by
+      rw [Equiv.Perm.mul_apply, swp3, h1, za]
+    have c4 : col z ((σ * swp) 4) =
+        sc (σ 4) • col z a := by
+      rw [Equiv.Perm.mul_apply, swp4, hst (σ 4), hte, zero_smul, add_zero]
+    exact pattern23 N hN z hz (σ * swp) (col z b)
+      (col z a) hub1 hub2 hua1 hua2 (indep_symm hab) 1 1 (sc a') (sc (σ 4)) one_ne_zero
+      one_ne_zero hsa' hse c0 c1 c2 c3 c4
+
+theorem LemA_proof (N : Submodule ℂ M45) (hN : SLev N) (hrs : ∀ Z ∈ N, rs Z = 0) :
+    Module.finrank ℂ N ≤ 2 :=
+  LemA_red LemA2_proof N hN hrs
+

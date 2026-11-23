@@ -1,0 +1,207 @@
+theorem dual_eq_dotL {n : ℕ} (φ : (Fin n → ℂ) →ₗ[ℂ] ℂ) (z : Fin n → ℂ) :
+    φ z = dotL (fun i => φ (Pi.single i 1)) z := by
+  have hz : φ z = φ (∑ i, z i • (Pi.single i 1 : Fin n → ℂ)) :=
+    congrArg (fun y => φ y) (pi_eq_sum_univ' z)
+  rw [hz, map_sum, dotL_apply]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  rw [map_smul, smul_eq_mul]
+
+theorem fk_annihilator {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L) (r : Fin 5) :
+    ∃ κ : Fin 5 → ℂ, (∀ t ∈ L, dotL κ (rowMap r t) = 0) ∧ dotL κ 1 = 1 := by
+  obtain ⟨φ, hφ1, hφ0⟩ := Submodule.exists_dual_map_eq_bot_of_notMem
+    (one_not_mem_row hL L le_rfl r) inferInstance
+  have hφL : ∀ t ∈ L, φ (rowMap r t) = 0 := by
+    intro t ht
+    have h3 : φ (rowMap r t) ∈ (L.map (rowMap r)).map φ := ⟨rowMap r t, ⟨t, ht, rfl⟩, rfl⟩
+    rw [hφ0] at h3
+    exact (Submodule.mem_bot ℂ).mp h3
+  refine ⟨fun i => ((φ 1)⁻¹ • φ) (Pi.single i 1), fun t ht => ?_, ?_⟩
+  · exact (dual_eq_dotL ((φ 1)⁻¹ • φ) (rowMap r t)).symm.trans
+      (by rw [LinearMap.smul_apply, hφL t ht, smul_zero])
+  · exact (dual_eq_dotL ((φ 1)⁻¹ • φ) 1).symm.trans
+      (by rw [LinearMap.smul_apply, smul_eq_mul, inv_mul_cancel₀ hφ1])
+
+theorem second_relation {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L) (r r' : Fin 5)
+    (hmin : Module.finrank ℂ L = Module.finrank ℂ (rowsZero L r r') + 7)
+    (f1 : (Fin 5 → ℂ) × (Fin 5 → ℂ) →ₗ[ℂ] ℂ)
+    (hf1 : ∀ t ∈ L, f1 (rowMap r t, rowMap r' t) = 0)
+    (hf1J : f1 ((1 : Fin 5 → ℂ), (1 : Fin 5 → ℂ)) = 0)
+    (v1 : (Fin 5 → ℂ) × (Fin 5 → ℂ)) (hv1 : f1 v1 ≠ 0) :
+    ∃ g : (Fin 5 → ℂ) × (Fin 5 → ℂ) →ₗ[ℂ] ℂ,
+      (∀ t ∈ L, g (rowMap r t, rowMap r' t) = 0) ∧
+      g ((1 : Fin 5 → ℂ), (1 : Fin 5 → ℂ)) = 0 ∧ g v1 = 0 ∧ ∃ x, g x ≠ 0 := by
+  have hk : L ⊓ LinearMap.ker ((rowMap r).prod (rowMap r')) = rowsZero L r r' := by
+    unfold rowsZero
+    rw [LinearMap.ker_prod]
+    exact (inf_assoc _ _ _).symm
+  have hrn : Module.finrank ℂ L =
+      Module.finrank ℂ (L ⊓ LinearMap.ker ((rowMap r).prod (rowMap r')) :
+        Submodule ℂ (Fin 5 × Fin 5 → ℂ)) +
+      Module.finrank ℂ (L.map ((rowMap r).prod (rowMap r'))) := rank_nullity L _
+  rw [hk] at hrn
+  have hJ : (((1 : Fin 5 → ℂ), (1 : Fin 5 → ℂ)) : (Fin 5 → ℂ) × (Fin 5 → ℂ)) ∉
+      L.map ((rowMap r).prod (rowMap r')) := by
+    rintro ⟨t, ht, h⟩
+    exact one_not_mem_row hL L le_rfl r ⟨t, ht, congrArg Prod.fst h⟩
+  have hJ1 := finrank_sup_vec _ _ hJ
+  obtain ⟨I0, hI0⟩ : ∃ I0 : Submodule ℂ ((Fin 5 → ℂ) × (Fin 5 → ℂ)),
+      I0 = L.map ((rowMap r).prod (rowMap r')) ⊔
+        Submodule.span ℂ {(((1 : Fin 5 → ℂ), (1 : Fin 5 → ℂ)) : (Fin 5 → ℂ) × (Fin 5 → ℂ))} :=
+    ⟨_, rfl⟩
+  rw [← hI0] at hJ1
+  have hfin : Module.finrank ℂ I0 = 8 := by omega
+  have hI1 : I0 ≤ LinearMap.ker f1 := by
+    rw [hI0]
+    refine sup_le ?_ ?_
+    · rintro _ ⟨t, ht, rfl⟩
+      rw [LinearMap.mem_ker]
+      exact hf1 t ht
+    · rw [Submodule.span_singleton_le_iff_mem, LinearMap.mem_ker]
+      exact hf1J
+  have hv1n : v1 ∉ I0 := fun h => hv1 (LinearMap.mem_ker.mp (hI1 h))
+  have h9 := finrank_sup_vec I0 v1 hv1n
+  obtain ⟨I1, hI1def⟩ : ∃ I1 : Submodule ℂ ((Fin 5 → ℂ) × (Fin 5 → ℂ)),
+      I1 = I0 ⊔ Submodule.span ℂ {v1} := ⟨_, rfl⟩
+  rw [← hI1def] at h9
+  have hV : Module.finrank ℂ ((Fin 5 → ℂ) × (Fin 5 → ℂ)) = 5 + 5 := by
+    rw [Module.finrank_prod, Module.finrank_fintype_fun_eq_card, Fintype.card_fin]
+  obtain ⟨x, hx⟩ : ∃ x, x ∉ I1 := by
+    by_contra hno
+    have hall : ∀ x, x ∈ I1 := fun x => by
+      by_contra hx
+      exact hno ⟨x, hx⟩
+    have htop : I1 = ⊤ := Submodule.eq_top_iff'.mpr hall
+    have h13 : Module.finrank ℂ I1 = Module.finrank ℂ ((Fin 5 → ℂ) × (Fin 5 → ℂ)) := by
+      rw [htop, finrank_top]
+    omega
+  obtain ⟨g, hgx, hg0⟩ := Submodule.exists_dual_map_eq_bot_of_notMem hx inferInstance
+  have hgI : ∀ y ∈ I1, g y = 0 := by
+    intro y hy
+    have h3 : g y ∈ I1.map g := ⟨y, hy, rfl⟩
+    rw [hg0] at h3
+    exact (Submodule.mem_bot ℂ).mp h3
+  have hI0le : I0 ≤ I1 := by
+    rw [hI1def]
+    exact le_sup_left
+  refine ⟨g, fun t ht => ?_, ?_, ?_, x, hgx⟩
+  · apply hgI
+    apply hI0le
+    rw [hI0]
+    exact Submodule.mem_sup_left ⟨t, ht, rfl⟩
+  · apply hgI
+    apply hI0le
+    rw [hI0]
+    exact Submodule.mem_sup_right (Submodule.mem_span_singleton_self _)
+  · apply hgI
+    rw [hI1def]
+    exact Submodule.mem_sup_right (Submodule.mem_span_singleton_self _)
+
+theorem c7_final {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L) (r r' : Fin 5)
+    (hr : r ≠ r')
+    (hmin : Module.finrank ℂ L = Module.finrank ℂ (rowsZero L r r') + 7)
+    (ha : 4 ≤ Module.finrank ℂ (L.map (rowMap r)))
+    (ha' : 4 ≤ Module.finrank ℂ (L.map (rowMap r'))) :
+    ∃ κ κ' ν ν' : Fin 5 → ℂ,
+      (∀ t ∈ L, dotL κ (rowMap r t) = 0) ∧ dotL κ 1 = 1 ∧
+      (∀ t ∈ L, dotL κ' (rowMap r' t) = 0) ∧ dotL κ' 1 = 1 ∧
+      (∀ t ∈ L, dotL ν (rowMap r t) + dotL ν' (rowMap r' t) = 0) ∧
+      dotL ν 1 + dotL ν' 1 = 0 ∧
+      ((∀ j, κ j ≠ 0) → (∀ j, κ' j ≠ 0) →
+        ∃ a b, ν a / κ a ≠ ν b / κ b ∧ ν' a / κ' a ≠ ν' b / κ' b ∧
+          ν a / κ a + ν' a / κ' a = ν b / κ b + ν' b / κ' b ∧
+          ∀ m, (ν m / κ m = ν a / κ a ∧ ν' m / κ' m = ν' a / κ' a ∧
+              κ' m / κ m = κ' a / κ a) ∨
+            (ν m / κ m = ν b / κ b ∧ ν' m / κ' m = ν' b / κ' b ∧
+              κ' m / κ m = - (κ' a / κ a)) ∨
+            (ν m / κ m = ν a / κ a ∧ ν' m / κ' m = ν' b / κ' b ∧
+              ν a / κ a + ν' a / κ' a ≠ 0 ∧ (κ' m / κ m) ^ 2 = - (κ' a / κ a) ^ 2 ∧
+              (ν a / κ a + ν' b / κ' b) ^ 2 = - (ν a / κ a + ν' a / κ' a) ^ 2 ∧
+              κ' a / κ a * (ν a / κ a + ν' a / κ' a) +
+                κ' m / κ m * (ν a / κ a + ν' b / κ' b) = 0)) := by
+  obtain ⟨κ, hκL, hκ1⟩ := fk_annihilator hL r
+  obtain ⟨κ', hκ'L, hκ'1⟩ := fk_annihilator hL r'
+  have hf1 : ∀ t ∈ L, relM κ κ' (rowMap r t, rowMap r' t) = 0 := by
+    intro t ht
+    rw [relM_apply, hκL t ht, hκ'L t ht, sub_zero]
+  have hf1J : relM κ κ' ((1 : Fin 5 → ℂ), (1 : Fin 5 → ℂ)) = 0 := by
+    rw [relM_apply, hκ1, hκ'1, sub_self]
+  have hv1 : relM κ κ' ((1 : Fin 5 → ℂ), (0 : Fin 5 → ℂ)) = 1 := by
+    rw [relM_apply, hκ1, map_zero, sub_zero]
+  obtain ⟨g, hgL, hgJ, hgv1, x, hgx⟩ := second_relation hL r r' hmin (relM κ κ') hf1 hf1J
+    ((1 : Fin 5 → ℂ), (0 : Fin 5 → ℂ)) (by rw [hv1]; exact one_ne_zero)
+  have hgrel : ∀ z : (Fin 5 → ℂ) × (Fin 5 → ℂ), g z =
+      dotL (fun i => g (LinearMap.inl ℂ (Fin 5 → ℂ) (Fin 5 → ℂ) (Pi.single i 1))) z.1 +
+      dotL (fun i => g (LinearMap.inr ℂ (Fin 5 → ℂ) (Fin 5 → ℂ) (Pi.single i 1))) z.2 := by
+    intro z
+    have e1 := dual_eq_dotL (g.comp (LinearMap.inl ℂ (Fin 5 → ℂ) (Fin 5 → ℂ))) z.1
+    have e2 := dual_eq_dotL (g.comp (LinearMap.inr ℂ (Fin 5 → ℂ) (Fin 5 → ℂ))) z.2
+    have e3 : g z = g (LinearMap.inl ℂ (Fin 5 → ℂ) (Fin 5 → ℂ) z.1) +
+        g (LinearMap.inr ℂ (Fin 5 → ℂ) (Fin 5 → ℂ) z.2) := by
+      rw [← map_add]
+      congr 1
+      rw [LinearMap.inl_apply, LinearMap.inr_apply, Prod.mk_add_mk, add_zero, zero_add]
+    rw [e3]
+    exact congrArg₂ (· + ·) e1 e2
+  obtain ⟨ν, hν⟩ : ∃ ν : Fin 5 → ℂ,
+      ν = fun i => g (LinearMap.inl ℂ (Fin 5 → ℂ) (Fin 5 → ℂ) (Pi.single i 1)) := ⟨_, rfl⟩
+  obtain ⟨ν', hν'⟩ : ∃ ν' : Fin 5 → ℂ,
+      ν' = fun i => g (LinearMap.inr ℂ (Fin 5 → ℂ) (Fin 5 → ℂ) (Pi.single i 1)) := ⟨_, rfl⟩
+  rw [← hν, ← hν'] at hgrel
+  have hνL : ∀ t ∈ L, dotL ν (rowMap r t) + dotL ν' (rowMap r' t) = 0 := by
+    intro t ht
+    have h := hgL t ht
+    rw [hgrel] at h
+    exact h
+  have hν1 : dotL ν 1 + dotL ν' 1 = 0 := by
+    have h := hgJ
+    rw [hgrel] at h
+    exact h
+  refine ⟨κ, κ', ν, ν', hκL, hκ1, hκ'L, hκ'1, hνL, hν1, fun hκ0 hκ'0 => ?_⟩
+  have e1 : (fun m => κ' m / κ m * κ m) = κ' := funext fun m => div_mul_cancel₀ _ (hκ0 m)
+  have e2 : (fun m => ν m / κ m * κ m) = ν := funext fun m => div_mul_cancel₀ _ (hκ0 m)
+  have e3 : (fun m => ν' m / κ' m * (κ' m / κ m * κ m)) = ν' := funext fun m => by
+    rw [div_mul_cancel₀ _ (hκ0 m), div_mul_cancel₀ _ (hκ'0 m)]
+  have hω : ∀ j, κ' j / κ j ≠ 0 := fun j => div_ne_zero (hκ'0 j) (hκ0 j)
+  have q1 : ∀ t ∈ L, dotL (fun m => κ' m / κ m * κ m) (rowMap r' t) = 0 := by
+    rw [e1]
+    exact hκ'L
+  have q2 : dotL (fun m => κ' m / κ m * κ m) 1 = 1 := by
+    rw [e1]
+    exact hκ'1
+  have q3 : ∀ t ∈ L, dotL (fun m => ν m / κ m * κ m) (rowMap r t) +
+      dotL (fun m => ν' m / κ' m * (κ' m / κ m * κ m)) (rowMap r' t) = 0 := by
+    rw [e2, e3]
+    exact hνL
+  have q4 : dotL (fun m => ν m / κ m * κ m) 1 +
+      dotL (fun m => ν' m / κ' m * (κ' m / κ m * κ m)) 1 = 0 := by
+    rw [e2, e3]
+    exact hν1
+  have hind : ¬ ∃ s : ℂ, (∀ m, ν m / κ m = s) ∧ ∀ m, ν' m / κ' m = -s := by
+    rintro ⟨s, hs1, hs2⟩
+    have hνs : ∀ z, dotL ν z = s * dotL κ z := by
+      intro z
+      rw [dotL_apply, dotL_apply, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun m _ => ?_
+      have h4 : ν m = s * κ m := by
+        rw [← hs1 m, div_mul_cancel₀ _ (hκ0 m)]
+      rw [h4]
+      ring
+    have hν's : ∀ z, dotL ν' z = -s * dotL κ' z := by
+      intro z
+      rw [dotL_apply, dotL_apply, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun m _ => ?_
+      have h4 : ν' m = -s * κ' m := by
+        rw [← hs2 m, div_mul_cancel₀ _ (hκ'0 m)]
+      rw [h4]
+      ring
+    have hgs : ∀ z, g z = s * relM κ κ' z := by
+      intro z
+      rw [hgrel, hνs, hν's, relM_apply]
+      ring
+    have h5 := hgs ((1 : Fin 5 → ℂ), (0 : Fin 5 → ℂ))
+    rw [hgv1, hv1, mul_one] at h5
+    apply hgx
+    rw [hgs, ← h5, zero_mul]
+  exact c7_rows_ind hL r r' hr hmin ha ha' κ (fun m => κ' m / κ m) (fun m => ν m / κ m)
+    (fun m => ν' m / κ' m) hκ0 hω hκL hκ1 q1 q2 q3 q4 hind
+

@@ -1,0 +1,4 @@
+### DI5.3 THEOREM TC5 (RIGOROUS): a 4x5 space L' with defect line inside C(e_a - e_b) has dim L' <= 4.
+ Equivalently: there is no (5,1) space with a two-column defect line, i.e. no 8-dim level space with a deletable row whose defect line is
+ e_a - e_b.  Ingredients: Lemma SL and its classification (blueprint S4-S8), the normal form DI5.2, Lemmas Z, LAG, NB, and one exact
+ resultant identity (F1).  All closed forms were checked numerically (di_test3/4/5) and the theorem was tested against 22 example spaces.

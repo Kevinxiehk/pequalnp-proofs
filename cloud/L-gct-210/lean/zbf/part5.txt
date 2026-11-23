@@ -1,0 +1,148 @@
+theorem c7_sep {ι : Type} (ρ ρ' ω : ι → ℂ) (hω : ∀ j, ω j ≠ 0)
+    (hd : ∀ j l, ρ j ≠ ρ l → ρ' j ≠ ρ' l → ω j + ω l = 0 ∧ ρ j + ρ' j = ρ l + ρ' l)
+    (h1 : ∃ j l, ρ j ≠ ρ l) (h2 : ∃ j l, ρ' j ≠ ρ' l) :
+    ∃ a b, ρ a ≠ ρ b ∧ ρ' a ≠ ρ' b ∧ ω a + ω b = 0 ∧ ρ a + ρ' a = ρ b + ρ' b ∧
+      ∀ m, (ρ m = ρ a ∧ ρ' m = ρ' a) ∨ (ρ m = ρ b ∧ ρ' m = ρ' b) ∨
+        (ρ m = ρ a ∧ ρ' m = ρ' b) := by
+  have hex : ∃ a b, ρ a ≠ ρ b ∧ ρ' a ≠ ρ' b := by
+    by_contra hno
+    have hno' : ∀ a b, ρ a ≠ ρ b → ρ' a = ρ' b := by
+      intro a b hab
+      by_contra hab'
+      exact hno ⟨a, b, hab, hab'⟩
+    obtain ⟨j, l, hjl⟩ := h1
+    obtain ⟨p, q, hpq⟩ := h2
+    have hc : ∀ m, ρ' m = ρ' j := by
+      intro m
+      by_cases hm : ρ m = ρ j
+      · have h3 : ρ m ≠ ρ l := by
+          rw [hm]
+          exact hjl
+        exact (hno' m l h3).trans (hno' j l hjl).symm
+      · exact hno' m j hm
+    exact hpq ((hc p).trans (hc q).symm)
+  obtain ⟨a, b, hab, hab'⟩ := hex
+  obtain ⟨hωab, hσab⟩ := hd a b hab hab'
+  have hfour : ∀ m, (ρ m = ρ a ∧ ρ' m = ρ' a) ∨ (ρ m = ρ b ∧ ρ' m = ρ' b) ∨
+      (ρ m = ρ a ∧ ρ' m = ρ' b) ∨ (ρ m = ρ b ∧ ρ' m = ρ' a) := by
+    intro m
+    by_cases e1 : ρ m = ρ a
+    · by_cases e2 : ρ' m = ρ' a
+      · exact Or.inl ⟨e1, e2⟩
+      · by_cases e4 : ρ' m = ρ' b
+        · exact Or.inr (Or.inr (Or.inl ⟨e1, e4⟩))
+        · have e3 : ρ m ≠ ρ b := by
+            rw [e1]
+            exact hab
+          have h5 := (hd m b e3 e4).2
+          have h6 : ρ' m = ρ' a := by linear_combination h5 - hσab - e1
+          exact absurd h6 e2
+    · by_cases e2 : ρ' m = ρ' a
+      · by_cases e3 : ρ m = ρ b
+        · exact Or.inr (Or.inr (Or.inr ⟨e3, e2⟩))
+        · have e4 : ρ' m ≠ ρ' b := by
+            rw [e2]
+            exact hab'
+          have h5 := (hd m b e3 e4).2
+          have h6 : ρ m = ρ a := by linear_combination h5 - hσab - e2
+          exact absurd h6 e1
+      · obtain ⟨h7, h8⟩ := hd m a e1 e2
+        by_cases e3 : ρ m = ρ b
+        · have h6 : ρ' m = ρ' b := by linear_combination h8 + hσab - e3
+          exact Or.inr (Or.inl ⟨e3, h6⟩)
+        · by_cases e4 : ρ' m = ρ' b
+          · have h6 : ρ m = ρ b := by linear_combination h8 + hσab - e4
+            exact absurd h6 e3
+          · obtain ⟨h9, _⟩ := hd m b e3 e4
+            have h10 : (2 : ℂ) * ω a = 0 := by linear_combination h7 - h9 + hωab
+            exact absurd ((mul_eq_zero.mp h10).resolve_left two_ne_zero) (hω a)
+  by_cases hc2 : ∃ m2, ρ m2 = ρ b ∧ ρ' m2 = ρ' a
+  · obtain ⟨m2, hm2, hm2'⟩ := hc2
+    have hωba : ω b + ω a = 0 := by linear_combination hωab
+    refine ⟨b, a, hab.symm, hab'.symm, hωba, hσab.symm, fun m => ?_⟩
+    rcases hfour m with h | h | h | h
+    · exact Or.inr (Or.inl h)
+    · exact Or.inl h
+    · exfalso
+      have e1 : ρ m ≠ ρ m2 := by
+        rw [h.1, hm2]
+        exact hab
+      have e2 : ρ' m ≠ ρ' m2 := by
+        rw [h.2, hm2']
+        exact hab'.symm
+      have h5 := (hd m m2 e1 e2).2
+      rw [h.1, h.2, hm2, hm2'] at h5
+      have h6 : (2 : ℂ) * (ρ' a - ρ' b) = 0 := by linear_combination hσab - h5
+      exact hab' (sub_eq_zero.mp ((mul_eq_zero.mp h6).resolve_left two_ne_zero))
+    · exact Or.inr (Or.inr h)
+  · refine ⟨a, b, hab, hab', hωab, hσab, fun m => ?_⟩
+    rcases hfour m with h | h | h | h
+    · exact Or.inl h
+    · exact Or.inr (Or.inl h)
+    · exact Or.inr (Or.inr h)
+    · exact absurd ⟨m, h⟩ hc2
+
+theorem c7_types {ι : Type} (ρ ρ' ω : ι → ℂ) (hω : ∀ j, ω j ≠ 0)
+    (ha : ∀ j l, ρ j = ρ l → ρ' j ≠ ρ' l →
+      ω j * (ρ j + ρ' j) + ω l * (ρ l + ρ' l) = 0)
+    (hb : ∀ j l, ρ j ≠ ρ l → ρ' j = ρ' l →
+      ω l * (ρ j + ρ' j) + ω j * (ρ l + ρ' l) = 0)
+    (hd : ∀ j l, ρ j ≠ ρ l → ρ' j ≠ ρ' l → ω j + ω l = 0 ∧ ρ j + ρ' j = ρ l + ρ' l)
+    (h1 : ∃ j l, ρ j ≠ ρ l) (h2 : ∃ j l, ρ' j ≠ ρ' l) :
+    ∃ a b, ρ a ≠ ρ b ∧ ρ' a ≠ ρ' b ∧ ρ a + ρ' a = ρ b + ρ' b ∧
+      ∀ m, (ρ m = ρ a ∧ ρ' m = ρ' a ∧ ω m = ω a) ∨
+        (ρ m = ρ b ∧ ρ' m = ρ' b ∧ ω m = - ω a) ∨
+        (ρ m = ρ a ∧ ρ' m = ρ' b ∧ ρ a + ρ' a ≠ 0 ∧ ω m ^ 2 = - ω a ^ 2 ∧
+          (ρ a + ρ' b) ^ 2 = - (ρ a + ρ' a) ^ 2) := by
+  obtain ⟨a, b, hab, hab', hωab, hσab, hall⟩ := c7_sep ρ ρ' ω hω hd h1 h2
+  have corner : ∀ m, ρ m = ρ a → ρ' m = ρ' b →
+      (ρ a + ρ' a ≠ 0 ∧ ω m ^ 2 = - ω a ^ 2 ∧ (ρ a + ρ' b) ^ 2 = - (ρ a + ρ' a) ^ 2) := by
+    intro m hm hm'
+    have e2 : ρ' a ≠ ρ' m := by
+      rw [hm']
+      exact hab'
+    have h3 := ha a m hm.symm e2
+    have e1 : ρ b ≠ ρ m := by
+      rw [hm]
+      exact hab.symm
+    have h4 := hb b m e1 hm'.symm
+    rw [hm, hm'] at h3 h4
+    have h4' : ω m * (ρ a + ρ' a) - ω a * (ρ a + ρ' b) = 0 := by
+      linear_combination h4 + ω m * hσab - (ρ a + ρ' b) * hωab
+    have hs1 : ω a * ((ρ a + ρ' a) ^ 2 + (ρ a + ρ' b) ^ 2) = 0 := by
+      linear_combination (ρ a + ρ' a) * h3 - (ρ a + ρ' b) * h4'
+    have hs2 := (mul_eq_zero.mp hs1).resolve_left (hω a)
+    have hst : (ρ a + ρ' b) ^ 2 = - (ρ a + ρ' a) ^ 2 := by linear_combination hs2
+    have hsne : ρ a + ρ' a ≠ 0 := by
+      intro h0
+      have ht : (ρ a + ρ' b) * (ρ a + ρ' b) = 0 := by
+        linear_combination hst - (ρ a + ρ' a) * h0
+      have ht' := mul_self_eq_zero.mp ht
+      apply hab'
+      linear_combination h0 - ht'
+    have hm1 : (ρ a + ρ' a) * (ω m ^ 2 + ω a ^ 2) = 0 := by
+      linear_combination ω m * h4' + ω a * h3
+    have hm2 := (mul_eq_zero.mp hm1).resolve_left hsne
+    exact ⟨hsne, by linear_combination hm2, hst⟩
+  refine ⟨a, b, hab, hab', hσab, fun m => ?_⟩
+  rcases hall m with h | h | h
+  · refine Or.inl ⟨h.1, h.2, ?_⟩
+    have e1 : ρ m ≠ ρ b := by
+      rw [h.1]
+      exact hab
+    have e2 : ρ' m ≠ ρ' b := by
+      rw [h.2]
+      exact hab'
+    have h3 := (hd m b e1 e2).1
+    linear_combination h3 - hωab
+  · refine Or.inr (Or.inl ⟨h.1, h.2, ?_⟩)
+    have e1 : ρ m ≠ ρ a := by
+      rw [h.1]
+      exact hab.symm
+    have e2 : ρ' m ≠ ρ' a := by
+      rw [h.2]
+      exact hab'.symm
+    have h3 := (hd m a e1 e2).1
+    linear_combination h3
+  · exact Or.inr (Or.inr ⟨h.1, h.2, corner m h.1 h.2⟩)
+

@@ -1,0 +1,61 @@
+theorem cols_zero (σ : Equiv.Perm (Fin 5)) (Z : M45) (h : ∀ j, col Z (σ j) = 0) : Z = 0 := by
+  funext ⟨i, m⟩
+  have hh := congrFun (h (σ.symm m)) i
+  rw [Equiv.apply_symm_apply] at hh
+  exact hh
+
+theorem S6_active (N : Submodule ℂ M45) (hN : SLev N) (hrs : ∀ Z ∈ N, rs Z = 0)
+    (hd : Module.finrank ℂ N = 2) (z : M45)
+    (hmax : ∀ Z ∈ N, ∀ m, ∃ c : ℂ, col Z m = c • col z m) (a b c : Fin 5)
+    (hab : a ≠ b) (hac : a ≠ c) (hbc : b ≠ c)
+    (hind : ∀ s1 s2 s3 : ℂ, s1 • col z a + s2 • col z b + s3 • col z c = 0 →
+      s1 = 0 ∧ s2 = 0 ∧ s3 = 0) : ∀ m, col z m ≠ 0 := by
+  intro m hm
+  have hma : a ≠ m := by
+    intro h
+    have h1 := (hind 1 0 0 (by rw [h, hm]; simp)).1
+    exact one_ne_zero h1
+  have hmb : b ≠ m := by
+    intro h
+    have h1 := (hind 0 1 0 (by rw [h, hm]; simp)).2.1
+    exact one_ne_zero h1
+  have hmc : c ≠ m := by
+    intro h
+    have h1 := (hind 0 0 1 (by rw [h, hm]; simp)).2.2
+    exact one_ne_zero h1
+  obtain ⟨σ, h0, h1, h2, h3⟩ := perm_four a b c m hab hac hma hbc hmb hmc
+  have p := peel N hN hrs (σ 4)
+  have hbot : (N ⊓ LinearMap.ker (colL (σ 4)) : Submodule ℂ M45) = ⊥ := by
+    rw [eq_bot_iff]
+    intro Z hZ
+    rw [Submodule.mem_bot]
+    have hz1 := Submodule.mem_inf.mp hZ
+    have hZN := hz1.1
+    have c4 : col Z (σ 4) = 0 := LinearMap.mem_ker.mp hz1.2
+    obtain ⟨s1, e1⟩ := hmax Z hZN a
+    obtain ⟨s2, e2⟩ := hmax Z hZN b
+    obtain ⟨s3, e3⟩ := hmax Z hZN c
+    obtain ⟨s4, e4⟩ := hmax Z hZN m
+    rw [hm, smul_zero] at e4
+    have hsum := sum_cols_perm σ Z
+    rw [h0, h1, h2, h3, c4, hrs Z hZN, e1, e2, e3, e4, add_zero, add_zero] at hsum
+    obtain ⟨u1, u2, u3⟩ := hind s1 s2 s3 hsum
+    apply cols_zero σ
+    apply fin5
+    · rw [h0, e1, u1, zero_smul]
+    · rw [h1, e2, u2, zero_smul]
+    · rw [h2, e3, u3, zero_smul]
+    · rw [h3]
+      exact e4
+    · exact c4
+  rw [hbot, finrank_bot] at p
+  omega
+
+theorem SLev_N (K : Submodule ℂ M45) (hK : SLev K) :
+    SLev (K ⊓ LinearMap.ker rs : Submodule ℂ M45) :=
+  fun Y hY a => hK Y (Submodule.mem_inf.mp hY).1 a
+
+theorem rs_N (K : Submodule ℂ M45) :
+    ∀ Z ∈ (K ⊓ LinearMap.ker rs : Submodule ℂ M45), rs Z = 0 :=
+  fun _ hZ => LinearMap.mem_ker.mp (Submodule.mem_inf.mp hZ).2
+

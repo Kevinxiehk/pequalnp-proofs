@@ -1,0 +1,39 @@
+## RESULT (rows; final 15:15) -- gap NOT settled (no proof of <= 8, no 8- or 9-dim level space). What is new:
+ R1 [RIGOROUS, 3-line proof, section D] DEFECT CONSTRUCTION = the exact normal form of "deletable row" (repr's conjecture (D)).
+    For a 4x5 matrix Y put p_k(Y)_j := P_k(Y minus column j) (k = 1..4, j = 1..5); for a 4x5 level space L' let
+    C(L') := span{p_k(Y) : Y in L', k}  (inside 1^perp of C^5; e := dim C(L')).  Then
+        L(L') := L' (+) e_r (x) (C(L') + C1)^perp       (L' placed in the rows != r)
+    is a 5x5 LEVEL space of dimension dim L' + 4 - e with row r deletable; conversely a level L with deletable row r has a level
+    4x5 projection L', dim L <= dim L' + 4 - e(L'), and L + e_r(x)(C(L')+C1)^perp is still level. e = 0 is zeros' free-row case.
+    Hence:  (D) + (DI4): "dim L' - e(L') <= 4 for all 4x5 (and 5x4) level spaces"  ==>  the gap;  and an 8-dim level space with a
+    deletable row exists  <=>  a 4x5 level space with (dim L', e) in {(5,1),(6,2),(7,3),(8,4)} exists (+ transposes).
+ R2 [EXACT] explicit 7-dim level spaces WITHOUT a full free row or column, explained by R1 (free part of the deletable row 3-dim):
+    (a) L_m = span{ e_2 m^T ; e_4 w^T (w.1 = w.m = 0) ; x e_2^T (x_0+x_1+x_3 = 0, x_2 = x_4 = 0) ; (1,1,-3,1,0)^T e_4^T },
+        m = (m_0,m_1,m_2,m_3,0), sum m = 0: hand proof for all m (section D); integer polynomial identity perm(J+t) == 120
+        checked for m = (1,2,-4,1,0), also with a shear c = 1 (rows/exact7.py). [L_m with c = 0 is of repr's product type,
+        pattern (2,1 | 3,1) up to transpose: repr's files prod_*_{31000,22000,21100,11110} already contain free-line-free
+        7-dim spaces numerically, so UPDATE 4's "every known 7-dim space contains a full free line" was not accurate.]
+    (b) NOT of product type, DC part = ex1's plane, (r,d,r_A,r_B) = (5,2,2,3):  span{ u(e_0-e_3)^T, ubar e_1^T, ubar e_4^T
+        (u = (1,w,w^2) on rows 0,1,3), (1,1,-3,1,0)^T e_2^T, e_4 w^T (w_0 = w_3, sum w = 0) }: exact identity in Z[w] (exact7b.py).
+    Numerically (1e-13, two independent checkers, 27 spaces) 7-dim level spaces exist for (dim L', e) = (3,0), (4,1), (5,2), (6,3):
+    free part of the deletable row of dim 4, 3, 2, 1. All 27 have exactly one deletable line and first-order extension space
+    L + C(e_r 1^T - J/5) (dim 8), hence lie in no 8-dim level space. 14 of 15 (4,1) spaces contain the "split free row"
+    e_i m^T (+) e_r(x){1,m}^perp with m = the defect line.
+ R3 [numerical; seeded searches calibrated on the analogous existing transitions (5/12, 5/12, 1/9)] no 4x5 level space with
+    (dim L', e) = (5,1), (6,2), (7,3) found (0/38, 0/29, 0/24; residual floors 4.1, 3.7, 2.4), none with (7,4) (0/12): no 8-dim
+    level space with a deletable row found. Equal-row block classes mu = (4,1), (3,2), (3,1,1), (2,2,1): dim 8 not found
+    (dim 7 is reached in (4,1), (3,1,1), (2,2,1)).
+    UNIFORM LAW seen on three floors (q = 5): for (p-1) x 5 level L', dim L' - e(L') <= p - 2 with equality for every e
+    (p = 3: (1,0),(2,1),(3,2),(4,3) exist, (2,0),(3,1),(4,2) do not; p = 4: (2,0),...,(5,3) exist, (3,0),...,(6,3) do not;
+    p = 5: (3,0),...,(6,3) exist; (4,0) impossible by zeros' SL).  CONJECTURE (DI): dim L' - dim C(L') <= p - 2.
+ R4 [RIGOROUS] Target (A) of my task is FALSE as stated: 5-dim degenerate level 4x5 spaces exist: (i) F_3 (+) C(e_1-e_2)e_j^T
+    (three rows, contains a full free row), (ii) a 5-dim 4x4 level space (2n-3 type: free column + 2) padded with a zero column.
+    Correct statement of the a_r = 1 branch: normal form (*) in section S; a_r = 1 does not imply deletable (L080, row 4).
+    Side remark: the team's sol_n4_d5 is (to its 1e-4 subspace accuracy) free column 0 (+) 2-dim, column 0 deletable (error
+    7e-6 against 0.8..1 for the other lines) -- it is NOT free-line-free (zeros' remark was a tolerance artefact).
+ R5 [RIGOROUS] GENERALISED FK: perm restricted to L + CJ is 120 lambda^5, so every LINEAR subspace Y of {perm = 0} of codimension c
+    meets a d-dim level space in dimension >= d + 1 - c; new instances Y = {row i in C(a e_j + b e_k), row i' in C(a e_j - b e_k)}.
+ OPEN (precise): (DI) [already (DI4) suffices with (D)]; (D); in the branch a_r = 1 of a 9-dim L the three types of section S.
+ BEST NEXT STEP: prove (DI) for p = 3 (2 x q; formulas in section D': C = span{a+b, A(a-b) + 2 a o b}) and then by induction along
+    the tower (C(L') contains the free parts of all rows of L'; C'(Y2,v) = D(Y2)(1+v) for Y2 = the rows above); or classify the
+    (4,1) spaces: with a split free row e_i m^T the condition is "m is an eigenvector of D(Y3) for all Y3 in the 3-row projection".

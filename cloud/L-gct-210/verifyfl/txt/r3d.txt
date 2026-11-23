@@ -1,0 +1,8 @@
+ Column-centred spaces (kappa == 0) with a good defect line [NUMERICAL, r3_z.py, r3_z5.py]: spaces with ALL column sums zero and defect line
+ exactly C m exist in dimension 1, 2 and 3 for good m ((1,2,-3,0,0): 10/13, 18/30, 4/10 of the LM hits are genuinely not strongly level),
+ so "kappa == 0 => strongly level or two-column" is false below dimension 4.  But the four such 3-dim spaces tested (q = 3) are DEAD ENDS:
+ no extension to dimension 4 with defect line C m (0/56 starts; the same extension search re-extends random 3-dim subspaces of known (4,1)
+ spaces 8/8).  This is the mechanism one would have to prove: in a (5,1) space every 3-dim subspace of ker kappa would be an extendable
+ column-centred space with defect in C m, hence (if such spaces are always strongly level) ker kappa would be strongly level of dim >= 4.
+   (E3)  a column-centred 3-dim space with defect line exactly C m (m good) lies in no 4-dim space with defect line C m
+         [=> no (5,1) with good m; together with TC5 and (ISO) this is (DI_5) at e = 1].

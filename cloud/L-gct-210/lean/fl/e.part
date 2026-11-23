@@ -1,0 +1,138 @@
+theorem root4k (a b c d : ℂ) (h1 : a + b + c + d = 0) (h2 : a * a + b * b + c * c + d * d = 0)
+    (h3 : a * a * a + b * b * b + c * c * c + d * d * d = 0) :
+    a ^ 4 = (a * a * a * a + b * b * b * b + c * c * c * c + d * d * d * d) / 4 := by
+  linear_combination
+    (a ^ 3 - (a + b + c + d) / 2 * a ^ 2 + (a + b + c + d) ^ 2 / 6 * a
+      - (a + b + c + d) ^ 3 / 24) * h1
+    + (a ^ 2 / 2 - (a + b + c + d) / 2 * a + (a + b + c + d) ^ 2 / 4
+      - (a * a + b * b + c * c + d * d) / 8) * h2
+    + (a / 3 - (a + b + c + d) / 3) * h3
+
+theorem pow4_iso (w : V4) (h1 : tau w = 0) (h2 : ip w w = 0) (h3 : t3 w w w = 0) :
+    w 0 ^ 4 = t4 w w w w / 4 ∧ w 1 ^ 4 = t4 w w w w / 4 ∧ w 2 ^ 4 = t4 w w w w / 4 ∧
+      w 3 ^ 4 = t4 w w w w / 4 := by
+  simp only [tau, ip, t3, t4] at h1 h2 h3 ⊢
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · linear_combination root4k (w 0) (w 1) (w 2) (w 3) h1 h2 h3
+  · linear_combination root4k (w 1) (w 0) (w 2) (w 3) (by linear_combination h1)
+      (by linear_combination h2) (by linear_combination h3)
+  · linear_combination root4k (w 2) (w 0) (w 1) (w 3) (by linear_combination h1)
+      (by linear_combination h2) (by linear_combination h3)
+  · linear_combination root4k (w 3) (w 0) (w 1) (w 2) (by linear_combination h1)
+      (by linear_combination h2) (by linear_combination h3)
+
+theorem br_w3 (w : V4) (c P : ℂ) (hw2 : ip w w = 0) (p0 : w 0 ^ 4 = P / 4)
+    (p1 : w 1 ^ 4 = P / 4) (p2 : w 2 ^ 4 = P / 4) (p3 : w 3 ^ 4 = P / 4) :
+    br (c • (fun i => w i ^ 3 : V4)) (c • (fun i => w i ^ 3 : V4)) w w = c ^ 2 * P ^ 2 / 2 := by
+  simp only [br, t4, ip, Pi.smul_apply, smul_eq_mul] at hw2 ⊢
+  linear_combination (-6 * c ^ 2) * ((w 0 ^ 4 + P / 4) * p0 + (w 1 ^ 4 + P / 4) * p1
+      + (w 2 ^ 4 + P / 4) * p2 + (w 3 ^ 4 + P / 4) * p3)
+    + 2 * c ^ 2 * (w 0 ^ 4 + w 1 ^ 4 + w 2 ^ 4 + w 3 ^ 4 + P) * (p0 + p1 + p2 + p3)
+    + c ^ 2 * (w 0 ^ 6 + w 1 ^ 6 + w 2 ^ 6 + w 3 ^ 6) * hw2
+
+theorem G23core (v w : V4) (hv1 : tau v = 0) (hv2 : ip v v = 0) (hw1 : tau w = 0)
+    (hw2 : ip w w = 0) (hi : indep v w) (h3 : t3 w w w = 0) (h13 : t4 v w w w = 0) :
+    br v v w w ≠ 0 := by
+  have hw0 : w ≠ 0 := by
+    intro h
+    have := (hi 0 1 (by rw [h]; simp)).2
+    exact one_ne_zero this
+  have hv0 : v ≠ 0 := by
+    intro h
+    have := (hi 1 0 (by rw [h]; simp)).1
+    exact one_ne_zero this
+  have hP : t4 w w w w ≠ 0 := fun h => hw0 (iso34 w hw1 hw2 h3 h)
+  obtain ⟨p0, p1, p2, p3⟩ := pow4_iso w hw1 hw2 h3
+  have a1 : tau (fun i => w i ^ 3 : V4) = 0 := by
+    simp only [tau, t3] at h3 ⊢
+    linear_combination h3
+  have a2 : ip (fun i => w i ^ 3 : V4) (fun i => w i ^ 3 : V4) = 0 := by
+    simp only [ip] at hw2 ⊢
+    linear_combination w 0 ^ 2 * p0 + w 1 ^ 2 * p1 + w 2 ^ 2 * p2 + w 3 ^ 2 * p3
+      + t4 w w w w / 4 * hw2
+  have a3 : ip (fun i => w i ^ 3 : V4) v = 0 := by
+    simp only [ip, t4] at h13 ⊢
+    linear_combination h13
+  have a4 : (fun i => w i ^ 3 : V4) ≠ 0 := by
+    intro h
+    apply hP
+    have e : t4 w w w w = ip w (fun i => w i ^ 3 : V4) := by
+      simp only [t4, ip]
+      ring
+    rw [e, h]
+    simp [ip]
+  obtain ⟨c, hc⟩ := Q4 (fun i => w i ^ 3 : V4) v a4 a1 a2 hv1 hv2 a3
+  have hc0 : c ≠ 0 := by
+    intro h
+    apply hv0
+    rw [hc, h, zero_smul]
+  rw [hc, br_w3 w c (t4 w w w w) hw2 p0 p1 p2 p3]
+  exact div_ne_zero (mul_ne_zero (pow_ne_zero 2 hc0) (pow_ne_zero 2 hP)) two_ne_zero
+
+theorem G23 (v w : V4) (hv1 : tau v = 0) (hv2 : ip v v = 0) (hw1 : tau w = 0)
+    (hw2 : ip w w = 0) (hi : indep v w) (μ ν1 ν2 ν3 : ℂ) (hμ : μ ≠ 0) (h1 : ν1 ≠ 0)
+    (h2 : ν2 ≠ 0) (h3 : ν3 ≠ 0)
+    (hTa : t3 ((-μ) • v) (ν1 • w) (ν2 • w) + t3 ((-μ) • v) (ν1 • w) (ν3 • w)
+      + t3 ((-μ) • v) (ν2 • w) (ν3 • w) + t3 (ν1 • w) (ν2 • w) (ν3 • w) = 0)
+    (hTb : t3 (μ • v) (ν1 • w) (ν2 • w) + t3 (μ • v) (ν1 • w) (ν3 • w)
+      + t3 (μ • v) (ν2 • w) (ν3 • w) + t3 (ν1 • w) (ν2 • w) (ν3 • w) = 0)
+    (hBa : br ((-μ) • v) (ν1 • w) (ν2 • w) (ν3 • w) = 0)
+    (hB1 : br (μ • v) ((-μ) • v) (ν2 • w) (ν3 • w) = 0) : False := by
+  have hn : ν1 * ν2 * ν3 ≠ 0 := mul_ne_zero (mul_ne_zero h1 h2) h3
+  have e1 : t3 w w w = 0 := by
+    have h : ν1 * ν2 * ν3 * t3 w w w = 0 := by
+      simp only [t3, Pi.smul_apply, smul_eq_mul] at hTa hTb ⊢
+      linear_combination (1 / 2 : ℂ) * hTa + (1 / 2 : ℂ) * hTb
+    exact (mul_eq_zero.mp h).resolve_left hn
+  have e2 : t4 v w w w = 0 := by
+    have h : μ * (ν1 * ν2 * ν3) * t4 v w w w = 0 := by
+      simp only [br, t4, ip, Pi.smul_apply, smul_eq_mul] at hBa hw2 ⊢
+      linear_combination (1 / 6 : ℂ) * hBa + (1 / 2 : ℂ) * μ * ν1 * ν2 * ν3
+        * (v 0 * w 0 + v 1 * w 1 + v 2 * w 2 + v 3 * w 3) * hw2
+    exact (mul_eq_zero.mp h).resolve_left (mul_ne_zero hμ hn)
+  have e3 : br v v w w = 0 := by
+    have h : μ ^ 2 * (ν2 * ν3) * br v v w w = 0 := by
+      simp only [br, t4, ip, Pi.smul_apply, smul_eq_mul] at hB1 ⊢
+      linear_combination (-1 : ℂ) * hB1
+    exact (mul_eq_zero.mp h).resolve_left (mul_ne_zero (pow_ne_zero 2 hμ) (mul_ne_zero h2 h3))
+  exact G23core v w hv1 hv2 hw1 hw2 hi e1 e2 e3
+
+theorem generic_t {ι : Type} (s : Finset ι) (a b : ι → ℂ) (h : ∀ i ∈ s, a i ≠ 0 ∨ b i ≠ 0) :
+    ∃ t : ℂ, ∀ i ∈ s, a i + t * b i ≠ 0 := by
+  classical
+  obtain ⟨t, ht⟩ := Infinite.exists_notMem_finset (s.image (fun i => -a i / b i))
+  refine ⟨t, fun i hi h0 => ?_⟩
+  by_cases hb : b i = 0
+  · rw [hb, mul_zero, add_zero] at h0
+    rcases h i hi with h1 | h1
+    · exact h1 h0
+    · exact h1 hb
+  · apply ht
+    rw [Finset.mem_image]
+    refine ⟨i, hi, ?_⟩
+    rw [div_eq_iff hb]
+    linear_combination (-1 : ℂ) * h0
+
+theorem generic_pt {P : Type} [AddCommGroup P] [Module ℂ P] {ι : Type} (s : Finset ι)
+    (f : ι → P →ₗ[ℂ] ℂ) (h : ∀ i ∈ s, f i ≠ 0) : ∃ x : P, ∀ i ∈ s, f i x ≠ 0 := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => exact ⟨0, fun i hi => by simp at hi⟩
+  | insert j s hj ih =>
+    obtain ⟨x, hx⟩ := ih (fun i hi => h i (Finset.mem_insert_of_mem hi))
+    have hfj : f j ≠ 0 := h j (Finset.mem_insert_self j s)
+    obtain ⟨y, hy⟩ : ∃ y, f j y ≠ 0 := by
+      by_contra hcon
+      apply hfj
+      refine LinearMap.ext fun z => ?_
+      by_contra hz
+      exact hcon ⟨z, hz⟩
+    obtain ⟨t, ht⟩ := generic_t (insert j s) (fun i => f i x) (fun i => f i y) (by
+      intro i hi
+      rcases Finset.mem_insert.mp hi with rfl | hi'
+      · exact Or.inr hy
+      · exact Or.inl (hx i hi'))
+    refine ⟨x + t • y, fun i hi => ?_⟩
+    rw [map_add, map_smul, smul_eq_mul]
+    exact ht i hi
+

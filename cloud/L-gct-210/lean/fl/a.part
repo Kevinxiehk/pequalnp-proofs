@@ -1,0 +1,156 @@
+theorem perm5_row (r : Fin 5) (M : M55) :
+    ∑ f : Fin 5 ↪ Fin 5, ∏ i, M (i, f i) =
+      ∑ a, M (r, a) * P4 a (fun p => M (r.succAbove p.1, p.2)) := by
+  have h1 : ∑ f : Fin 5 ↪ Fin 5, ∏ i, M (i, f i) =
+      ∑ g : Fin 5 ↪ Fin 5, ∏ i, M (r.cycleRange.symm i, g i) := by
+    refine Eq.trans ?_ (sum_emb_perm r.cycleRange.symm
+      (fun g : Fin 5 ↪ Fin 5 => ∏ i, M (r.cycleRange.symm i, g i)))
+    refine Finset.sum_congr rfl fun f _ => ?_
+    exact (Equiv.prod_comp r.cycleRange.symm (fun j => M (j, f j))).symm
+  have h2 : ∀ g : Fin 5 ↪ Fin 5, ∏ i, M (r.cycleRange.symm i, g i) =
+      M (r, g 0) * ∏ b : Fin 4, M (r.succAbove b, g b.succ) := by
+    intro g
+    rw [Fin.prod_univ_succ]
+    simp only [Fin.cycleRange_symm_zero, Fin.cycleRange_symm_succ]
+  rw [h1]
+  refine (Finset.sum_congr rfl (fun g _ => h2 g)).trans ?_
+  refine (sum_emb_succ (fun a e => M (r, a) * ∏ b : Fin 4, M (r.succAbove b, e b))).trans ?_
+  simp only [P4, Finset.sum_filter, Finset.mul_sum]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun e _ => ?_
+  rw [Fin.prod_univ_four]
+  by_cases h : ∀ b, e b ≠ a
+  · rw [if_pos h, if_pos ⟨h 0, h 1, h 2, h 3⟩]
+  · have h' : ¬(e 0 ≠ a ∧ e 1 ≠ a ∧ e 2 ≠ a ∧ e 3 ≠ a) := by
+      intro hh
+      apply h
+      intro b
+      fin_cases b
+      · exact hh.1
+      · exact hh.2.1
+      · exact hh.2.2.1
+      · exact hh.2.2.2
+    rw [if_neg h, if_neg h', mul_zero]
+
+def rowMat (r : Fin 5) (w : Fin 5 → ℂ) : M55 := fun p => if p.1 = r then w p.2 else 0
+
+def del (r : Fin 5) : M55 →ₗ[ℂ] M45 :=
+  LinearMap.funLeft ℂ ℂ (fun p : Fin 4 × Fin 5 => (r.succAbove p.1, p.2))
+
+def rowP (r : Fin 5) : M55 →ₗ[ℂ] (Fin 5 → ℂ) :=
+  LinearMap.funLeft ℂ ℂ (fun j : Fin 5 => (r, j))
+
+theorem del_apply (r : Fin 5) (t : M55) (p : Fin 4 × Fin 5) :
+    del r t p = t (r.succAbove p.1, p.2) := rfl
+
+theorem rowP_apply (r : Fin 5) (t : M55) (j : Fin 5) : rowP r t j = t (r, j) := rfl
+
+theorem level_row (L : Submodule ℂ M55)
+    (hL : ∀ t ∈ L, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120)
+    (r : Fin 5) (hF : ∀ w : Fin 5 → ℂ, ∑ j, w j = 0 → rowMat r w ∈ L)
+    (y : M55) (hy : y ∈ L) (w : Fin 5 → ℂ) (hw : ∑ j, w j = 0) (c : ℂ) :
+    ∑ a, (1 + c * y (r, a) + w a) * P4 a (fun p => 1 + c * y (r.succAbove p.1, p.2)) = 120 := by
+  have hm : c • y + rowMat r w ∈ L := L.add_mem (L.smul_mem c hy) (hF w hw)
+  have h := hL _ hm
+  have h2 := perm5_row r (fun p => 1 + (c • y + rowMat r w) p)
+  have h3 : ∑ a, (1 + (c • y + rowMat r w) (r, a)) *
+      P4 a (fun p => 1 + (c • y + rowMat r w) (r.succAbove p.1, p.2)) = 120 := h2.symm.trans h
+  rw [← h3]
+  refine Finset.sum_congr rfl fun a _ => ?_
+  have e1 : (fun p : Fin 4 × Fin 5 => 1 + (c • y + rowMat r w) (r.succAbove p.1, p.2)) =
+      fun p => 1 + c * y (r.succAbove p.1, p.2) := by
+    funext p
+    simp [rowMat, Fin.succAbove_ne]
+  have e2 : (c • y + rowMat r w) (r, a) = c * y (r, a) + w a := by
+    simp [rowMat]
+  rw [e1, e2, add_assoc]
+
+theorem propR (L : Submodule ℂ M55)
+    (hL : ∀ t ∈ L, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120)
+    (r : Fin 5) (hF : ∀ w : Fin 5 → ℂ, ∑ j, w j = 0 → rowMat r w ∈ L)
+    (y : M55) (hy : y ∈ L) :
+    (∑ a, y (r, a) = 0) ∧ ∀ a, P4 a (fun p => 1 + y (r.succAbove p.1, p.2)) = 24 := by
+  have base : ∀ c : ℂ, ∑ a, (1 + c * y (r, a)) *
+      P4 a (fun p => 1 + c * y (r.succAbove p.1, p.2)) = 120 := by
+    intro c
+    have h := level_row L hL r hF y hy (fun _ => 0) (by simp) c
+    simpa using h
+  have eqc : ∀ (c : ℂ) (a b : Fin 5), P4 a (fun p => 1 + c * y (r.succAbove p.1, p.2)) =
+      P4 b (fun p => 1 + c * y (r.succAbove p.1, p.2)) := by
+    intro c a b
+    have hw : ∑ j : Fin 5, ((if j = a then (1 : ℂ) else 0) - (if j = b then (1 : ℂ) else 0)) = 0 := by
+      simp [Finset.sum_sub_distrib]
+    have h := level_row L hL r hF y hy
+      (fun j => (if j = a then (1 : ℂ) else 0) - (if j = b then (1 : ℂ) else 0)) hw c
+    have h3 : ∑ x, (1 + c * y (r, x) + ((if x = a then (1 : ℂ) else 0) - (if x = b then (1 : ℂ) else 0))) *
+        P4 x (fun p => 1 + c * y (r.succAbove p.1, p.2)) =
+        ∑ x, (1 + c * y (r, x)) * P4 x (fun p => 1 + c * y (r.succAbove p.1, p.2)) +
+        (P4 a (fun p => 1 + c * y (r.succAbove p.1, p.2)) -
+          P4 b (fun p => 1 + c * y (r.succAbove p.1, p.2))) := by
+      simp only [add_mul, sub_mul, Finset.sum_add_distrib, Finset.sum_sub_distrib, ite_mul, one_mul,
+        zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    have hb := base c
+    linear_combination h - hb - h3
+  have key : ∀ c : ℂ, (5 + c * ∑ a, y (r, a)) *
+      P4 0 (fun p => 1 + c * y (r.succAbove p.1, p.2)) = 120 := by
+    intro c
+    have e5 : (5 : ℂ) + c * ∑ a, y (r, a) = ∑ a : Fin 5, (1 + c * y (r, a)) := by
+      simp [Finset.sum_add_distrib, Finset.mul_sum]
+    rw [← base c, e5, Finset.sum_mul]
+    refine Finset.sum_congr rfl fun a _ => ?_
+    rw [eqc c a 0]
+  have hρ : ∑ a, y (r, a) = 0 := by
+    by_contra hne
+    have h := key (-5 / ∑ a, y (r, a))
+    have e : (-5 / ∑ a, y (r, a)) * ∑ a, y (r, a) = -5 := by
+      field_simp
+    rw [e] at h
+    norm_num at h
+  refine ⟨hρ, fun a => ?_⟩
+  have h := key 1
+  rw [hρ] at h
+  have h1 := eqc 1 a 0
+  simp only [one_mul] at h h1
+  rw [h1]
+  linear_combination (1 / 5 : ℂ) * h
+
+theorem stageA (L : Submodule ℂ M55)
+    (hL : ∀ t ∈ L, (∑ f : Fin 5 ↪ Fin 5, ∏ i, (1 + t (i, f i))) = 120)
+    (r : Fin 5) (hF : ∀ w : Fin 5 → ℂ, ∑ j, w j = 0 → rowMat r w ∈ L) :
+    SLev (L.map (del r)) ∧
+    SLev ((L ⊓ LinearMap.ker (rowP r)).map (del r)) ∧
+    Module.finrank ℂ L ≤
+      4 + Module.finrank ℂ ((L ⊓ LinearMap.ker (rowP r) : Submodule ℂ M55).map (del r)) := by
+  have hS : SLev (L.map (del r)) := by
+    intro Y hY a
+    obtain ⟨y, hy, rfl⟩ := hY
+    exact (propR L hL r hF y hy).2 a
+  refine ⟨hS, ?_, ?_⟩
+  · intro Y hY a
+    exact hS Y (Submodule.map_mono inf_le_left hY) a
+  · have h1 := rank_nullity L (rowP r)
+    have h2 : L.map (rowP r) ≤ sumZero 5 := by
+      rintro v ⟨y, hy, rfl⟩
+      rw [mem_sumZero]
+      exact (propR L hL r hF y hy).1
+    have h3 := (Submodule.finrank_mono h2).trans (finrank_sumZero (n := 5) (by norm_num))
+    have h4 := rank_nullity (L ⊓ LinearMap.ker (rowP r) : Submodule ℂ M55) (del r)
+    have h5 : ((L ⊓ LinearMap.ker (rowP r)) ⊓ LinearMap.ker (del r) : Submodule ℂ M55) = ⊥ := by
+      rw [eq_bot_iff]
+      rintro t ⟨⟨_, ht1⟩, ht2⟩
+      rw [Submodule.mem_bot]
+      rw [SetLike.mem_coe, LinearMap.mem_ker] at ht1 ht2
+      funext ⟨i, j⟩
+      by_cases hi : i = r
+      · have := congrFun ht1 j
+        rw [rowP_apply] at this
+        rw [hi]
+        exact this
+      · obtain ⟨k, hk⟩ := Fin.exists_succAbove_eq hi
+        have := congrFun ht2 (k, j)
+        rw [del_apply] at this
+        rw [← hk]
+        exact this
+    rw [h5, finrank_bot] at h4
+    omega
+

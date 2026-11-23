@@ -1,0 +1,5 @@
+STATUS 15:49 (round 2): new task (DI_5) at e = 1 received; read BRIEF UPDATE 4-6 and NOTES-rows (R1-R9, sections D, DI).
+STATUS 16:05: Lemma EQ (any m) proved and checked on the examples; symmetrised normal form for m = e_a - e_b derived and checked;
+ cases q = 3, q = 2 nondegenerate, dim zeta = 2 and dim Nbar = 3 of a hypothetical (5,1) excluded by hand; new exact (4,1) example found.
+STATUS 16:20: last case (q, dim Nbar, dim zeta) = (2,2,1): sub-cases (N-a), (N-b), (c1), (c3), (c2-i), (c2-ii) excluded by hand; (c2-iii) reduced
+ to (R'), closed numerically. Global LM with m fixed: (3,1) 9/10, (4,1) 9/61, (5,1) 0/84.

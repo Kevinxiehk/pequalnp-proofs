@@ -1,0 +1,65 @@
+STATUS 19:05: second half of round 4: lifting lemma, (NCOL), calibrated (NC) searches, 4x4 data, (D) reduced to dim 7. Sections R4.7 - R4.12.
+ R4.7 LIFTING LEMMA (rigorous, elementary).  Let F_1, .., F_m be sets of polynomial functions on a vector space; a linear subspace K
+   "has property i" if every f in F_i vanishes identically on K. If a linear space L has none of the m properties, there is t in L
+   such that NO linear subspace of L through t has any of them (so the generic subspace of every dimension k >= 1 has none).
+   Proof. Choose f_i in F_i with f_i not identically 0 on L; the product f_1...f_m is not identically 0 on L; take t with
+   f_1(t)...f_m(t) != 0.  QED.   "Row r deletable" (pi_r(L) level: P'_k(pi_r t) = 0, k = 1..4) and "column n neutral" are of this form.
+   COROLLARY D-UP: if every level space of dimension d has a deletable line, so has every level space of dimension >= d.
+     Hence (D) <=> (D)_7 := "every 7-dim level space has a deletable row or column", and (D) for dim >= 8 FOLLOWS from (D)_7;
+     an 8-dim level space without deletable line would contain an open dense family of 7-dim level subspaces without one.
+   COROLLARY C-UP (with R4.1): assume (DI_5; e-1). Every property of the defect space that holds for all extremal (e+3, e) spaces
+     holds for every (e+4, e) space (all its hyperplanes are extremal with the SAME defect space).
+ R4.8 (NCOL): THE DEFECT SPACE OF AN EXTREMAL SPACE LIES IN A COORDINATE HYPERPLANE   [NUMERICAL, 0 exceptions].
+   Statement (NCOL_e): every extremal (e+3, e) space, e = 1, 2, 3, has a NEUTRAL COLUMN n (C inside e_n^perp; equivalently L' minus
+   column n is a level 4 x 4 space Q; equivalently W contains 1 - 5 e_n, i.e. the 5 x 5 space L(L') contains e_r (1 - 5 e_n)^T, i.e.
+   L(L') + CJ contains the matrix "J with row r replaced by 5 e_n^T").
+   Evidence: (i) all 87 extremal spaces of rows/ (rows/ext_chk.py): (d,e,#neutral columns) = (4,1,1): 13, (4,1,2): 8, (4,1,3): 3,
+   (5,2,1): 25, (5,2,2): 19, (6,3,1): 19 [so every known (6,3) space has C = V_S, |S| = 4, W = C(1 - 5e_n)]; NONE has a deletable ROW
+   (3 x 5 rest level).  (ii) independent sample (rows/ncol_ext.py): the 33 seven-dim 5 x 5 level spaces found by repr, numerics,
+   lowd, split, methods, dc5: each has a deletable line, and the rest L' always has a neutral line of the other kind
+   ((3,0): 17, (4,1): 3, (5,2): 6, (6,3): 5; two files needed the rank cut 1e-3 because they are LM-limited).  (iii) with the defect
+   line fixed WITHOUT zero entry no (4,1) space was ever found (verifyfl 0/39; rows round 3: fixed full-support m reaches only dim 6
+   for L). Non-extremal spaces need not have one ((3,1) spaces with full-support m exist), so (NCOL) is an extremality statement.
+   So: EVERY KNOWN 7-DIM LEVEL SPACE IS A DOUBLE TOWER over a 4 x 4 level space Q: delete a row, then a column (or transposed).
+   REDUCTION (rigorous, by C-UP): (DI_5)  <=  (NCOL_e) and (NC'_e) for e = 1, 2, 3, where
+        (NC'_e): a 4 x 5 level space with a neutral column and defect dimension e has dim <= e + 3.
+   [Induction on e: (DI_5;0) is SL; given (DI_5;e-1) and (NCOL_e), every (e+4,e) space has a neutral column, excluded by (NC'_e).]
+ R4.9 CALIBRATED SEARCHES for spaces with neutral columns (rows/nc_search.py, ncdef_search.py; residual < 1e-9 = found) [NUMERICAL]:
+     k = 2 neutral columns:  dim 5: 12/25 found (all e = 2);   dim 6: 0/22 (best residual 2.2)          -> supports (NC_2)
+     k = 1 neutral column:   dim 6:  7/29 found (all e = 3);   dim 7: 0/25 (best residual 1.5)          -> supports (NC_1)
+     k = 1 and e <= 1:       dim 4:  5/11;  dim 5: 0/8 (best 4.2)        k = 1 and e <= 2:  dim 5: 3/5;  dim 6: 0/15 (best 3.2)
+   so (NC'_1), (NC'_2), (NC'_3) are supported at the usual (uncertified) level. The 19 new spaces are in rows/nc_d*_k*_s*.npy.
+   NEGATIVE: "a column-centred 4 x 5 level space has dim <= 3" (which would give (DI_5) at once, because the column-sum map
+   Y -> c(Y) = -p_1(Y)/6 is LINEAR with image inside C, so dim L' <= e + dim ker c) is FALSE: column-centred level spaces of dim 4
+   exist (rows/cc_search.py: 5/60, e = 2 or 3; dim 3: 30/30 with e = 4).  The exact statement is dim ker c <= 3 + e - rank c.
+ R4.10 THE TRANSPOSED DEFECT CONSTRUCTION AND THE 4 x 4 DATA.
+   Rigorous. Let column n of L' be neutral, Y = (q | x), Q := {q} (level 4 x 4), X_n := {x : (0|x) in L'}, M_i(q) := level polynomial of
+   the 3 x 4 matrix (J+q minus row i) (sum_i M_i = 96 on Q), M^(j)_i(q) := perm_3((J+q) minus row i, column j), C^col(Q) :=
+   span{M(q) - 24*1} (inside 1^perp of C^4, dim e^col <= 3), e^row(Q) := the usual defect of Q (column deletions). Then
+     (a) C_j(Y) = (1+x).M^(j)(q) (j != n);  L' level <=> sum x = 0 and x.(M(q) - 24*1) = 0;  the row-sum map of Q has image in C^col(Q);
+     (b) X_n inside (C^col(Q) + C1)^perp, so dim L' = dim Q + dim X_n <= dim Q + 3 - e^col(Q)  [dim Q <= 6 by the checked L_gct_214];
+     (c) PADDING LEMMA: a 4 x 4 level space with e^col = 0 (or e^row = 0) has dim <= 3   [(Q^T | 0) is a strongly level 4 x 5 space: SL];
+     (d) hence (NC'_3) [= (NC_1)]  <=  no 4 x 4 level space with (dim Q, e^col) = (5,1) or (6,2)  (the 4 x 4 copy of the defect problem).
+   Numerical (rows/q44_chk.py, all 87 extremal spaces, every neutral column; 9 LM-limited cases read off in the limit):
+        e^row(Q) = e(L'),     dim X_n = 3 - e^col(Q),     dim Q = e^row(Q) + e^col(Q),
+   with (dim Q, e^col, e^row) = (2,1,1), (3,2,1), (4,3,1), (3,1,2), (4,2,2), (5,3,2), (4,1,3), (5,2,3), (3,0,3), (2,0,2).  So every known
+   7-dim level space is  L = Q (+) [column n: 3 - e^col(Q)] (+) [row r: 4 - e^row(Q)]  with  dim Q = e^row(Q) + e^col(Q):
+   the total is 7 IDENTICALLY, and 8 would need a 4 x 4 level space with dim Q > e^row + e^col in this position.
+   Test of the symmetric inequality on 5 x 5 spaces (rows/sym_chk.py; e_row, e_col <= 4 := dimensions of the spans of the column- resp.
+   row-deletion vectors of L): among 90 level spaces of other agents, dim L <= e_row + e_col holds in 89, with EQUALITY (3+4 or 4+3)
+   for 36 of the 39 seven-dim ones (the 3 others are LM-limited); it FAILS for methods/sp_circ4.npy: C * circ(1, i, -i, -1) padded by a zero
+   row and column is a level line with ALL TEN line deletions level (e_row = e_col = 0). So "dim L <= e_row(L) + e_col(L)" (which
+   would give 8 for 5 x 5, 6 for 4 x 4, 4 for 3 x 3) is false as it stands; the correct form must account for doubly strongly level
+   parts (not found). [C circ4 (+) full free column is a (4,3) space, exact check: not extremal, no contradiction.]
+ R4.11 TARGET (2), conjecture (D) for dim >= 8: NOT proved. What is rigorous: D-UP (R4.7): (D)_7 => (D)_8 => (D)_9, and (D) <=> (D)_7.
+   (D)_8 and (DI_5) together are EQUIVALENT to the gap statement at 8 ("no 8-dim level space"): a deletable row r of an 8-dim L gives
+   pi_r(L) of type (8-z, <= 4-z), i.e. (7,<=3), (6,<=2), (5,<=1) ((8,.) and (4,0) are excluded); conversely vacuous. So (D)_8 is
+   not a lemma on the way but half of the problem. What Lemma C + (Z3) + R3.1 give for an 8-dim L without assuming (D): for every row
+   r, L_r := L cap {row r = 0} is a 4 x 5 level space of dim 3 + a_r in {4,..,7} (a_r <= 4), e(L_r) >= 1, z_r <= 4 - e(L_r) <= 3, and for
+   r != r' dim(L_r cap L_r') >= 1; under (DI_5): e(L_r) >= a_r, z_r <= 4 - a_r. None of this forces row sums == 0 on L. I found no
+   argument; the realistic route is (D)_7 (a statement about 7-dim spaces, testable: 39 + 33 known spaces, 0 exceptions).
+ R4.12 WHAT WOULD CLOSE (DI_5) NOW (sharpest form found).  By R4.8:  (NCOL_1,2,3) + (NC'_1,2,3).   Compared with R4.6 this replaces
+   (LAW) and the list of mixed/degenerate patterns of C by ONE statement about C ("C lies in a coordinate hyperplane"), and puts all
+   remaining cases into the 4 x 4 world: L' = (Q | x), x in the affine fibre over q cut out by x.(M(q) - 24*1) = 0, sum x = 0.
+   Known cases of (NC'): (NC'_1) with two-column m (TC5); (NC'_e) when one row carries a nondegenerate C (FS).  Open: everything else.
+STATUS 19:15 (round 4 final): RESULT ROUND 4 written at the top.

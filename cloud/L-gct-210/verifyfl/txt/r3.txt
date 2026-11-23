@@ -1,0 +1,48 @@
+## DI5-R3 (verifyfl, round 3, start 17:38, budget 90 min): the SPLIT case of (DI_5), and what it says about (5,1), (6,2), (7,3)
+
+### R3.0 The symmetric form (one line, used everywhere below)
+ Per(r_1,...,r_5) := permanent of the 5x5 matrix with rows r_1..r_5 (symmetric, 5-linear). For a 4x5 matrix Y with rows y^1..y^4 put
+ l_i := 1 + y^i. Laplace expansion along the fifth row:   <w, C(Y)> = Per(l_1, l_2, l_3, l_4, w)   for every w in C^5.
+ So "L' has defect space C" means:  Per(l_1,..,l_4,w) = 24 tau(w) + <w, c(Y)>,  c(Y) := C(Y) - 24*1 in C, for all Y in L', w.
+ Since a single row enters linearly:  C(Y + t e_i u^T) = C(Y) + t D_i(Y) u,  where D_i(Y) is the SYMMETRIC 5x5 matrix with
+ <w, D_i(Y) u> = Per(l_1,.., u (slot i),.., l_4, w)  (it depends only on the three rows of Y other than i; D_i(0) = 6(J - I)), and
+ C(Y) = D_i(Y) l_i.   gamma(Y) := vector of column sums of Y;  c(Y) = -6 gamma(Y) + O(Y^2), so gamma(Y) lies in C.
+
+### R3.1 THEOREM SPLIT (e = 1; RIGOROUS, three lines).  Let L' be a 4x5 space with defect line C m containing e_i m^T, and <m,m> != 0. Then
+      thetahat(Y) = kappa(Y) mu(Y)   for all Y in L'     (mu(Y) := the eigenvalue: D_i(Y) m = mu(Y) m,  mu(0) = -6),
+ hence ker kappa = {Y in L' : column sums 0} is STRONGLY LEVEL, dim ker kappa <= 3 (Lemma SL) and dim L' <= 4.
+ In particular: NO (5,1) SPACE IS SPLIT WITH A NON-ISOTROPIC DEFECT LINE (and none contains a (5,1)-subspace of that kind).
+ Proof. (1) Y + t e_i m^T is in L', so C(Y) + t D_i(Y) m is in 24*1 + C m for all t: D_i(Y) m = mu(Y) m.
+ (2) thetahat(Y) <m,m> = <m, C(Y)> = <m, D_i(Y) l_i> = <D_i(Y) m, l_i> = mu(Y) <m, y^i>   (symmetry of D_i; <m,1> = 0).
+ (3) The parts of degree 1 in Y of (2): -6 kappa(Y) <m,m> = -6 <m, y^i>. So <m,y^i> = kappa(Y) <m,m>, and (2) becomes
+     thetahat(Y) <m,m> = mu(Y) kappa(Y) <m,m>.  QED
+ Checked on all 24 split example spaces (rows' 22, t22, my L'_4): |thetahat - kappa mu| <= 1.4e-6 (LM-limited), r3_test1.py.
+ Remarks. (a) This proves the round-2 observation "ker kappa is strongly level in all split examples" and rows' claim "the 3-row
+ projection has dim <= 3" (dim L' = 1 + dim of the 3-row projection) for <m,m> != 0.  (b) For ISOTROPIC m (<m,m> = 0, at least three
+ non-neutral columns) (2)-(3) only give <m,y^i> = 0; the statement is OPEN there (see R3.4).
+
+### R3.2 THEOREM FS ("fully split in one row"; any e; RIGOROUS).  Let L' be a 4x5 level space with defect space C = C(L'). Assume
+ (i) e_i (x) C lies in L' for some row i (the single-row part of row i is all of C; it is always inside C by rows' (H1)), and
+ (ii) the form <,> is nondegenerate on C.  Then  c(Y) = D_i(Y) gamma(Y)  for all Y in L';  so ker gamma is strongly level and
+      dim L' <= 3 + rank(gamma) <= 3 + e:   (DI_5) HOLDS FOR L'.  In particular (6,2) and (7,3) spaces of this kind do not exist.
+ Proof. By R3.0, D_i(Y) u lies in C for u in C. For u in C: <u, c(Y)> = <u, D_i(Y) l_i> = <D_i(Y) u, y^i>. Degree 1 in Y:
+ <u, gamma(Y)> = <u, y^i> for all u in C; applying this to u' = D_i(Y) u in C: <u, c(Y)> = <D_i(Y) u, gamma(Y)> = <u, D_i(Y) gamma(Y)>;
+ both c(Y) and D_i(Y) gamma(Y) lie in C and <,> is nondegenerate there. Lemma SL bounds ker gamma.  QED
+ Check: rows' seed_d5_e2_t0 and t2 are fully split in one row (single-row dims [2,0,0,0], [0,0,2,0]) and their ker gamma is strongly level
+ (2e-14). Most (5,2) and (6,3) examples are split over SEVERAL rows or not at all (single-row dims [0,1,1,0], [0,0,1,0], [0,0,0,0]); ker gamma
+ is still strongly level of dim 3 in 10 of 12 of them, but NOT in clm_p4_d5_defect2_s9 (C degenerate, rank 1) and clm_p4_d6_defect3_s3
+ (rank gamma = 2 < e = 3) [numerical, r3_test2.py]. So "ker gamma strongly level" is not a general law, and the several-rows case needs the
+ cross pairings <y^i, u'> (u' in the single-row part of another row), which the argument does not control.
+
+### R3.3 LEMMA HYP (RIGOROUS): how the dichotomy would finish (5,1).
+ (a) Every 4-dim subspace H of a (5,1) space L' is a (4,1) space with the same defect line (e(H) <= 1, and e(H) = 0 is excluded by SL).
+ (b) L' contains at most four lines C e_i m^T; a generic hyperplane H of L' contains none of them. Hence:
+     if every (4,1) space with defect line C m contains some e_i m^T ["dichotomy at dimension 4" for this m], then no (5,1) space with
+     defect line C m exists.   (No hypothesis on <m,m>; R3.1 is not needed for this implication.)
+ (c) With R3.1 and TC5: a (5,1) space with non-isotropic, non-two-column m would be NON-SPLIT, and all of its 4-dim subspaces would be
+     non-split (4,1) spaces with that m.  So (DI_5) at e = 1 is equivalent to:
+       (NS4)  there is no 5-dim space all of whose hyperplanes are non-split (4,1) spaces;   sufficient: every (4,1) space with a
+              non-two-column defect line is split.
+ Evidence for the sufficient statement [NUMERICAL]: rows' 22 general-m (4,1) spaces are split; my searches with m fixed (r3_gr.py):
+ m = (1,2,-3,0,0): (3,1) 6/12 hits, 5 of them NON-split; (4,1) 3/40 hits, ALL split; m = (1,2,3,-1,-5) (no neutral column): (3,1) 1/12
+ (non-split), (4,1) 0/39.  So non-split spaces are common in dimension 3 and unseen in dimension 4 for non-two-column m.

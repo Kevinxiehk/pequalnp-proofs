@@ -1,0 +1,6 @@
+ R4.13 DIRECT TEST OF (NCOL_3) WITH THE DEFECT SPACE FIXED (rows/fixC_search.py) [NUMERICAL, calibrated only for e = 3]:
+   defect space required inside a fixed 3-dim C0 of 1^perp:  C0 = e_0^perp cap 1^perp: dim 6 found 4/19;  C0 generic (no neutral column):
+   dim 4: 2/5, dim 5: 1/37, dim 6: 0/46 (best residual 2.4).  For e = 2 the same test is NOT calibrated (a generic plane inside
+   e_0^perp cap 1^perp gave 0/12 at dim 5: the known (5,2) planes are special, in line with (LAW)), so no claim is made there.
+STATUS 19:10 (round 4 final): RESULT ROUND 4 written at the top. Rigorous this round: R4.1 - R4.3, R4.7, R4.10(a)-(d), reduction R4.8.
+   Numerical only: R4.4, (NCOL), R4.9, the 4 x 4 data of R4.10, R4.13.  Not proved: (6,2), (7,3), (D)_8.

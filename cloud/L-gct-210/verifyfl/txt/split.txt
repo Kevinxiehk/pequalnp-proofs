@@ -1,0 +1,6 @@
+ Split case, two exact remarks (rigorous, not yet used): if e_i m^T =: Y_1 is in L' then (S1) thetahat is AFFINE along Y_1:
+   thetahat(Y + t Y_1) = thetahat(Y) + t mu(Y3), where Y3 = the three rows of Y other than i and D_i(Y3) m = mu(Y3) m (row i enters
+   C(Y) linearly; mu(0) = -6);  (S2) polarising p_2 between Y in L' and Y_1 gives m_j (s_i(Y) - 2 Y_ij) in C m, i.e. row i of every Y in L'
+   is constant on supp(m) modulo C m.  Observed (23 split examples incl. L'_4): ker kappa is strongly level; by (S1) this is equivalent to
+   "the rational section Y_0 -> Y_0 - (thetahat(Y_0)/mu(Y3_0)) Y_1 of strongly level points is linear on ker kappa"; a proof would settle the
+   split case by Lemma SL (dim L' = 1 + dim ker kappa <= 4).
