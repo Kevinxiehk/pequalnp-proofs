@@ -192,3 +192,46 @@ run: consistent with "dim L_r = 6 => dim L <= 7", which is what (S6') + FL give.
   "every 6-dim 4x5 level space has a deletable row or column" is tested by it.
 - a 7-dim 4x5 level space -> new object; compute its FO2 bound (need <= 8 to exclude a_r = 3).
 - an 8-dim 5x5 level space of any kind (section 5, or ext55b.py with m = 2 on any 6-dim M) -> new object, send basis.
+
+## 7. ROUND 2 (20:30): what is now PROVED, and the exact tasks that remain   [supersedes the priorities of section 6]
+
+Proved since section 6 was written (NOTES-reg2 sections 5, 7, 8):
+- SP8 [hand, from stage2 (Z3) + verifyfl TC5 / SPLIT / SL]: a 5x5 level space containing e_i (x) {w : sum w = 0, <m,w> = 0} has dim <= 8 if
+  m = e_a - e_b, or if <m,m> != 0 and it also contains e_i' m^T (i' != i). This settles the families M*, all EC moves, DR3-split.
+- FO2 bound(M) <= dim T_1(M) - 1 for EVERY M (the form q_0 = 12 P_2 is nonzero on tau = J - 5 e_r 1^T, which is always in T_1(M)).
+  So for a family with dim T_1 = 9 no q_Y-rank computation is needed: "dim T_1(M) <= 9" already gives (S6-FO2).
+- (S6-FO2) + FL exclude a_r = 3 too (take a 6-dim subspace of L_r).
+- EXACT (char 0, Singular; also 3 primes with msolve; calibrations non-unit): the NC family M(w0,w1,w3) (pattern (1,1,1|3)) and the whole
+  support pattern (2,2|2) satisfy (S6-FO2); scripts reg2/gb/gen_nc.py, gen_dr22.py (run from reg2/gb: `python3 -I gen_nc.py 0`,
+  `python3 -I gen_nc.py 0 e0`, `python3 -I gen_dr22.py 0 elim J` (J = 1..4), `python3 -I gen_dr22.py 0 e0`; first argument = prime, 0 = Q).
+
+TASK X1 (exact, automatic; the natural continuation; each run is seconds). LINE-SPANNED 6-dim 4x5 level spaces.
+  Definition: M = (+)_i e_i (x) U_i (+) (+)_c V_c (x) e_c, U_i inside {w in C^5 : sum w = 0} of dim u_i, V_c inside {x in C^4 : sum x = 0}
+  of dim v_c, direct sum, sum u_i + sum v_c = 6. Support pattern (u | v) up to permutations of rows and of columns (45 patterns with all
+  parts <= 3; a part u_i = 4 is a full free row = Theorem FL).
+  P_1, P_2 conditions: <u,u'> = 0 for u in U_i, u' in U_i', i != i'; <x,x'> = 0 for x in V_c, x' in V_c', c != c'; and for every (i,c):
+  (all u in U_i have u_c = 0) or (all x in V_c have x_i = 0)  -- an "incidence case". For each pattern and incidence case:
+  (a) parametrise the parts by annihilators (as in gen_dr22.py: U = {w : <mu_k, w> = 0}) in ALL coordinate charts of the parameters;
+  (b) level ideal I_lev = coefficients in y of F(J' + sum y_k B_k) - 120 (reg2/gb/famtool.py computes them: class Family);
+  (c) FO equations = coefficients in y of sum_{i,j} t_ij cof_ij(J + (Y;0)), t = (X ; rho) (also in famtool);
+  (d) Omega-test: add sum_{j != c} rho_j = 0 after subtracting tau, and a chart rho_j = 1; eliminate X, rho: the elimination ideal J_Om
+      in the parameters. On V(I_lev) minus V(J_Om): Omega inside span(1, e_c) [c = the column found numerically; if no such column
+      exists use the E_0-test and a direct rank computation];
+  (e) E_0-test: rho = 0, X normalised modulo M (+) C d (d = row-mean direction of the deletable row or column-mean direction of the
+      neutral column, Lemma DL in NOTES-reg2 7.1), charts x_ib = 1, elimination ideal J_E;
+  (f) on V(I_lev) minus V(J_Om) minus V(J_E): dim T_1 = 9, so (S6-FO2) holds; on each component of the special loci V(J_Om), V(J_E):
+      repeat with the larger expected Omega, or (finite sets) run the exact certificate reg2/exact_fo2.py (function cert) on the members;
+  (g) every special member: record (dim T_1, dim Omega, rank q, bound). DECISIVE: a member without full free row and bound >= 9.
+  Patterns where the numerical census (reg2/linespan.py) found solutions: NC type: (3|3), (3|2,1), (3|1,1,1), (2,1|3), (2,1|2,1),
+  (2,1|1,1,1), (1,1,1|3) [done], (1,1,1|2,1); deletable-row type: (2,2|2) [done], (2,1,1|2), (3,1|2), (3,1|1,1) [the last two contain
+  M*_2, M*_1 and are covered by SP8 when <m,m> != 0: only the isotropic m need the computation]. All other patterns: decide whether
+  V(I_lev) has members of dimension 6 at all (the census found none in 2 starts x 2 seeds per pattern).
+  Rules: every chart; char 0 (Singular std / eliminate) or >= 3 primes; calibration = the same script with the normalisation replaced by
+  a KNOWN first-order direction (rho = e_c), which must be non-unit.
+TASK X2 (exact). One-parameter family M*_1 and M*_2: not needed any more for the regime (SP8), but the 8-dim question is open: solve
+  exactly "M* (+) span(t_1, t_2) level, t_k in T_1(M*)/M*" (2-planes in a 5-dim space; reg2/ext55b.py found 0 of 82 numerically).
+TASK X3 (census add-on). For every 6-dim solution of censuses A, B, E record also: dim E_0, the deletable rows (d_i in E_0) and neutral
+  columns, the single-row parts U_i, and whether Omega lies in A(U_i) = {s : U_i o s inside U_i + C1} (empirical law (EL), NOTES-reg2
+  7.5; script reg2/autest.py). A violation of (EL), a space with no deletable row and no neutral column, or dim E_0 >= 8 is NEW and wanted.
+TASK X4 (7-dim, errata A5). Redo the dimension-7 searches (section 1 (iii), section 2) with N >= 400 sample points; by NOTES-reg2 7.3 a
+  7-dim space is excluded as soon as each of its 6-dim subspaces has a deletable row or neutral column and dim E_0 = 7.

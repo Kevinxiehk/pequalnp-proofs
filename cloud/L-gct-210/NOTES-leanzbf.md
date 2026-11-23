@@ -309,3 +309,11 @@ STATUS 20:11 (round 3): R3c.lean compiles (exit 0, axioms ok, format 0, guard 0/
  certificates checked first with exact arithmetic, lean/zbf/py/chk_t1p.py); rowsZeroS_single(_finrank); s2_count (X_123 = 0 and
  dim L_i = 5 force (2,2,2) or (2,2,3) up to order).  The STRUCTURAL parts of T2 / T2'' (I_3^perp = N_12 + N_13 + C n**, K_S) are NOT
  formalized.
+STATUS 20:25 (round 3): R3d.lean, R3e.lean compile (exit 0, axioms ok, format 0, guard 0/0; snapshots R3d_ok, R3e_ok).
+ R3d: ZF (a_r = 1 with zero-free FK annihilator), PairI / PairII (Type I / II predicates built on TypeCl), pair_I_or_II (every minimal
+ pair of ZF rows is of Type I or II; from c7_final_cl), T1Hyp, TripleStmt, T2Hyp, T2ppHyp, R31Hyp (PRECISE STATEMENTS of T1, T2, T2'',
+ R3-1 as Props -- they are hypotheses, not proved), s2_core, s2 (Corollary S2: X_ijk = 0 forces exactly two minimal pairs sharing a row,
+ both of Type II, third pair of dimension 3), s2_star (S2*: with R3-1, X_ijk != 0 for every triple of ZF rows).
+ R3e: blk_row_scale; t1_identity (stage 3, section 7: CA2 => identity (T1), for ANY row set S not containing e: if x in L is supported
+ on the rows S and xi in L has row e = 0, a_e = 1, then every 4x4 subpermanent of the matrix (rows of x on S, rows of xi elsewhere),
+ row e deleted, vanishes; |S| = 2 is stage3's X_a X_b Xi_c Xi_d = 0 in A_4; applied to xi = xi_1 + xi_2 it gives Q_x R_c R_d = 0).

@@ -183,3 +183,94 @@ Summary of the [A] items
    8             330                                     792                               494
    9             495                                    1287                               714
  Rule already stated in HANDOFF C1 ("sample >= 2 x the number of monomials") — apply it to every script before a long run.
+
+==========================================================================================================================
+# ROUND 6 ADDENDUM (verify2, 2026-11-23 20:35) — audit of the local session's exact runs VF-A, VF-B and of the new spec sections
+Files audited: /home/claude/coord/local/results/VF-A/{gen.py, RESULT.md, A1_2147483629.ms, CAL_2147483629.gb}, VF-B/{gen.py, calpts.py,
+RESULT.md}; COMPUTE-verifyfl.md section NEXT (20:05); COMPUTE-stage2.md S4; COMPUTE-rows.md X4, X5.
+Own scripts (all in /home/claude/work/L-gct-210/verify2/vf/): own_gen_A.py, drive_A.sh, exact_A.py, firstorder_A.py, secondorder_A.py,
+own_gen_B.py; outputs in vf/run and vf/runB.
+
+## VF-A (one-vector extensions of the four isotropic planes) — generator CORRECT; verdict CONFIRMED and now a PROOF
+ gen.py, line by line: constants (i, sqrt 3, w, beta, xi), Z, Zs, the four cases, the parametrisation of A_m (rows 0..2 free + lambda,
+   16 unknowns), C_j, the basis W of m^perp, the coefficient extraction (every (k,t,x)-coefficient containing x), the two generic
+   linear equations (N-directions) and the generic affine equation: all as in spec A. The verdict proves what verifyfl claims:
+   by PS / the proof of PR3 (verified in round 5) a principal (5,1) for m = (1,w,w^2,0,0) contains, after a row permutation, one of the
+   four planes N, hence a 3-dim extension of it. The four cases are closed under the conjugations i -> -i, sqrt 3 -> -sqrt 3 (they
+   permute the cases up to a row and a column permutation), so one choice of square roots mod p covers all conjugates.
+ The caveat "single generic affine normalisation" IS a gap for a proof (a solution cone inside the hyperplane l_3 = 0 would be missed;
+   likewise the two generic linear equations must be independent on N). It is now CLOSED, three ways:
+   (1) OWN generator (different parametrisation: E a general 4x5 matrix with the four linear equations "column sums in C m";
+       C_j - 24 by the squarefree-algebra expansion; N removed by setting two entries of E to 0 where (Z,Zs) has an invertible minor),
+       ALL 18 coordinate charts E[r][c] = 1:  UNIT in 18 of 18 charts for each of A1..A4, at p = 2147483629 and p = 2147483497;
+       calibration CAL non-unit in 19 of 19 charts.  (msolve 0.10.1 in this container, about 6 s in total.)
+   (2) homogeneous system (no affine equation): reduced DRL basis = 18 linear forms + E34^2, E32*E34, E32^2: the only solution is 0.
+   (3) no Groebner basis at all (exact_A.py, exact arithmetic mod p): the first-order system has rank 12 on the 16-dim A_m, so the
+       first-order extension space is N + 2 directions; on these two directions the x^2-coefficients span ALL binary quadrics (rank 3).
+       (Numerically over C: same ranks, singular values 10..20 against 1e-13.)
+ CHARACTERISTIC 0: the set of extensions is a PROJECTIVE variety (homogeneous equations in E modulo N). A point over Q-bar can be
+   scaled to be integral with a unit coordinate at a prime above p and then reduces to a point mod p. So "empty mod p" (all charts
+   unit, or (2), or (3)) at ONE prime PROVES "empty in characteristic 0". Request A is settled rigorously: none of the four planes N
+   lies in a 3-dim space with defect in C m; hence no principal (5,1) space for |supp m| = 3 (with PR3 for non-isotropic m).
+   No further run is needed for A.
+
+## VF-B (N-problem) — generator CORRECT; calibration REPRODUCED; two caveats for the main cases
+ gen.py: parametrisation by (1) (rows 0..2 x columns P[:-1] free, the rest from row sums 0 / column sums m_j resp. 0), (2) all (k,t)-
+   coefficients of R_i(k Z + t Zs) with W = {e_j (j not in P), m_b e_a - m_a e_b}, (3) the three normal-form equations per column,
+   successive saturation by the ideals (entries of zs_j): as in spec B. The system is a set of NECESSARY conditions for a principal
+   (5,1) (Theorem PS (a)-(c), verified), so "unit after saturation" does give "no principal (5,1) with this defect line".
+ Reproduced here (Singular in this container, gen.py unchanged, P = 2147482921): m = (1,2,-3,0,0): unit after saturation (4 s);
+   m = (1,w,w^2,0,0): dim 0, vdim 24 (9 s). With my OWN generator (own_gen_B.py: full 4 x |P| blocks of variables, linear conditions
+   as equations, squarefree-algebra expansion, exact CHART gauge): (1,2,-3,0,0) unit, (1,1,-2,0,0) unit, (1,w,w^2,0,0) dim 0 vdim 24.
+ [B] Gauge. gen.py fixes the gauge (Z -> Z + c Zs, Zs -> c' Zs) by one generic linear equation on Z and one generic affine equation
+   on Zs. A solution orbit with ls(Zs) = 0 or lz(Zs) = 0 has no representative: for a PROOF use the exact chart
+        Zs[0][j0] = 1,  Z[0][j0] = 0    for ONE fixed j0 in P,   then saturate by the ideals (entries of zs_j), j in P, j != j0.
+   This loses nothing: zs_{j0} != 0 has a nonzero entry, a row permutation (a symmetry of the system) moves it to row 0, the two gauge
+   freedoms normalise it. own_gen_B.py does exactly this (argument 4 = j0). For |P| = 4 it did not finish in 100 s here.
+ [A4, still valid here] After saturation the solution set is only QUASI-projective (the conditions zs_j != 0 are open), so the
+   projectivity argument of VF-A does NOT apply: "unit after saturation mod p" for the main cases is evidence, not a proof. For a
+   proof: Singular over Q (or Q(i), Q(w), Q(z)); or show in addition that the boundary is empty mod p, i.e. that the UNSATURATED
+   system has no solution with some zs_j = 0 that is a limit of solutions (not available: before saturation the system is non-unit).
+
+## COMPUTE-verifyfl.md, section NEXT
+ (F1)-(F4): correct (they are (C1), (C2') at s = 0 with (Nn), (B-i'), (B-ii') of NOTES-verifyfl R5.1; verified in round 5).
+ [B] "(SL_m) holds for m iff [DC3], [T22], [T31]": only "if" is true. (SL_m) does not imply [DC3] (a 3-dim doubly centred space is
+   allowed by (SL_m)). So: UNIT for all three  ==>  (SL_m).  But a NON-unit [DC3] does not refute (SL_m); in that case type (1,3)
+   needs its own system [T13]: N = a 3-dim doubly centred space of the k = 3 list of N1 plus one column-centred Y with s(Y) != 0
+   (and [DC4] for type (0,4)). The spec expects k = 3 solutions for isotropic m, so this case will occur.
+ [C] RIGOUR NOTE (v) can be sharpened, and this saves the expensive characteristic-0 runs wherever it applies:
+      if a system describes ALL points of a projective variety — every cell of a Grassmannian, every coordinate chart of a projective
+      space, every case of an isotropic line (v(th) and chi_3), no saturation, no open condition — and all its coefficients are
+      integral at p, then UNIT in every cell at ONE prime p proves emptiness in characteristic 0.
+   Applies to: request A (done above); N4 "Gr(4,9) all cells" (Lemma 3C) and "Lemma SL on Gr(4,15)"; N1 [DC-k] (all cells of
+   Gr(k,8), all cases of v_4, v_5 — the parameter space is projective); the statement "no 4-dim column-centred K" as a whole
+   (closed subvariety of Gr(4,15)). It does NOT apply to a single TYPED system with an open condition (q = 3 exactly, <z_1,z_1> != 0,
+   zs_j != 0): a characteristic-0 solution of type (3,1) may reduce mod p to a K of another type. So either all types are shown
+   empty at the same prime with reductions that are valid in characteristic p (the hand lemmas (F2)-(F4), Lemma N, "7 pairs" use only
+   nondegenerate forms and Newton's identities: fine for p > 5, but each use should be named), or the typed systems are run over Q.
+ N1 calibrations (type I, type II, N_V; Lemma NP for v_4 = v_5 = 0), N2 calibration (Zs = chi_1 (1,1,-2,0,0): SL3-RED case (i)),
+   N3 calibrations (Props I-ALL, II-ALL), N4: consistent with the hand results, all of which I have verified (round 5 and round 6:
+   Lemma 3C, NP, T, Props I', V, I-ALL, II-ALL, SL3-RED). In N4, "extension variety of chi_1 (x) Lam_M = exactly one point": correct
+   (the second alternative of Prop I', chi_3 (e_n - e_n')^T, is not an extension: its quartic term is 8 c^2 l_p l_p' != 0).
+ N6: (SL_C) => dim L' <= e + 3 correct; (F2) for general C reads <z_j,z_j> = th(Z)_j with th(Z) in C (Lemma QB for general e, verified).
+   The listed planes / 3-spaces C contain no two-column vector except the two marked controls (checked).
+
+## COMPUTE-stage2.md S4 (minimal pairs with zeros)
+ The closed form is correct: I re-derived (i), (ii) (G_T = Gram matrix of the inverse form on the row space of R_T; the radical vector
+   of q_T on Pi_T is the dual of c_1 R_1 + c_2 R_2 with G c = 0, and ell of it equals a_T c_2), and gamma_check agrees with the
+   independent pair_check on 29750 random sparse column pairs.
+ [B] The data are stated incompletely. (nu, nu') must annihilate the rows of J as well: add the equation
+        sum_i nu_i + sum_i nu'_i = 0,
+   and (nu, nu') is then defined modulo (kappa, -kappa') and scaling — not modulo (kappa,0) and (0,kappa') separately (NOTES-stage2
+   section 2: "sum_i (p_i + p~_i) = 0 encodes (1,1) in I^"). The row space of R_T, hence the condition for T, is not invariant under
+   (nu,nu') -> (nu + a kappa, nu') in general (it is in the alternative G_11 = G_12 = 0, not in the alternative a_T = 0). Without the
+   equation the solution set is larger than the set of pair data.
+
+## COMPUTE-rows.md X4, X5 — no errors found
+ X5: re-derived from Theorem NCOL-P3 / P51 for kernel type (2,2,1): B_a = R, B_b = -R on v^perp, B_a v = B_b v = v, B_c = reflection in v;
+   the row-sum relation forces m_c = 0 (m_a = 0 or m_b = 0 give f = 0 when the entries of m are distinct) and R p = lam p with
+   lam = (m_a+m_b)/(m_a-m_b); then Z = a m^T + t n (e_a - e_b)^T with a = (kappa/4)1 + phi v + eta n, t = 2 m_a m_b eta/(m_a-m_b),
+   kappa^2 = (4/3) phi^2 <v,v>: as stated.
+ [B] (rows' notes, not the spec) Theorem DC (a) and NC'-DC (b) of NOTES-rows R5.2 state identities that are only inequalities:
+   dim L' = rank c + rank(s restricted to ker c) + dim L'_dc <= rank c + rank s + dim L'_dc (example with strict inequality: the level
+   line spanned by e_0 u^T + (e_1 - e_2) e_0^T). All uses in COMPUTE-rows are of the "<=" form and stand.

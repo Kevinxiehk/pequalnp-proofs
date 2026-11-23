@@ -36,7 +36,7 @@ def cases(k, vt=VT):
                 for v4 in vt: out.append((k, rho, piv, 1, '-', v4))
             else: out.append((k, rho, piv, 0, '-', '-'))
     return out
-def build(p, mspec, case):
+def build(p, mspec, case, split=None):
     k, rho, piv, lc, t3, t4 = case
     cs = X.Consts(p); m, W = X.parse_m(mspec, cs); V = X.Vars()
     rows = X.echelon_rows(6, piv, V, 'u') if k - rho > 0 else []
@@ -57,13 +57,28 @@ def build(p, mspec, case):
     if rho == 2: nus = [({(): 1}, {}), ({}, {(): 1})]
     elif rho == 1: nus = [({(): 1}, V.new('al'))] if lc == 0 else [({}, {(): 1})]
     else: nus = []
+    # optional split of the case "N_P = C Z_0" by vartheta(Z_0) = <column 0 of Z_0, itself>/m_0:
+    #   split 'A': vartheta(Z_0) = 0 (one more equation);  split 'B': vartheta(Z_0) != 0 (new variable u, u*<z,z> = 1) and the
+    #   complement elements are normalised by Theta(Z_r, Z_0) = 0, i.e. <column j of Z_r, column j of Z_0> = 0 for j = 0,1,2
+    #   (instead of "pivot coordinates = 0"); A and B together cover the case.
+    if split:
+        assert k - rho == 1
+        nrm = {}
+        for a in range(4): nrm = X.padd(nrm, X.pmul(B[0][a][0], B[0][a][0], p), p)
+        if split == 'A': extra.append(nrm)
+        else: extra.append(X.padd(X.pmul(V.new('u'), nrm, p), X.pconst(-1, p), p))
     for r, (l3, l4) in enumerate(nus):
-        co = [({} if d in piv else V.new('y%d_%d' % (r, d))) for d in range(6)]
+        co = [({} if (d in piv and split != 'B') else V.new('y%d_%d' % (r, d))) for d in range(6)]
         M = X.dcsub_matrix(co, [0, 1, 2], p)
         for lam, name, col in ((l3, '3', 3), (l4, '4', 4)):
             if lam and vec[name] is not None:
                 for a in range(4):
                     e = X.pmul(lam, vec[name][a], p); M[a][col] = X.padd(M[a][col], e, p); M[a][2] = X.padd(M[a][2], e, p, -1)
+        if split == 'B':
+            for j in range(3):
+                q = {}
+                for a in range(4): q = X.padd(q, X.pmul(M[a][j], B[0][a][j], p), p)
+                extra.append(q)
         B.append(M)
     polys, nx = X.equations(B, W, p)
     return V.names, polys + extra

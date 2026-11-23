@@ -1,4 +1,32 @@
 # NOTES-reg2 (role reg2; start 18:47, budget 100 min -> ends ~20:27). Regime: some row/column with a_r >= 2.
+## RESULT ROUND 2 (reg2, 19:59 - 21:xx; details in sections 5 - 8) -- the regime is NOT closed; four new rigorous pieces
+ R2-1 [RIGOROUS, hand; section 5] THEOREM SP8: a level space of 5x5 matrices containing e_i (x) {w : sum w = 0, <m,w> = 0} has dim <= 8 if
+      m = e_a - e_b, or if <m,m> != 0 and it contains e_i' m^T for another row i'. (stage2's (Z3): L_i is a 4x5 level space with defect in C m;
+      then verifyfl's TC5 / SPLIT / SL.) This excludes, for ALL parameters and without computation, the families that defeated the
+      first-order criterion: M*_1(x,y), M*_2, every single EC move of a Type F space, and the DR3 spaces with their split element.
+ R2-2 [RIGOROUS; 8.1] (a) FO2 bound(M) <= dim T_1(M) - 1 for every M (q_0 = 12 P_2 is nonzero on tau_r in T_1(M)); so dim T_1(M) <= 9 implies
+      (S6-FO2) for M. (b) (S6-FO2) + FL exclude a_r = 3 as well as a_r = 2 (6-dim subspace of L_r) -- as verify2 noted.
+ R2-3 [EXACT, char 0, all charts, calibrations non-unit; 8.2, 8.3] with Singular / msolve in this container:
+      NC family M(w0,w1,w3) (pattern (1,1,1|3)): Omega = span(1,e_0), E_0 = M + C d, dim T_1 = 9 for EVERY member;
+      the WHOLE support pattern (2,2|2) (a new explicit 2-parameter family M(mu), level for every mu): dim T_1 = 9 except at the 0/1
+      vectors mu, where (dim T_1, dim Omega, rank q) = (10, 3, 4). So (S6-FO2) holds on both (every level space containing a member has
+      dim <= 8; dim <= 7 if it is L_r and mu is not 0/1), and all these spaces are maximal 4x5 level spaces.
+ R2-4 [RIGOROUS; 7.1-7.3] Lemma DL / Proposition MAX: row i deletable <=> (e_i - 1/4) (x) 1 in E_0(M); neutral column c => 1 (x) (e_c - 1/5)
+      in E_0(M); P_2 = -15/2, -24/5 on these directions; so a space with a deletable row or neutral column and dim E_0 = dim M + 1 is
+      maximal. Hence "every 6-dim 4x5 level space has a deletable row or neutral column and dim E_0 = 7" would give "4x5 level <= 6".
+ R2-5 [section 6] FILTER for regime 1: a row with a_r = 1 needs Phi = 0 and Omega(L_r) = C^5 (one SVD). Generic hyperplanes of the Type F
+      spaces with Omega = C^5 pass it (and FO2 = 9): by (Z3) they are regime-1 candidates exactly if a (5,1) space with a generic line
+      exists. Hyperplanes of M* fail it or are excluded by SP8.
+ STATUS OF "L_r = M (dim 6) inside a 9-dim level space", by family:   F: FL [rigorous];   M*, EC moves, DR3-split: SP8 [rigorous];
+      pattern (2,2|2), NC family (1,1,1|3): [exact];   other NC / DR2 spaces: criterion A with Omega computed per space [numerical];
+      DR3 with isotropic or non-split m: none found; reduces to "(5,1) with that line".
+ NOT DONE: target (1) "6-dim => deletable row or column" (no proof; upstream L_gct_215 has no dim-6/7 structure statements beyond the
+      case tree, see 7.4); target (3) reduced to (1) + dim E_0 = 7 (7.3) or to (S6-FO2) (8.1(b)); no 7-dim space found.
+ EMPIRICAL LAW (EL) [numerical, 7.5]: Omega(M) lies in {s : U_i o s inside U_i + C1} for every single-row part of a 6-dim M (55 rows, 0
+      violations); if true for L_r in regime a_r = 2 it forces every single-row element outside row r to be a multiple of e_i (e_a - e_b)^T.
+ Best next steps: TASK X1 of COMPUTE-reg2.md section 7 (exact treatment of the remaining line-spanned patterns; each run is seconds with
+      reg2/gb/famtool.py), a proof of (EL), and the classification (1).
+
 ## RESULT (reg2, final 19:55) -- regime a_r >= 2 NOT closed by a proof. New: a rigorous first-order criterion, the taxonomy of 6-dim 4x5
 ## level spaces (four families, one of them NEW and exact), and the exact statement that would close the regime.
  Notation: L level 5x5, row r, M := L_r (4x5 level, dim 4 + a_r if dim L = 9), W_r := row-r projection of L, J' = 4x5 all-ones,

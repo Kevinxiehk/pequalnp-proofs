@@ -144,7 +144,7 @@ Every hit: run `handoff/oracle.py file.npy` -> prints (d,e), level error, dimens
  (2,0,0,0), (0,0,0,0); (6,3) FS-type and column-type; and verify perm(J + t) = 120 symbolically on the lifts. Known exact examples:
  rows/exact7.py, rows/exact7b.py.
 
-## NEW (round 6) — queue these first (written 20:40)
+## NEW (round 6) — queue these first (written 20:22)
 
 ### R6-1 (replaces X4 by a much smaller system): strongly level planes live on <= 3 columns
  REDUCTION (rigorous, rows NOTES R6.1): a principal K (3-dim strongly level, s(K) = 1^perp) with >= 4 nonzero columns contains a 2-dim

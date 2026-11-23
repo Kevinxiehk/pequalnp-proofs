@@ -7197,6 +7197,162 @@ theorem FL45 (K : Submodule ℂ M45) (hK : Lev45 K) (i : Fin 4)
   have h5 := (Submodule.finrank_mono h4).trans (finrank_sumZero (n := 5) (by norm_num))
   omega
 
+theorem Di_mem (K : Submodule ℂ M45) (hK : Lev45 K) (i : Fin 4) (u : Fin 5 → ℂ)
+    (hE : rowE i u ∈ K) (Y : M45) (hY : Y ∈ K) :
+    (fun b => P4 b (repl i u (fun p => 1 + Y p))) ∈ defC K ∧
+      ∑ b, P4 b (repl i u (fun p => 1 + Y p)) = 0 := by
+  have eN : repl i (fun j => 1 + Y (i, j)) (fun p => 1 + Y p) = fun p => 1 + Y p :=
+    repl_self i (fun p => 1 + Y p)
+  have eN1 : (fun p : Fin 4 × Fin 5 => 1 + (Y + rowE i u) p) =
+      repl i ((fun j => 1 + Y (i, j)) + u) (fun p => 1 + Y p) := by
+    funext ⟨k, j⟩
+    by_cases h : k = i
+    · rw [h, repl_at]
+      show 1 + (Y (i, j) + if i = i then u j else 0) = 1 + Y (i, j) + u j
+      rw [if_pos rfl]
+      ring
+    · rw [repl_ne i k h]
+      show 1 + (Y (k, j) + if k = i then u j else 0) = 1 + Y (k, j)
+      rw [if_neg h]
+      ring
+  have hadd : ∀ b, P4 b (repl i u (fun p => 1 + Y p)) =
+      P4 b (fun p : Fin 4 × Fin 5 => 1 + (Y + rowE i u) p) - P4 b (fun p => 1 + Y p) := by
+    intro b
+    have h := P4_repl_add b i (fun j => 1 + Y (i, j)) u (fun p => 1 + Y p)
+    rw [eN] at h
+    rw [eN1]
+    linear_combination (-1 : ℂ) * h
+  constructor
+  · have g1 : (fun a => P4 a (fun p : Fin 4 × Fin 5 => 1 + (Y + rowE i u) p)) ∈ defC K :=
+      Submodule.subset_span ⟨Y + rowE i u, K.add_mem hY hE, rfl⟩
+    have g2 : (fun a => P4 a (fun p => 1 + Y p)) ∈ defC K :=
+      Submodule.subset_span ⟨Y, hY, rfl⟩
+    have e : (fun b => P4 b (repl i u (fun p => 1 + Y p))) =
+        (fun a => P4 a (fun p : Fin 4 × Fin 5 => 1 + (Y + rowE i u) p))
+        - (fun a => P4 a (fun p => 1 + Y p)) := by
+      funext b
+      exact hadd b
+    rw [e]
+    exact (defC K).sub_mem g1 g2
+  · have h1 := hK _ (K.add_mem hY hE)
+    have h2 := hK Y hY
+    rw [Fin.sum_univ_five] at h1 h2 ⊢
+    rw [hadd 0, hadd 1, hadd 2, hadd 3, hadd 4]
+    linear_combination h1 - h2
+
+theorem R415_F1 (K : Submodule ℂ M45) (hK : Lev45 K) (i : Fin 4) (u : Fin 5 → ℂ)
+    (hE : rowE i u ∈ K) (Y : M45) (hY : Y ∈ K) :
+    (tau (col (repl i 0 Y) 0) * u 0 + tau (col (repl i 0 Y) 1) * u 1
+      + tau (col (repl i 0 Y) 2) * u 2 + tau (col (repl i 0 Y) 3) * u 3
+      + tau (col (repl i 0 Y) 4) * u 4 = 0) ∧
+    (fun b => tau (col (repl i 0 Y) b) * u b) ∈ defC K := by
+  have hU := single_row_sum K hK i u hE
+  have hu := single_row_defC K hK i u hE
+  have fam : ∀ t : ℂ, (fun b => P4 b (fun p => (repl i u (fun _ => 1)) p + t * (repl i 0 Y) p)) ∈ defC K ∧
+      ∑ b, P4 b (fun p => (repl i u (fun _ => 1)) p + t * (repl i 0 Y) p) = 0 := by
+    intro t
+    have h := Di_mem K hK i u hE (t • Y) (K.smul_mem t hY)
+    have e1 : (fun p : Fin 4 × Fin 5 => 1 + (t • Y) p) = fun p => 1 + t * Y p := by
+      funext p
+      simp only [Pi.smul_apply, smul_eq_mul]
+    have e2 : repl i u (fun p => 1 + t * Y p) =
+        fun p => (repl i u (fun _ => 1)) p + t * (repl i 0 Y) p := by
+      funext ⟨k, j⟩
+      show repl i u (fun p => 1 + t * Y p) (k, j) =
+        (repl i u (fun _ => 1)) (k, j) + t * (repl i 0 Y) (k, j)
+      by_cases hk : k = i
+      · rw [hk, repl_at, repl_at, repl_at]
+        simp only [Pi.zero_apply]
+        ring
+      · rw [repl_ne i k hk, repl_ne i k hk, repl_ne i k hk]
+    rw [e1, e2] at h
+    exact h
+  have hpoly := fun b => P4_poly1 b (repl i u (fun _ => 1)) (repl i 0 Y)
+  choose p2 p3 p4 hp using hpoly
+  have E0 := kc1_formula 0 i u Y
+  have E1 := kc1_formula 1 i u Y
+  have E2 := kc1_formula 2 i u Y
+  have E3 := kc1_formula 3 i u Y
+  have E4 := kc1_formula 4 i u Y
+  rw [sa0.1, sa0.2.1, sa0.2.2.1, sa0.2.2.2] at E0
+  rw [sa1.1, sa1.2.1, sa1.2.2.1, sa1.2.2.2] at E1
+  rw [sa2.1, sa2.2.1, sa2.2.2.1, sa2.2.2.2] at E2
+  rw [sa3.1, sa3.2.1, sa3.2.2.1, sa3.2.2.2] at E3
+  rw [sa4.1, sa4.2.1, sa4.2.2.1, sa4.2.2.2] at E4
+  obtain ⟨c, hc⟩ : ∃ c : Fin 5 → ℂ, ∀ j, tau (col (repl i 0 Y) j) = c j :=
+    ⟨fun j => tau (col (repl i 0 Y) j), fun j => rfl⟩
+  obtain ⟨k1, hk1⟩ : ∃ k1 : Fin 5 → ℂ, ∀ b, kc1 b (repl i u (fun _ => 1)) (repl i 0 Y) = k1 b :=
+    ⟨fun b => kc1 b (repl i u (fun _ => 1)) (repl i 0 Y), fun b => rfl⟩
+  obtain ⟨q0, hq0⟩ : ∃ q0 : Fin 5 → ℂ, ∀ b, P4 b (repl i u (fun _ => 1)) = q0 b :=
+    ⟨fun b => P4 b (repl i u (fun _ => 1)), fun b => rfl⟩
+  simp only [hc, hk1] at E0 E1 E2 E3 E4
+  simp only [hk1, hq0] at hp
+  simp only [hc]
+  have hsum : k1 0 + k1 1 + k1 2 + k1 3 + k1 4 = 0 := by
+    have hall : ∀ t : ℂ, (q0 0 + q0 1 + q0 2 + q0 3 + q0 4) + (k1 0 + k1 1 + k1 2 + k1 3 + k1 4) * t + (p2 0 + p2 1 + p2 2 + p2 3 + p2 4) * t ^ 2 + (p3 0 + p3 1 + p3 2 + p3 3 + p3 4) * t ^ 3 + (p4 0 + p4 1 + p4 2 + p4 3 + p4 4) * t ^ 4 = 0 := by
+      intro t
+      have h := (fam t).2
+      rw [Fin.sum_univ_five, hp 0 t, hp 1 t, hp 2 t, hp 3 t, hp 4 t] at h
+      linear_combination h
+    have hr := roots5 (fun k : Fin 5 => ((k : ℕ) : ℂ) + 1) inj_succ5 (q0 0 + q0 1 + q0 2 + q0 3 + q0 4) (k1 0 + k1 1 + k1 2 + k1 3 + k1 4) (p2 0 + p2 1 + p2 2 + p2 3 + p2 4) (p3 0 + p3 1 + p3 2 + p3 3 + p3 4) (p4 0 + p4 1 + p4 2 + p4 3 + p4 4)
+      (fun k => hall _)
+    linear_combination hr.2.1
+  have hcu : (c 0 * u 0 + c 1 * u 1 + c 2 * u 2 + c 3 * u 3 + c 4 * u 4) = 0 := by
+    linear_combination (c 0 + c 1 + c 2 + c 3 + c 4) * hU + (1 / 6 : ℂ) * (E0 + E1 + E2 + E3 + E4) - (1 / 6 : ℂ) * hsum
+  have g0 : k1 0 = -2 * (c 0 + c 1 + c 2 + c 3 + c 4) * u 0 + 4 * c 0 * u 0 - 2 * (c 0 * u 0 + c 1 * u 1 + c 2 * u 2 + c 3 * u 3 + c 4 * u 4) := by
+    linear_combination E0 + 2 * ((c 0 + c 1 + c 2 + c 3 + c 4) - c 0) * hU
+  have g1 : k1 1 = -2 * (c 0 + c 1 + c 2 + c 3 + c 4) * u 1 + 4 * c 1 * u 1 - 2 * (c 0 * u 0 + c 1 * u 1 + c 2 * u 2 + c 3 * u 3 + c 4 * u 4) := by
+    linear_combination E1 + 2 * ((c 0 + c 1 + c 2 + c 3 + c 4) - c 1) * hU
+  have g2 : k1 2 = -2 * (c 0 + c 1 + c 2 + c 3 + c 4) * u 2 + 4 * c 2 * u 2 - 2 * (c 0 * u 0 + c 1 * u 1 + c 2 * u 2 + c 3 * u 3 + c 4 * u 4) := by
+    linear_combination E2 + 2 * ((c 0 + c 1 + c 2 + c 3 + c 4) - c 2) * hU
+  have g3 : k1 3 = -2 * (c 0 + c 1 + c 2 + c 3 + c 4) * u 3 + 4 * c 3 * u 3 - 2 * (c 0 * u 0 + c 1 * u 1 + c 2 * u 2 + c 3 * u 3 + c 4 * u 4) := by
+    linear_combination E3 + 2 * ((c 0 + c 1 + c 2 + c 3 + c 4) - c 3) * hU
+  have g4 : k1 4 = -2 * (c 0 + c 1 + c 2 + c 3 + c 4) * u 4 + 4 * c 4 * u 4 - 2 * (c 0 * u 0 + c 1 * u 1 + c 2 * u 2 + c 3 * u 3 + c 4 * u 4) := by
+    linear_combination E4 + 2 * ((c 0 + c 1 + c 2 + c 3 + c 4) - c 4) * hU
+  have G : ∀ b, k1 b = -2 * (c 0 + c 1 + c 2 + c 3 + c 4) * u b + 4 * c b * u b - 2 * (c 0 * u 0 + c 1 * u 1 + c 2 * u 2 + c 3 * u 3 + c 4 * u 4) :=
+    fin5 (fun b => k1 b = -2 * (c 0 + c 1 + c 2 + c 3 + c 4) * u b + 4 * c b * u b - 2 * (c 0 * u 0 + c 1 * u 1 + c 2 * u 2 + c 3 * u 3 + c 4 * u 4)) g0 g1 g2 g3 g4
+  have hk1mem : k1 ∈ defC K := by
+    have e : k1 = (1 / 12 : ℂ) • ((-25 : ℂ) • (fun b => P4 b (fun p => (repl i u (fun _ => 1)) p + (0 : ℂ) * (repl i 0 Y) p)) + (48 : ℂ) • (fun b => P4 b (fun p => (repl i u (fun _ => 1)) p + (1 : ℂ) * (repl i 0 Y) p)) - (36 : ℂ) • (fun b => P4 b (fun p => (repl i u (fun _ => 1)) p + (2 : ℂ) * (repl i 0 Y) p))
+        + (16 : ℂ) • (fun b => P4 b (fun p => (repl i u (fun _ => 1)) p + (3 : ℂ) * (repl i 0 Y) p)) - (3 : ℂ) • (fun b => P4 b (fun p => (repl i u (fun _ => 1)) p + (4 : ℂ) * (repl i 0 Y) p))) := by
+      funext b
+      simp only [Pi.smul_apply, Pi.add_apply, Pi.sub_apply, smul_eq_mul]
+      rw [hp b 0, hp b 1, hp b 2, hp b 3, hp b 4]
+      ring
+    have m0 := (defC K).smul_mem (-25 : ℂ) (fam 0).1
+    have m1 := (defC K).smul_mem (48 : ℂ) (fam 1).1
+    have m2 := (defC K).smul_mem (36 : ℂ) (fam 2).1
+    have m3 := (defC K).smul_mem (16 : ℂ) (fam 3).1
+    have m4 := (defC K).smul_mem (3 : ℂ) (fam 4).1
+    rw [e]
+    exact (defC K).smul_mem _ ((defC K).sub_mem ((defC K).add_mem ((defC K).sub_mem
+      ((defC K).add_mem m0 m1) m2) m3) m4)
+  refine ⟨hcu, ?_⟩
+  have e : (fun b => c b * u b) = (1 / 4 : ℂ) • (k1 + (2 * (c 0 + c 1 + c 2 + c 3 + c 4)) • u) := by
+    funext b
+    simp only [Pi.smul_apply, Pi.add_apply, smul_eq_mul]
+    linear_combination (-1 / 4 : ℂ) * G b + (1 / 2 : ℂ) * hcu
+  rw [e]
+  exact (defC K).smul_mem _ ((defC K).add_mem hk1mem ((defC K).smul_mem _ hu))
+
+theorem R415_F2 (K : Submodule ℂ M45) (hK : Lev45 K) (i k : Fin 4) (hik : i ≠ k)
+    (u u' : Fin 5 → ℂ) (hE : rowE i u ∈ K) (hE' : rowE k u' ∈ K) :
+    (fun b => u' b * u b) ∈ defC K := by
+  have h := (R415_F1 K hK i u hE (rowE k u') hE').2
+  have e : ∀ b, tau (col (repl i 0 (rowE k u')) b) = u' b := by
+    intro b
+    have h1 := tau_repl0 i (rowE k u') b
+    have h2 : tau (col (rowE k u') b) = ∑ a : Fin 4, (if a = k then u' b else 0) := by
+      rw [Fin.sum_univ_four]
+      rfl
+    have h3 : rowE k u' (i, b) = 0 := by
+      show (if i = k then u' b else 0) = 0
+      rw [if_neg hik]
+    have h4 : ∑ a : Fin 4, (if a = k then u' b else 0) = u' b := by simp
+    rw [h2, h3, h4] at h1
+    linear_combination (-1 : ℂ) * h1
+  simp only [e] at h
+  exact h
+
 end
 
 end PEqualNP.Outside.L_gct_210_aux.FL
