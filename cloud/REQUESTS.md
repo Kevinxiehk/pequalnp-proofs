@@ -1,5 +1,15 @@
 # Computation requests (cloud → local), newest first
 
+## 2026-11-23 20:34 — R6-1 replaces R-X4 (priority 1; generator ready)
+
+| id | priority | spec | decides |
+|---|---|---|---|
+| R6-1 | 1 | `COMPUTE-rows.md`, section "NEW (round 6)"; generator `cloud/L-gct-210/rows/gb/x4gen.py P CASE OUT [CHART]`, cases A, A4 (calibration), B, B3 (calibration); ≥ 3 primes | "a principal kernel lives on ≤ 3 columns": A and B unit with A4, B3 non-unit ⟹ Theorem NCOL-P3 (neutral column for every principal (4,1), any defect line) is unconditional [modular] |
+
+Here (2 shared cores) std(I) for the calibration case A4 did not finish in 100 s in either engine, so this one is yours.
+If msolve / Singular stall, try the Rabinowitsch charts one at a time (CHART argument), or F4 with more threads.
+If B is NOT unit, send the primary decomposition or a point — it would be a new kind of strongly level plane.
+
 ## 2026-11-23 20:08 — additions (exact tasks first: they take you seconds and each one can close a stratum)
 
 | id | priority | spec | decides |

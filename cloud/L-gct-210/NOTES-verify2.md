@@ -425,3 +425,11 @@ STATUS 20:25: VF-A audited line by line (gen.py = spec A; W basis, A_m parametri
  span all binary quadrics. Since the solution set is PROJECTIVE, emptiness mod one prime proves emptiness in characteristic 0 (a point over
  Q-bar reduces to a point mod P): request A is a THEOREM, not only evidence. VF-B: gen.py = spec B (parametrisation, (2), (3), saturation);
  calibration reproduced here with Singular (unit; dim 0 vdim 24) and with my OWN generator in an exact chart gauge (verify2/vf/own_gen_B.py).
+STATUS 20:40: COMPUTE-verifyfl NEXT audited: (F1)-(F4) correct; "(SL_m) iff [DC3],[T22],[T31] empty" is only "if" ((SL_m) does not imply [DC3]; if
+ [DC3] is non-unit, type (1,3) = 3-dim doubly centred + one more needs its own system); RIGOUR NOTE (v) can be sharpened: for a system covering ALL
+ points of a PROJECTIVE variety, unit at one prime IS a proof in char 0 (not so with saturations / open conditions). COMPUTE-rows X4, X5 consistent
+ (X5 normal form re-derived: f = phi v + eta n, t = 2 m_a m_b eta/(m_a - m_b), only m_c = 0 possible). COMPUTE-stage2 S4: the closed form (i), (ii)
+ re-derived (radical vector = q-dual of c_1 R_1 + c_2 R_2, ell of it = a_T c_2) and gamma_check = pair_check on 29750 random sparse column pairs;
+ but S4 omits the normalisation sum nu + sum nu' = 0 (and (nu,nu') is defined modulo (kappa,-kappa'), not modulo (kappa,0) and (0,kappa')).
+ rows R5: (SC1), NCOL-P, NCOL-P3, P51 (i),(ii), NCOL2-P (R5.13) VERIFIED. Theorem DC (a) / NC'-DC (b): the "=" is wrong (counterexample: the level
+ line C(e_0 u^T + (e_1 - e_2) e_0^T): rank c = rank s = 1, no dc part, dim 1); correct with rank(s restricted to ker c); the "<=" consequences stand.
