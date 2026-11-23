@@ -417,3 +417,11 @@ STATUS 20:04: Lemma Z probe: 0 constrained solutions in 9 starts, control 20/20 
 # ROUND 6 (start 20:09, budget ~2 h -> ends ~22:09). (1) audit local session's exact runs /home/claude/coord/local/results/VF-A, VF-B;
 #  (2) COMPUTE-verifyfl NEXT (N1-N6, (F1)-(F4)), COMPUTE-stage2 S4, COMPUTE-rows X4/X5; (3) rows R5 (NCOL-P3, P51, SC1, DC/NC'-DC, R5.13),
 #  stage2 R7 ((FO-r), 25 cofactors, cross family), verifyfl R5.9, R5.10; (4) stage3 sec. 26 (A5), (C6)-(C8).
+STATUS 20:25: VF-A audited line by line (gen.py = spec A; W basis, A_m parametrisation, coefficient extraction, cases, normalisation). The verdict is
+ now established three ways: (i) local gen.py (generic chart, 4 primes); (ii) my OWN generator (verify2/vf/own_gen_A.py: 20 variables + linear
+ constraints, squarefree-algebra expansion, N removed by two zero cells) on ALL 18 coordinate charts: unit in 18/18 for A1-A4 at two primes, CAL
+ non-unit in 19/19; homogeneous Groebner basis = 18 linear forms + all three quadratic monomials of the two remaining variables; (iii) exact
+ linear algebra mod p (verify2/vf/exact_A.py): first-order rank 12 (kernel = N + 2 directions), the x^2-coefficients on these two directions
+ span all binary quadrics. Since the solution set is PROJECTIVE, emptiness mod one prime proves emptiness in characteristic 0 (a point over
+ Q-bar reduces to a point mod P): request A is a THEOREM, not only evidence. VF-B: gen.py = spec B (parametrisation, (2), (3), saturation);
+ calibration reproduced here with Singular (unit; dim 0 vdim 24) and with my OWN generator in an exact chart gauge (verify2/vf/own_gen_B.py).

@@ -58,3 +58,22 @@ def run_msolve(polys,names,p,tag,timeout=110):
     elems=[e.strip() for e in body.strip('[]').replace('\n','').split(',') if e.strip()]
     unit=(len(elems)==1 and elems[0] in ('1','[1]'))
     return unit,len(elems),time.time()-t0
+def to_str_Q(poly,names):
+    terms=[]
+    for k,v in poly.items():
+        if v==0: continue
+        mon='*'.join('%s^%d'%(names[i],e) if e>1 else names[i] for i,e in enumerate(k) if e)
+        terms.append(('%d*%s'%(v,mon)) if mon else '%d'%v)
+    return '+'.join(terms).replace('+-','-') if terms else '0'
+def run_singular(polys,names,tag,timeout=110,char=0):
+    """exact (char 0) or modular std basis with Singular; returns (is_unit, size, seconds)"""
+    lines=[to_str_Q(q,names) for q in polys]; lines=[l for l in lines if l!='0']
+    script='ring R=%d,(%s),dp;\nideal I=%s;\noption(redSB);\nideal G=std(I);\nprint(size(G));\nprint(G[1]);\nquit;\n'%(char,','.join(names),',\n'.join(lines))
+    fn='/tmp/sg_%s.sing'%tag; open(fn,'w').write(script); t0=time.time()
+    try:
+        r=subprocess.run(['/home/claude/tools/gb/Singular','-q'],stdin=open(fn),capture_output=True,text=True,timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return None,None,time.time()-t0
+    out=[l.strip() for l in r.stdout.strip().split('\n') if l.strip()]
+    if len(out)<2: return None,r.stdout[:200]+r.stderr[:200],time.time()-t0
+    return (out[0]=='1' and out[1]=='1'),out[0],time.time()-t0

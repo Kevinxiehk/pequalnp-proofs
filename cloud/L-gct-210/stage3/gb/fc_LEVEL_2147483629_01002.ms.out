@@ -1,0 +1,27 @@
+#Reduced Groebner basis data
+#---
+#field characteristic: 2147483629
+#variable order:       qa1, qa2, qb0, qb1, qb2, qc1, qc2, qd0, qd1, qd2, w0, w1, pp0, pp1, pp2, tb, td
+#monomial order:       graded reverse lexicographical
+#length of basis:      20 elements sorted by increasing leading monomials
+#---
+[1*td^1+1,
+1*pp2^1,
+1*pp1^1,
+1*pp0^1,
+1*w0^1+2147483628*w1^1,
+1*qd1^1+2147483628*tb^1,
+1*qd0^1+1,
+1*qc2^1+1*qd2^1,
+1*qc1^1+1*tb^1,
+1*qb2^1+1*qd2^1+1610612721*w1^1+536870907,
+1*qb1^1+1*tb^1+2147483628,
+1*qb0^1+1,
+1*qa2^1+2147483628*qd2^1+536870908*w1^1+1610612722,
+1*qa1^1+2147483628*tb^1+1,
+1*tb^2+2147483628*tb^1+1,
+1*w1^1*tb^1+1431655754*qd2^1+2147483628*w1^1+1431655753*tb^1+715827876,
+1*qd2^1*tb^1+1610612721*w1^1+536870907,
+1*w1^2+1431655752*w1^1+715827876,
+1*qd2^1*w1^1+2147483628*qd2^1,
+1*qd2^2+2147483628*qd2^1+536870908*w1^1+1610612722]:

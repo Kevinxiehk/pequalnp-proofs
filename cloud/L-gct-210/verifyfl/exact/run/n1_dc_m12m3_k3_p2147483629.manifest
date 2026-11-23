@@ -1,1 +1,2 @@
 n1_dc_m12m3_k3_p2147483629_c000.ms cell=0 pivots=(0, 1, 2) nvars=27 npolys=124 verdict=UNIT basis=1 time=54.12s
+n1_dc_m12m3_k3_p2147483629_c001.ms cell=1 pivots=(0, 1, 3) nvars=26 npolys=124 verdict=TIMEOUT basis=None time=60.26s

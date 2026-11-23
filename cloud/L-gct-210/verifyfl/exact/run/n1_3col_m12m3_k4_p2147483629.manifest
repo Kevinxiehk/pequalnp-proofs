@@ -1,0 +1,6 @@
+n1_3col_m12m3_k4_p2147483629_c000.ms cell=0 pivots=(0, 1, 2, 3) nvars=20 npolys=78 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c001.ms cell=1 pivots=(0, 1, 2, 4) nvars=19 npolys=78 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c002.ms cell=2 pivots=(0, 1, 2, 5) nvars=18 npolys=78 verdict=UNIT basis=1 time=0.03s
+n1_3col_m12m3_k4_p2147483629_c003.ms cell=3 pivots=(0, 1, 2, 6) nvars=17 npolys=68 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c004.ms cell=4 pivots=(0, 1, 2, 7) nvars=16 npolys=68 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c005.ms cell=5 pivots=(0, 1, 2, 8) nvars=15 npolys=68 verdict=UNIT basis=1 time=0.01s
