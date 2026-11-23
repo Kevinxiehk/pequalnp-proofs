@@ -19,7 +19,7 @@ named below. Order = priority. For every numerical item a CALIBRATION is listed 
    t in L with all rows except k, l equal to 0.
  * THE REGIME OF (S3): L level, dim 9, all a_r = 1 (every pi_r(L) is 4-dim; then dim L_r = 5), all lam_{rr'} >= 3, and z != 0.
    Proved by hand so far: z = 0 is impossible; z = (1,0,0,0,0) is impossible unless lam = 4 for two disjoint row pairs (family F4b, item 3);
-   two entries z_i = 2 are impossible unless both planes Z_i are degenerate for <,>. OPEN: z_e = 2 (item 1, 2), F4b (item 3), several
+   two entries z_i = 2 are impossible (Theorem Z22, section 26 (B'), proved at 20:10). OPEN: z_e = 2 (item 1, 2), F4b (item 3), several
    rows with single-row elements (item 4).
  * FIRST-ORDER SPACE AND FO2 (stage2, NOTES-stage2.md R5; library verify2/fo2lib.py). For a level space M:
      T_1(M) = { t in Mat_5 : sum_{ij} t_ij C_ij(J + m) = 0 for all m in M },  C_ij(B) = permanent of B with row i and column j deleted

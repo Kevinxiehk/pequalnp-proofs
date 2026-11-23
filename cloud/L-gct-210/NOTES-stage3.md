@@ -1,5 +1,5 @@
 # NOTES-stage3 (role: stage3; start 14:37, budget 90 min -> ends ~16:07)
-## RESULT, ROUND 7 (stage3, 20:12; final) -- details in section 26; requests for the heavy machine in COMPUTE-stage3.md
+## RESULT, ROUND 7 (stage3, 20:10; final) -- details in section 26; requests for the heavy machine in COMPUTE-stage3.md
  Regime: 9-dim level L, all a_r = 1, all lam >= 3 ("no minimal row pair"), z = vector of the dims of the single-row parts.
  (1) z = (1,0,0,0,0) (exactly one single-row direction) is IMPOSSIBLE in the families F1 (all lam = 3), F3 (lam_ae = 4), F4a (lam_ab = 4,
      lam_cd = 3)  [rigorous hand proofs, NOT yet verified independently].
@@ -17,7 +17,7 @@
      and a precise reason why the missing cyclic identity cannot come from lineality along e_e Z. NOT settled.
  (4) What is left: table in section 26 (D):  F4b;  z = (2,0,0,0,0) = (S3-a);  the z-vectors with single-row elements in several rows
      and at most one entry 2 (not analysed);  rows with a_r >= 2 (outside this regime).
- (5) COMPUTE-stage3.md (asked for by the coordinator): six self-contained computation requests (direct structured searches for
+ (5) COMPUTE-stage3.md (asked for by the coordinator): five self-contained computation requests (direct structured searches for
      z_e = 2 and for one single-row element; cores of (S3-a) with the cyclic products and FO2; F4b systems A/B with the
      calibration M_0 and the small exact free-column sub-problem; several single-row rows; exact confirmation of the plane lemmas).
 
@@ -1361,7 +1361,8 @@ STATUS 19:20: results so far: (i) pattern m_ie = 3 is impossible by counting, th
             If some xi_r has two nonzero entries (columns k,l), then by Xi_a^2 = Xi_b^2 = Xi_c^2 all three are p_r (e_k - e_l) with
             p_r != 0, and Xi_a^2 = -2 Xi_a Xi_b, Xi_b^2 = -2 Xi_a Xi_b give p_a = -2 p_b, p_b = -2 p_a: p_a = 0. Otherwise every xi_r has
             at most one nonzero entry and sum 0: xi = 0. Contradiction in both cases.                                           QED
-        Sanity checks (z22_check.py, 200 random instances): dim(Z o Z) = 3 for totally isotropic Z; no B != 0 in Lemma DEG; generic
+        Sanity checks (z22_check.py): the three degree-1 identities of STEP 1 hold EXACTLY on random rational data (Fractions);
+        200 random instances: dim(Z o Z) = 3 for totally isotropic Z; no B != 0 in Lemma DEG; generic
         (deg-1) pairs have dim(U o U') = 4. A light LM search for the 7-dim space span(t,t',t'') (+) e_d U (+) e_e U' (deg-1 shape,
         level conditions only) found 0 solutions in 8 starts (deg_small.py; corroboration only).
         COROLLARY of STEP 1 for ANY two rows d, e of a level space L with full split data (e_d U (+) e_e U' inside L, U' = (U + C1)^perp,
@@ -1378,6 +1379,10 @@ STATUS 19:20: results so far: (i) pattern m_ie = 3 is impossible by counting, th
         cyclic difference. FO2 adds quadratic conditions on the 2-dim quotient L/M (rows outside the planes); to use them one needs
         M explicitly. Not done.
    (C8) If a second row has a single-row part of dim 2: (B). If e(L_e) = 1: L_e is a (5,1) space.
+   (C9) ANSWER to "is e_e (x) Z part of a split pair inside L?": never a full one -- a second row carrying U' = (Z + C1)^perp (or any
+        2-dim single-row part) is excluded by Theorem Z22 ((B')). A second row can at most carry ONE vector w' of U' (z = (2,1,..));
+        then (w' in row d) for all x in L:  x_d + c(x) lies in U' + C1,  <w', x_e + c(x)> = 0,  <c(x), u o w'> = 0 for u in Z  (c = column sums of the other three
+        rows; the degree-1 identities of (B') STEP 1), which is not enough to run the FL2* argument. OPEN.
  (D) WHAT IS LEFT of "no 9-dim level space with all a_r = 1 and lam >= 3", by the vector z (sorted; z_i <= 2, at most ... by (c1),(c2)):
    z = 0:                 impossible (Theorem N = N1 + N2-X).
    z = (1,0,0,0,0):       F1, F3, F4a impossible ((A3), (A4));   F4b OPEN ((A5), (A5'): core shape realisable (M_0), identities (i)-(iii)).
@@ -1390,4 +1395,4 @@ STATUS 19:25 (round 7): section 26 written: z = (1,0,0,0,0) impossible in F1, F3
 STATUS 19:31: COMPUTE-stage3.md written (requests for the 24-core machine).
 STATUS 19:58: F4b: (CA2) gives exactly (i)-(iii); exact level space M_0 of F4b-core shape found (violates (iii), dim T_1 = 8); F4b stays OPEN.
 STATUS 20:02: Lemma DEG for the degenerate two-plane case added (section 26 (B')).
-STATUS 20:12: THEOREM Z22 proved (two rows with 2-dim single-row parts are impossible, degenerate planes included). Final report of round 7.
+STATUS 20:10: THEOREM Z22 proved (two rows with 2-dim single-row parts are impossible, degenerate planes included). Final report of round 7.

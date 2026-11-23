@@ -1,57 +1,78 @@
 # NOTES-leanfl (role: leanfl; round 1 16:38-18:05, round 2 18:13-19:15, round 3 19:16-)
 
-## RESULT (leanfl, rounds 1-3) -- LEMMA SL, THEOREM FL (row and column), LEMMA DS, the DEFECT CONSTRUCTION, LEMMA EQ, THEOREM SPLIT,
-## LEMMA HYP, the HYPERPLANE LEMMA and LEMMA SL_3 are Lean-checked WITHOUT ANY HYPOTHESIS.
-File: /home/claude/work/L-gct-210/lean/fl/FL.lean (see the last STATUS line for the current snapshot FL.vNN.lean and line count).
-leancheck: exit 0, axioms propext / Classical.choice / Quot.sound only, format counts all 0 (no sorry, no comments, no banned words).
-Final (placeholder-named) theorem, no hypotheses:
+## RESULT (leanfl, rounds 1-3) -- Lean-checked WITHOUT ANY HYPOTHESIS: LEMMA SL, THEOREM FL (row and column), LEMMA DS, the DEFECT
+## CONSTRUCTION (Prop. D / normal form R1), LEMMA EQ, THEOREM SPLIT (both forms), THEOREM FS, LEMMA HYP, the HYPERPLANE LEMMA, LEMMA SL_3,
+## THEOREM NCOL-S (a), (b), the TC5 NORMAL FORM (DI5.2), LEMMA QB, R4.2 (a), (b).   Not done: TC5 itself, PS, PR3, FL2*, R4.2 (c),(d), R4.3.
+File: /home/claude/work/L-gct-210/lean/fl/FL.lean (the last STATUS line names the current snapshot FL.vNN.lean, its size and the build list).
+leancheck: exit 0; axioms propext / Classical.choice / Quot.sound only; format counts all 0; GUARD counts 0/0 (helpers live in
+namespace PEqualNP.Outside.L_gct_210_aux.FL, no line begins with add_; adopted in v25). Size is above 300 KB (cap waived by the coordinator).
+Final (placeholder-named) theorem, no hypotheses, last declaration of the file:
   theorem PEqualNP.Outside.L_gct_210_fl :
       (forall K : Submodule C (Fin 4 x Fin 5 -> C), SLev K -> finrank K <= 3)                                   [LEMMA SL]
     /\ (forall L, <gap hypothesis verbatim> -> forall r, (forall w, sum w = 0 -> e_r w^T in L) -> finrank L <= 7)      [THEOREM FL, free row]
     /\ (forall L, <gap hypothesis verbatim> -> forall c, (forall w, sum w = 0 -> w e_c^T in L) -> finrank L <= 7)      [THEOREM FL, free column]
-All other results are theorems of namespace PEqualNP.Gct.FL210 in the same file (statements below). NO formalized step failed and no error
-was found in the paper proofs. Not formalized: NCOL-S (R4.14), TC5 normal form (DI5.2) -- see "Open" below.
+All other results are theorems of the namespace PEqualNP.Outside.L_gct_210_aux.FL in the same file. NO formalized step failed and NO
+error was found in any of the paper proofs that were formalized (blueprint S1-S9, chief's DS, rows' D / R3.8 / R4.1 / R4.14 / R4.2(a,b),
+verifyfl's DI5.1 / DI5.2 / R3.1 / R3.2 / R3.3 / R4.1(QB)).
 
 ### Main theorems (Lean names; all COMPILED, no hypotheses)
-| paper statement | Lean name | statement in Lean terms |
+| paper statement | Lean name (helpers) | statement in Lean terms |
 | Lemma SL (strongly level 4x5 => dim <= 3) | LemmaSL | SLev K -> finrank K <= 3 |
 | Theorem FL, full free row | TheoremFL_row | level L, rowMat r w in L for all sum-zero w -> finrank L <= 7 |
 | Theorem FL, full free column (transposition) | TheoremFL_col (gap_swap5, trE5, FL_col_of) | same with colMat c w |
 | Corollary (stage A + SL) | Cor_row, Cor_row7 | SLev ((L inf ker (rowP r)).map (del r)) -> finrank L <= finrank (L.map (rowP r)) + 3; <= 7 if all row-r sums vanish |
-| chief's Lemma DS | LemmaDS (P4_poly, P4_ones, DS_star, DS_i) | level L, row r deletable (sum_a P4 a (1 + del r t) = 120 on L) -> all row-r sums vanish; if finrank (L.map (rowP r)) = 4 then L cap {row r = 0} is strongly level and finrank L <= 7 |
-| rows' Prop. D (a): defect construction | defL, defL_level, defL_deletable, defL_finrank, defL_finrank' | K 4x5 level (Lev45 K) -> defL r K = K (+) e_r (x) defW K is a 5x5 level space with row r deletable, finrank = finrank K + finrank (defW K) |
-| rows' Prop. D (b): converse / normal form R1 | defect_conv, defect_conv' | ANY level L: finrank L <= finrank L' + finrank (defW L'), L' = L.map (del r) (deletability not needed); with defW_finrank: finrank L + finrank (defC L') <= finrank L' + 5 |
-| dim W = 4 - e | defW_finrank (dotL, dotL_ker) | finrank (defW K) + finrank (defC K) = 5, defC K = span{C(Y)} = C(L') + C 1 (so finrank defC = e + 1) |
+| chief's Lemma DS | LemmaDS (P4_poly, P4_ones, DS_star, DS_i) | level L, row r deletable -> all row-r sums vanish; if finrank (L.map (rowP r)) = 4 then L cap {row r = 0} is strongly level and finrank L <= 7 |
+| rows' Prop. D (a): defect construction | defL, defL_level, defL_deletable, defL_finrank, defL_finrank' | Lev45 K -> defL r K = K (+) e_r (x) defW K is a 5x5 level space with row r deletable, finrank = finrank K + finrank (defW K) |
+| rows' Prop. D (b) / normal form R1 | defect_conv, defect_conv' | ANY level L: finrank L <= finrank L' + finrank (defW L'), L' = L.map (del r); finrank L + finrank (defC L') <= finrank L' + 5 |
+| dim W = 4 - e | defW_finrank (dotL, dotL_ker) | finrank (defW K) + finrank (defC K) = 5, defC K = span{C(Y)} = C(L') + C 1 (finrank defC = e + 1) |
 | strongly level = defect 0 | defW_SLev, defW_le, defW_sum | SLev K -> defW K = sumZero 5; always defW K <= sumZero 5 |
 | verifyfl's Lemma EQ (DI5.1) | LemmaEQ, LemmaEQ_cols | DefLine K m, column permutation pi with m (pi j) != m j -> K cap Fix(pi) strongly level, finrank <= 3; m a != m b -> K cap {col a = col b} strongly level and finrank K <= 3 + rank(Y -> y_a - y_b) |
-| verifyfl's THEOREM SPLIT (R3.1) | ThmSplit, (ker kappa form:) ThmSplit_kappa [see STATUS for whether x4.part is in the current snapshot] | DefLine K m, sum m = 0, <m,m> != 0, e_i m^T in K -> K cap {<m, row i> = 0} strongly level and finrank K <= 4 |
+| verifyfl's THEOREM SPLIT (R3.1) | ThmSplit (repl, P4_repl_add, per_stk, per_rows, P4_sym) | DefLine K m, sum m = 0, <m,m> != 0, e_i m^T in K -> K cap {<m, row i> = 0} strongly level and finrank K <= 4 |
+| SPLIT, ker kappa form (step (3) of R3.1) | ThmSplit_kappa (split_id, split_ker, pc_ev, P4_repl_ones, P4_lin) | same hypotheses -> K cap {all column sums 0} strongly level, finrank <= 3 |
+| verifyfl's THEOREM FS (R3.2), row form | ThmFS (rowL, fsMap) | defect space Cs inside 1^perp, e_i (x) Cs inside K, <,> nondegenerate on Cs -> K cap {row i perp Cs} strongly level, finrank K <= 3 + finrank Cs |
 | verifyfl's Lemma HYP (R3.3) (a), (b) | LemmaHYP_a, LemmaHYP_b (hyp4, colsumL) | (a) H <= K, DefLine K m, finrank H = 4 -> DefLine H m and H not strongly level; (b) if every 4-dim space with defect line C m contains some e_i m^T then no 5-dim space with defect line C m exists |
-| rows' Hyperplane Lemma (R4.1) | HyperplaneLemma, HyperplaneCor | (DI_5; e-1) in the form "finrank (defC K) <= e -> finrank K <= finrank (defC K) + 2"; L' level with finrank (defC L') = e + 1; K <= L' -> defC K = defC L' or finrank K <= finrank (defC K) + 2; if finrank K >= e + 3 then defC K = defC L' |
-| rows' Lemma SL_3 (R3.8) | LemmaSL3 (Vp_*, SL3_q2, SL3_two, SL3_d2) | SLev K and row i of every Y in K is zero -> finrank K <= 2 (zero-row form, see dictionary) |
+| rows' Hyperplane Lemma (R4.1) | HyperplaneLemma, HyperplaneCor | (DI_5; e-1) as "finrank (defC K) <= e -> finrank K <= finrank (defC K) + 2"; L' level, finrank (defC L') = e + 1, K <= L' -> defC K = defC L' or finrank K <= finrank (defC K) + 2; if finrank K >= e + 3 then defC K = defC L' |
+| rows' Lemma SL_3 (R3.8), zero-row form | LemmaSL3 (Vp_span, Vp_nondeg, Vp_t3, Vp_finrank, SL3_q2, SL3_two, SL3_d2) | SLev K and row i of every Y in K is zero -> finrank K <= 2 |
+| rows' Theorem NCOL-S (a) (R4.14) | NCOL_S_a (kc1, P4_poly1, kc1_eq, pc_ev2, P4_repl2, kc1_formula, split_eig, ncol_lin, tau_repl0) | DefLine K m, sum m = 0, <m,m> != 0, e_i m^T in K, m without zero entry -> row i vanishes on N = K cap {<m, row i> = 0} and finrank K <= 3 |
+| rows' Theorem NCOL-S (b) | ncol_core, ncol_b1, NCOL_S_b (P4_zero_row') | for all Y in K the column sums of the rows != i are equal on supp m; if n is the only zero of m: row i of N is supported at n, N cap {row i = 0} strongly level of finrank <= 2, = 2 if finrank K = 4 |
+| verifyfl's TC5 normal form (DI5.2) | uY, dY, e2, Ed, TC5_sum, TC5_diff, TC5_n2, TC5_n3, TC5_n4, TC5_dd, TC5_normal | the four displayed identities; DefLine K (e_0 - e_1) <=> for all Y in K: (i) [u,y_2,y_3,y_4] level and (ii) perm(J+[u,u,y_k,y_l]) - perm[d,d,1+y_k,1+y_l] = 24 (columns numbered 0..4) |
+| verifyfl's Lemma QB (R4.1) | LemmaQB (qA1, qA2, P4_quad, qb_lin, qA1_eq, qA2_eq) | DefLine K m, sum m = 0, m != 0, Y in K -> exists kappa theta2: column sums = kappa m; (a) sum_a <y_a,y_a> = <s,s> + kappa^2 <m,m>; (b) <y_j,y_j> - <s,y_j> - kappa^2 m_j^2 = -(theta2/2) m_j |
+| QB (a) for any level 4x5 space; R4.2 (a), (b) | Lev45_quad, single_row_sum, single_row_perp, single_row_defC (rowE) [r4.part: see STATUS for whether it is in the current snapshot] | Lev45 K, Y in K -> total sum 0 and sum_a <y_a,y_a> = <s,s> + sum_a c_a^2; e_i u^T in K -> sum u = 0 and u in defC K; e_i u^T, e_k u'^T in K, i != k -> <u,u'> = 0 |
 
-### Dictionary / API guide for the new statements
+### Dictionary / API guide
+  M55 = Fin 5 x Fin 5 -> C, M45 = Fin 4 x Fin 5 -> C, V4 = Fin 4 -> C.  col Y j (column), rs Y (row sums, linear), tau, ip, t3, t4, br.
   P4 a N        = permanent of the 4x4 matrix "N minus column a" (sum over injective e : Fin 4 -> Fin 5 avoiding a); C(Y)_a = P4 a (1 + Y).
+                  P4_cols: P4 a N = pc (col N (a.succAbove 0)) .. (col N (a.succAbove 3)); pc = 4x4 permanent in column form; sa0..sa4
+                  turn a.succAbove k into literals; P4_c0..P4_c4 are the literal versions; pc_tau, pc_expand expand pc.
   SLev K        = forall Y in K, forall a, P4 a (1 + Y) = 24            (strongly level = defect 0).
   Lev45 K       = forall Y in K, sum_a P4 a (1 + Y) = 120              (4x5 level: <1, C(Y)> = 120).
-  DefLine K m   = forall Y in K, exists theta, forall a, P4 a (1 + Y) = 24 + theta * m a     (defect line C m; sum m = 0 and m != 0 are separate hypotheses where needed).
-  defW K        = {w : forall Y in K, sum_a w a * P4 a (1 + Y) = 0} = (C(K) + C 1)^perp  (Submodule of Fin 5 -> C; mem_defW is Iff.rfl).
+  DefLine K m   = forall Y in K, exists theta, forall a, P4 a (1 + Y) = 24 + theta * m a     (defect line C m; sum m = 0, m != 0 are separate hypotheses).
+  defW K        = {w : forall Y in K, sum_a w a * P4 a (1 + Y) = 0} = (C(K) + C 1)^perp  (mem_defW is Iff.rfl).
   defC K        = span{C(Y) : Y in K} = C(K) + C 1;   defect e(K) = finrank (defC K) - 1.
   defL r K      = K.comap (del r) inf (defW K).comap (rowP r)      (the space L(L') of rows' Prop. D).
-  "row r deletable in L"  is stated as  forall t in L, sum_a P4 a (fun p => 1 + t (r.succAbove p.1, p.2)) = 120.
-  rowMat r w = e_r w^T, colMat c w = w e_c^T, del r = delete row r, rowP r = row r, ins r Y = Y with a zero row inserted at r, stk r N w = (N; w).
-  repl i u N    = N with row i replaced by u.  P4_repl_add (additivity in a row), P4_sym r i w u N: sum_a w a * P4 a (repl i u N) =
-                  sum_a u a * P4 a (repl i w N)  (symmetry of the 5-linear form Per(l_1..l_4, w) in the slots i and 5; via per_stk, per_rows).
-  phiRow i m Y  = <m, row i of Y>;  colsumL j Y = column sum j;  csL = all column sums;  cperm sigma = column permutation.
-  roots5 T hT a0..a4 : a polynomial of degree <= 4 vanishing at five distinct points T i has zero coefficients (Mathlib Vandermonde);
-  moments5 : sum_i X i * T i ^ j = 0 for j < 5 and T injective -> X = 0.  P4_poly a B Y : P4 a (B + s Y) is a polynomial of degree <= 4 in s.
-  SL_3 dictionary: a 3x5 space Pi "all of whose 3x4 column deletions are level" corresponds to the 4x5 space of its zero-row extensions
-  (Laplace expansion of P4 a (1 + Y) along the all-ones row i gives the 3x4 level sum of the deletion a), so LemmaSL3 is rows' SL_3.
-  (This Laplace step itself is not formalized; the 4x5 zero-row form is the one used by NCOL-S and R4.15.)
+  "row r deletable in L"  :=  forall t in L, sum_a P4 a (fun p => 1 + t (r.succAbove p.1, p.2)) = 120.
+  rowMat r w = e_r w^T (5x5), colMat c w, rowE i u = e_i u^T (4x5; the hypotheses "e_i m^T in K" are written with the same lambda),
+  del r = delete row r, rowP r = row r, ins r Y = Y with a zero row inserted at r, stk r N w = (N; w), cperm sigma = column permutation.
+  repl i u N    = N with row i replaced by u (repl_at, repl_ne, repl_self).  P4_repl_add (additivity in a row), P4_zero_row, P4_zero_row',
+                  P4_sym r i w u N: sum_a w a * P4 a (repl i u N) = sum_a u a * P4 a (repl i w N)  (symmetry of Per(l_1..l_4, w)).
+  Polynomial tools: P4_poly a B Y (P4 a (B + sY) has degree <= 4 in s), P4_poly1 (same with the constant and linear coefficients explicit:
+                  P4 a B and kc1 a B Y = sum_k P4 a (repl k (row k of Y) B), kc1_eq), P4_lin, P4_quad (P4 b (1 + cY) with explicit
+                  coefficients qA1, qA2 of c, c^2; closed forms qA1_eq, qA2_eq), roots5 (degree <= 4, five distinct roots => all
+                  coefficients 0; used with the nodes 1..5 = inj_succ5), moments5 (Vandermonde, transposed), vdm3, cramer2.
+  Explicit permanents: P4_ones (= 24), P4_repl_ones (row i = m, others 1: 6 sum_{j != b} m_j), P4_repl2 (rows y, m, 1, 1: 2 sum_{j != l} y_j m_l).
+  phiRow i m Y  = <m, row i of Y>;  colsumL j Y = column sum j;  csL = all column sums;  fsMap i Cs : M45 -> Dual Cs.
+  Plane V' = {x in C^4 : tau x = 0, x_i = 0} (zero-row case): Vp_span (two independent vectors span it), Vp_nondeg, Vp_t3, Vp_finrank.
+  SL_3 dictionary: a 3x5 space "all of whose 3x4 column deletions are level" corresponds to the 4x5 space of its zero-row extensions
+  (Laplace expansion of P4 a (1 + Y) along the all-ones row i); this Laplace step itself is not formalized.
+  How to add a result: write a new part file, append it before v.tail in the build list, compile with leancheck (5 min for the whole
+  file); never start a line with add_; brute-force identities about pc: simp (config := {decide := true}) only [pc, ..., Fin.sum_univ_four,
+  ite_true, ite_false, add_zero, zero_add] then ring (at most ~4 such cases per declaration, else the heartbeat limit is hit);
+  avoid `exact` across non-syntactic pc arguments (whnf timeout): first rewrite the columns with a `have hc : forall j, col .. j = .. := fun j => rfl`.
 
 ### Blueprint steps S1-S9 (rounds 1-2): all COMPILED, no hypothesis
   S1 Prop R (perm5_row, level_row, propR, stageA); S2 Lemma C (pc_tau, pc_expand, coeffs, C1, C2, C34, C2pol); S3 (Q1, Q4, Niso, peel, maxpt, tricho);
   S4 Lemma A incl. G23 (A1, A1b, A1cols, G23, pattern23, LemA2_proof, caseA3, LemA_proof, two_line_pattern); S5 (Bi, Bii, Biii);
-  S6 type IV excluded (HypS6_proof: chart = spv/chart, Uv, lamL, N_coords, star_cert, Lam_star, Lam_F, singA, pairB, core5, AlgCore_of, HypS6_of,
+  S6 type IV excluded (HypS6_proof: spv/chart, Uv, lamL, N_coords, star_cert, Lam_star, Lam_F, singA, pairB, core5, AlgCore_of, HypS6_of,
      caseC_alg, HypS6C_proof); S7 type II excluded (typeII_ids, IIa_tu, Ps4*, HypIIa_proof, S7_elem, S7_step, HypS7alg_of, HypS7_of);
   S8 type I excluded (S8_elem, S8_step1, Qv framework, S8a, S8b, HypS8_proof); S9 (No22, SL_of, FL_of).
 
@@ -60,33 +81,40 @@ was found in the paper proofs. Not formalized: NCOL-S (R4.14), TC5 normal form (
    vector v (tau v = <v,v> = tau(v^3) = 0, v_i^4 = kappa): products are a twisted convolution (Qv_mul), tau and <,> are read off (tau_Qv, ip_Qv).
  - S6 chart: the six special lines are spv pi (pi in Perm(Fin 3)), 6 > 5 columns (pigeonhole), so some special v is proportional to no column
    of the generic element z; then every column is zeta_m U(theta_m), U(theta) = Qv v 0 (-theta^2/2) theta 1 (no "point at infinity").
- - S6 (C3*): one polynomial certificate (star_cert): lam_m (c(th_m) lam_m^2 - sum_a lam_a^2 k(th_m, th_a)) = (1/2) sum_n T_n - T_m - lam_m R_m,
-   k(x,y) = 2x + 4y + x^2 y^3 + x y^4/2, c(x) = 12x + 3x^5; division by lam_m via the parallelogram law with the generic element (Lam_F).
- - S6 patterns: singleton lines (g <= 3) by singA; (2,1,1,1) by pairB (quadratic k(x,s) with three distinct roots); (1^5) by caseC_alg:
-   with w in Lam having four vanishing moments and theta w in Lam, the power sums p_j = sum w_n^2 theta_n^j satisfy p_0 = ... = p_4 = 0
-   (two polynomial identities D, E of degree <= 4 with five roots, plus the sum of the five (+) equations), hence w = 0 by Vandermonde.
-   This replaces the blueprint's case distinction c_0 = 0 / c_0 != 0 and the explicit partial fractions.
- - Lemma DS (i): the limit s -> 0 is replaced by "a polynomial of degree <= 4 in s vanishing at s = 1..5 vanishes identically" (P4_poly, roots5).
+ - S6 (C3*): one polynomial certificate (star_cert); division by lam_m via the parallelogram law with the generic element (Lam_F).
+ - S6 patterns: singleton lines by singA; (2,1,1,1) by pairB; (1^5) by caseC_alg: with w in Lam having four vanishing moments and theta w
+   in Lam, the power sums p_j = sum w_n^2 theta_n^j satisfy p_0 = ... = p_4 = 0, hence w = 0 by Vandermonde (replaces the case distinction
+   c_0 = 0 / c_0 != 0 and the explicit partial fractions of the blueprint).
+ - Lemma DS (i): the limit s -> 0 is replaced by "a polynomial of degree <= 4 vanishing at s = 1..5 vanishes identically" (P4_poly, roots5);
+   the same device is used for every "degree-k part" (SPLIT step (3), NCOL-S, QB).
  - Prop. D (b) is proved for every level L (the inequality does not use deletability).
  - THEOREM SPLIT: steps (1), (2) of R3.1 give directly "K cap {<m, row i> = 0} is strongly level" (the form used by rows' R4.14);
-   step (3) (<m, y^i> = kappa(Y) <m,m>, i.e. ker kappa inside that hyperplane) is the separate lemma split_ker / ThmSplit_kappa (x4.part).
+   step (3) is the separate lemma split_ker (column sums 0 => <m, row i> = 0).  THEOREM FS is proved in the same row form.
  - LEMMA SL_3, case (q, d) = (1, 2): NEW SHORT ARGUMENT replacing R3.8 (d). With N = span{v(e_a-e_b)^T, w(e_c-e_d)^T}, Y_0 in K, u = s(Y_0):
    C3 at the inactive column e, second difference in the direction w(e_c-e_d)^T: tau(y_a w^2) + tau(y_b w^2) = 0; on the plane V' this is
-   gamma_w (<y_a,v> + <y_b,v>) = 0 (keyw); C2pol with v(e_a-e_b)^T at columns a, b: 2<y_a,v> = <u,v> = 2<y_b,v>; so <u,v> = 0, likewise
+   gamma_w (<y_a,v> + <y_b,v>) = 0; C2pol with v(e_a-e_b)^T at columns a, b: 2<y_a,v> = <u,v> = 2<y_b,v>; so <u,v> = 0, likewise
    <u,w> = 0, and u = 0 because <,> is nondegenerate on V' = span(v,w). Hence d = 2 forces q = 0 (SL3_d2); q = 2 forces N = 0 (SL3_q2).
+ - NCOL-S: D^(1)(Y) m is used in the raw form 2 sum_{j != b} c_j sum_{l != b,j} m_l (kc1_formula) and then in the closed form
+   -2 S m_b + 4 c_b m_b - 2 c.m (ncol_core); c.m = 0 is obtained in one stroke by summing the eigenvector relations over b (no case
+   distinction "m has a zero / has no zero"), so ncol_b1 holds for every m with <m,m> != 0.
+ - QB is stated before centring ((b) as <y_j,y_j> - <s,y_j> - kappa^2 m_j^2 = -(theta2/2) m_j, theta2 = the degree-2 part of thetahat);
+   Lev45_quad is the general-e statement (a) with <c,c> = sum of squared column sums.
+ - TC5_dd holds for arbitrary a, b (the hypothesis a, b in V of DI5.2 is not needed for that identity).
 
 ### Open (not formalized)
- - rows' Theorem NCOL-S (R4.14) and R4.15: need the explicit degree-1 part D^(1)(Y) m = -2S m + 4 c o m - 2(c.m) 1 (tools ready: P4_poly, P4_lin,
-   pc_ev, P4_repl_ones, split_id, roots5, LemmaSL3, ThmSplit).
- - verifyfl's TC5 normal form (DI5.2) and Theorem TC5; Theorem FS / TS (R3.2, R3.2'); the native 3x5 statement of SL_3 (Laplace along the ones row).
+ - verifyfl's Theorem TC5 (DI5.3: Lemmas Z, LAG, NB and branches P1-P4), Theorem TS, Theorem PS / PR-RED / PR3 (R4.3-R4.5), round-5 items;
+   rows' FL2* (R3.9), R4.2 (c), (d), R4.3; the degree-wise conditions (C2'), (C3'), (C4') of DI5.2; the native 3x5 statement of SL_3.
+   Tools that are ready for them: everything in the API guide; for PS the blueprint lemmas ip_phi / tau_phi / Biii (B_j isometries) and
+   LemmaQB; for FL2* the pieces P4_repl2, kc1_formula (= Delta_1 u), LemmaSL3, single_row_perp.
 
-### Build recipe (reproduces FL.lean byte for byte; leancheck takes 3-4 minutes for the whole file)
-  cd lean/fl; cat pre a b c d1 e f g h j k o2 p i5 l2 m n r1 r2 s1 s2 s3 t3 ds x1 x2 x3 y1 [x4] (.part) v.tail > FL.lean
-  (round 2: r1 Qv framework; r2 S8; s1 S6 chart + coordinates + (C3*); s2 S6 patterns A, B; s3 S6 pattern (1^5) + Vandermonde tools;
-   t3 Lemma SL / Theorem FL row + column / corollaries; ds Lemma DS; round 3: x1 defect construction + Lemma EQ; x2 Theorem SPLIT;
-   x3 defect dimension + Hyperplane Lemma + Lemma HYP; y1 Lemma SL_3; x4 SPLIT in the ker kappa form; v.tail final theorem.)
-  Snapshots: FL.v14 (round 1), v15 (S8), v16 (column version), v17 (S6 modulo (1^5)), v18 (hypothesis-free FL), v19 (DS), v20 (Prop. D, EQ,
-  SPLIT), v21 (defect dimension, R4.1, HYP), v22 (SL_3); later ones in the STATUS lines.
+### Build recipe (reproduces FL.lean byte for byte; leancheck takes about 5 minutes for the whole file)
+  cd lean/fl; cat pre a b c d1 e f g h j k o2 p i5 l2 m n r1 r2 s1 s2 s3 t3 ds x1 x2 x3 y1 x4 n1 n2 z1 z2 q1 [r4] (.part) v.tail > FL.lean
+  (rounds 1-2: pre .. n blueprint S1-S9; r1 Qv; r2 S8; s1-s3 S6; t3 SL / FL row + column / corollaries; ds Lemma DS;
+   round 3: x1 Prop. D + Lemma EQ; x2 SPLIT; x3 defect dimension + R4.1 + HYP; y1 SL_3; x4 SPLIT ker kappa; n1 NCOL-S (a); n2 NCOL-S (b);
+   z1 FS; z2 TC5 normal form; q1 QB; r4 Lev45_quad + R4.2 (a), (b); v.tail final theorem.)
+  Snapshots (all compile): FL.v14 (round 1), v15 (S8), v16 (column), v17 (S6 mod (1^5)), v18 (hypothesis-free FL), v19 (DS), v20 (D, EQ, SPLIT),
+  v21 (defect dim, R4.1, HYP), v22 (SL_3), v23 (SPLIT kappa), v24 (NCOL-S a), v25 (NCOL-S b, GUARD-COMPLIANT from here on), v26 (FS, DI5.2),
+  v27 (QB); later ones in the STATUS lines.  Files *.bak_v24 are the pre-guard versions of the five edited parts.
 
 ## RESULT ROUND 1 (superseded by the section above; kept for the per-step table and the round-1 deviations)
 ## THEOREM FL was Lean-checked modulo TWO explicit hypotheses: HypS6 (blueprint S6, type IV) and HypS8 (S8 Steps 2-4, type I).
@@ -230,3 +258,4 @@ STATUS 19:55 (round 3): FL.lean = FL.v24.lean compiles (6442 lines, 287 KB, exit
 STATUS 20:00 (round 3): FL.lean = FL.v25.lean compiles (6593 lines, 295 KB, exit 0, format 0, GUARD 0/0). Guard rules adopted (coordinator message 19:56): helper namespace renamed to PEqualNP.Outside.L_gct_210_aux.FL (pre.part, v.tail), no line begins with add_ (defW rewritten as a structure instance with add_mem' mid-line; simp lists re-wrapped). New n2.part: NCOL-S (b): ncol_core (closed form D b = -2 S m_b + 4 c_b m_b - 2 c.m and the eigenvector relations), ncol_b1 (for every Y in K the column sums of the rows != i are equal on supp m), P4_zero_row', NCOL_S_b (m with exactly one zero n: row i of N is supported at n; N cap {row i = 0} strongly level, finrank <= 2, and = 2 if finrank K = 4). Build: ... x1 x2 x3 y1 x4 n1 n2 (.part) v.tail. Next (coordinator list): Theorem FS (z1.part written), TC5 normal form DI5.2, TC5, QB/PS/PR3, FL2*.
 STATUS 20:04 (round 3): FL.lean = FL.v26.lean compiles (6783 lines, 304 KB, exit 0, format 0, guard 0/0). New z1.part: verifyfl's THEOREM FS (R3.2) in row form (ThmFS: defect space Cs inside 1^perp, e_i (x) Cs inside K, <,> nondegenerate on Cs => K cap {row i perp Cs} strongly level and finrank K <= 3 + finrank Cs; fsMap = the map K -> Dual Cs). New z2.part: TC5 NORMAL FORM DI5.2 (uY, dY, e2, Ed; TC5_sum, TC5_diff, TC5_n2/n3/n4 = the four displayed identities, TC5_dd = perm[d,d,1+a,1+b] = 4 e_2(d) + 2<a+b,E(d)> + perm[d,d,a,b] (holds for all a, b), TC5_normal: DefLine K (e_0 - e_1) <=> (i) and (ii)). Build: ... n1 n2 z1 z2 (.part) v.tail. Compiling q1.part: verifyfl's LEMMA QB (R4.1).
 STATUS 20:08 (round 3): FL.lean = FL.v27.lean compiles (6932 lines, 315 KB, exit 0, format 0, guard 0/0). New q1.part: verifyfl's LEMMA QB (R4.1): qA1, qA2 (explicit linear and quadratic coefficients of P4 b (1 + cY)), P4_quad, qb_lin (m b' A_k(b) = m b A_k(b') for k = 1, 2, by roots5), qA1_eq, qA2_eq (closed forms), LemmaQB: DefLine K m, sum m = 0, m != 0, Y in K => exists kappa theta2 with column sums = kappa m, (a) sum_a <y_a,y_a> = <s,s> + kappa^2 <m,m>, (b) <y_j,y_j> - <s,y_j> - kappa^2 m_j^2 = -(theta2/2) m_j for all j (the form before centring). Build: ... z1 z2 q1 (.part) v.tail. Compiling r4.part: Lev45_quad (QB (a) for every level 4x5 space), rows' R4.2 (a), (b) (single-row parts lie in the defect space and are pairwise orthogonal).
+STATUS 20:10 (round 3): FL.lean = FL.v28.lean compiles (7050 lines, 321 KB, exit 0, format 0, guard 0/0). New r4.part: Lev45_quad (for every level 4x5 space: total sum 0 and sum_a <y_a,y_a> = <s,s> + sum_a c_a^2), rowE, one_add_rowE, one_add_rowE2, single_row_sum, single_row_perp, single_row_defC (rows' R4.2 (a), (b)). RESULT section rewritten. Build: ... z1 z2 q1 r4 (.part) v.tail. Next: R4.2 (c) (r5.part).

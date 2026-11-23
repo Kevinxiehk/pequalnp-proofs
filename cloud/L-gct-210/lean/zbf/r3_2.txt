@@ -1,0 +1,265 @@
+theorem zbf_cases {n : ℕ} (hn : n ≠ 0) {α β : Type} [Fintype α] [DecidableEq α] [Fintype β]
+    [DecidableEq β] {L : Submodule ℂ (Fin n × Fin n → ℂ)} (hL : Lev n L)
+    (r c : α ⊕ β ≃ Fin n) :
+    (∃ k k' : ℂ, k * k' = (Nat.factorial n : ℂ) ∧ ∀ w ∈ blockSpace L r c,
+        blk (fun a => r (Sum.inl a)) (fun a => c (Sum.inl a)) (hat n w) =
+          k * w.1 ^ Fintype.card α ∧
+        blk (fun b => r (Sum.inr b)) (fun b => c (Sum.inr b)) (hat n w) =
+          k' * w.1 ^ Fintype.card β) ∨
+      ((∀ w ∈ blockSpace L r c, w.1 = 0) ∧
+        ((∀ w ∈ blockSpace L r c,
+            blk (fun a => r (Sum.inl a)) (fun a => c (Sum.inl a)) (hat n w) = 0) ∨
+          ∀ w ∈ blockSpace L r c,
+            blk (fun b => r (Sum.inr b)) (fun b => c (Sum.inr b)) (hat n w) = 0)) := by
+  by_cases h : ∀ w ∈ blockSpace L r c, w.1 = 0
+  · exact Or.inr ⟨h, zbf_zero hn hL r c h⟩
+  · left
+    have h' : ∃ w ∈ blockSpace L r c, w.1 ≠ 0 := by
+      by_contra hno
+      apply h
+      intro w hw
+      by_contra hw1
+      exact hno ⟨w, hw, hw1⟩
+    obtain ⟨w0, hw0, hw01⟩ := h'
+    have hu0 : w0.1⁻¹ • w0 ∈ blockSpace L r c := (blockSpace L r c).smul_mem _ hw0
+    have h0 : (w0.1⁻¹ • w0).1 = 1 := by
+      rw [Prod.smul_fst, smul_eq_mul, inv_mul_cancel₀ hw01]
+    have hp := zbf_prod hL r c _ hu0
+    rw [LinearMap.fst_apply, h0, one_pow, mul_one] at hp
+    exact ⟨_, _, hp, fun w hw => zbf_ufd hL r c _ hu0 h0 w hw⟩
+
+theorem t0 {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L) (r c : Fin 3 ⊕ Fin 2 ≃ Fin 5) :
+    (∃ k k' : ℂ, k * k' = 120 ∧ ∀ w ∈ blockSpace L r c,
+        blk (fun a => r (Sum.inl a)) (fun a => c (Sum.inl a)) (hat 5 w) = k * w.1 ^ 3 ∧
+        blk (fun b => r (Sum.inr b)) (fun b => c (Sum.inr b)) (hat 5 w) = k' * w.1 ^ 2) ∨
+      ((∀ w ∈ blockSpace L r c, w.1 = 0) ∧
+        ((∀ w ∈ blockSpace L r c,
+            blk (fun a => r (Sum.inl a)) (fun a => c (Sum.inl a)) (hat 5 w) = 0) ∨
+          ∀ w ∈ blockSpace L r c,
+            blk (fun b => r (Sum.inr b)) (fun b => c (Sum.inr b)) (hat 5 w) = 0)) := by
+  rcases zbf_cases (n := 5) (by norm_num) hL r c with ⟨k, k', hk, hw⟩ | h
+  · left
+    refine ⟨k, k', ?_, fun w hw' => ?_⟩
+    · rw [hk]
+      norm_num [Nat.factorial]
+    · have h3 := hw w hw'
+      rw [Fintype.card_fin, Fintype.card_fin] at h3
+      exact h3
+  · exact Or.inr h
+
+theorem t2_cubic (t a1 a2 a3 : ℂ) :
+    pm (fun p : Fin 3 × Fin 3 => vec3 (vec3 t a1 (-t - a1) p.2) (vec3 t (-a2) (t + a2) p.2)
+      (vec3 t (-a3) (t + a3) p.2) p.1) =
+      2 * t * (t * a1 + a1 * a2 + a1 * a3 - a2 * a3) := by
+  simp only [pm, permanent_three, Matrix.of_apply, vec3_0, vec3_1, vec3_2]
+  ring
+
+theorem t2_core (α β1 β2 β3 : ℂ)
+    (h : ∀ t a1 a2 a3 : ℂ, α * t + β1 * a1 + β2 * a2 + β3 * a3 = 0 →
+      2 * t * (t * a1 + a1 * a2 + a1 * a3 - a2 * a3) = 0) :
+    β1 = 0 ∧ β2 = 0 ∧ β3 = 0 := by
+  have hβ2 : β2 = 0 := by
+    have e1 := h β2 0 (-(α + β3)) β2 (by ring)
+    have e2 := h β2 0 (-(α - β3)) (-β2) (by ring)
+    have e3 := h β2 β2 (-(α + β1)) 0 (by ring)
+    have e4 := h β2 (-β2) (-(α - β1)) 0 (by ring)
+    have h5 : β2 * (β2 * β2) = 0 := by linear_combination (e3 - e4 + e1 - e2) / 4
+    rcases mul_eq_zero.mp h5 with h6 | h6
+    · exact h6
+    · exact mul_self_eq_zero.mp h6
+  have hβ3 : β3 = 0 := by
+    have f1 := h β3 0 β3 (-(α + β2)) (by ring)
+    have f2 := h β3 0 (-β3) (-(α - β2)) (by ring)
+    have f3 := h β3 β3 0 (-(α + β1)) (by ring)
+    have f4 := h β3 (-β3) 0 (-(α - β1)) (by ring)
+    have h5 : β3 * (β3 * β3) = 0 := by linear_combination (f3 - f4 + f1 - f2) / 4
+    rcases mul_eq_zero.mp h5 with h6 | h6
+    · exact h6
+    · exact mul_self_eq_zero.mp h6
+  subst hβ2
+  subst hβ3
+  have g1 := h β1 (-α) 1 1 (by ring)
+  have g2 := h β1 (-α) 1 (-1) (by ring)
+  have g4 := h β1 (-α) (-1) (-1) (by ring)
+  exact ⟨by linear_combination (g1 + g4 - 2 * g2) / (-8), rfl, rfl⟩
+
+theorem t2pp_cubic (j t a1 a2 a3 : ℂ) :
+    pm (fun p : Fin 3 × Fin 3 => vec3 (vec3 t a1 (-t - a1) p.2) (vec3 t (-a2) (t + a2) p.2)
+      (vec3 (-a3) (-(j * (t - a3))) (-t) p.2) p.1) =
+      (a2 - a1) * t * (t - j * (t - a3)) - a3 * (t * (a1 + a2) + 2 * a1 * a2) := by
+  simp only [pm, permanent_three, Matrix.of_apply, vec3_0, vec3_1, vec3_2]
+  ring
+
+theorem t2pp_core (j α β1 β2 β3 : ℂ) (hj : j ≠ 1)
+    (h : ∀ t a1 a2 a3 : ℂ, α * t + β1 * a1 + β2 * a2 + β3 * a3 = 0 →
+      (a2 - a1) * t * (t - j * (t - a3)) - a3 * (t * (a1 + a2) + 2 * a1 * a2) = 0) :
+    False := by
+  by_cases h3 : β3 = 0
+  · subst h3
+    have e1 := h β1 (-α) 0 0 (by ring)
+    have e2 := h β2 0 (-α) 0 (by ring)
+    have e3 := h 0 β2 (-β1) 1 (by ring)
+    by_cases hα : α = 0
+    · subst hα
+      by_cases hβ1 : β1 = 0
+      · subst hβ1
+        have e4 := h 1 1 0 0 (by ring)
+        exact hj (by linear_combination e4)
+      · have hβ2 : β2 = 0 := by
+          have h5 : β1 * β2 = 0 := by linear_combination e3 / 2
+          exact (mul_eq_zero.mp h5).resolve_left hβ1
+        subst hβ2
+        have e4 := h 1 0 1 0 (by ring)
+        exact hj (by linear_combination -e4)
+    · have hβ1 : β1 = 0 := by
+        have h5 : (1 - j) * (α * (β1 * β1)) = 0 := by linear_combination e1
+        rcases mul_eq_zero.mp h5 with h6 | h6
+        · exact absurd (by linear_combination -h6 : j = 1) hj
+        · rcases mul_eq_zero.mp h6 with h7 | h7
+          · exact absurd h7 hα
+          · exact mul_self_eq_zero.mp h7
+      have hβ2 : β2 = 0 := by
+        have h5 : (1 - j) * (α * (β2 * β2)) = 0 := by linear_combination -e2
+        rcases mul_eq_zero.mp h5 with h6 | h6
+        · exact absurd (by linear_combination -h6 : j = 1) hj
+        · rcases mul_eq_zero.mp h6 with h7 | h7
+          · exact absurd h7 hα
+          · exact mul_self_eq_zero.mp h7
+      subst hβ1
+      subst hβ2
+      have e4 := h 0 1 1 1 (by ring)
+      norm_num at e4
+  · have f1 := h 0 β3 β3 (-(β1 + β2)) (by ring)
+    have f2 := h 0 β3 (-β3) (-(β1 - β2)) (by ring)
+    have hβ1 : β1 = 0 := by
+      have h5 : β3 * β3 * β1 = 0 := by linear_combination (f1 - f2) / 4
+      rcases mul_eq_zero.mp h5 with h6 | h6
+      · exact absurd (mul_self_eq_zero.mp h6) h3
+      · exact h6
+    have hβ2 : β2 = 0 := by
+      have h5 : β3 * β3 * β2 = 0 := by linear_combination (f1 + f2) / 4
+      rcases mul_eq_zero.mp h5 with h6 | h6
+      · exact absurd (mul_self_eq_zero.mp h6) h3
+      · exact h6
+    subst hβ1
+    subst hβ2
+    have f3 := h β3 β3 β3 (-α) (by ring)
+    have hα : α = 0 := by
+      have h5 : β3 * β3 * α = 0 := by linear_combination f3 / 4
+      rcases mul_eq_zero.mp h5 with h6 | h6
+      · exact absurd (mul_self_eq_zero.mp h6) h3
+      · exact h6
+    subst hα
+    have f4 := h β3 0 β3 0 (by ring)
+    have h5 : (1 - j) * (β3 * (β3 * β3)) = 0 := by linear_combination f4
+    rcases mul_eq_zero.mp h5 with h6 | h6
+    · exact hj (by linear_combination -h6)
+    · rcases mul_eq_zero.mp h6 with h7 | h7
+      · exact h3 h7
+      · exact h3 (mul_self_eq_zero.mp h7)
+
+theorem t1p_alg (i y a b c c2 c3 : ℂ) (hi : i * i = -1) (hy : 2 * y = -1 + i)
+    (h1 : a + b + c = 1) (h2 : c2 * (i * a + b - c) = 1) (h3 : c3 * (-a + b + i * c) = 1)
+    (h4 : c + c2 * b = -y) (h5 : a + c3 * b = -y) (h6 : i * (c2 * a + c3 * c) = -y) :
+    False := by
+  have hA : b * (1 - c2 - c3) = i := by linear_combination h1 - h4 - h5 + hy
+  have hB : c2 * (i + b * (1 + c2 - i * c3)) = 1 := by
+    linear_combination h2 - c2 * i * h5 + c2 * h4 + c2 * (i - 1) / 2 * hy + c2 / 2 * hi
+  have hC : c3 * (i + b * (1 + c3 - i * c2)) = 1 := by
+    linear_combination h3 + c3 * h5 - c3 * i * h4 + c3 * (i - 1) / 2 * hy + c3 / 2 * hi
+  have hD : -y * (c2 + c3) - 2 * c2 * c3 * b = i * y := by
+    linear_combination -i * h6 + (c2 * a + c3 * c) * hi - c2 * h5 - c3 * h4
+  have hE : (c2 - c3) * (i + b * (1 + c2 + c3)) = 0 := by linear_combination hB - hC
+  have hi0 : i ≠ 0 := by
+    intro h0
+    rw [h0] at hi
+    norm_num at hi
+  rcases mul_eq_zero.mp hE with hG | hF
+  · have hcc : c2 = c3 := by linear_combination hG
+    subst hcc
+    have hR1 : (1 - i) * c2 ^ 2 + (2 + 2 * i) * c2 - 1 = 0 := by
+      linear_combination (1 - 2 * c2) * hB - c2 * (1 + c2 - i * c2) * hA + c2 ^ 2 * hi
+    have hQ2 : c2 ^ 2 + i * c2 - (1 + i) / 4 = 0 := by
+      linear_combination (-1 / 2 : ℂ) * ((1 - 2 * c2) * hD + 2 * c2 ^ 2 * hA +
+        (c2 * (1 - 2 * c2) + i * (1 - 2 * c2) / 2) * hy + (1 - 2 * c2) / 2 * hi)
+    have hEE : (1 + i) * c2 - 1 / 2 = 0 := by
+      linear_combination hR1 - (1 - i) * hQ2 - (c2 - 1 / 4) * hi
+    have hfin : (1 : ℂ) / 4 = 0 := by
+      linear_combination (1 + i) ^ 2 * hQ2 - ((1 + i) * c2 + 1 / 2 + i * (1 + i)) * hEE +
+        (1 + i) / 4 * hi
+    norm_num at hfin
+  · have hb : b = 0 := by linear_combination (hF + hA) / 2
+    have h0 : i = 0 := by linear_combination -hA + (1 - c2 - c3) * hb
+    exact hi0 h0
+
+theorem rowsZeroS_single {n : ℕ} (L : Submodule ℂ (Fin n × Fin n → ℂ)) (r : Fin n) :
+    rowsZeroS L {r} = L ⊓ LinearMap.ker (rowMap r) := by
+  ext t
+  rw [mem_rowsZeroS, Submodule.mem_inf, LinearMap.mem_ker]
+  constructor
+  · rintro ⟨h1, h2⟩
+    exact ⟨h1, funext fun j => h2 r (Finset.mem_singleton_self r) j⟩
+  · rintro ⟨h1, h2⟩
+    refine ⟨h1, fun r' hr' j => ?_⟩
+    rw [Finset.mem_singleton.mp hr']
+    exact congrFun h2 j
+
+theorem rowsZeroS_single_finrank {n : ℕ} (L : Submodule ℂ (Fin n × Fin n → ℂ)) (r : Fin n) :
+    Module.finrank ℂ L = Module.finrank ℂ (rowsZeroS L {r}) +
+      Module.finrank ℂ (L.map (rowMap r)) := by
+  rw [rowsZeroS_single]
+  exact rank_nullity L (rowMap r)
+
+theorem s2_count (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)) (r1 r2 r3 : Fin 5)
+    (h1 : Module.finrank ℂ (rowsZeroS L {r1}) = 5)
+    (h2 : Module.finrank ℂ (rowsZeroS L {r2}) = 5)
+    (h3 : Module.finrank ℂ (rowsZeroS L {r3}) = 5)
+    (h0 : rowsZeroS L {r1, r2, r3} = ⊥)
+    (l12 : 2 ≤ Module.finrank ℂ (rowsZeroS L {r1, r2}))
+    (l13 : 2 ≤ Module.finrank ℂ (rowsZeroS L {r1, r3}))
+    (l23 : 2 ≤ Module.finrank ℂ (rowsZeroS L {r2, r3})) :
+    (Module.finrank ℂ (rowsZeroS L {r1, r2}) = 2 ∧
+        Module.finrank ℂ (rowsZeroS L {r1, r3}) = 2 ∧
+        Module.finrank ℂ (rowsZeroS L {r2, r3}) = 2) ∨
+      (Module.finrank ℂ (rowsZeroS L {r1, r2}) = 2 ∧
+        Module.finrank ℂ (rowsZeroS L {r1, r3}) = 2 ∧
+        Module.finrank ℂ (rowsZeroS L {r2, r3}) = 3) ∨
+      (Module.finrank ℂ (rowsZeroS L {r1, r2}) = 2 ∧
+        Module.finrank ℂ (rowsZeroS L {r1, r3}) = 3 ∧
+        Module.finrank ℂ (rowsZeroS L {r2, r3}) = 2) ∨
+      (Module.finrank ℂ (rowsZeroS L {r1, r2}) = 3 ∧
+        Module.finrank ℂ (rowsZeroS L {r1, r3}) = 2 ∧
+        Module.finrank ℂ (rowsZeroS L {r2, r3}) = 2) := by
+  have ea : ({r1, r2} : Finset (Fin 5)) ∪ {r1, r3} = {r1, r2, r3} := by
+    ext x
+    simp only [Finset.mem_union, Finset.mem_insert, Finset.mem_singleton]
+    tauto
+  have eb : ({r1, r2} : Finset (Fin 5)) ∪ {r2, r3} = {r1, r2, r3} := by
+    ext x
+    simp only [Finset.mem_union, Finset.mem_insert, Finset.mem_singleton]
+    tauto
+  have ec : ({r1, r3} : Finset (Fin 5)) ∪ {r2, r3} = {r1, r2, r3} := by
+    ext x
+    simp only [Finset.mem_union, Finset.mem_insert, Finset.mem_singleton]
+    tauto
+  have sa1 : ({r1} : Finset (Fin 5)) ⊆ {r1, r2} ∩ {r1, r3} := by
+    intro x hx
+    rw [Finset.mem_singleton] at hx
+    rw [Finset.mem_inter, Finset.mem_insert, Finset.mem_insert]
+    exact ⟨Or.inl hx, Or.inl hx⟩
+  have sb1 : ({r2} : Finset (Fin 5)) ⊆ {r1, r2} ∩ {r2, r3} := by
+    intro x hx
+    rw [Finset.mem_inter, Finset.mem_insert, Finset.mem_insert]
+    exact ⟨Or.inr hx, Or.inl (Finset.mem_singleton.mp hx)⟩
+  have sc1 : ({r3} : Finset (Fin 5)) ⊆ {r1, r3} ∩ {r2, r3} := by
+    intro x hx
+    rw [Finset.mem_inter, Finset.mem_insert, Finset.mem_insert]
+    exact ⟨Or.inr hx, Or.inr hx⟩
+  have ba := rows_disjoint_bound L {r1, r2} {r1, r3} (by rw [ea]; exact h0)
+  have bb := rows_disjoint_bound L {r1, r2} {r2, r3} (by rw [eb]; exact h0)
+  have bc := rows_disjoint_bound L {r1, r3} {r2, r3} (by rw [ec]; exact h0)
+  have ma := Submodule.finrank_mono (rowsZeroS_mono L sa1)
+  have mb := Submodule.finrank_mono (rowsZeroS_mono L sb1)
+  have mc := Submodule.finrank_mono (rowsZeroS_mono L sc1)
+  omega
+

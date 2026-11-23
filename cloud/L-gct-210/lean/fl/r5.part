@@ -1,0 +1,56 @@
+
+theorem single_row_t3 (K : Submodule ℂ M45) (hK : Lev45 K) (i k l : Fin 4) (hik : i ≠ k)
+    (hil : i ≠ l) (hkl : k ≠ l) (u u' u'' : Fin 5 → ℂ) (hE : rowE i u ∈ K)
+    (hE' : rowE k u' ∈ K) (hE'' : rowE l u'' ∈ K) :
+    u 0 * u' 0 * u'' 0 + u 1 * u' 1 * u'' 1 + u 2 * u' 2 * u'' 2 + u 3 * u' 3 * u'' 3
+      + u 4 * u' 4 * u'' 4 = 0 := by
+  have hU := single_row_sum K hK i u hE
+  have hU' := single_row_sum K hK k u' hE'
+  have hU'' := single_row_sum K hK l u'' hE''
+  have huu'' := single_row_perp K hK i l hil u u'' hE hE''
+  have hu'u'' := single_row_perp K hK k l hkl u' u'' hE' hE''
+  have hNl : (fun j => (repl i (fun j => 1 + u j) (repl k (fun j => 1 + u' j) (fun _ => 1))) (l, j)) = fun _ => 1 := by
+    funext j
+    rw [repl_ne i l (Ne.symm hil), repl_ne k l (Ne.symm hkl)]
+  have eN : repl l (fun _ => 1) (repl i (fun j => 1 + u j) (repl k (fun j => 1 + u' j) (fun _ => 1))) = (repl i (fun j => 1 + u j) (repl k (fun j => 1 + u' j) (fun _ => 1))) := by
+    have h := repl_self l (repl i (fun j => 1 + u j) (repl k (fun j => 1 + u' j) (fun _ => 1)))
+    rw [hNl] at h
+    exact h
+  have e3 : (fun p : Fin 4 × Fin 5 => 1 + (rowE i u + rowE k u' + rowE l u'') p) =
+      repl l ((fun _ => 1) + u'') (repl i (fun j => 1 + u j) (repl k (fun j => 1 + u' j) (fun _ => 1))) := by
+    funext ⟨a, j⟩
+    by_cases h : a = l
+    · rw [h, repl_at]
+      show 1 + ((if l = i then u j else 0) + (if l = k then u' j else 0)
+        + (if l = l then u'' j else 0)) = 1 + u'' j
+      rw [if_neg (Ne.symm hil), if_neg (Ne.symm hkl), if_pos rfl, zero_add, zero_add]
+    · rw [repl_ne l a h]
+      have h2 := congrFun (one_add_rowE2 i k hik u u') (a, j)
+      rw [← h2]
+      show 1 + ((if a = i then u j else 0) + (if a = k then u' j else 0)
+        + (if a = l then u'' j else 0)) = 1 + ((if a = i then u j else 0)
+        + (if a = k then u' j else 0))
+      rw [if_neg h, add_zero]
+  have h3 := hK _ (K.add_mem (K.add_mem hE hE') hE'')
+  rw [e3, Fin.sum_univ_five] at h3
+  have h2 := hK _ (K.add_mem hE hE')
+  rw [one_add_rowE2 i k hik, Fin.sum_univ_five] at h2
+  have ha : ∀ b, P4 b (repl l ((fun _ => 1) + u'') (repl i (fun j => 1 + u j) (repl k (fun j => 1 + u' j) (fun _ => 1)))) =
+      P4 b (repl i (fun j => 1 + u j) (repl k (fun j => 1 + u' j) (fun _ => 1))) + P4 b (repl l u'' (repl i (fun j => 1 + u j) (repl k (fun j => 1 + u' j) (fun _ => 1)))) := by
+    intro b
+    have h := P4_repl_add b l (fun _ => 1) u'' (repl i (fun j => 1 + u j) (repl k (fun j => 1 + u' j) (fun _ => 1)))
+    rw [eN] at h
+    exact h
+  have hsym := P4_sym 0 l (fun _ => 1) u'' (repl i (fun j => 1 + u j) (repl k (fun j => 1 + u' j) (fun _ => 1)))
+  rw [eN, Fin.sum_univ_five, Fin.sum_univ_five] at hsym
+  rw [ha 0, ha 1, ha 2, ha 3, ha 4] at h3
+  have hw : u'' 0 * P4 0 (repl i (fun j => 1 + u j) (repl k (fun j => 1 + u' j) (fun _ => 1))) + u'' 1 * P4 1 (repl i (fun j => 1 + u j) (repl k (fun j => 1 + u' j) (fun _ => 1))) + u'' 2 * P4 2 (repl i (fun j => 1 + u j) (repl k (fun j => 1 + u' j) (fun _ => 1)))
+      + u'' 3 * P4 3 (repl i (fun j => 1 + u j) (repl k (fun j => 1 + u' j) (fun _ => 1))) + u'' 4 * P4 4 (repl i (fun j => 1 + u j) (repl k (fun j => 1 + u' j) (fun _ => 1))) = 0 := by
+    linear_combination h3 - h2 - hsym
+  rw [P4_repl2 0 i k hik, P4_repl2 1 i k hik, P4_repl2 2 i k hik, P4_repl2 3 i k hik,
+    P4_repl2 4 i k hik] at hw
+  simp only [sa0.1, sa0.2.1, sa0.2.2.1, sa0.2.2.2, sa1.1, sa1.2.1, sa1.2.2.1, sa1.2.2.2, sa2.1, sa2.2.1, sa2.2.2.1, sa2.2.2.2, sa3.1, sa3.2.1, sa3.2.2.1, sa3.2.2.2, sa4.1, sa4.2.1, sa4.2.2.1, sa4.2.2.2] at hw
+  linear_combination (1 / 4 : ℂ) * hw
+    - (1 / 2 : ℂ) * (12 + 3 * (u 0 + u 1 + u 2 + u 3 + u 4) + 3 * (u' 0 + u' 1 + u' 2 + u' 3 + u' 4) + (u 0 + u 1 + u 2 + u 3 + u 4) * (u' 0 + u' 1 + u' 2 + u' 3 + u' 4) - (u 0 * u' 0 + u 1 * u' 1 + u 2 * u' 2 + u 3 * u' 3 + u 4 * u' 4)) * hU''
+    + (3 / 2 : ℂ) * huu'' + (3 / 2 : ℂ) * hu'u'' + (1 / 2 : ℂ) * (u 0 + u 1 + u 2 + u 3 + u 4) * hu'u''
+    + (1 / 2 : ℂ) * (u' 0 + u' 1 + u' 2 + u' 3 + u' 4) * huu''

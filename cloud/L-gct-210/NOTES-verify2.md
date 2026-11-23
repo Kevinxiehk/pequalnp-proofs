@@ -413,3 +413,7 @@ STATUS 20:01: stage2 COMPUTE spec read; reg2's M* confirmed (verify2/reg2_mstar.
 STATUS 20:04: Lemma Z probe: 0 constrained solutions in 9 starts, control 20/20 (17 with an exact zero row or column). Conjugation handling
  checked in all scripts that compute T_1 / Omega. Errata final (180+ lines). New files: verify2/{audit_verifyfl,audit_sampling,seven_pairs,
  reg2_mstar,reg2_mstar_exact,lemmaz_probe}.py, verify2/spot/ (one (4,1) hit of run_clm.py), logs/lemmaz_s*.log. Handing back.
+
+# ROUND 6 (start 20:09, budget ~2 h -> ends ~22:09). (1) audit local session's exact runs /home/claude/coord/local/results/VF-A, VF-B;
+#  (2) COMPUTE-verifyfl NEXT (N1-N6, (F1)-(F4)), COMPUTE-stage2 S4, COMPUTE-rows X4/X5; (3) rows R5 (NCOL-P3, P51, SC1, DC/NC'-DC, R5.13),
+#  stage2 R7 ((FO-r), 25 cofactors, cross family), verifyfl R5.9, R5.10; (4) stage3 sec. 26 (A5), (C6)-(C8).
