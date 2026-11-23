@@ -1,0 +1,13 @@
+ R5.12 (R-LAW): ROW-CENTRED ELEMENTS HAVE THEIR ROWS IN THE DEFECT SPACE.
+   Numerical (all 90 principal extremal spaces, every kernel type, e = 1, 2, 3; max relative distance 1e-12): every Z in N = L' cap ker s
+   has ALL ITS ROWS in C, i.e. N lies in C^4 (x) C, equivalently Z w = 0 for all w in W = (C + C1)^perp (so column n of Z vanishes for every
+   neutral n).  For e = 1 all 28 principal (4,1) spaces have N = C e_i m^T (rank one, split).  N is spanned by single-row elements in 74 of
+   the 90 (this is the "row-split" phenomenon of R4.4), not always.  It FAILS in the non-principal extremal spaces.
+   Rigorous part (any e): if K is spanned by single-column elements (A_j orthogonal projectors onto X_j), then for Z in N with c(Z) = u:
+   z_j = (u_j/4) 1 + B_j F_j with (F_j) in V (x) C (normal form R5.7(3) for general e: (<sigma, B_j^T z_j^V>)_j lies in C for all sigma),
+   the row sums give sum_j A_j F_j = 0, hence A_j F_j = 0 and B_j F_j = F_j for every j:  Z = (1/4) 1 u^T + F  with F in V (x) C.  QED
+   For the other kernel types the law is equivalent to: sum_j w_j <z_j, h_j> = 0 for all h in K, w in C^perp (not proved).
+   Use: with (R-LAW) an extremal principal space is L' = K (+) N, K strongly level on <= 3 columns, N an e-dim subspace of C^4 (x) C mapped
+   isomorphically onto C by the column sums; an (e+4,e) space of this kind would have N of dim e+1 inside C^4 (x) C with a doubly centred
+   element of rank <= e whose rows lie in C.
+STATUS 19:59: R5.12 (R-LAW) written.

@@ -53,6 +53,7 @@ Every hit: run `handoff/oracle.py file.npy` -> prints (d,e), level error, dimens
  With one neutral column (smaller target if (NCOL) is true), command `python3 ncdef_search.py D E 1 S0 S1 TMAX`:
    targets (5,1), (6,2), (7,3) — 20 000 starts each;  calibrations (4,1): 5 of 11, (5,2): 3 of 5, (6,3) — here.
  Seeded at known extremal spaces (all files `clm_p4_d*_defect*_s*.npy`, `seed_d*_e*_t*.npy`, `c52_*.npy`, `nc_d*_k*_s*.npy`, `ncdef_*.npy`):
+   (run it in a fresh working directory: it writes seed_dD_eE_tTRIAL.npy and would overwrite existing files of that name)
    `python3 seeded.py 'PATTERN' E_OLD D E NTRIALS TMAX`, e.g. `seeded.py 'clm_p4_d4_defect1_s*.npy' 1 5 1 2000 36000`
    (starts from a known (D-1, E_OLD) space plus a random extra vector); pairs (E_OLD -> D,E): (1 -> 5,1), (2 -> 6,2), (3 -> 7,3), (1 -> 5,2)
    as calibration [seeding (5,2) at (4,1) spaces produced 15 hits here].  If `describe` (rect.py) fails for some input, delete that print.
@@ -117,6 +118,18 @@ Every hit: run `handoff/oracle.py file.npy` -> prints (d,e), level error, dimens
         Why: my Theorem NCOL-P3 proves (NCOL_1) for every (4,1) space whose kernel of the column-sum map is such a K on <= 3 columns.
         Numerical version: `python3 run_clm.py 4 3 defect 0 S0 S1 TMAX` (strongly level 3-spaces; hits are frequent), keep those with
         row-sum rank 3, and count the zero columns of each (e.g. with the column-rank lines of rows/nc_look.py).
+
+   (X5) Principal (5,1) spaces, kernel type (2,2,1) (the only observed kernel type not covered by my Theorem P51). Data: v in V non-isotropic,
+        R a rotation of the plane v^perp (inside V) with isotropic eigenvector n, R n = lam n; K = C v e_c^T + {((1-R)y/2 at column a,
+        (1+R)y/2 at column b) : y in v^perp}; m with m_c = 0 and lam = (m_a+m_b)/(m_a-m_b). Candidates for the row-centred part:
+        N = {a m^T + t n (e_a - e_b)^T}, a = (kappa/4)1 + phi v + eta n, t = 2 m_a m_b eta/(m_a - m_b), kappa^2 = (4/3) phi^2 <v,v>.
+        Question: can K (+) N (N of dim 2) be level with all deletion vectors in 24*1 + C m (and K strongly level, which needs
+        sum_i (h_a)_i (h_b)_i (h_c)_i = 0 on K)? Small exact system in (v, R, m, phi, eta); a "no" removes this type.
+
+### H3b — test of (R-LAW) at scale
+ For every fresh extremal space with ker(column sums) a strongly level 3-space (kc_chk.py): are all rows of all elements of
+ N = L' cap {row sums = 0} in the defect space C?  `python3 rlaw_chk.py 'PATTERNS'` prints, per (e, principal?, kernel type), the maximal
+ relative distance of those rows from C and lists every violation in a principal space (90 of 90 principal spaces satisfy it here).
 
 ### H5 — (D)_7 and dimension 8 for 5x5 directly
  `python3 run_clm.py 5 7 level 0 S0 S1 TMAX` (census of 7-dim 5x5 level spaces; report the hit rate) and `python3 run_clm.py 5 8 level 0 ...`

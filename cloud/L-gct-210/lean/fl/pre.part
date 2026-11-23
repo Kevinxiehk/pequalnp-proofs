@@ -1,7 +1,7 @@
 import Mathlib
 import PEqualNP.Defs
 
-namespace PEqualNP.Gct.FL210
+namespace PEqualNP.Outside.L_gct_210_aux.FL
 
 open Finset
 

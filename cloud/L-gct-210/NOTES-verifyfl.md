@@ -27,6 +27,11 @@
         Excluded: type (0,4); every K with dim N_P = 2; type (3,1) with vartheta(Z_*) = 0 unless (R2).
         (R3) is the analogue of blueprint S7/S8 and is where the two-column counterexamples live ((N): a climb for m = (1,-1,0,0,0)
         reaches a column-centred (4,1) space of type (2,2)); so it is the place where "not two-column" must enter.
+ G6' (R) Props I-ALL and II-ALL (R5.9): for |supp m| = 3 a K containing a blueprint type I plane chi_1 (x) Lam_M (ANY 3-set M of columns)
+        or a type II plane mu v (e_i - e_j)^T + mu' v' (e_k - e_l)^T (any position; m non-isotropic) has dim <= 3.  So the two extremal
+        configurations of blueprint S7/S8 are excluded; the proof shows exactly where two-column m escapes (theta_3 (m_i + m_j) = 0 does
+        not force theta_3 = 0 when m = e_i - e_j).  (N) calibrated: climbs from the type II plane reach dim 4 for m = (1,-1,0,0,0) in 3/3
+        runs and stop at dim 3 for (1,2,-3,0,0), (1,1,-2,0,0) in 6/6 runs.
  G7 (R) |supp m| >= 4 with four distinct nonzero entries, type (3,1): the pencil forces vartheta(Z_*) = 0, Theta(.,Z_*) = <phi,s(.)> with
         phi isotropic, phi != 0 (R5.7).  Nothing else proved for |supp m| = 4, 5 or for isotropic m (status list in R5.7).
  (N) Sanity/landscape: 3-column spaces of dim 3 abundant, dim 4 never (0/100); 3-dim column-centred spaces with defect are plentiful
@@ -1000,6 +1005,74 @@
    B (N-problem for |P| = 4, 5; exact), C (calibrated Gr(4,15) searches), D (direct (5,1) searches), E (extension varieties of explicit
    2-dim spaces for m = (1,2,-3,0,0)), F (typed searches for the residual kinds (R1)-(R4)).
 
+ R5.9 THE BLUEPRINT'S EXTREMAL PLANES (types I and II) NEVER SIT IN A 4-DIM K WHEN |supp m| = 3 (rigorous; added 20:00).
+   These are the configurations of blueprint S7/S8; for two-column m the type II plane DOES extend to a 4-dim column-centred space
+   (numerically 3 of 3 climbs, r5_climb_r3.py), for |supp m| = 3 it does not (0 of 6 climbs; proved below).
+   PROP I-ALL (any m with |supp m| = 3).  Let M be a 3-set of columns, Lam_M the zero-sum vectors supported on M.  If K contains
+   chi_1 (x) Lam_M then dim K <= 3 (for M != P: K lies in chi_1 (x) C^M).
+   Proof. M = P is Prop I'.  Let M != P, {o,o'} the complement; then M contains a column of P and so does {o,o'}.  For Y in K and
+   x in Lam_M, Y + t chi_1 x^T is in K; the four coefficient identities of Lemma T hold with (P; n, n') replaced by (M; o, o') (they are
+   identities in the columns), now with right sides theta m:
+    t^3 of (C4'): deleting i in M cap P there is no t^3-term, so the t^3-coefficient of theta_4 vanishes, and deleting o', o gives
+       x_i x_j x_k <chi_3,y_o> = 0 = x_i x_j x_k <chi_3,y_o'>:   <chi_3,y_o> = <chi_3,y_o'> = 0.
+    t^2 of (C3'_i), i in M:  x_j x_k <chi_2, y_o + y_o'> = rho m_i.  With j in M cap P and x = e_j - e_k (x_i = 0): deleting j gives rho = 0,
+       deleting i gives <chi_2, y_o + y_o'> = 0.  Then rho = 0 for every x (delete j in M cap P).
+    t^2 of (C3'_o), (C3'_o') with x = e_j - e_k:  <chi_2,y_i> + <chi_2,y_o'> = 0 = <chi_2,y_i> + <chi_2,y_o>;  so <chi_2,y_o> = <chi_2,y_o'> = 0
+       and <chi_2,y_i> = 0 for every i in M.
+   Hence y_o = al_o chi_3, y_o' = al_o' chi_3, y_i = p_i chi_1 + r_i chi_3 (i in M), s = s_1 chi_1 + s_3 chi_3.  (C2'pol) between Y and
+   Z = chi_1 x^T: a column of P outside M gives Theta(Y,Z) = 0, then column i in M gives <2y_i - s,chi_1> = 0, r_i = s_3/2, and
+   s_3 = -2(al_o + al_o').  By (ID8):  [y_i,y_j,y_k,y_o] = al_o s_3 (4 e_2(p) - 3 s_3^2) = theta_4 m_o',  the same with o, o' exchanged, and
+   [y_j,y_k,y_o,y_o'] = al_o al_o' (8 p_j p_k - 6 s_3^2) = theta_4 m_i (i in M)   [both checked numerically].  Replace Y by Y + chi_1 x^T
+   (p -> p + x) and compare the parts quadratic in x, tau_2 := that part of theta_4:
+       4 al_o s_3 e_2(x) = tau_2 m_o',   4 al_o' s_3 e_2(x) = tau_2 m_o,   8 al_o al_o' x_j x_k = tau_2 m_i  (i in M).
+   M contains a neutral column i_0 (as M != P): al_o al_o' = 0; then a column i in M cap P gives tau_2 = 0, so al_o s_3 = al_o' s_3 = 0,
+   s_3^2 = -2(al_o + al_o') s_3 = 0, s_3 = 0, al_o' = -al_o, al_o^2 = 0.  So y_o = y_o' = 0, r_i = 0: K lies in chi_1 (x) C^M.  QED
+   PROP II-ALL (|supp m| = 3, m non-isotropic).  If K contains a plane N_0 = { mu v (e_i - e_j)^T + mu' v' (e_k - e_l)^T } with v, v'
+   non-proportional isotropic and i, j, k, l distinct, then dim K <= 3.
+   Proof. Step 0: N_0 is the strongly level type II plane.  Let o be the fifth column.  On N_0 (ID4): T_i = mu mu'^2 tau(v v'^2) = -T_j,
+   T_k = mu^2 mu' tau(v^2 v') = -T_l, T_o = 0, and the only nonzero bracket is [Z^(o)] = mu^2 mu'^2 [v,v,v',v'].  (C3'): theta_3 (m_i + m_j) = 0
+   = theta_3 (m_k + m_l); both sums cannot vanish when |supp m| = 3, so theta_3 = 0 on N_0 and tau(v v'^2) = tau(v^2 v') = 0.  (C4') for a
+   column of P among i,j,k,l: theta_4 = 0, so [v,v,v',v'] = 0.  By (II-a), v = zeta, v' = conj(zeta) after a row permutation and rescaling.
+   [For two-column m = e_i - e_j one has m_i + m_j = 0 and theta_3 need not vanish: this is exactly the escape of the two-column case.]
+   Step 1 (ID11, checked to 2e-14, r5_propII.py): for column-centred Y, Z = mu zeta (e_i - e_j)^T + mu' zb (e_k - e_l)^T (zb := conj zeta,
+   1_3 := (1,1,1,0) = zeta zb), the t^2-coefficients of T_c(Y + tZ) are
+       c = o:  -mu^2 <zb, y_k + y_l> - mu'^2 <zeta, y_i + y_j>;
+       c = i:   mu mu' <1_3, y_k - y_l> - mu'^2 <zeta, y_j + y_o>;        c = j:  -mu mu' <1_3, y_k - y_l> - mu'^2 <zeta, y_i + y_o>;
+       c = k:  -mu^2 <zb, y_o + y_l> + mu mu' <1_3, y_i - y_j>;           c = l:  -mu^2 <zb, y_o + y_k> - mu mu' <1_3, y_i - y_j>;
+   each equals rho m_c with rho = r_20 mu^2 + r_11 mu mu' + r_02 mu'^2 (the t^2-coefficient of theta_3/2).  (C2'pol) between Y and Z:
+       mu <zeta, 2y_i - s> = 2 m_i Th,  -mu <zeta, 2y_j - s> = 2 m_j Th,  mu' <zb, 2y_k - s> = 2 m_k Th,  -mu' <zb, 2y_l - s> = 2 m_l Th,  0 = 2 m_o Th.
+   Coordinates in V: basis zeta, zb, h := (1,1,1,-3); <zeta,zb> = 3, <h,h> = 12, other products 0; <1_3, x zeta + xb zb + eta h> = 3 eta.
+   Up to exchanging zeta and zb (a row permutation) there are three placements of the pairs.
+   (II') {i,j} = {a,b}, {k,l} = {c,n}, o = n'.  mu^2: (i) gives r_20 = 0, then <zb,y_n+y_n'> = <zb,y_n'+y_c> = <zb,y_c+y_n> = 0, so
+     <zb,y_c> = <zb,y_n> = <zb,y_n'> = 0.  mu mu': (o) gives nothing, (l = n) gives <1_3,y_a-y_b> = 0, then (k = c) gives r_11 = 0 and (i)
+     gives <1_3,y_c - y_n> = 0.  mu'^2: (k) gives r_02 = 0, then <zeta,y_a> = <zeta,y_b> = <zeta,y_n'> = 0.  (C2'pol): column n: <zb,s> = 0;
+     column c: Th = 0; column a: <zeta,s> = 0.  So S lies in C h: q <= 1.  For Y in N: y_n' is orthogonal to zeta, zb and isotropic, so 0;
+     y_n in C zb (the isotropic line of column n), y_c = xb_c zb + eta_c h, y_a = x_a zeta + eta_a h, y_b = x_b zeta + eta_b h, and
+     <1_3,y_a - y_b> = <1_3,y_c - y_n> = 0 with sum_j y_j = 0 give eta_c = 0, eta_a = eta_b = 0: N = N_0.  dim K <= 1 + 2.
+   (II'') {i,j} = {a,n}, {k,l} = {b,n'}, o = c.  mu^2: (i = a) gives r_20 = 0, then <zb,y_b> = <zb,y_c> = <zb,y_n'> = 0.  mu'^2: (k = b)
+     gives r_02 = 0, then <zeta,y_a> = <zeta,y_n> = <zeta,y_c> = 0.  mu mu': (o = c) gives r_11 = 0, then <1_3,y_b - y_n'> = <1_3,y_a - y_n> = 0.
+     (C2'pol), columns n, n': <zeta,s> = <zb,s> = 0: q <= 1.  For Y in N: y_n in C zeta, y_n' in C zb, y_c = eta_c h, y_a = x_a zeta + eta_a h,
+     y_b = xb_b zb + eta_b h, and the 1_3-relations give eta_a = eta_b = 0, hence eta_c = 0: N = N_0.  dim K <= 3.
+   (II) {i,j} = {a,b}, {k,l} = {n,n'}, o = c.  mu^2: (i) gives r_20 = 0, then <zb,y_n> = <zb,y_n'> = <zb,y_c> = 0.  mu mu': (o) gives
+     r_11 = 0, then <1_3,y_n - y_n'> = <1_3,y_a - y_b> = 0.  mu'^2: -<zeta,y_a+y_b> = r_02 m_c, -<zeta,y_b+y_c> = r_02 m_a,
+     -<zeta,y_a+y_c> = r_02 m_b; adding, <zeta,y_a+y_b+y_c> = 0, so <zeta,y_j> = r_02 m_j (j in P).  (C2'pol): column c: Th = 0; columns a, b:
+     <zeta,y_a> = <zeta,y_b> = <zeta,s>/2; column n: <zb,s> = 0.
+     If m_a != m_b: r_02 = 0, <zeta,s> = 0, S in C h, q <= 1; for Y in N: y_n, y_n' in C zb, y_c = eta_c h, y_a = x_a zeta + eta_a h,
+       y_b = x_b zeta + eta_b h, eta_a + eta_b + eta_c = 0 and (C2') 12 eta_j^2 = vartheta m_j.  If vartheta is not == 0 on N the three
+       linear forms eta_j are proportional to one form with coefficients gam_j, gam_j^2 = k m_j, sum gam_j = 0 = sum gam_j^2, so gam is a
+       multiple of (1,w,w^2) or (1,w^2,w) and m is isotropic: excluded.  So eta_j = 0 and N = N_0: dim K <= 3.
+     If m_a = m_b (= 1, m_c = -2): s = s_1 zb + s_2 h, and every Y in K is
+         y_a = x zeta + (s_1/2) zb + eta_a h,  y_b = -x zeta + (s_1/2) zb + eta_a h,  y_c = -s_1 zb + eta_c h,
+         y_n = xb_n zb + eta_n h,  y_n' = (s_1 - xb_n) zb + eta_n h,      2 eta_a + eta_c + 2 eta_n = s_2,
+       and (C2'): eta_n (eta_n - s_2) = 0,  12 eta_a (eta_a - s_2) = vartheta,  12 eta_c (eta_c - s_2) = -2 vartheta.  Solving (linear forms):
+       eta_n == 0 and (eta_a == 0 or eta_a == 2 s_2/3), or eta_n == s_2 and eta_a == c s_2 with 3c^2 + 2c + 1 = 0; in every case eta_a,
+       eta_c, eta_n are multiples of s_2, so K lies in a 4-dim space parametrised by (x, xb_n, s_1, s_2).  If dim K = 4, K contains the
+       elements with x = s_2 = 0, s_1 = 1: Y = zb l^T, l = (1/2, 1/2, -1, xb_n, 1 - xb_n), for every xb_n.  But T_n(Y) = 3 e_3(1/2,1/2,-1,1-xb_n)
+       = -3/4 - (9/4)(1 - xb_n) and T_n'(Y) = -3/4 - (9/4) xb_n cannot both vanish.  So dim K <= 3.   QED
+   CONSEQUENCE for the residual kinds: in (R3), (R4) the doubly centred part N contains neither a type I plane chi_1 (x) Lam_M nor a type II
+   plane (in any position and after any row permutation).  What is left there: N on which vartheta is not identically 0, the g = 1
+   spaces v (x) Lam with tau(v^3) != 0 (blueprint A1 with defect), and type IV-like configurations.
+
 ## LOG
 STATUS 14:17: started; read BRIEF (+UPDATE, UPDATE 3), NOTES-zeros. Re-deriving reduction (i) and Lemma SL by hand first.
 STATUS 14:20: hand re-derivation of every step done once (reduction, C2/C3/C4 column forms, dim N <= 2, q=3 => N=0,
@@ -1062,3 +1135,4 @@ NOTE (process): the round-4 STATUS lines above were all written from 18:59 on (t
 STATUS 19:18 (ROUND 5 started 19:14, budget 100 min -> about 20:54; target (SL_m)): blueprint S3-S8 re-read; setting up the defect versions (Lemma C', pencil b_j^*g = s^*g + 4 m_j vartheta, types (q,d) with q + d = 4). First findings: for q = 3 the DC element Z_* vanishes on neutral columns; pencil counting alone cannot exclude type (3,1).
 STATUS 19:30: new rigorous bricks for |supp m| = 3: Lemma 3C (a column-centred space supported on the three columns of P has dim <= 3, any m), Lemma NP (DC part supported on P: dim <= 2 for non-isotropic m, types I' and V), top-degree linear constraints on the neutral columns; type (3,1) with Z_* = chi_1 l^T, e_2(l) != 0 excluded. New exact planes verified (r5_checks.py). COMPUTE-verifyfl.md written for the 24-core machine (requests A-E).
 STATUS 19:42: section DI5-R5 (R5.1-R5.8) and RESULT ROUND 5 written: Theorem SL3-RED reduces (SL_m) for non-isotropic 3-support m to the residual kinds (R1)-(R4); request F added to COMPUTE-verifyfl.md. Continuing with (R4)/(R3).
+STATUS 20:00: R5.9 added: Props I-ALL and II-ALL (blueprint type I and type II planes never lie in a 4-dim K for |supp m| = 3; coefficient identities checked numerically, r5_propII.py); numerics: typed Gr(4,14) search fails even on the two-column control (0/34), climbs from the type II plane are reliable (control 3/3).

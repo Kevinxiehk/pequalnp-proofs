@@ -1,6 +1,6 @@
 # NOTES-rows (role rows; start 14:17, budget 90 min -> ends ~15:47)
-## RESULT, ROUND 5 (rows; final 20:00) -- (NC') NOT proved; (NCOL_1) PROVED in the principal case (Theorem NCOL-P3), exact 4x4 statement found
- Details and proofs: section R5 (R5.1 - R5.10).  Heavy-computation requests: COMPUTE-rows.md (H1-H6, exact systems X1-X4).
+## RESULT, ROUND 5 (rows; final 20:02) -- (NC') NOT proved; (NCOL_1) PROVED in the principal case (Theorem NCOL-P3), exact 4x4 statement found
+ Details and proofs: section R5 (R5.1 - R5.12).  Heavy-computation requests: COMPUTE-rows.md (H1-H6, exact systems X1-X4).
  V1 [RIGOROUS, R5.9] THEOREM NCOL-P3: let L' be a 4 x 5 level space with defect line C m (ANY m, isotropic allowed), K in L' a 3-dim strongly
     level subspace with row sums s(K) = 1^perp living on three columns a, b, c, and Z in L' with zero row sums and c(Z) != 0. Then
     m_a m_b m_c = 0 (two columns: m_a m_b = 0). So every (4,1) space whose column-centred part ker c is such a K has a neutral column,
@@ -9,6 +9,13 @@
     Covers 28 of the 30 known (4,1) spaces (the 2 others are column-centred with a two-column defect line); every ingredient checked
     numerically to 1e-9 or better.  Hypothesis left: "K lives on <= 3 columns" (true for 90/90 principal kernels and 49/49 fresh strongly
     level 3-spaces; types by column ranks (1,1,1), (2,1), (3), (3,2), (2,2,1)); exact problem X4.
+ V1' [RIGOROUS, R5.11] THEOREM P51: if the five entries of m are pairwise distinct, there is NO (5,1) space with defect line C m containing a
+    3-dim strongly level K with s(K) = 1^perp that is spanned by single-column elements or lives on two columns (kernel types (1,1,1),
+    (2,1), (3), (3,2) = 41 of 49 fresh strongly level 3-spaces); a (4,1) space of the first kind is split.  Mechanism: the row-centred
+    elements are RANK ONE, Z = a m^T, and the derivative of the deletion vector along each single-column element forces a = kappa e_i.
+    Left for principal (5,1): kernel type (2,2,1), repeated entries of m (incl. isotropic (1,w,w^2,0,0)); see also R5.10.
+ V1'' [NUMERICAL + partly rigorous, R5.12] (R-LAW): in all 90 principal extremal spaces every row-centred element has ALL ITS ROWS IN THE
+    DEFECT SPACE C (N = L' cap ker s lies in C^4 (x) C; Z w = 0 for w in W); proved for kernels spanned by single-column elements (any e).
  V2 [RIGOROUS, R5.6] (SC1) first-order law for a single-column element x e_n^T in ANY column: <x, s(Y) - y_n> = 0 and (<x,y_j>)_{j != n} in
     C cap e_n^perp for all Y in L'.  For e = 1 and m_n != 0: all other columns of all of L' are orthogonal to x.
  V3 [RIGOROUS, R5.2] THEOREM DC / NC'-DC: dim L' = rank c + rank s + dim L'_dc, so (DI_5) can fail only through DOUBLY CENTRED elements.
@@ -894,3 +901,47 @@ STATUS 19:47: Theorem NCOL-P3 (R5.9), (SC1) (R5.6), K-structure census (R5.8) wr
    NEUTRAL COLUMN c, with p_0 in f(N).  Every Z in N has zero column c, and the element Z_* of N with kappa = 0 is (q_*|0) with q_* a
    DOUBLY CENTRED 4 x 4 matrix whose columns m_j B_j f_* are all isotropic (this is the doubly centred element forced by R5.2(b)(iii)).
    Remaining sub-cases: m_a = 0 as well (then A_b = 0 on P), m_b = -m_a (then A_b = A_a on P).  Not finished: the cubic and quartic conditions.
+ R5.11 THEOREM P51 (RIGOROUS): NO (5,1) SPACE OF THE TWO MAIN PRINCIPAL TYPES WHEN m HAS FIVE DISTINCT ENTRIES.
+   Let L' be a 4 x 5 level space with defect line C m, all five entries of m pairwise distinct (so at most one zero), and K in L' a 3-dim
+   strongly level subspace with s(K) = V = 1^perp.  Put N := L' cap ker s (L' = K + N).
+   (i)  If K is spanned by single-column elements (K = (+)_n X_n e_n^T), then dim L' <= 4, and if dim L' = 4 then L' is split:
+        N = C e_i m^T for some row i.
+   (ii) If K lives on two columns a, b and dim N >= 2, then K is the full free column F_a or F_b; so by (i) dim N >= 2 is impossible.
+   Hence there is no (5,1) space with such a K of column-rank type (1,1,1), (2,1), (3) or (3,2).  [Left: type (2,2,1), where the same
+   computation gives N inside {a m^T + t n(e_a - e_b)^T}, n isotropic; not finished.  Isotropic m is allowed here; e.g. (1,w,w^2,0,0) has
+   a repeated entry and is NOT covered.]
+   Proof of (i). Notation of R5.7/R5.9: A_j = orthogonal projector onto X_j, V = (+) X_j. For Z in N, sum_j m_j A_j f = 0 splits into
+   m_j A_j f = 0 for each j, so B_j f = f whenever m_j != 0 and  Z = a m^T  with a = (kappa/4) 1 + f (RANK ONE);  f != 0 for Z != 0.
+   Let x be in X_n and j != n. C_j is linear in column n, and the cofactors are 3 x 3 permanents of J + a m^T:
+        d/d eps C_j(a m^T + eps x e_n^T) = sum_{k=0}^{3} (3-k)! k! <x, E_k(a)> e_k(m^(j,n)),     E_k(a)_i := e_k(a without a_i),
+   m^(j,n) := m without the entries j, n   [checked numerically to 3e-13].  As a vector over j (0 at n) it lies in C m cap e_n^perp.
+   Here e_1(m^(j,n)) = -(m_j + m_n), e_2(m^(j,n)) = e_2(m^(n)) + m_j(m_j + m_n) =: q_2(m_j), e_3(m^(j,n)) = e_3(m^(n)) - m_j q_2(m_j) =: q_3(m_j)
+   are polynomials in m_j of exact degrees 1, 2, 3, and <x,E_1(a)> = -<x,f>.
+   If m_n != 0: <x,f> = 0 and the vector must vanish: 2<x,E_2> q_2(m_j) + 6<x,E_3> q_3(m_j) = 0 at the four distinct points m_j (j != n).
+   If m_n = 0: it equals lam m_j at the four distinct points: a polynomial of degree <= 3 in m_j with four roots.
+   In both cases <x,E_2(a)> = <x,E_3(a)> = 0. The X_n span V, so E_2(a) and E_3(a) are multiples of 1:
+        a_i (kappa - a_i) = t for all i,   and   a_i (e_2(a) - t) is independent of i      (kappa = sum a_i).
+   So the a_i take at most two values alpha, beta with alpha + beta = kappa; a constant vector gives f = 0; multiplicities (3,1) give
+   alpha = 0, a = kappa e_i; multiplicities (2,2) give kappa = 0 and e_2(a) = -2 alpha^2 = t = -alpha^2, a = 0.  Hence a(Z) is a multiple
+   of a unit vector for every Z in N; a is linear and injective on N, so dim N <= 1 and N = C e_i m^T.  QED (i)
+   Proof of (ii). B_b = -B_a =: -B; the row-sum relation on P := f(N) is (m_a + m_b) p = (m_a - m_b) B p; m_a != m_b, so B = lam on P.
+   P is 2-dim with a form of rank 1 (<f(Z),f(Z')> = (3/4) kappa kappa', kappa not identically 0), so P = n^perp for an isotropic n; P contains
+   non-isotropic vectors, so lam = +-1; an isometry of V that is +-1 on n^perp is +-1 on V. So B = 1 (A_a = 0, K = F_b) or B = -1 (K = F_a).  QED
+   Consequences: (a) every (4,1) space whose single-column elements have row sums spanning 1^perp and whose m has distinct entries
+   is SPLIT (consistent with the census); (b) for the principal (5,1) problem with distinct entries only the kernel type (2,2,1)
+   (and kernels on 4 or 5 columns, never seen) remain.  This is consistent with verifyfl's numerics (R4.7: no solution of the
+   N-problem for distinct entries, solutions only for repeated entries).
+STATUS 19:55: R5.10, R5.11 (Theorem P51) written.
+ R5.12 (R-LAW): ROW-CENTRED ELEMENTS HAVE THEIR ROWS IN THE DEFECT SPACE.
+   Numerical (all 90 principal extremal spaces, every kernel type, e = 1, 2, 3; max relative distance 1e-12): every Z in N = L' cap ker s
+   has ALL ITS ROWS in C, i.e. N lies in C^4 (x) C, equivalently Z w = 0 for all w in W = (C + C1)^perp (so column n of Z vanishes for every
+   neutral n).  For e = 1 all 28 principal (4,1) spaces have N = C e_i m^T (rank one, split).  N is spanned by single-row elements in 74 of
+   the 90 (this is the "row-split" phenomenon of R4.4), not always.  It FAILS in the non-principal extremal spaces.
+   Rigorous part (any e): if K is spanned by single-column elements (A_j orthogonal projectors onto X_j), then for Z in N with c(Z) = u:
+   z_j = (u_j/4) 1 + B_j F_j with (F_j) in V (x) C (normal form R5.7(3) for general e: (<sigma, B_j^T z_j^V>)_j lies in C for all sigma),
+   the row sums give sum_j A_j F_j = 0, hence A_j F_j = 0 and B_j F_j = F_j for every j:  Z = (1/4) 1 u^T + F  with F in V (x) C.  QED
+   For the other kernel types the law is equivalent to: sum_j w_j <z_j, h_j> = 0 for all h in K, w in C^perp (not proved).
+   Use: with (R-LAW) an extremal principal space is L' = K (+) N, K strongly level on <= 3 columns, N an e-dim subspace of C^4 (x) C mapped
+   isomorphically onto C by the column sums; an (e+4,e) space of this kind would have N of dim e+1 inside C^4 (x) C with a doubly centred
+   element of rank <= e whose rows lie in C.
+STATUS 19:59: R5.12 (R-LAW) written.

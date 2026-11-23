@@ -96,14 +96,30 @@ named below. Order = priority. For every numerical item a CALIBRATION is listed 
    M = { sum_{r in R} c_r e_r y_r^T + (sum_r c_r) e_e p^T + mu e_e w^T + ga (e_a g_a^T + e_b g_b^T) + de (e_c g_c^T + e_d g_d^T) }
    a 7-dim level subspace of L (coordinates c_a, c_b, c_c, c_d, mu, ga, de); (y_r, g_r) independent for each r; (w, p) independent;
    s(w) = 0; w orthogonal to y_r and to g_a + g_b, g_c + g_d; L/M is 2-dim and for every r the map L/M -> C^5 / pi_r(M) is injective.
- SYSTEM A (core): the ten vectors (50 unknowns); equations: M level (784 coefficient equations as in item 2). Hinges: the
-   independences above (2x2 Gram determinants >= 0.1 after normalising the vectors).
- SYSTEM B (full): add t_1, t_2 in Mat_5; equations: L = M + C t_1 + C t_2 level (1992 equations); hinges: all a_r = 1 for L.
- Method: numerical, >= 2000 starts each; CALIBRATION for A: the free column (y_r = e_1, p = -e_1) with suitable w, g must be
-   recovered when the hinges are dropped. DECISION: no solution of A with the hinges -> F4b is impossible already at the core, and
-   an exact elimination of system A (50 unknowns minus the torus/GL_2 gauges; saturate by the hinges) would be a proof. Solutions of A
-   but none of B -> compute T_1(M) and the FO2 bound on the solutions of A as in item 2 (c). A solution of B refutes the gap.
- (A quick version of SYSTEM A is being run by me now in the container; see NOTES-stage3.md section 26 for its outcome.)
+ NECESSARY IDENTITIES in A_4 (from the 9-dim L, NOT from M alone; P_r := span(y_r, g_r) for r in R, P_e := span(w, p)):
+   (i)   P_a P_b P_c P_d = 0;      (ii)  y_a . P_c P_d P_e = 0  and  y_b . P_c P_d P_e = 0;      (iii) y_c . P_a P_b P_e = 0  and  y_d . P_a P_b P_e = 0.
+ SYSTEM A (core): the ten vectors (50 unknowns); equations: M level (784 coefficient equations as in item 2) AND (i), (ii), (iii)
+   (16 + 16 + 16 products, 5 coefficients each). Hinges: the independences above (second singular value of the normalised pairs >= 0.3,
+   all ten vectors of norm >= 0.3 after the normalisation |p|^2 + sum |y_r|^2 = 5, |w| = 1, |g_a|^2 + |g_b|^2 = |g_c|^2 + |g_d|^2 = 2).
+ SYSTEM B (full): add t_1, t_2 in Mat_5; equations: L = M + C t_1 + C t_2 level (1992 equations); hinges: all a_r = 1 for L, t_i away from M.
+ WHY (i)-(iii) MUST BE IMPOSED: M alone can be level. EXPLICIT EXAMPLE M_0 (exact; stage3/f4b_example.py checks perm(J+m) = 120 at 900
+   random points with coefficients in Z[omega], omega = exp(2 pi i/3)):  y_r = e_1 (all r), p = -e_1, w = (0,-1,-1,3,-1),
+   g_a = -g_b = n := (0,1,omega^2,0,omega),  g_c = -g_d = n' := (0,1,omega,0,omega^2).  M_0 = (free column 1) (+) C e_e w^T (+)
+   C (e_a - e_b) n^T (+) C (e_c - e_d) n'^T is a 7-dim level space with z = (0,0,0,0,1), lam_ab = lam_cd = 4, all other lam = 3
+   -- exactly the invariants of the F4b core. It violates (iii) (y_c . g_a g_b w != 0) and has dim T_1(M_0) = 8.
+ Method: numerical, >= 2000 starts each. CALIBRATION for A: with (i)-(iii) switched off the search must find M_0-like solutions
+   (here: script stage3/f4b_core.py / f4b_run.py, `python3 -I f4b_run.py SEED TIMELIMIT`; my 7 hinged starts without (i)-(iii) found
+   none, residual floor 0.03-0.14, so the plain LM has a low success rate on this system -- use many starts / better globalisation;
+   the free-column sub-family below is found in 1 of 14 starts).
+ DECISION: no solution of A -> F4b is impossible at the level of (core + identities); then an exact elimination would be a proof.
+   Solutions of A but none of B -> compute T_1(M) and the FO2 bound on the solutions of A as in item 2 (c). A solution of B refutes the gap.
+ EXACT SUB-PROBLEM (small enough for Groebner/primary decomposition): the FREE-COLUMN SUB-FAMILY y_a = y_b = y_c = y_d = e_1.
+   Proved by hand: then p = -e_1 + p', and w, p', q_r := g_r (r in R) are vectors of C^N, N = {2,3,4,5}, with coordinate sum 0, q_r != 0,
+   w != 0 (18 unknowns up to scaling). Equations: M level; (i') the four triple products q_k q_l q_m = 0 in (A_N)_3 and
+   q_a q_b q_c q_d = 0 in (A_N)_4; (ii'),(iii') q_a q_b w = q_c q_d w = q_a q_b p' = q_c q_d p' = 0 in (A_N)_3.
+   Script: stage3/f4b_fc.py, `python3 -I f4b_fc.py SEED TIMELIMIT 1 ID` (ID = 1 imposes (i')-(iii'); here ID = 0: 1 solution (M_0)
+   in 14 starts; ID = 1: 0 in 8 starts, residual floor 0.58). Wanted: exact decision "the system with ID = 1 has no solution with
+   all q_r != 0 and w != 0".
 
 ## 4. SEVERAL ROWS WITH SINGLE-ROW ELEMENTS (z = (1,1,*,*,*), (2,1,*,*,*), (2,2,..) with degenerate planes) -- not analysed by hand
  Direct search as in item 1 with prescribed single-row elements e_e w^T and e_d w'^T (two different rows; proved: s(w) = s(w') = 0 and

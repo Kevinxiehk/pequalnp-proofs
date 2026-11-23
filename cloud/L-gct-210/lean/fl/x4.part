@@ -4,8 +4,8 @@ def ev (i : Fin 4) (x : ℂ) : V4 := fun k => if k = i then x else 1
 theorem pc_ev (i : Fin 4) (x1 x2 x3 x4 : ℂ) :
     pc (ev i x1) (ev i x2) (ev i x3) (ev i x4) = 6 * (x1 + x2 + x3 + x4) := by
   fin_cases i <;>
-    simp (config := {decide := true}) only [pc, ev, Fin.sum_univ_four, ite_true, ite_false,
-      add_zero, zero_add] <;>
+    simp (config := {decide := true}) only [pc, ev, Fin.sum_univ_four, ite_true, ite_false, add_zero,
+      zero_add] <;>
     ring
 
 theorem P4_repl_ones (b : Fin 5) (i : Fin 4) (m : Fin 5 → ℂ) :

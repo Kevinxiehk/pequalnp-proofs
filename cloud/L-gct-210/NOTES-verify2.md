@@ -367,3 +367,8 @@ STATUS 20:08: verifyfl R4: Lemma QB, Theorem PS (a)-(c), PR-RED, THEOREM PR3 (st
 STATUS 20:20: stage2 R6: cross-family theorem R6-2 (permanent formula, all cofactors, <C(U),t>, degree 2/1/0 analysis -> T_1 of dim 10 for
  b != 0, a not in C1; block rank argument 2*2 + 1 = 5; numerics (10,5,7) from round 4; the polar formula for P_2 not recomputed), R6-5 (a),(b),
  (T2) (order-2 coefficient of <v, G(T(v)+xi)>), lam = 5 lemma (C Phi + Phi^T C = 0; diagonal argument), Lemma (z_i = 3): re-derived, no error.
+STATUS 20:35: stage3 sec. 26 (round 7): counting tools (c1)-(c5); (A1); (A2) lam-patterns F1/F3/F4a/F4b; (A3) F1 (graph connectivity, (QL) with
+ one/two/three rank-one maps); (A4) F3 and F4a: every input of N2-X re-derived for the pair with lam = 4 ((Q4) x 3 via (CA2) on L_m and the
+ injectivity lemma, planes independent of m, (Qb), (Q5) by the hyperplane argument, (NT), (NT'), (M7)), and the isotropy count replacing
+ (beta-0) (Q = (J_3 - I) (x) I_2 nondegenerate on P^3); (B) Lemma dim(U o U') >= 2 and its corollary: re-derived, no error. (A5), (C5)-(C8):
+ structure statements read, (C5) checked, the rest not (open families).

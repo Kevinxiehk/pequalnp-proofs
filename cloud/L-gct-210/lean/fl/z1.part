@@ -1,0 +1,82 @@
+
+def rowL (i : Fin 4) : M45 →ₗ[ℂ] (Fin 5 → ℂ) := LinearMap.funLeft ℂ ℂ (fun j : Fin 5 => (i, j))
+
+def fsMap (i : Fin 4) (Cs : Submodule ℂ (Fin 5 → ℂ)) : M45 →ₗ[ℂ] Module.Dual ℂ Cs :=
+  (Submodule.dualRestrict Cs).comp (dotL.flip.comp (rowL i))
+
+theorem fsMap_apply (i : Fin 4) (Cs : Submodule ℂ (Fin 5 → ℂ)) (Y : M45) (v : Fin 5 → ℂ)
+    (hv : v ∈ Cs) : fsMap i Cs Y ⟨v, hv⟩ =
+      v 0 * Y (i, 0) + v 1 * Y (i, 1) + v 2 * Y (i, 2) + v 3 * Y (i, 3) + v 4 * Y (i, 4) := rfl
+
+theorem ThmFS (K : Submodule ℂ M45) (Cs : Submodule ℂ (Fin 5 → ℂ))
+    (hdefC : ∀ Y ∈ K, (fun a => P4 a (fun p => 1 + Y p) - 24) ∈ Cs)
+    (hC1 : ∀ u ∈ Cs, ∑ a, u a = 0) (i : Fin 4)
+    (hsplit : ∀ u ∈ Cs, (fun p : Fin 4 × Fin 5 => if p.1 = i then u p.2 else 0) ∈ K)
+    (hnd : ∀ x ∈ Cs, (∀ u ∈ Cs, ∑ a, u a * x a = 0) → x = 0) :
+    SLev (K ⊓ LinearMap.ker (fsMap i Cs)) ∧
+      Module.finrank ℂ K ≤ 3 + Module.finrank ℂ Cs := by
+  have hS : SLev (K ⊓ LinearMap.ker (fsMap i Cs)) := by
+    intro Y hY a
+    obtain ⟨hYK, hYψ⟩ := Submodule.mem_inf.mp hY
+    have hψ : fsMap i Cs Y = 0 := LinearMap.mem_ker.mp hYψ
+    have hc := hdefC Y hYK
+    have eN : repl i (fun j => 1 + Y (i, j)) (fun p => 1 + Y p) = fun p => 1 + Y p :=
+      repl_self i (fun p => 1 + Y p)
+    have key : ∀ u ∈ Cs, ∑ b, u b * (P4 b (fun p => 1 + Y p) - 24) = 0 := by
+      intro u hu
+      have hE := hdefC _ (K.add_mem hYK (hsplit u hu))
+      have eN1 : (fun p : Fin 4 × Fin 5 =>
+          1 + (Y + fun p : Fin 4 × Fin 5 => if p.1 = i then u p.2 else 0) p) =
+          repl i ((fun j => 1 + Y (i, j)) + u) (fun p => 1 + Y p) := by
+        funext ⟨k, j⟩
+        by_cases h : k = i
+        · rw [h, repl_at]
+          show 1 + (Y (i, j) + if i = i then u j else 0) = 1 + Y (i, j) + u j
+          rw [if_pos rfl]
+          ring
+        · rw [repl_ne i k h]
+          show 1 + (Y (k, j) + if k = i then u j else 0) = 1 + Y (k, j)
+          rw [if_neg h]
+          ring
+      have hDu : (fun b => P4 b (repl i u (fun p => 1 + Y p))) ∈ Cs := by
+        have e : (fun b => P4 b (repl i u (fun p => 1 + Y p))) =
+            (fun a => P4 a (fun p : Fin 4 × Fin 5 =>
+              1 + (Y + fun p : Fin 4 × Fin 5 => if p.1 = i then u p.2 else 0) p) - 24)
+            - (fun a => P4 a (fun p => 1 + Y p) - 24) := by
+          funext b
+          have hadd := P4_repl_add b i (fun j => 1 + Y (i, j)) u (fun p => 1 + Y p)
+          rw [eN] at hadd
+          show P4 b (repl i u (fun p => 1 + Y p)) =
+            (P4 b (fun p : Fin 4 × Fin 5 =>
+              1 + (Y + fun p : Fin 4 × Fin 5 => if p.1 = i then u p.2 else 0) p) - 24)
+            - (P4 b (fun p => 1 + Y p) - 24)
+          rw [eN1]
+          linear_combination (-1 : ℂ) * hadd
+        rw [e]
+        exact Cs.sub_mem hE hc
+      have hs := P4_sym 0 i u (fun j => 1 + Y (i, j)) (fun p => 1 + Y p)
+      rw [eN] at hs
+      have h1 := hC1 _ hDu
+      have h2 := fsMap_apply i Cs Y _ hDu
+      rw [hψ] at h2
+      have h3 := hC1 u hu
+      rw [Fin.sum_univ_five] at h1 h3 hs ⊢
+      rw [Fin.sum_univ_five] at hs
+      have h2' : P4 0 (repl i u (fun p => 1 + Y p)) * Y (i, 0)
+          + P4 1 (repl i u (fun p => 1 + Y p)) * Y (i, 1)
+          + P4 2 (repl i u (fun p => 1 + Y p)) * Y (i, 2)
+          + P4 3 (repl i u (fun p => 1 + Y p)) * Y (i, 3)
+          + P4 4 (repl i u (fun p => 1 + Y p)) * Y (i, 4) = 0 := h2.symm
+      linear_combination hs - 24 * h3 + h1 + h2'
+    have hz := hnd _ hc key
+    have hza := congrFun hz a
+    have hza' : P4 a (fun p => 1 + Y p) - 24 = 0 := hza
+    linear_combination hza'
+  refine ⟨hS, ?_⟩
+  have rn := rank_nullity K (fsMap i Cs)
+  have h1 : Module.finrank ℂ (K.map (fsMap i Cs)) ≤ Module.finrank ℂ Cs := by
+    have h := Submodule.finrank_le (K.map (fsMap i Cs))
+    rw [Subspace.dual_finrank_eq] at h
+    exact h
+  have h3 := LemmaSL _ hS
+  omega

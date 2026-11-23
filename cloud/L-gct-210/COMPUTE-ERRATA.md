@@ -1,4 +1,4 @@
-# COMPUTE-ERRATA — audit of the computation specs (verify2, round 5, written 19:50)
+# COMPUTE-ERRATA — audit of the computation specs (verify2, round 5; written 19:45, updated 19:58)
 
 Audited: handoff/HANDOFF.md section 2 (C1–C5), handoff/oracle.py, COMPUTE-rows.md, COMPUTE-verifyfl.md, COMPUTE-stage3.md,
 COMPUTE-reg2.md. Method: every definition and every "X decides Y" re-derived by hand; named scripts read and spot-run
@@ -6,7 +6,17 @@ COMPUTE-reg2.md. Method: every definition and every "X decides Y" re-derived by 
 stage2/r5_FO2.py). Severity: [A] = would produce a wrong conclusion or make a run meaningless; [B] = wrong number / imprecise
 statement, harmless if the oracle is applied; [C] = clarification.
 
+Versions audited: HANDOFF.md (19:28), oracle.py (19:27), COMPUTE-stage3.md (19:31), COMPUTE-rows.md (19:32 version in full; the 19:47
+version only checked for new sections: none), COMPUTE-verifyfl.md (19:29 version in full; section F added 19:45: read, see below),
+COMPUTE-reg2.md (19:31 version in full; the 19:52 update read: sections 0, 3b, 6), COMPUTE-stage2.md (19:44; not on my list, read once).
+
 Summary of the [A] items
+ A6 (HANDOFF sec. 1 "Blocked 4" and C2; COMPUTE-reg2 sections 1-3 in their 19:31 wording): the statement "(S6') a 6-dim 4x5 level space
+    without a full free row has dim Omega <= 2" is FALSE. reg2's exact family M*(x,y) has no full free row, dim Omega = 4, dim T_1 = 11,
+    FO2 bound 8 — confirmed by me (exact level identity for three rational members; (11, 4, 5, 8) with my own code). So the first-order
+    criterion does not close a_r = 2; the target is (S6-FO2): "no full free row => FO2 bound <= 8". COMPUTE-reg2 (19:52) says this in its
+    READ FIRST; HANDOFF does not. C2's decision rule must read: report (dim Omega, dim T_1, FO2 bound); the decisive event is a 6-dim
+    space without a full free row and FO2 bound >= 9.
  A1 (COMPUTE-stage3 sec. 0, 1, 4): "Level spaces of dim 8 exist" is FALSE as far as anyone knows (largest known: 7). So "calibration at
     dim 8" can never succeed; calibrate at dim 7, treat dim 8 as a target.
  A2 (COMPUTE-stage3 item 5c): the CLAIM is false as a statement about planes (explicit counterexample below). An exact run would
@@ -129,9 +139,26 @@ Summary of the [A] items
    (accurate to ~1e-6) this UNDER-estimates dim T_1 and gives a bound that is too small — the unsafe direction for the decisions
    in sec. 6 ("FO2 <= 8 -> the regime dies for this space"). Example: stage2's candidate /tmp/r5_Lr_2_1.npy reads (7,2,6) at
    1e-9 and (12,7,8) at 1e-5. FIX: polish first (as sec. 0 already demands for the type), and print the singular-value gap.
+ [A6] the 19:31 text of sections 1-3 and 4(b) speaks of "(S6')" and of the F / NC dichotomy; both are superseded (see A6 above and the
+   file's own READ FIRST of 19:55). The updated sections 0, 3b, 6 are consistent: (S6-FO2) + FL => no a_r = 2 at dim 9 (and also no
+   a_r = 3: apply (S6-FO2) to a 6-dim subspace of the 7-dim L_r, which has no full free row by rows' SL_3 corollary). Lemma EC and the
+   level proof of M* (sec. 4(e) / NOTES-reg2 4.3) re-derived by hand; M* level exactly (verify2/reg2_mstar_exact.py).
  Otherwise no errors found. Spot run: `exact_T1.py` (1.5 s) certifies Omega inside span(1, e_c) for the two exact spaces.
  Recomputed with my own code (verify2/reg2_fo2.py): (dim T_1, rank, bound, dim Omega) = (9,3,7,2) for 19 six-dim spaces of rows and
    (10,4,8,3) for rc45; three files are near-degenerate (see NOTES-verify2.md, RESULT ROUND 4).
+
+## COMPUTE-stage2.md (not on my list; read once)
+ Definitions ((Q-r) with the corrected (iii), block types, T_1, q_m as a symmetric BILINEAR form, FO2, (T2), (FO-r)), the DEAD/ALIVE
+   logic, and the level conditions of the block family (2,4) in S3 (re-derived: P_1, P_2, P_3 as stated): no errors found.
+ [A5-type] r6_census.py samples (i) at 50 points and (ii) at 28 (the spec itself says to raise them to 140, 80 and re-checks every
+   solution at 80 fresh points). (i) is an inhomogeneous quartic in 5 coordinates: 125 monomials, so use >= 250 for (i) and >= 140 for (ii).
+ [C] S5 (diagonal N2 blocks) is not needed: Theorem N2-X is verified (NOTES-verify2.md, RESULT ROUND 3).
+ [C] S4 (closed-form pair conditions, pairlib.py): not audited.
+
+## COMPUTE-verifyfl.md, section F (added 19:45)
+ Rests on verifyfl's Theorem SL3-RED (NOTES-verifyfl R5.6), which I have not verified (Lemma C', Lemma 3C, Lemma NP are verified).
+ The kinds (R1)-(R4) are search targets; a hit is a counterexample to (SL_m) only after the fresh-point test of A3.
+ (R2): v = chi_1 + x chi_2 - (x^2/2) chi_3 is isotropic (checked).
 
 ## Sample-size table (number of coefficients of a form of degree k in d coordinates = C(d+k−1, k))
    d      k=4 (4x5 level / defect, top degree)     k=5 (5x5 level, top degree)     all degrees 1..4 together (inhomogeneous quartic)

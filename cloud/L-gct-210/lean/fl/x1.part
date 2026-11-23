@@ -4,24 +4,23 @@ def Lev45 (K : Submodule ℂ M45) : Prop := ∀ Y ∈ K, ∑ a, P4 a (fun p => 1
 def DefLine (K : Submodule ℂ M45) (m : Fin 5 → ℂ) : Prop :=
   ∀ Y ∈ K, ∃ θ : ℂ, ∀ a, P4 a (fun p => 1 + Y p) = 24 + θ * m a
 
-def defW (K : Submodule ℂ M45) : Submodule ℂ (Fin 5 → ℂ) where
-  carrier := {w | ∀ Y ∈ K, ∑ a, w a * P4 a (fun p => 1 + Y p) = 0}
-  add_mem' := by
-    intro w w' hw hw' Y hY
-    have h1 := hw Y hY
-    have h2 := hw' Y hY
-    rw [Fin.sum_univ_five] at h1 h2 ⊢
-    simp only [Pi.add_apply]
-    linear_combination h1 + h2
-  zero_mem' := by
-    intro Y hY
-    simp
-  smul_mem' := by
-    intro c w hw Y hY
-    have h1 := hw Y hY
-    rw [Fin.sum_univ_five] at h1 ⊢
-    simp only [Pi.smul_apply, smul_eq_mul]
-    linear_combination c * h1
+def defW (K : Submodule ℂ M45) : Submodule ℂ (Fin 5 → ℂ) :=
+  { carrier := {w | ∀ Y ∈ K, ∑ a, w a * P4 a (fun p => 1 + Y p) = 0}, add_mem' := (by
+      intro w w' hw hw' Y hY
+      have h1 := hw Y hY
+      have h2 := hw' Y hY
+      rw [Fin.sum_univ_five] at h1 h2 ⊢
+      simp only [Pi.add_apply]
+      linear_combination h1 + h2),
+    zero_mem' := (by
+      intro Y hY
+      simp),
+    smul_mem' := (by
+      intro c w hw Y hY
+      have h1 := hw Y hY
+      rw [Fin.sum_univ_five] at h1 ⊢
+      simp only [Pi.smul_apply, smul_eq_mul]
+      linear_combination c * h1) }
 
 theorem mem_defW (K : Submodule ℂ M45) (w : Fin 5 → ℂ) :
     w ∈ defW K ↔ ∀ Y ∈ K, ∑ a, w a * P4 a (fun p => 1 + Y p) = 0 := Iff.rfl

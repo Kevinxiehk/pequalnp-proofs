@@ -1,13 +1,22 @@
 # NOTES-stage3 (role: stage3; start 14:37, budget 90 min -> ends ~16:07)
-## RESULT, ROUND 7 (stage3, 19:25; provisional, updated at the end of the round) -- details in section 26
- (1) z = (1,0,0,0,0) (exactly one single-row direction): IMPOSSIBLE in the families F1 (all lam = 3), F3 (lam_ae = 4), F4a (lam_ab = 4).
+## RESULT, ROUND 7 (stage3, 20:03; final) -- details in section 26; requests for the heavy machine in COMPUTE-stage3.md
+ Regime: 9-dim level L, all a_r = 1, all lam >= 3 ("no minimal row pair"), z = vector of the dims of the single-row parts.
+ (1) z = (1,0,0,0,0) (exactly one single-row direction) is IMPOSSIBLE in the families F1 (all lam = 3), F3 (lam_ae = 4), F4a (lam_ab = 4,
+     lam_cd = 3)  [rigorous hand proofs, NOT yet verified independently].
      F1: Theorem S3-G now needs no side condition (m_ie <= 2 by counting, planes always well defined). F3, F4a: the proof of N2-X applies
      to the pair with lam = 4 (inputs re-derived in the presence of e_e w^T; its step (beta-0) replaced by an isotropy count).
-     The only remaining family is F4b (lam_ab = lam_cd = 4): L then contains a twisted free column on all five rows plus e_e w^T.
+     The only remaining family is F4b (lam_ab = lam_cd = 4): L contains a twisted free column on all five rows plus e_e w^T; the 7-dim
+     core M is explicit in ten vectors; (CA2) gives exactly the identities (i)-(iii) of (A5'). NEW: an EXACT 7-dim level space M_0 with
+     the shape and all invariants of the F4b core exists (free column (+) cube-root-of-unity block; exact check in Z[omega]); it
+     violates (iii) and has dim T_1(M_0) = 8. So F4b cannot be excluded by the level conditions of the core alone. F4b is OPEN.
  (2) two rows with 2-dim single-row parts: impossible by rows' FL2* unless both planes are degenerate (Lemma: dim(U o U') >= 2).
  (3) (S3-a), z_e = 2: structure sharpened (all 2-row spaces through e are trivial, lam_{rr'} = 2 + m_kl, (Q4) for the four other rows),
      and a precise reason why the missing cyclic identity cannot come from lineality along e_e Z. NOT settled.
- (4) What is left: table in section 26 (D).
+ (4) What is left: table in section 26 (D):  F4b;  z = (2,0,0,0,0);  two entries 2 with both planes degenerate;  the z-vectors with
+     single-row elements in several rows (not analysed);  rows with a_r >= 2 (outside this regime).
+ (5) COMPUTE-stage3.md (asked for by the coordinator): six self-contained computation requests (direct structured searches for
+     z_e = 2 and for one single-row element; cores of (S3-a) with the cyclic products and FO2; F4b systems A/B with the
+     calibration M_0 and the small exact free-column sub-problem; several single-row rows; exact confirmation of the plane lemmas).
 
 ## RESULT, ROUND 6 (stage3, 19:01) -- (S3) settled in its GENERIC single-row case (Theorem S3-G); z_e = 2 and the non-generic cases open. Section 24.
  (1) THEOREM S3-G [rigorous hand proof, NOT yet independently verified]: no 9-dim level space with all a_r = 1 and all lam_{rr'} = 3 has
@@ -1264,6 +1273,43 @@ STATUS 19:20: results so far: (i) pattern m_ie = 3 is impossible by counting, th
         collapsed 4-set with m_ab = m_cd = 2. Identities: P_a P_b P_c P_d = 0;  y_c, y_d kill P_a P_b P_e;  y_a, y_b kill P_c P_d P_e
         (P_r = span(y_r, g_r), P_e = span(w,p)); moments s(y_r) = s = -s(p), <y_r,y_r'> = s^2 = -<y_r,p>, tau(y_r,y_r',p) = -s^3, ...
         The proof of N2-X does not apply (for the 4-sets {a,b,c,e}, ... only the lines C y_c, ... are available).
+   (A5') F4b, WHAT (CA2) GIVES EXACTLY, AND WHY IT IS NOT ENOUGH ALONE [rigorous + one exact example].
+        Coordinates on M: m = sum_r c_r x^{re} + mu e_e w^T + ga G_ab + de G_cd (G_ab := e_a g_a^T + e_b g_b^T, G_cd likewise); rows
+        a: c_a y_a + ga g_a,  b: c_b y_b + ga g_b,  c: c_c y_c + de g_c,  d: c_d y_d + de g_d,  e: (sum c) p + mu w.
+        L_e = {sum c = 0, mu = 0} (dim 5), L_a = {c_a = 0, ga = 0}, ... (dim 5 each), so every L_r lies in M and (CA2) on the five row
+        kernels is a statement about M. Expanding in the (linearly independent) monomials:
+          (i)   (CA2) on L_e   <=>  P_a P_b P_c P_d = 0 in A_4                       [all 16 products; the monomials ga^i de^j c^.. on
+                                                                                      {sum c = 0} are independent];
+          (ii)  (CA2) on L_a, L_b  <=>  y_b . P_c P_d P_e = 0,  y_a . P_c P_d P_e = 0  [row b of L_a is only the LINE C y_b];
+          (iii) (CA2) on L_c, L_d  <=>  y_d . P_a P_b P_e = 0,  y_c . P_a P_b P_e = 0.
+        Nothing more comes from (CA2). In particular the twisted free column N := Phi (+) C e_e w^T satisfies the FULL (Q4) for its five
+        row spaces (four lines and one plane):  Y_a Y_b Y_c Y_d = 0  and  Y_k Y_l Y_m . P_e = 0 for the four triples of R.
+        LEVEL CONDITIONS OF N in closed form (eps = sum of coefficients, Y_T := prod_{r in T} Y_r for T inside R):
+          eps(Y_r) = s = -eps(P);   eps(Y_T) = 0 for |T| >= 2;   eps(Y_T P) = 0 for |T| >= 1;   eps(Y_T W) = 0 for all T (also T empty).
+        [sigma_k(m) = sum_{|T|=k} c_T eps(Y_T) + sum_{|T|=k-1} c_T eps(Y_T ((sum c) P + mu W)); non-squarefree monomials c_r c_T (r in T)
+         occur only in the second sum.] Example: all y_r equal forces y_r = s e_j (e_2 = e_3 = 0 and all 4-fold products of entries 0).
+        FREE-COLUMN SUB-FAMILY y_a = y_b = y_c = y_d = e_1 (s = 1): then p = -e_1 + p', and after the gauge g_a -> g_a + be e_1,
+          g_b -> g_b - be e_1 one has g_r = q_r in C^N (N = {2,..,5}) with s(q_r) = 0, <q_a,q_b> = <q_c,q_d> = 0, <q_a + q_b, p'> = 0;
+          w, p' in C^N with sum 0.  [g_a = q_a, g_b = ka e_1 + q_b: sigma_2 on Y_ab gives ka = -2 s(q_a), <q_a,q_b> = -s(q_a)^2;
+          sigma_2 on G_ab + c x^{de} gives <q_a + q_b, p'> = 0; sigma_2 on G_ab + c x^{ae} gives s(q_a) = 0.]  So M = (free column 1) (+) D
+          with D in the columns N (the "free column (+) D" model of round 4), and (i)-(iii) read: all four triple products of
+          q_a, q_b, q_c, q_d vanish in (A_N)_3, q_a q_b q_c q_d = 0, and q_a q_b . {w, p'} = q_c q_d . {w, p'} = 0 in (A_N)_3.
+        EXACT EXAMPLE M_0 (stage3/f4b_example.py: perm(J + m) = 120 at 900 random points with coefficients in Z[omega], 0 failures):
+          y_r = e_1, p = -e_1, w = (0,-1,-1,3,-1), g_a = -g_b = n = (0,1,omega^2,0,omega), g_c = -g_d = n' = (0,1,omega,0,omega^2),
+          omega = exp(2 pi i/3).  M_0 is a 7-dim level space with z = (0,0,0,0,1), lam_ab = lam_cd = 4, all other lam = 3, dim (M_0)_r = 5:
+          EXACTLY the invariants and the shape of the F4b core. So the level conditions of the core alone do NOT exclude F4b.
+          M_0 satisfies (i) but violates (iii) (e_1 . n n w != 0: n^2 w has the coefficient 6 n_2 n_3 at y_2 y_3 y_4), and
+          dim T_1(M_0) = 8 (numerical rank, gap 5e-2 / 2e-16), so M_0 lies in no 9-dim level space, in agreement with (iii).
+          [In the isotropic structure of M_0 (q_a, q_b on one isotropic line C n of the three columns T, q_c, q_d on the other one),
+           (ii) + (iii) force w in C^T with s(w) = sum w_j/n_j = sum w_j/n'_j = 0, a Fourier system: w = 0. So this structure is excluded
+           rigorously; the general sub-family is not.]
+        NUMERICS (light, this container; LM with finite-difference Jacobians; scripts f4b_core.py, f4b_run.py, f4b_fc.py):
+          general core, level conditions only, non-degeneracy hinges: 0 solutions in 7 starts (residual floors 0.03 - 0.14; without the
+          hinges 7 of 7 starts converge to degenerate solutions);  free-column sub-family, level only: 1 solution (= M_0) in 19 starts;
+          free-column sub-family with (i)-(iii): 0 in 8 starts (floor 0.58). The success rate of plain LM on these systems is low, so
+          this is NOT evidence either way; the decisive computations are specified in COMPUTE-stage3.md, item 3.
+        EXACT OPEN STATEMENT (F4b): there are no vectors y_a..y_d, p, w, g_a..g_d (independences as in (A5)) and t_1, t_2 such that
+          M (+) C t_1 (+) C t_2 is a 9-dim level space with all a_r = 1; necessary: M level, (i), (ii), (iii), and FO2 for M.
  (B) TWO ROWS WITH 2-DIM SINGLE-ROW PARTS [rigorous, uses rows' Theorem FL2*].
    LEMMA. For 2-dim U inside 1^perp and U' = (U + C1)^perp: dim(U o U') >= 2.  [If <= 1, every u' in U' has a u != 0 in U with
    disjoint support; for generic u' this puts u on the columns where U' vanishes, i.e. on {j : e_j in U + C1}; that set has exactly
@@ -1285,9 +1331,12 @@ STATUS 19:20: results so far: (i) pattern m_ie = 3 is impossible by counting, th
    (C8) If a second row has a single-row part of dim 2: (B). If e(L_e) = 1: L_e is a (5,1) space.
  (D) WHAT IS LEFT of "no 9-dim level space with all a_r = 1 and lam >= 3", by the vector z (sorted; z_i <= 2, at most ... by (c1),(c2)):
    z = 0:                 impossible (Theorem N = N1 + N2-X).
-   z = (1,0,0,0,0):       F1, F3, F4a impossible ((A3), (A4));   F4b OPEN ((A5)).
+   z = (1,0,0,0,0):       F1, F3, F4a impossible ((A3), (A4));   F4b OPEN ((A5), (A5'): core shape realisable (M_0), identities (i)-(iii)).
    z = (2,0,0,0,0):       OPEN = (S3-a): missing cyclic identity / weakened plane problem ((C), section 24 (C)).
    two entries 2:         impossible unless both planes are degenerate ((B)); the degenerate case OPEN.
    z = (1,1,*,*,*), (2,1,*,*,*) with one entry 2 at most: OPEN, not analysed (for two rows e, e' with z = 1 one has
                           W W' . P_k P_l = 0 for the pairs of the other three rows; the single-row vectors are pairwise orthogonal).
    Besides: rows with a_r >= 2 (reg2), the transposed statements, and the verification of sections 21, 24, 26.
+STATUS 19:25 (round 7): section 26 written: z = (1,0,0,0,0) impossible in F1, F3, F4a; FL2* corollary; structure of (S3-a); table (D).
+STATUS 19:31: COMPUTE-stage3.md written (requests for the 24-core machine).
+STATUS 20:03: F4b: (CA2) gives exactly (i)-(iii); exact level space M_0 of F4b-core shape found (violates (iii), dim T_1 = 8); F4b stays OPEN. Final report.
