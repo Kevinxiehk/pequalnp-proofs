@@ -300,3 +300,12 @@ STATUS 20:02 (round 3): R3a.lean (= Zbf11 renamed) and R3b.lean compile (exit 0,
  tau-coordinates: with Q_a = {m : rho'_m = rho'_a}, Q_b = {m : rho_m = rho_b}: for all t in L
  sum_{m in Q_b} kappa_m t(r,m) + sum_{m in Q_a} kappa'_m t(r',m) = 0; in Type I, Q_b = C^c, Q_a = C: the weighted partial sums over C
  agree; in Type II these are the cells Q_3, Q_2 of stage2 section 3); c7_rows_nf, c7_cols_nf.
+STATUS 20:11 (round 3): R3c.lean compiles (exit 0, axioms ok, format 0, guard 0/0; snapshot R3c_ok.lean). Target (2), first layer:
+ zbf_cases (general alternative: (blk_1 = k ell^|alpha|, blk_2 = k' ell^|beta|, k k' = n!) or (ell = 0 on U and one block permanent
+ vanishes on U)); t0 (= T0 for a row triple x column triple, Fin 3 + Fin 2); t2_cubic (the T2 cubic 2t(t a1 + a1 a2 + a1 a3 - a2 a3));
+ t2_core (a linear form whose kernel lies in the zero set of that cubic has no a1, a2, a3 coefficient -- elementary proof by test
+ points, no irreducibility theory); t2pp_cubic, t2pp_core (the T2'' cubic contains NO hyperplane, for any j != 1; so n**|K_S = 0);
+ t1p_alg (T1': the six equations of the cyclic Type II triple have no solution, for ANY i with i^2 = -1, i.e. both signs eps;
+ certificates checked first with exact arithmetic, lean/zbf/py/chk_t1p.py); rowsZeroS_single(_finrank); s2_count (X_123 = 0 and
+ dim L_i = 5 force (2,2,2) or (2,2,3) up to order).  The STRUCTURAL parts of T2 / T2'' (I_3^perp = N_12 + N_13 + C n**, K_S) are NOT
+ formalized.

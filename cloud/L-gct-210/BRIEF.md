@@ -140,3 +140,23 @@ When your budget ends (stated in your task) or you finish, reply with: what you 
   a_r >= 2 (Type I'); annihilators with zero entries (stage2 round 4 in progress); conjecture (D).
 - New upstream (constructions/gluing only): Outside/L_gct_204 (block gluing, general), L_gct_206 (4x6 dim 7),
   L_gct_207 (5x7 dim 9).
+
+## UPDATE 9 (20:20) — exact engines here, second machine, guard rules
+
+* **Gröbner engines in this container:** `/home/claude/tools/gb/msolve` (0.x, `msolve -g 2 -f in.ms -o out` gives a reduced
+  DRL basis mod p; input format: line 1 variables, line 2 characteristic, then polynomials separated by commas) and
+  `/home/claude/tools/gb/Singular` (`Singular -q < script`; has `sat`, `std`, number fields via minpoly). Tested: the local
+  session's VF-A run is reproduced here (unit ideal; calibration 83 elements) in 0.02 s. BUDGET: runs of seconds; at most
+  ~2 CPU-minutes per run and ~10 per round; anything larger goes into your COMPUTE-<role>.md for the 24-core machine.
+  A generator in the style of `/home/claude/coord/local/results/VF-A/gen.py` (pure Python modular polynomial arithmetic →
+  msolve input) is the template. Rules (errata A4): unit mod p is evidence — repeat at ≥ 3 primes, on coordinate charts
+  (not one generic affine normalisation), with a calibration that must come out non-unit; mark results [modular] or [exact].
+* **Second machine (24 cores, msolve + Singular):** runs the tasks of `/home/claude/coord/cloud/REQUESTS.md`; its results
+  appear under `/home/claude/coord/local/results/` (read-only for you). So far: VF-A unit ideal for the four isotropic planes
+  (4 primes); VF-B calibration passed; C1 calibration (4,1) 183/500, (5,1)/(6,2)/(7,3) searches running.
+* **Spec errata:** `COMPUTE-ERRATA.md` (verify2). No 8-dim level space is known. (S6′) is false; the target is (S6-FO2).
+* **Lean guard rules:** helpers under namespace `PEqualNP.Outside.L_gct_210_aux`; no line beginning with `add_`.
+  Kevin: keep formalizing everything, ignore the 512 KiB cap for now.
+* **New verified / proved today (see the NOTES files):** (FO-r) (stage2 R7); dim L ≤ dim L_r + dim Ω(L_r) − 1 and family M*
+  (reg2); NCOL-P3, P51, Theorem DC (rows R5); SL3-RED, Lemma NP, Props I-ALL / II-ALL, (SL_m) ⟺ [DC3], [T22], [T31]
+  (verifyfl R5); Theorem Z22 and z = (1,0,0,0,0) except F4b (stage3 §26).
