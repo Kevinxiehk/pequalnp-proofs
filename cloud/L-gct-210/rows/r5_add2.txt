@@ -1,0 +1,30 @@
+ R5.6 FIRST-ORDER LAW FOR SINGLE-COLUMN ELEMENTS IN ANY COLUMN (rigorous; generalises (F1^T), no neutrality assumed).
+   (SC1) Let x e_n^T be in a 4 x 5 level space L' (x in C^4, sum x = 0). Then for every Y in L' (columns y_j, row sums s(Y)):
+          <x, s(Y) - y_n> = 0      and      the vector (<x, y_j>)_{j != n}, with 0 at n, lies in C cap e_n^perp.
+   Proof. C_j is linear in column n: C(Y + lam x e_n^T) - C(Y) = lam v(Y), v_n = 0, v_j = x.M^(j;n)(Y), M^(j;n)_i = perm_3((J+Y) minus row i,
+   columns j, n); v(Y) lies in C. Degree 1: v^(1)_j = 2[<x,y_j> + <x,y_n> - <x,s>]; sum over j != n is 6[<x,y_n> - <x,s>] = 0 as C is in 1^perp. QED
+   Consequence for e = 1: if m_n != 0 and x e_n^T is in L', then EVERY column j != n of EVERY Y in L' is orthogonal to x.
+   Checked (rows/sc1_chk.py): 184 (space, column) pairs with single-column elements, 68 of them non-neutral columns, 1167 tests, max 6e-6.
+ R5.7 THEOREM NCOL-P (rigorous; (NCOL_1) when the single-column elements span the row sums; NO hypothesis on m, isotropic allowed).
+   Let L' be a 4 x 5 level space with defect space C m, dim L' >= 4, X_n := {x : x e_n^T in L'}. If sum_n X_n = 1^perp (in C^4), then
+   m_n = 0 for some n with X_n != 0: L' has a neutral column carrying a single-column element.
+   Proof. (1) K := sum_n X_n e_n^T is strongly level: P_k of a sum of single-column elements in distinct columns is multi-homogeneous in
+   the pieces, each piece may be scaled inside L', so every multi-homogeneous part of P_k vanishes, and these parts are exactly the terms of
+   the deletion polynomials. P_2 gives X_n perp X_n' (n != n'), so 1^perp = (+) X_n orthogonally, dim K = 3, s : K -> V := 1^perp bijective.
+   (2) Isometries (zeros / verifyfl): for h in K write h_j = A_j s(h); polarising p_2 = 0 on K, B_j := 1 - 2A_j are isometries of V,
+   sum_j A_j = 1.  Here A_j is the orthogonal projector onto X_j:  B_j x = x for x in X_n, j != n, and B_n x = -x.
+   (3) Normal form (verifyfl PS, any m): N := L' cap ker s has dim >= 1; for Z in N, p_2(Z, h)_j = <s(h), B_j^T z_j^V> (z_j^V = component of
+   column j in V) must be a multiple of m_j for every s(h) in V: z_j^V = m_j B_j f with one f = f(Z) in V; f = 0 forces z_j = (c_j/4) 1 and
+   then Z = 0 or Z = (kappa/4) 1 m^T, which has f = 0 only if ... [f(Z) = 0 and Z != 0 means Z = (kappa/4) 1 m^T, kappa != 0; this matrix
+   has all rows equal and is level only if m is a multiple of (1, z, z^2, z^3, z^4), z^5 = 1, which has no zero entry; in that case the
+   theorem's conclusion fails for THIS Z, so the statement assumes N contains some Z with f(Z) != 0, e.g. any Z not of this form.]
+   (4) Row sums of Z vanish: sum_j m_j B_j f = 0. Pair with x in X_n: sum_j m_j <f, B_j^{-1} x> = (sum_{j != n} m_j - m_n) <f,x> = -2 m_n <f,x>.
+   So m_n <f, x> = 0 for all n and x in X_n. As f != 0 and the X_n span V, some <f,x> != 0, hence m_n = 0.  QED
+   Coverage: of the 28 principal (4,1) examples, 15 have K spanned by single-column elements (types (1,1,1) and (2,1) below).
+   The same pairing for any e: for Z in ker s and x in X_n: <z_n, x> = 0  (column n of every row-centred element is orthogonal to X_n).
+ R5.8 STRUCTURE OF THE STRONGLY LEVEL KERNEL K = ker c IN THE 90 PRINCIPAL EXTREMAL SPACES (numerical):
+   K is always supported on at most THREE columns; column ranks of K: (1,1,1): 21, (2,1): 30, (3): 9 [K spanned by single-column
+   elements: 60], (3,2): 25, (2,2,1): 5 [exactly one single-column direction]; K has no single-row element; K ALWAYS contains a
+   single-column element, and in every case some column carrying a single-column element of K is NEUTRAL (90/90).
+   So the mechanism of (NCOL) in the principal case is: "a single-column element of the strongly level kernel sits in a neutral column".
+   Proved: e = 1 with K spanned by single-column elements (R5.7); e = 1 split non-isotropic (R4.14).  Not proved: types (3,2), (2,2,1); e >= 2.

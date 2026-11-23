@@ -1179,7 +1179,7 @@ STATUS 19:18: R6-8 added. Final report sent.
 # except possibly for ONE column c with kappa^r = e_c, kappa'^c = e_r (entry (r,c) = 0 on L), where only <= 4 holds and L = L_r + L^c.
 STATUS 19:36: /home/claude/work/L-gct-210/COMPUTE-stage2.md written (tasks S1-S6: census at scale, non-block solutions, exact FO2 for (2,4),
  minimal pairs with zeros as an exact problem, two-row-column blocks, z = 3). Starting (1).
-STATUS 19:44: new first-order test (FO-r) found: it kills the generic (2,4) solutions and the whole cross family including the locus b = 0.
+STATUS 19:43: new first-order test (FO-r) found: it kills the generic (2,4) solutions and the whole cross family including the locus b = 0.
 
 ## R7-1. LEMMA (FO-r): the row-r projection of T_1(L_r) must be all of C^5  [rigorous; sharper than "dim T_1 >= 9"]
  Let r be a row with 4-dim projection of a level space L, X = L_r. Then T_1(X) contains L and tau = e_r 1^T - J/5 (R5-4), whose row r is

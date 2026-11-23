@@ -25,7 +25,10 @@ Self-contained. Everything over C. J = all-ones 5x5 matrix, J' = all-ones 4x5 ma
 * (T2) for a candidate X = L_r: unknown T_0..T_4 in C^(4x5);  D_T G_j(xi) := derivative of G_j at xi in direction T.
     (T2): D_{T_k} G_j(xi) + D_{T_j} G_k(xi) = 0 for all j <= k and all xi in X;   solvable := some solution has sum_k T_k in J' + X.
   Necessary for X = L_r (order 2 at v = 0 of chief's identity <v, G(T(v) + xi)> = 120 <kappa,v>^5).  Linear in T.
-* A candidate X is DEAD if FO2 bound <= 8 or (T2) is not solvable; ALIVE otherwise.  So far: 49 verified solutions, all of block
+* (FO-r) [added 19:46, the sharpest first-order test]: for X = L_r the projection of T_1(X) to row r (row 0 in the scripts) must be ALL of
+  C^5 (T_1(X) contains L, whose row-r projection is a hyperplane not containing 1, and e_r 1^T - J/5).  Script: `r7_FOrow.py`,
+  function `report(name, B)` prints dim T_1 and the dimension of the row projection (must be 5).
+* A candidate X is DEAD if the (FO-r) projection has dim < 5, or FO2 bound <= 8, or (T2) is not solvable; ALIVE otherwise.  So far: 49 verified solutions, all of block
   type; alive: only solutions with a 3-dim single-row or single-column part (cross spaces on two special loci, two (3,3) solutions).
 
 ## 1. Scripts (numpy + scipy only; directory /home/claude/work/L-gct-210/stage2/)
@@ -55,7 +58,7 @@ replace the prefix once:  `sed -i 's#/home/claude/work/L-gct-210/stage2#NEWDIR#g
  the table: (2,4): (dim T_1, rank, bound) = (9,3,7) mostly, sometimes (12,7,8), (8,3,6); (3,3): z = 2 -> (10,5,7), z = 3 -> bound 8 or 9.
  Near misses (final residual < 1e-5): restart with MAXIT 3000 (singular solutions converge linearly).
  For every verified solution record: block type, row/column projection dims, z (single-row dims), z' (single-column dims),
- dim T_1, rank, FO2 bound, (T2) distance, and for ALIVE solutions the result of `r6_extend.py` with D = 8 and D = 9 (20 starts each).
+ dim T_1, dim of the row-r projection of T_1 ((FO-r)), rank, FO2 bound, (T2) distance, and for ALIVE solutions the result of `r6_extend.py` with D = 8 and D = 9 (20 starts each).
  DECISION: (a) an ALIVE solution with all z, z' <= 2 = a candidate L_r that the present tests do not exclude: send the .npy (it is
  the next thing to exclude, or the seed of a construction); (b) a solution for which `r6_extend.py` with D = 8 or 9 converges
  (residual < 1e-9, confirm with exact/high precision) = an 8- or 9-dim level space: STOP and report; (c) none: evidence for
@@ -87,7 +90,16 @@ replace the prefix once:  `sed -i 's#/home/claude/work/L-gct-210/stage2#NEWDIR#g
  Wanted (Sage/Macaulay2): the components of the variety of 5-dim subspaces X of C^12 = {(s_1,s_2,p,q)} satisfying these identities and
  rank(p-projection) <= 3, rank(q-projection) <= 3; for a generic point and for the special strata of each component the exact
  dim T_1 and rank (symbolic, over the function field of the component). Conjecture from 20 numerical solutions: dim T_1 = 9 (rank 3),
- rarely 12 (rank 7) or 8 (rank 3); bound <= 8 always when z, z' <= 2.  DECISION: a stratum with bound >= 9 and z, z' <= 2 = candidate.
+ rarely 12 (rank 7) or 8 (rank 3); bound <= 8 always when z, z' <= 2.  Sharper target found after writing this (NOTES-stage2 R7-2): the cofactors of J + xi on this family are explicit,
+     C_00 = C_10 = C_20 = 2 gam, C_30 = 6 be, C_40 = 6 al, C_0j = (2+s) gam_j + h_j, C_1j = (2+s_2) gam_j + h_j, C_2j = (2+s_1) gam_j + h_j,
+     C_3j = 2(3+s) be_j + 6 Q_0, C_4j = 2(3+s) al_j + 6 P_0   (P = 1+p, Q = 1+q, al = sum P', be = sum Q', gam = al be - <P',Q'>,
+     al_j = al - P'_j, be_j = be - Q'_j, gam_j = al_j be_j - <P',Q'> + P'_j Q'_j, h_j = 2 P_0 be_j + 2 Q_0 al_j, s = s_1 + s_2),
+ and (FO-r) holds iff for every j = 1..4 the function s * gam_j, restricted to X, lies in the span of the restrictions of the C_ij, i >= 1.
+ CASE A (s = 0 on X): (FO-r) holds; numerically FO2 bound 8.  CASE B (ab = <p',q'> on X, s != 0): in all 20 numerical solutions the
+ row projection is 2-dim (DEAD at first order).  WANTED: (1) a symbolic proof that in Case B some s * gam_j is not in that span
+ (parametrise the 5-dim subspaces X of Case B; if a, b are independent on X then p_0 = -a - (1+mu) b, q_0 = (mu-1) a - b for a constant mu);
+ (2) for Case A (X = domino direction + 2-row level space on rows 3,4) the exact FO2 bound on every stratum.
+ DECISION: a stratum that passes (FO-r), has FO2 bound >= 9 and z, z' <= 2 = candidate.
 
 ### S4 — minimal pairs with zero entries in the annihilators, as an exact problem
  Data of a minimal row pair: kappa, kappa' in C^5 (sum = 1 each), (nu, nu') in C^5 x C^5 (defined modulo (kappa,0), (0,kappa') and
