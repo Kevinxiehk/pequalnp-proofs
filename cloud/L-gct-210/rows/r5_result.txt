@@ -1,0 +1,27 @@
+## RESULT, ROUND 5 (rows; final 20:00) -- (NC') NOT proved; (NCOL_1) PROVED in the principal case (Theorem NCOL-P3), exact 4x4 statement found
+ Details and proofs: section R5 (R5.1 - R5.9).  Heavy-computation requests: COMPUTE-rows.md (H1-H6, exact systems X1-X4).
+ V1 [RIGOROUS, R5.9] THEOREM NCOL-P3: let L' be a 4 x 5 level space with defect line C m (ANY m, isotropic allowed), K in L' a 3-dim strongly
+    level subspace with row sums s(K) = 1^perp living on three columns a, b, c, and Z in L' with zero row sums and c(Z) != 0. Then
+    m_a m_b m_c = 0 (two columns: m_a m_b = 0). So every (4,1) space whose column-centred part ker c is such a K has a neutral column,
+    and it is an active column of K.  Proof: isometries B_j with B_a+B_b+B_c = 1, normal form z_j = m_j((kappa/4)1 + B_j f), <f,f> =
+    (3/4)kappa^2 != 0, and a 3 x 3 Gram computation that ends in (alpha+beta-gamma)(alpha-beta+gamma)(-alpha+beta+gamma) = 8 m_a m_b m_c = 0.
+    Covers 28 of the 30 known (4,1) spaces (the 2 others are column-centred with a two-column defect line); every ingredient checked
+    numerically to 1e-9 or better.  Hypothesis left: "K lives on <= 3 columns" (true for 90/90 principal kernels and 49/49 fresh strongly
+    level 3-spaces; types by column ranks (1,1,1), (2,1), (3), (3,2), (2,2,1)); exact problem X4.
+ V2 [RIGOROUS, R5.6] (SC1) first-order law for a single-column element x e_n^T in ANY column: <x, s(Y) - y_n> = 0 and (<x,y_j>)_{j != n} in
+    C cap e_n^perp for all Y in L'.  For e = 1 and m_n != 0: all other columns of all of L' are orthogonal to x.
+ V3 [RIGOROUS, R5.2] THEOREM DC / NC'-DC: dim L' = rank c + rank s + dim L'_dc, so (DI_5) can fail only through DOUBLY CENTRED elements.
+    With a neutral column:  dim L' = e + 3 + delta - s1 - s2 - s3,  delta = dim Q_dc,  s1 = e^col(Q) - rank rho,  s2 = 3 - e^col(Q) - dim X_n,
+    s3 = e - rank kappa (all >= 0).  So the exact 4 x 4 statement behind (NC'_e) is (DC-COST): delta <= s1 + s2 + s3; (NC') holds whenever Q
+    has no doubly centred element; with the checked L_gct_216: dim L' <= e + 6.  Bilinear form of the problem (R5.1):
+    Xh^T (Adj(q) - 6J) Wh = 0 on Q and the claim dim Q + dim Xh + dim Wh <= 8, which interpolates between a triviality (Q = 0) and the
+    checked L_gct_214 (Xh = Wh = C1). The checked 4 x 4 theorems 214/216/217 alone do NOT give (DC-COST).
+ V4 [RIGOROUS, R5.3] (NCOL_3) + (DI_4x4) => no (7,3), where (DI_4x4): "a 4 x 4 level space has dim Q <= e^col(Q) + 3" = (DI_5) for 4 x 5
+    spaces with a zero column; it needs only: no (dim, e^col) = (5,1), (6,2); (5,1) with a two-column line is excluded by TC5.
+ V5 [NUMERICAL, calibrated] 4 x 4: (4,1) 9/17, (5,1) 0/14; (5,2) 2/10, (6,2) 0/15; any 6-dim 4 x 4 level space 0/15; row-centred (4,1): 1/34
+    and that hit has a two-column defect line.  Block pattern (3,2) for (6,3): 0/30 (control 4/19).  Towers continue: in all 120 cases
+    the 4 x 4 base Q has again a deletable row or column.  Principal census: 90 of 95 extremal spaces have ker c = strongly level
+    3-space with s = 1^perp, always on <= 3 columns, always containing a single-column element in a neutral column.
+    Slack census: delta = 0 in 126 of 135 tower positions; delta > 0 in 7, always paid exactly (s3 or s1); s2 = 0 always.
+ NOT PROVED: (NC'_e) (= (DC-COST)); (DI_4x4); (NCOL_1) for non-principal spaces and "K on <= 3 columns"; (NCOL_2), (NCOL_3)
+    (for e >= 2 the Gram argument of V1 needs rank-one column data; only numerics and (FS-DEC)).

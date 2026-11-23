@@ -25,7 +25,7 @@ Self-contained. Everything over C. J = all-ones 5x5 matrix, J' = all-ones 4x5 ma
 * (T2) for a candidate X = L_r: unknown T_0..T_4 in C^(4x5);  D_T G_j(xi) := derivative of G_j at xi in direction T.
     (T2): D_{T_k} G_j(xi) + D_{T_j} G_k(xi) = 0 for all j <= k and all xi in X;   solvable := some solution has sum_k T_k in J' + X.
   Necessary for X = L_r (order 2 at v = 0 of chief's identity <v, G(T(v) + xi)> = 120 <kappa,v>^5).  Linear in T.
-* (FO-r) [added 19:46, the sharpest first-order test]: for X = L_r the projection of T_1(X) to row r (row 0 in the scripts) must be ALL of
+* (FO-r) [added 19:44, the sharpest first-order test]: for X = L_r the projection of T_1(X) to row r (row 0 in the scripts) must be ALL of
   C^5 (T_1(X) contains L, whose row-r projection is a hyperplane not containing 1, and e_r 1^T - J/5).  Script: `r7_FOrow.py`,
   function `report(name, B)` prints dim T_1 and the dimension of the row projection (must be 5).
 * A candidate X is DEAD if the (FO-r) projection has dim < 5, or FO2 bound <= 8, or (T2) is not solvable; ALIVE otherwise.  So far: 49 verified solutions, all of block

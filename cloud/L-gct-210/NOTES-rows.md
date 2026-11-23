@@ -1,4 +1,31 @@
 # NOTES-rows (role rows; start 14:17, budget 90 min -> ends ~15:47)
+## RESULT, ROUND 5 (rows; final 20:00) -- (NC') NOT proved; (NCOL_1) PROVED in the principal case (Theorem NCOL-P3), exact 4x4 statement found
+ Details and proofs: section R5 (R5.1 - R5.10).  Heavy-computation requests: COMPUTE-rows.md (H1-H6, exact systems X1-X4).
+ V1 [RIGOROUS, R5.9] THEOREM NCOL-P3: let L' be a 4 x 5 level space with defect line C m (ANY m, isotropic allowed), K in L' a 3-dim strongly
+    level subspace with row sums s(K) = 1^perp living on three columns a, b, c, and Z in L' with zero row sums and c(Z) != 0. Then
+    m_a m_b m_c = 0 (two columns: m_a m_b = 0). So every (4,1) space whose column-centred part ker c is such a K has a neutral column,
+    and it is an active column of K.  Proof: isometries B_j with B_a+B_b+B_c = 1, normal form z_j = m_j((kappa/4)1 + B_j f), <f,f> =
+    (3/4)kappa^2 != 0, and a 3 x 3 Gram computation that ends in (alpha+beta-gamma)(alpha-beta+gamma)(-alpha+beta+gamma) = 8 m_a m_b m_c = 0.
+    Covers 28 of the 30 known (4,1) spaces (the 2 others are column-centred with a two-column defect line); every ingredient checked
+    numerically to 1e-9 or better.  Hypothesis left: "K lives on <= 3 columns" (true for 90/90 principal kernels and 49/49 fresh strongly
+    level 3-spaces; types by column ranks (1,1,1), (2,1), (3), (3,2), (2,2,1)); exact problem X4.
+ V2 [RIGOROUS, R5.6] (SC1) first-order law for a single-column element x e_n^T in ANY column: <x, s(Y) - y_n> = 0 and (<x,y_j>)_{j != n} in
+    C cap e_n^perp for all Y in L'.  For e = 1 and m_n != 0: all other columns of all of L' are orthogonal to x.
+ V3 [RIGOROUS, R5.2] THEOREM DC / NC'-DC: dim L' = rank c + rank s + dim L'_dc, so (DI_5) can fail only through DOUBLY CENTRED elements.
+    With a neutral column:  dim L' = e + 3 + delta - s1 - s2 - s3,  delta = dim Q_dc,  s1 = e^col(Q) - rank rho,  s2 = 3 - e^col(Q) - dim X_n,
+    s3 = e - rank kappa (all >= 0).  So the exact 4 x 4 statement behind (NC'_e) is (DC-COST): delta <= s1 + s2 + s3; (NC') holds whenever Q
+    has no doubly centred element; with the checked L_gct_216: dim L' <= e + 6.  Bilinear form of the problem (R5.1):
+    Xh^T (Adj(q) - 6J) Wh = 0 on Q and the claim dim Q + dim Xh + dim Wh <= 8, which interpolates between a triviality (Q = 0) and the
+    checked L_gct_214 (Xh = Wh = C1). The checked 4 x 4 theorems 214/216/217 alone do NOT give (DC-COST).
+ V4 [RIGOROUS, R5.3] (NCOL_3) + (DI_4x4) => no (7,3), where (DI_4x4): "a 4 x 4 level space has dim Q <= e^col(Q) + 3" = (DI_5) for 4 x 5
+    spaces with a zero column; it needs only: no (dim, e^col) = (5,1), (6,2); (5,1) with a two-column line is excluded by TC5.
+ V5 [NUMERICAL, calibrated] 4 x 4: (4,1) 9/17, (5,1) 0/14; (5,2) 2/10, (6,2) 0/15; any 6-dim 4 x 4 level space 0/15; row-centred (4,1): 1/34
+    and that hit has a two-column defect line.  Block pattern (3,2) for (6,3): 0/30 (control 4/19).  Towers continue: in all 120 cases
+    the 4 x 4 base Q has again a deletable row or column.  Principal census: 90 of 95 extremal spaces have ker c = strongly level
+    3-space with s = 1^perp, always on <= 3 columns, always containing a single-column element in a neutral column.
+    Slack census: delta = 0 in 126 of 135 tower positions; delta > 0 in 7, always paid exactly (s3 or s1); s2 = 0 always.
+ NOT PROVED: (NC'_e) (= (DC-COST)); (DI_4x4); (NCOL_1) for non-principal spaces and "K on <= 3 columns"; (NCOL_2), (NCOL_3)
+    (for e >= 2 the Gram argument of V1 needs rank-one column data; only numerics and (FS-DEC)).
 ## RESULT, ROUND 4 (rows; final 19:13) -- (6,2), (7,3) and (D) NOT proved. Induction on e set up exactly; one new structural law
 ## (NCOL, numerical, 0 exceptions in 120 spaces) reduces (DI_5) to 4 x 5 spaces with a neutral column = "double towers" over 4 x 4.
  Details and proofs: section R4 (R4.1 - R4.15).  (d,e) space = 4 x 5 level space of dim d with defect space C of dim e; extremal: d = e + 3.
@@ -829,3 +856,41 @@ STATUS 19:39: section R5 (R5.1-R5.5) written: Theorem DC / NC-DC, (7,3) from (NC
    single-column element, and in every case some column carrying a single-column element of K is NEUTRAL (90/90).
    So the mechanism of (NCOL) in the principal case is: "a single-column element of the strongly level kernel sits in a neutral column".
    Proved: e = 1 with K spanned by single-column elements (R5.7); e = 1 split non-isotropic (R4.14).  Not proved: types (3,2), (2,2,1); e >= 2.
+ R5.9 THEOREM NCOL-P3 (RIGOROUS; (NCOL_1) for principal spaces whose strongly level kernel lives on <= 3 columns; ANY m, isotropic allowed).
+   Let L' be a 4 x 5 level space with defect space C m. Let K in L' be a 3-dim strongly level subspace with s(K) = V := 1^perp (in C^4)
+   all of whose elements vanish outside three columns a, b, c, and let Z in L' have s(Z) = 0 and c(Z) = kappa m with kappa != 0.
+   Then  m_a m_b m_c = 0.   If K vanishes outside two columns a, b:  m_a m_b = 0;  outside one column a:  m_a = 0.
+   So every (4,1) space with K := ker c strongly level, s(K) = V and K on <= 3 columns has a NEUTRAL column, and it is an active column of K.
+   Proof. (1) Isometries: h_j = A_j s(h) on K, B_j := 1 - 2A_j in O(V), sum_j B_j = 3 (polarised p_2 = 0 on K; zeros/verifyfl). Columns
+   d, e outside {a,b,c}: A_d = A_e = 0, B_d = B_e = 1, hence  B_a + B_b + B_c = 1.
+   (2) Normal form (R5.7 (3)): z_j = (kappa m_j/4) 1 + m_j B_j f, f in V; p_2(Z)_j = 2c_j^2 + 2<s - z_j, z_j> = m_j^2 [(3/2)kappa^2 - 2<f,f>]
+   must be proportional to m_j, and (m_j^2)_j is not (sum m = 0), so  nu := <f,f> = (3/4) kappa^2 != 0.
+   (3) Put g_j := B_j f (j = a,b,c):  <g_j,g_j> = nu,  g_a + g_b + g_c = f.  Row sums of Z: 0 = sum_j m_j B_j f = m_a g_a + m_b g_b + m_c g_c
+   + (m_d + m_e) f, and m_d + m_e = -(m_a+m_b+m_c), so with (alpha,beta,gamma) := (m_b+m_c, m_a+m_c, m_a+m_b):
+          alpha g_a + beta g_b + gamma g_c = 0.
+   (4) Gram matrix: tau_j := <g_j, f>; from g_a+g_b+g_c = f: tau_a+tau_b+tau_c = nu and <g_a,g_b> = -tau_c, <g_a,g_c> = -tau_b, <g_b,g_c> = -tau_a.
+   Pairing the relation with g_a, g_b, g_c:   beta tau_c + gamma tau_b = alpha nu,   alpha tau_c + gamma tau_a = beta nu,   alpha tau_b + beta tau_a = gamma nu.
+   If alpha beta gamma != 0: tau_a = nu (beta^2+gamma^2-alpha^2)/(2 beta gamma) etc., and tau_a+tau_b+tau_c = nu becomes
+   (alpha+beta-gamma)(alpha-beta+gamma)(-alpha+beta+gamma) = 0, i.e. 8 m_c m_b m_a = 0.  If alpha = 0 (say): gamma tau_a = beta nu, beta tau_a =
+   gamma nu give beta gamma = 0 (then alpha = beta = gamma = 0 and m_a = m_b = m_c = 0) or tau_a = nu (beta = gamma: m_b = m_c, with alpha = 0:
+   m_b = m_c = 0) or tau_a = -nu (beta = -gamma: m_a = 0).  In every case m_a m_b m_c = 0.
+   Two columns: B_b = -B_a =: -B, the relation is (m_a - m_b) B f = (m_a + m_b) f; f is non-isotropic, so the eigenvalue is +-1 (m_b = 0 or
+   m_a = 0), or m_a = m_b = 0.  One column: B_a = -1, -2 m_a f = 0.  QED
+   Checked numerically on all 28 principal (4,1) spaces (rows/ncolp_chk.py, ncolp3_chk.py): normal form (3e-6), <f,f> = (3/4)kappa^2 (2e-11),
+   sum B_j = 3 (1e-14), g_a+g_b+g_c = f (2e-9), the relation (6e-10), product of m over the active columns of K = 0 (1e-12).
+   This contains R5.7 (K spanned by single-column elements has <= 3 active columns) and needs no classification of K.
+   STATUS OF (NCOL_1): proved for (a) split non-isotropic m (R4.14); (b) principal K on <= 3 columns (this theorem) = 28 of the 30 known
+   (4,1) spaces; the 2 others are column-centred with a two-column defect line (three neutral columns).  Still unproved: that a principal K
+   always lives on <= 3 columns (true in 90/90 examples; exact problem X4 in COMPUTE-rows.md), and non-principal (4,1) spaces.
+   For e >= 2 the same computation gives only: sum_{j in {a,b,c}} A_j F_j(Z) = 0 for the column data F(Z) in V (x) C of row-centred Z
+   (the Gram argument needs F = f (x) u of rank one); open.
+STATUS 19:47: Theorem NCOL-P3 (R5.9), (SC1) (R5.6), K-structure census (R5.8) written.
+ R5.10 REMARKS ON PRINCIPAL (5,1) SPACES (rigorous, partial; for verifyfl's N-problem).  Setting of R5.9 with N := L' cap ker s of dim 2
+   (L' = K + N a (5,1) space), K on columns a, b, c.  Row sums of Z in N:  sum_j m_j A_j f(Z) = 0, i.e. with P := f(N) (2-dim, the form
+   <,> has rank 1 on P by <f(Z),f(Z')> = (3/4) kappa(Z) kappa(Z')):   (m_a A_a + m_b A_b + m_c A_c) p = 0 for all p in P.
+   By R5.9 one of m_a, m_b, m_c vanishes, say m_c = 0. If also m_a m_b (m_a + m_b) != 0, then A_b = -(m_a/m_b) A_a on P, and the isometry
+   identities <p,A_j p'> + <A_j p,p'> = 2<A_j p,A_j p'> for j = a, b give <A_a p, A_a p'> = 0 on P: A_a(P) is totally isotropic, so A_a has rank
+   <= 1 on P and there is p_0 != 0 in P with A_a p_0 = A_b p_0 = 0, A_c p_0 = p_0:  K CONTAINS THE SINGLE-COLUMN ELEMENT p_0 e_c^T IN THE
+   NEUTRAL COLUMN c, with p_0 in f(N).  Every Z in N has zero column c, and the element Z_* of N with kappa = 0 is (q_*|0) with q_* a
+   DOUBLY CENTRED 4 x 4 matrix whose columns m_j B_j f_* are all isotropic (this is the doubly centred element forced by R5.2(b)(iii)).
+   Remaining sub-cases: m_a = 0 as well (then A_b = 0 on P), m_b = -m_a (then A_b = A_a on P).  Not finished: the cubic and quartic conditions.

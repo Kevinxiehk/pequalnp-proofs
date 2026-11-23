@@ -1,4 +1,22 @@
 # NOTES-stage2 (role: stage2; start 14:38, budget 90 min -> ends ~16:08)
+## RESULT-R7 (stage2 round 7, 19:50) -- details in sections R7-1 .. R7-4 at the end; heavy-computation specs in COMPUTE-stage2.md.
+ REG1 is NOT proved; (2,4) is settled only numerically; z = 3 is reduced, not closed.
+ (FO-r) LEMMA [rigorous; sanity on the 10 full-projection lines of the known spaces]: for a line r with 4-dim projection, the projection
+        of T_1(L_r) to line r is ALL of C^5; equivalently every column-deletion permanent G_j(J' + xi) is, on L_r, a first-order variation
+        D_{t'} N(J' + xi) of the level function. Strictly sharper than "dim T_1 >= 9".
+ CROSS  [rigorous]: for every cross space with a not in C1 the projection is 3-dim -- excluded at first order, INCLUDING the locus b = 0
+        (3-dim single-column part) which FO2 could not exclude.
+ (2,4)  [formulas rigorous, conclusion numerical]: explicit cofactors; (FO-r) <=> s * gam_j in D(X) for j = 1..4. Case A (s = 0): (FO-r)
+        holds, FO2 bound 8 numerically. Case B (generic; all solutions with dim T_1 = 9): projection = C e_0 + C 1, dimension 2: dead at
+        first order in all 20+ solutions; no proof (needs the parametrisation of Case B).
+ TABLE  (stage2/r7_table.py): of all saved candidates the only ones passing (FO-r), FO2 and (T2) are of the form X_{ri} + e_i Z_i with
+        z_i = 3 (four (3,3) solutions, cross with a in C1); none of the five tested extends to an 8-dim level space.
+ z = 3  [rigorous reductions]: for non-isotropic m no other row carries a single-row element (P_2 + verifyfl's SPLIT), so L_i is a NON-SPLIT
+        (5,1) space, not two-column (TC5), whose defect function is a first-order variation of N ((FO-r) for row i) -- as for all its
+        hyperplanes, which are non-split (4,1) spaces (HYP); no such space is known. Not closed; isotropic m untouched.
+ (iii)  corrected as verify2 found; none of my results used the column part; the exceptional case (an identically vanishing entry)
+        is listed as (B0), no contradiction found.
+
 ## RESULT-R6 (stage2 round 6, 19:13) -- details in sections R6-1 .. R6-7 at the end. (Q-r) is NOT classified; REG1 is NOT proved.
  RIGOROUS: (1) THEOREM (cross family, R6-2): for the 5-dim level subspaces X(a,b) of a cross (one row + one column) with sparse parts of
      dim <= 2 (b != 0, a not in C1), T_1 is explicit (dim 10) and every level space containing X(a,b) has dim <= 7. On the two exceptional
@@ -1214,3 +1232,48 @@ STATUS 19:43: new first-order test (FO-r) found: it kills the generic (2,4) solu
    (COMPUTE-stage2.md, S3); I did not obtain it.
  So "dim T_1 = 9" is explained: T_1(X) = (7-dim part with zero row r) (+) (2-dim row-r part e_0, 1); and "not level beyond" holds in the
  stronger form "no level space with a 4-dim row-r projection contains X as its L_r".
+
+## R7-3. z_i = 3 in REG1 (split free line)  [reductions rigorous; NOT closed]
+ Setting: 9-dim level L, a_i = 1, z_i = 3, Z := Z_i = (C1 + Cm)^perp, m orthogonal to 1 (the defect line of the (5,1) space L_i).
+ (a) [P_2] single-row parts of different rows are orthogonal, so Z_k lies in Z^perp cap 1^perp = C m for every other row k: z_k <= 1, and a
+     single-row element of another row is e_k m^T, which lies in L_i. If <m,m> != 0, verifyfl's Theorem SPLIT (a 4x5 space with defect line
+     C m, <m,m> != 0, containing e_k m^T has dim <= 4) gives a contradiction. So for non-isotropic m:  z_k = 0 for all k != i, and L_i is a
+     NON-SPLIT (5,1) space.  (rows' FL2*(a) and NCOL-S apply to split spaces only, so they give nothing more here.)
+ (b) [TC5] m is not a two-column vector e_a - e_b.  [HYP] every hyperplane of L_i is a non-split (4,1) space with the same defect line; all
+     known non-split (4,1) spaces have a two-column defect line (rows U5), so no such hyperplane is known.
+ (c) [(FO-r) for row i] pi_i(T_1(L_i)) contains Z (+) C1 automatically; the fifth dimension requires the defect function g of L_i
+     (G(J' + xi) = 24*1 + g(xi) m) to be a first-order variation of N on L_i: g = D_{t'} N(J' + .) + const for some t'. The same then holds on
+     every hyperplane. All 27 known 7-dim level spaces with a deletable line are rigid (T_1 = M + C tau; rows), i.e. their defect
+     functions are NOT such variations. So z_i = 3 needs a first-order FLEXIBLE non-split (5,1) space.
+ (d) [R6-5, R6-7] four minimal pairs through row i, L_r = X_{ri} (+) e_i Z for r != i; column sums of all x in X_{ri} lie in C m; L = M_i (+) C t_0
+     with dim T_1(M_i) >= 10; and on the 6-dim space Lam_0 = L_i (+) C Theta (Theta = rows != i of t_0): G(J' + eta) lies in span(1,m), with
+     m-component 120 kappa_m - (1 - kappa_m s)(N(J'+eta) - 120)/s  (s = coordinate of Theta, kappa^i = 1/5 + kappa_m m).
+ (e) Candidates: every (Q-r) solution found that passes (FO-r), FO2 and (T2) is of the form X_{ri} (+) e_i Z with z_i = 3 (four (3,3)
+     solutions and the cross spaces with a in C1; table: stage2/r7_table.py). z_i = 3 would need an 8-dim level space M_i containing it;
+     the direct search (stage2/r6_extend.py, D = 8) finds none for the five candidates tested (4 starts each, residual floors 0.8 - 1.6).
+ NOT DONE: a proof. The statement that would finish z = 3 for non-isotropic m is verifyfl's (SL_m) / "every (4,1) space with a
+ non-two-column defect line is split"; isotropic m is not touched.
+
+## R7-4. Correction of (Q-r)(iii), the exceptional case, and what remains of REG1
+ (iii) corrected (verify2): row projections of L_r have dim <= 3 (Lemma C); column projections have dim <= 3 except possibly for ONE
+ column c, when kappa^r = e_c and kappa'^c = e_r (the entry (r,c) vanishes identically on L); then only <= 4 holds and L = L_r + L^c.
+ None of my statements used the column part: the censuses impose row ranks only, and (FO-r), FO2, (T2), the cross theorem and the
+ (2,4) formulas do not use (iii). In the exceptional case one has in addition: ell(u) = u_rc; for the four columns j != c the 6-dim
+ spaces {t in L : t_r in C e_j} have vanishing (r,j)-deletion permanent (and dually for the four rows i != r in column c); and by (**)
+ at v = e_c the image of L_r in the (r,c)-minor is a linear space of 4x4 matrices on which perm_4(B + .) = 120 is constant for a
+ suitable B. I found no contradiction for this case and no candidate (no census solution has a 4-dim column projection).
+ WHAT REMAINS OF REG1 (with stage3's Theorem N for (B2)):
+   (B1) a minimal row or column pair. Sub-case z = 3: R7-3. General case: L_r is a (Q-r) solution with a 3-dim row projection passing
+        (FO-r), FO2, (T2); the ones found are dead unless z = 3.
+   (B2) no minimal pair on either side: single-row and single-column elements with z, z' <= 2; every L_r is a (Q-r) solution passing the
+        three tests; all 40-odd solutions found with z, z' <= 2 fail at least one test (most already fail (FO-r) or FO2).
+   (B0) the exceptional case of (iii): an identically vanishing entry.
+ A proof of REG1 now needs: the classification of (Q-r) solutions (COMPUTE-stage2.md S1-S3) or a structural proof that a (Q-r) solution
+ passing (FO-r) and FO2 contains a 3-dim single-row part; and the non-split (5,1) problem for z = 3.
+STATUS 19:48: R7-1 .. R7-4 written. Table of all saved candidates: stage2/r7_table.py (ALIVE: four (3,3) solutions with z = 3 and the cross
+ spaces with a in C1; all others dead).
+ Sanity of (FO-r) (stage2/r7_FOrow_sanity.py): on the 7 known spaces all 10 lines with 4-dim projection have projection dimension 5.
+ The four ALIVE (3,3) candidates are spanned by sparse elements only: X = C y e_0^T + C y' e_1^T + e_i Z (two single-column elements with
+ <y,y'> = 0 and a 3-dim single-row space); their m is neither two-column nor isotropic.
+STATUS 19:50: RESULT-R7 at the top. Runs: r6_extend.py on three files reached its 115 s timeout after two; r7 struct scripts < 40 s.
+ Final report sent.

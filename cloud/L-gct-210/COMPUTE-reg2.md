@@ -5,6 +5,10 @@ All scripts named below live in /home/claude/work/L-gct-210/reg2/ and must be ru
 (they read `../rows/*.npy`, and insert the absolute paths /home/claude/work/L-gct-210/{reg2,stage2,chief} into sys.path:
 mirror that layout or edit the first line of each script). They need numpy only. Copy also rows/, stage2/, chief/.
 
+READ FIRST (update 19:55): sections 1-3 were written before the families DR and M* were found. Wherever they say "counterexample
+to (S6')" or speak of the F / NC dichotomy, read: record (dim Omega, dim T_1, FO2 bound) of every solution; the decisive event is
+a 6-dim space WITHOUT a full free row whose FO2 bound is >= 9 (see sections 0, 3b and 6, which are up to date).
+
 ## 0. Definitions (everything over C; indices from 0)
 
 - perm(A) = permanent. J = 5x5 all-ones, J' = 4x5 all-ones.
@@ -25,23 +29,37 @@ mirror that layout or edit the first line of each script). They need numpy only.
 - Defect space C(M) := span{ N(J'+Y) - 24*(1,..,1) : Y in M } (inside the sum-zero vectors of C^5); e(M) := dim C(M).
   Column c is NEUTRAL for M if N_c(J'+Y) = 24 for all Y in M (i.e. every vector of C(M) has c-th coordinate 0).
 - FULL FREE ROW: M contains { e_i w^T : w in C^5, sum w = 0 } (4-dim) for some row i.
-- TYPE F: M contains a full free row.   TYPE NC: no full free row, exactly one neutral column c, e(M) = 3, and
-  Omega(M) = span((1,1,1,1,1), e_c) (so dim Omega = 2, and then dim T_1 = 9 in all examples).   Anything else: OTHER.
 - FO2 bound of M: n - ceil(rank/2), n = dim T_1(M), rank = rank of a random linear combination of the Hessian forms
-  D^2 perm(J + (Y;0)) restricted to T_1(M) (bilinear, not hermitian). Code: stage2/r5_FO2.py, function FO2(Mb, rg) with
-  Mb = embedded basis (d,5,5); returns (n, rank, bound). Every level space containing M has dim <= bound.
+  q_Y(t,t') = D_t D_t' perm(J + (Y;0)), Y in M, restricted to T_1(M) (bilinear, not hermitian; entries of the Hessian are 3x3
+  permanents of minors). Code: stage2/r5_FO2.py, function FO2(Mb, rg) with Mb = embedded basis (d,5,5); returns (n, rank, bound).
+  Every 5x5 level space containing M is totally isotropic for all q_Y inside T_1(M), hence has dim <= bound.
+- FAMILIES of 6-dim 4x5 level spaces found so far, with invariants (dim Omega, dim T_1, FO2 bound):
+    F   : M contains a full free row (then M = free row (+) 2-dim)                         (3,10,8) or (5,12,9)
+    NC  : no full free row, exactly one neutral column c, e(M) = 3, Omega = span(1, e_c)        (2, 9,7)
+    DR  : no full free row, no neutral column, e = 4, one row i meets M only in a single-row part e_i (x) U, dim U = 2 or 3
+          ("deletable row")                                                                (2, 9,7) or (3,10,8)
+    M*  : "EC moves" of Type F spaces (exact, see section 4(e)); no full free row, Omega = (e_a - e_b)^perp   (4,11,8)
+  ext6.classify() only knows 'F', 'NC', 'OTHER' ('OTHER' = DR, M* or new); always print (dim Omega, dim T_1, FO2) as well.
 - PROVED (NOTES-reg2 section 1): for a level L and row r:  dim L <= dim L_r + dim Omega(L_r) - 1.  And (Theorem FL, verified by
-  the team): a 5x5 level space containing a full free row has dim <= 7.
-- THE TARGET STATEMENT (S6'): every 6-dim 4x5 level space M WITHOUT a full free row has dim Omega(M) <= 2.
-  (S6') implies: no 9-dim level space has a row or column with a_r >= 2.  ("dim Omega <= 3" suffices for a_r = 2;
-  a_r = 3 would also follow from "no 7-dim 4x5 level space exists".)  About 180 six-dim spaces checked so far (41 independent ones + 146 census solutions): all Type F or NC.
+  the team): a 5x5 level space containing a full free row has dim <= 7. And (stage2, Lemma FO2): dim L <= FO2 bound(M) if L contains M.
+- STATUS OF THE CONJECTURES (updated 19:55): "(S6') dim Omega <= 2 without a full free row" is FALSE (family M*: dim Omega = 4, so the
+  first-order criterion allows dim 9); but M* has FO2 bound 8 (exact). THE TARGET STATEMENT IS NOW
+      (S6-FO2): every 6-dim 4x5 level space M without a full free row has FO2 bound <= 8.
+  (S6-FO2) + FL imply: no 9-dim level space has a row or column with a_r = 2. For a_r = 3 one needs: no 7-dim 4x5 level space
+  (or FO2 bound <= 8 for each). About 200 six-dim spaces checked: FO2 bound 7 or 8 whenever there is no full free row.
+  THE DECISIVE OBJECT TO LOOK FOR: a 6-dim 4x5 level space with NO full free row and FO2 bound >= 9 (necessarily dim Omega >= 4).
 
 Helper functions already written (import from reg2/):
   t.py: perm, level_err(B) (max |F(J'+Y)-120| at random points of span(B)), rank, rowpart/colpart (single-row/column parts);
   a1.py: embed(B) ((d,4,5) -> (d,5,5)), defect(B) (singular values spanning C(M)), phirank, Phi, pk;
   a6.py: T1(Mb, rg) (basis of T_1 as (n,5,5)), E0(B, rg) (basis of E_0 as (n,4,5));
   a9.py: Omega(B, rg) -> (basis of Omega, dim T_1);
-  ext6.py: F45, perm5 (vectorised), complement, solve_ext(M, D, m, rg, iters, N), classify(B, rg) -> ('F'|'NC'|'OTHER', text).
+  ext6.py: F45, perm5 (vectorised), complement, solve_ext(M, D, m, rg, iters, N), classify(B, rg) -> ('F'|'NC'|'OTHER', text);
+  linespan.py SEED TMAX (census of spaces spanned by single-row and single-column elements, all 45 support patterns);
+  drsearch.py U SEED TMAX (census of M = e_3 (x) U (+) N with dim U = U, N arbitrary in rows 0-2; found the DR and M* families);
+  ecmove.py (builds the EC moves of Type F spaces and prints their invariants); mstar2.py, mstar2_fo2.py (exact M*: T_1, Omega,
+  exact FO2 certificate in Fractions); ext55.py M SEED files, ext55b.py M SEED NSTARTS files (5x5 level spaces M (+) m-plane inside
+  T_1(M): m = 1 finds 7-dim spaces, m = 2 would be an 8-dim level space, m = 3 a 9-dim one); exact_T1.py (exact T_1 / Omega).
 NUMERICAL PITFALL (important): many solutions are reached by "singular convergence": residual 1e-12 but the SPACE is only
   accurate to about 1e-6. Decide all ranks with a RELATIVE tolerance 1e-4 .. 1e-5 (classify() does), or polish first (Newton in
   extended precision, mpmath / Arb), before calling anything OTHER. Never report an OTHER space without re-checking level error
@@ -103,6 +121,25 @@ Output and decision: every solution is tested for a full free row (ext6.classify
 counterexample to (S6') (k = 2) / to "dim Omega <= 3" (k = 3): save it and compute its FO2 bound. Only Type F solutions in a
 large calibrated run = strong evidence that the regime is closed.
 
+## 3b. Census E (NEW, highest priority): deletable-row spaces and EC moves -- where dim Omega >= 4 occurs
+
+(a) `python3 -I drsearch.py 3 SEED TMAX` and `... 2 ...`, `... 1 ...`: unknowns = U (u vectors of C^5 in row 3) and N (6-u matrices
+in rows 0-2), residual = level polynomial at 240 points + a soft orthonormality term (finite-difference real Jacobian; replace by
+an analytic one). Here: u = 3: 4 solutions in 25 starts (three (3,10,8), one M*); u = 2: 1 in 4. Wanted: 10^4 starts for
+u = 1, 2, 3; for every solution (after polishing / rounding to its sparse limit, see PITFALL) the triple (dim Omega, dim T_1, FO2).
+(b) `python3 -I linespan.py SEED TMAX`: 45 support patterns, wanted 200 starts per pattern, same output.
+(c) EC moves, exact: Lemma EC (rows): if all elements of a level space M_0 have equal columns a, b then M_0 (+) C e_i (e_a - e_b)^T is
+level for any ONE row i. Take every Type F space e_3 (x) 1^perp (+) N whose 2-dim N has two equal columns a, b; replace the
+free-row direction e_3 (e_a - e_b)^T by e_i (e_a - e_b)^T, i in {0,1,2}: a 6-dim level space without full free row (ecmove.py:
+30 such spaces, all (4,11,8)). Wanted: (i) the list of all 2-dim N (3x5 spaces all of whose column deletions are level and with
+P-conditions making e_3 (x) 1^perp (+) N level) having equal columns; (ii) ITERATED / generalised moves: 6-dim level spaces M
+with a row carrying exactly a 2-dim single-row part U = {sum w = 0, w_a = w_b = w_c} or {w_a = w_b, w_c = w_d}, obtained from
+Type F by moving two free-row directions into other rows (drsearch.py 2 with U fixed to these shapes: add the constraint);
+(iii) for each: FO2 bound, exactly (mstar2_fo2.py is the template).
+Decision: any such space with FO2 bound >= 9 is a candidate L_r for a 9-dim level space: run `ext55b.py 3 SEED 500 file.npy`
+(3-planes in T_1(M)/M: <= 9 unknowns) -- a solution with fresh level error < 1e-10 REFUTES the gap; and `ext55b.py 2 ...`:
+a solution is an 8-dim level space (none is known). If all have bound <= 8: (S6-FO2) stands.
+
 ## 4. Exact computations
 
 (a) Exact Omega on exact spaces (proves the Type NC / Type F invariants on them). T_1(M) for a basis B_1..B_d with entries in
@@ -126,6 +163,13 @@ m = 1: this lists rigorously all 6-dim level spaces through M_5, and E_0 compute
 (d) The same for dimension 7 over each exact 6-dim space: E_0(M) = M (+) C d always so far; exact check that P_2(d) != 0
 proves that M lies in no 7-dim 4x5 level space.
 
+(e) The exact family M*(x,y) (NOTES-reg2 section 4.3): U := {w in C^5 : sum w = 0, w_1 = w_2}; x, y in C^3 with sum x = sum y = 0,
+<x,y> = 0;  M*(x,y) := e_3 (x) U (+) C (x;0) e_0^T (+) C (y;0) e_3^T (+) C e_2 (e_1 - e_2)^T  (rows 0..3, columns 0..4).
+Rational member x = (1,-1,0), y = (1,1,-2): reg2/Mstar2.npy; exact: dim T_1 = 11, Omega = (e_1 - e_2)^perp, FO2 rank 5, bound 8
+(`python3 -I mstar2.py`, `python3 -I mstar2_fo2.py`). Wanted: the same exact computation over Q(x,y)/(relations) (generic rank and
+degeneracy locus), and the exact solution set of "M* (+) C t is level, t in T_1(M*)/M*" (a variety in P^4; its lines would be
+8-dim level spaces: here 0 of 82 numerical starts) by Groebner / msolve (5 homogeneous unknowns, degrees 2..5).
+
 ## 5. Census D: the regime itself (5x5), dimension 8
 
 System. An 8-dim level space L of 5x5 matrices (perm(J + t) = 120, i.e. P_1..P_5 = 0 on L) whose row 4 takes values in a
@@ -139,13 +183,12 @@ be found from "L_4 of a known 7-dim space + random direction" (targets: L080, ex
 Output and decision: any 8-dim solution is a major find (send basis + level error at fresh points). None in a calibrated
 run: consistent with "dim L_r = 6 => dim L <= 7", which is what (S6') + FL give.
 
-## 6. What decides what (summary)
+## 6. What decides what (summary, updated 19:55)
 
-- polished OTHER 6-dim space, no full free row, dim Omega >= 3, FO2 >= 9  -> candidate L_r; the regime is NOT closed by
-  first/second order; run section 5 seeded with it.
-- same but FO2 <= 8  -> (S6') false but the regime still dies for this space; (S6') must be replaced by the FO2 statement.
-- OTHER with dim Omega <= 2 -> only the F/NC structure conjecture changes.
-- a 7-dim 4x5 level space -> new object; needs dim Omega <= 2.
-- nothing but F and NC in calibrated censuses A, B, C -> (S6') is the right theorem to prove; exact items 4(a)-(d) then give
-  the rigorous base cases, and the proof to look for is: (i) 6-dim => full free row or neutral column, (ii) neutral column and
-  dim 6 => Omega = span(1, e_c).
+- a polished 6-dim 4x5 level space with NO full free row and FO2 bound >= 9  -> genuine candidate L_r: run ext55b.py with m = 3
+  (9-dim: would REFUTE the gap) and m = 2 (8-dim level space: new object). This is the single most valuable search target.
+- no such space in calibrated censuses A, B, C, E -> (S6-FO2) is the theorem to prove; exact items 4(a)-(e) give base cases.
+- any 6-dim space outside the families F, NC, DR, M* -> save it with (dim Omega, dim T_1, FO2); the structure conjecture
+  "every 6-dim 4x5 level space has a deletable row or column" is tested by it.
+- a 7-dim 4x5 level space -> new object; compute its FO2 bound (need <= 8 to exclude a_r = 3).
+- an 8-dim 5x5 level space of any kind (section 5, or ext55b.py with m = 2 on any 6-dim M) -> new object, send basis.

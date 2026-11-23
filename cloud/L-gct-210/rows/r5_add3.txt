@@ -1,0 +1,28 @@
+ R5.9 THEOREM NCOL-P3 (RIGOROUS; (NCOL_1) for principal spaces whose strongly level kernel lives on <= 3 columns; ANY m, isotropic allowed).
+   Let L' be a 4 x 5 level space with defect space C m. Let K in L' be a 3-dim strongly level subspace with s(K) = V := 1^perp (in C^4)
+   all of whose elements vanish outside three columns a, b, c, and let Z in L' have s(Z) = 0 and c(Z) = kappa m with kappa != 0.
+   Then  m_a m_b m_c = 0.   If K vanishes outside two columns a, b:  m_a m_b = 0;  outside one column a:  m_a = 0.
+   So every (4,1) space with K := ker c strongly level, s(K) = V and K on <= 3 columns has a NEUTRAL column, and it is an active column of K.
+   Proof. (1) Isometries: h_j = A_j s(h) on K, B_j := 1 - 2A_j in O(V), sum_j B_j = 3 (polarised p_2 = 0 on K; zeros/verifyfl). Columns
+   d, e outside {a,b,c}: A_d = A_e = 0, B_d = B_e = 1, hence  B_a + B_b + B_c = 1.
+   (2) Normal form (R5.7 (3)): z_j = (kappa m_j/4) 1 + m_j B_j f, f in V; p_2(Z)_j = 2c_j^2 + 2<s - z_j, z_j> = m_j^2 [(3/2)kappa^2 - 2<f,f>]
+   must be proportional to m_j, and (m_j^2)_j is not (sum m = 0), so  nu := <f,f> = (3/4) kappa^2 != 0.
+   (3) Put g_j := B_j f (j = a,b,c):  <g_j,g_j> = nu,  g_a + g_b + g_c = f.  Row sums of Z: 0 = sum_j m_j B_j f = m_a g_a + m_b g_b + m_c g_c
+   + (m_d + m_e) f, and m_d + m_e = -(m_a+m_b+m_c), so with (alpha,beta,gamma) := (m_b+m_c, m_a+m_c, m_a+m_b):
+          alpha g_a + beta g_b + gamma g_c = 0.
+   (4) Gram matrix: tau_j := <g_j, f>; from g_a+g_b+g_c = f: tau_a+tau_b+tau_c = nu and <g_a,g_b> = -tau_c, <g_a,g_c> = -tau_b, <g_b,g_c> = -tau_a.
+   Pairing the relation with g_a, g_b, g_c:   beta tau_c + gamma tau_b = alpha nu,   alpha tau_c + gamma tau_a = beta nu,   alpha tau_b + beta tau_a = gamma nu.
+   If alpha beta gamma != 0: tau_a = nu (beta^2+gamma^2-alpha^2)/(2 beta gamma) etc., and tau_a+tau_b+tau_c = nu becomes
+   (alpha+beta-gamma)(alpha-beta+gamma)(-alpha+beta+gamma) = 0, i.e. 8 m_c m_b m_a = 0.  If alpha = 0 (say): gamma tau_a = beta nu, beta tau_a =
+   gamma nu give beta gamma = 0 (then alpha = beta = gamma = 0 and m_a = m_b = m_c = 0) or tau_a = nu (beta = gamma: m_b = m_c, with alpha = 0:
+   m_b = m_c = 0) or tau_a = -nu (beta = -gamma: m_a = 0).  In every case m_a m_b m_c = 0.
+   Two columns: B_b = -B_a =: -B, the relation is (m_a - m_b) B f = (m_a + m_b) f; f is non-isotropic, so the eigenvalue is +-1 (m_b = 0 or
+   m_a = 0), or m_a = m_b = 0.  One column: B_a = -1, -2 m_a f = 0.  QED
+   Checked numerically on all 28 principal (4,1) spaces (rows/ncolp_chk.py, ncolp3_chk.py): normal form (3e-6), <f,f> = (3/4)kappa^2 (2e-11),
+   sum B_j = 3 (1e-14), g_a+g_b+g_c = f (2e-9), the relation (6e-10), product of m over the active columns of K = 0 (1e-12).
+   This contains R5.7 (K spanned by single-column elements has <= 3 active columns) and needs no classification of K.
+   STATUS OF (NCOL_1): proved for (a) split non-isotropic m (R4.14); (b) principal K on <= 3 columns (this theorem) = 28 of the 30 known
+   (4,1) spaces; the 2 others are column-centred with a two-column defect line (three neutral columns).  Still unproved: that a principal K
+   always lives on <= 3 columns (true in 90/90 examples; exact problem X4 in COMPUTE-rows.md), and non-principal (4,1) spaces.
+   For e >= 2 the same computation gives only: sum_{j in {a,b,c}} A_j F_j(Z) = 0 for the column data F(Z) in V (x) C of row-centred Z
+   (the Gram argument needs F = f (x) u of rank one); open.

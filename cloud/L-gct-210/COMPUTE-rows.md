@@ -108,6 +108,16 @@ Every hit: run `handoff/oracle.py file.npy` -> prints (d,e), level error, dimens
         a vector mu in 1^perp of C^4, NOT of the form e_a - e_b, with: perm(J + t) = 24 and M(t) in 24*1 + C*mu for all t in S.
         If no such S exists, there is no 4x4 level space with (dim, e^col) = (5,1) [because the row-sum map has rank <= e^col].
 
+   (X4) Principal strongly level 3-spaces. V := 1^perp in C^4 with the standard bilinear form. Unknown: linear maps A_0..A_4 : V -> V with
+        sum_j A_j = id such that K := { h(sigma) = (A_0 sigma | ... | A_4 sigma) : sigma in V } (a 3-dim space of 4x5 matrices with row-sum
+        vector sigma) is strongly level: c(h(sigma)) = 0 for all sigma (i.e. all five 4x4 deletion permanents of J + h(sigma) equal 24;
+        the quadratic part says exactly that B_j := id - 2A_j are isometries of V). 45 - 9 unknowns, polynomial identities of degree 2,3,4
+        in sigma. Wanted: the list of all solutions up to row/column permutations, and in particular whether ALWAYS at least two of the
+        A_j vanish (K lives on <= 3 columns; true in 90 of 90 numerical examples, types by column ranks (1,1,1), (2,1), (3), (3,2), (2,2,1)).
+        Why: my Theorem NCOL-P3 proves (NCOL_1) for every (4,1) space whose kernel of the column-sum map is such a K on <= 3 columns.
+        Numerical version: `python3 run_clm.py 4 3 defect 0 S0 S1 TMAX` (strongly level 3-spaces; hits are frequent), keep those with
+        row-sum rank 3, and count the zero columns of each (e.g. with the column-rank lines of rows/nc_look.py).
+
 ### H5 — (D)_7 and dimension 8 for 5x5 directly
  `python3 run_clm.py 5 7 level 0 S0 S1 TMAX` (census of 7-dim 5x5 level spaces; report the hit rate) and `python3 run_clm.py 5 8 level 0 ...`
  (20 000 starts; decisive for "no 8-dim level space" at the usual uncertified level; the 7-dim run is its calibration).

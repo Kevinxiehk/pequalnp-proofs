@@ -12,6 +12,8 @@ theorem P4_repl_ones (b : Fin 5) (i : Fin 4) (m : Fin 5 → ℂ) :
     P4 b (repl i m (fun _ => 1)) = 6 * (m (b.succAbove 0) + m (b.succAbove 1)
       + m (b.succAbove 2) + m (b.succAbove 3)) := by
   rw [P4_cols]
+  have hc : ∀ j, col (repl i m (fun _ => 1)) j = ev i (m j) := fun j => rfl
+  rw [hc, hc, hc, hc]
   exact pc_ev i _ _ _ _
 
 theorem P4_lin (b : Fin 5) (Y : M45) : ∃ A2 A3 A4 : ℂ, ∀ c : ℂ,

@@ -1,0 +1,9 @@
+ R5.10 REMARKS ON PRINCIPAL (5,1) SPACES (rigorous, partial; for verifyfl's N-problem).  Setting of R5.9 with N := L' cap ker s of dim 2
+   (L' = K + N a (5,1) space), K on columns a, b, c.  Row sums of Z in N:  sum_j m_j A_j f(Z) = 0, i.e. with P := f(N) (2-dim, the form
+   <,> has rank 1 on P by <f(Z),f(Z')> = (3/4) kappa(Z) kappa(Z')):   (m_a A_a + m_b A_b + m_c A_c) p = 0 for all p in P.
+   By R5.9 one of m_a, m_b, m_c vanishes, say m_c = 0. If also m_a m_b (m_a + m_b) != 0, then A_b = -(m_a/m_b) A_a on P, and the isometry
+   identities <p,A_j p'> + <A_j p,p'> = 2<A_j p,A_j p'> for j = a, b give <A_a p, A_a p'> = 0 on P: A_a(P) is totally isotropic, so A_a has rank
+   <= 1 on P and there is p_0 != 0 in P with A_a p_0 = A_b p_0 = 0, A_c p_0 = p_0:  K CONTAINS THE SINGLE-COLUMN ELEMENT p_0 e_c^T IN THE
+   NEUTRAL COLUMN c, with p_0 in f(N).  Every Z in N has zero column c, and the element Z_* of N with kappa = 0 is (q_*|0) with q_* a
+   DOUBLY CENTRED 4 x 4 matrix whose columns m_j B_j f_* are all isotropic (this is the doubly centred element forced by R5.2(b)(iii)).
+   Remaining sub-cases: m_a = 0 as well (then A_b = 0 on P), m_b = -m_a (then A_b = A_a on P).  Not finished: the cubic and quartic conditions.

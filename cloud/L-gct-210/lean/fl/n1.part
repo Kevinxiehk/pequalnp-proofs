@@ -1,0 +1,347 @@
+
+def kc1 (a : Fin 5) (B Y : M45) : ℂ :=
+  ∑ e : Fin 4 ↪ Fin 5, if (e 0 ≠ a ∧ e 1 ≠ a ∧ e 2 ≠ a ∧ e 3 ≠ a) then
+        Y (0, e 0) * B (1, e 1) * B (2, e 2) * B (3, e 3)
+        + B (0, e 0) * Y (1, e 1) * B (2, e 2) * B (3, e 3)
+        + B (0, e 0) * B (1, e 1) * Y (2, e 2) * B (3, e 3)
+        + B (0, e 0) * B (1, e 1) * B (2, e 2) * Y (3, e 3) else 0
+
+theorem P4_poly1 (a : Fin 5) (B Y : M45) : ∃ c2 c3 c4 : ℂ, ∀ s : ℂ,
+    P4 a (fun p => B p + s * Y p) = P4 a B + kc1 a B Y * s + c2 * s ^ 2 + c3 * s ^ 3
+      + c4 * s ^ 4 := by
+  refine ⟨(∑ e : Fin 4 ↪ Fin 5, if (e 0 ≠ a ∧ e 1 ≠ a ∧ e 2 ≠ a ∧ e 3 ≠ a) then
+        Y (0, e 0) * Y (1, e 1) * B (2, e 2) * B (3, e 3)
+        + Y (0, e 0) * B (1, e 1) * Y (2, e 2) * B (3, e 3)
+        + Y (0, e 0) * B (1, e 1) * B (2, e 2) * Y (3, e 3)
+        + B (0, e 0) * Y (1, e 1) * Y (2, e 2) * B (3, e 3)
+        + B (0, e 0) * Y (1, e 1) * B (2, e 2) * Y (3, e 3)
+        + B (0, e 0) * B (1, e 1) * Y (2, e 2) * Y (3, e 3) else 0),
+    (∑ e : Fin 4 ↪ Fin 5, if (e 0 ≠ a ∧ e 1 ≠ a ∧ e 2 ≠ a ∧ e 3 ≠ a) then
+        Y (0, e 0) * Y (1, e 1) * Y (2, e 2) * B (3, e 3)
+        + Y (0, e 0) * Y (1, e 1) * B (2, e 2) * Y (3, e 3)
+        + Y (0, e 0) * B (1, e 1) * Y (2, e 2) * Y (3, e 3)
+        + B (0, e 0) * Y (1, e 1) * Y (2, e 2) * Y (3, e 3) else 0),
+    (∑ e : Fin 4 ↪ Fin 5, if (e 0 ≠ a ∧ e 1 ≠ a ∧ e 2 ≠ a ∧ e 3 ≠ a) then
+        Y (0, e 0) * Y (1, e 1) * Y (2, e 2) * Y (3, e 3) else 0), fun s => ?_⟩
+  simp only [P4, kc1]
+  rw [Finset.sum_mul, Finset.sum_mul, Finset.sum_mul, Finset.sum_mul, ← Finset.sum_add_distrib,
+    ← Finset.sum_add_distrib, ← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl (fun e _ => ?_)
+  split_ifs
+  · ring
+  · ring
+
+theorem kc1_eq (a : Fin 5) (B Y : M45) : kc1 a B Y =
+    P4 a (repl 0 (fun j => Y (0, j)) B) + P4 a (repl 1 (fun j => Y (1, j)) B)
+      + P4 a (repl 2 (fun j => Y (2, j)) B) + P4 a (repl 3 (fun j => Y (3, j)) B) := by
+  simp only [kc1, P4]
+  rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl (fun e _ => ?_)
+  simp only [repl_at, repl_ne 0 1 (by decide), repl_ne 0 2 (by decide), repl_ne 0 3 (by decide), repl_ne 1 0 (by decide), repl_ne 1 2 (by decide), repl_ne 1 3 (by decide), repl_ne 2 0 (by decide), repl_ne 2 1 (by decide), repl_ne 2 3 (by decide), repl_ne 3 0 (by decide), repl_ne 3 1 (by decide), repl_ne 3 2 (by decide)]
+  split_ifs
+  · ring
+  · ring
+
+theorem P4_zero_row (a : Fin 5) (N : M45) (i : Fin 4) (h : ∀ j, N (i, j) = 0) : P4 a N = 0 := by
+  rw [P4_prod]
+  apply Finset.sum_eq_zero
+  intro e _
+  have hz : ∏ k, N (k, e k) = 0 := Finset.prod_eq_zero (Finset.mem_univ i) (h (e i))
+  rw [hz]
+  simp
+
+def ev2 (k i : Fin 4) (y x : ℂ) : V4 := fun a => if a = k then y else if a = i then x else 1
+
+theorem pc_ev2_0 (i : Fin 4) (hki : (0 : Fin 4) ≠ i) (y1 y2 y3 y4 x1 x2 x3 x4 : ℂ) :
+    pc (ev2 0 i y1 x1) (ev2 0 i y2 x2) (ev2 0 i y3 x3) (ev2 0 i y4 x4) =
+      2 * (y1 * (x2 + x3 + x4) + y2 * (x1 + x3 + x4) + y3 * (x1 + x2 + x4)
+        + y4 * (x1 + x2 + x3)) := by
+  fin_cases i <;>
+    first
+    | exact absurd rfl hki
+    | (simp (config := {decide := true}) only [pc, ev2, Fin.sum_univ_four, ite_true, ite_false,
+        add_zero, zero_add] <;> ring)
+
+theorem pc_ev2_1 (i : Fin 4) (hki : (1 : Fin 4) ≠ i) (y1 y2 y3 y4 x1 x2 x3 x4 : ℂ) :
+    pc (ev2 1 i y1 x1) (ev2 1 i y2 x2) (ev2 1 i y3 x3) (ev2 1 i y4 x4) =
+      2 * (y1 * (x2 + x3 + x4) + y2 * (x1 + x3 + x4) + y3 * (x1 + x2 + x4)
+        + y4 * (x1 + x2 + x3)) := by
+  fin_cases i <;>
+    first
+    | exact absurd rfl hki
+    | (simp (config := {decide := true}) only [pc, ev2, Fin.sum_univ_four, ite_true, ite_false,
+        add_zero, zero_add] <;> ring)
+
+theorem pc_ev2_2 (i : Fin 4) (hki : (2 : Fin 4) ≠ i) (y1 y2 y3 y4 x1 x2 x3 x4 : ℂ) :
+    pc (ev2 2 i y1 x1) (ev2 2 i y2 x2) (ev2 2 i y3 x3) (ev2 2 i y4 x4) =
+      2 * (y1 * (x2 + x3 + x4) + y2 * (x1 + x3 + x4) + y3 * (x1 + x2 + x4)
+        + y4 * (x1 + x2 + x3)) := by
+  fin_cases i <;>
+    first
+    | exact absurd rfl hki
+    | (simp (config := {decide := true}) only [pc, ev2, Fin.sum_univ_four, ite_true, ite_false,
+        add_zero, zero_add] <;> ring)
+
+theorem pc_ev2_3 (i : Fin 4) (hki : (3 : Fin 4) ≠ i) (y1 y2 y3 y4 x1 x2 x3 x4 : ℂ) :
+    pc (ev2 3 i y1 x1) (ev2 3 i y2 x2) (ev2 3 i y3 x3) (ev2 3 i y4 x4) =
+      2 * (y1 * (x2 + x3 + x4) + y2 * (x1 + x3 + x4) + y3 * (x1 + x2 + x4)
+        + y4 * (x1 + x2 + x3)) := by
+  fin_cases i <;>
+    first
+    | exact absurd rfl hki
+    | (simp (config := {decide := true}) only [pc, ev2, Fin.sum_univ_four, ite_true, ite_false,
+        add_zero, zero_add] <;> ring)
+
+theorem pc_ev2 (k i : Fin 4) (hki : k ≠ i) (y1 y2 y3 y4 x1 x2 x3 x4 : ℂ) :
+    pc (ev2 k i y1 x1) (ev2 k i y2 x2) (ev2 k i y3 x3) (ev2 k i y4 x4) =
+      2 * (y1 * (x2 + x3 + x4) + y2 * (x1 + x3 + x4) + y3 * (x1 + x2 + x4)
+        + y4 * (x1 + x2 + x3)) := by
+  fin_cases k
+  · exact pc_ev2_0 i hki y1 y2 y3 y4 x1 x2 x3 x4
+  · exact pc_ev2_1 i hki y1 y2 y3 y4 x1 x2 x3 x4
+  · exact pc_ev2_2 i hki y1 y2 y3 y4 x1 x2 x3 x4
+  · exact pc_ev2_3 i hki y1 y2 y3 y4 x1 x2 x3 x4
+
+theorem P4_repl2 (b : Fin 5) (k i : Fin 4) (hki : k ≠ i) (y m : Fin 5 → ℂ) :
+    P4 b (repl k y (repl i m (fun _ => 1))) =
+      2 * (y (b.succAbove 0) * (m (b.succAbove 1) + m (b.succAbove 2) + m (b.succAbove 3))
+        + y (b.succAbove 1) * (m (b.succAbove 0) + m (b.succAbove 2) + m (b.succAbove 3))
+        + y (b.succAbove 2) * (m (b.succAbove 0) + m (b.succAbove 1) + m (b.succAbove 3))
+        + y (b.succAbove 3) * (m (b.succAbove 0) + m (b.succAbove 1) + m (b.succAbove 2))) := by
+  rw [P4_cols]
+  have hc : ∀ j, col (repl k y (repl i m (fun _ => 1))) j = ev2 k i (y j) (m j) := fun j => rfl
+  rw [hc, hc, hc, hc]
+  exact pc_ev2 k i hki _ _ _ _ _ _ _ _
+
+theorem d1_term (b : Fin 5) (i k : Fin 4) (m : Fin 5 → ℂ) (Y : M45) :
+    P4 b (repl k (fun j => repl i 0 Y (k, j)) (repl i m (fun _ => 1))) =
+      2 * (repl i 0 Y (k, b.succAbove 0)
+          * (m (b.succAbove 1) + m (b.succAbove 2) + m (b.succAbove 3))
+        + repl i 0 Y (k, b.succAbove 1)
+          * (m (b.succAbove 0) + m (b.succAbove 2) + m (b.succAbove 3))
+        + repl i 0 Y (k, b.succAbove 2)
+          * (m (b.succAbove 0) + m (b.succAbove 1) + m (b.succAbove 3))
+        + repl i 0 Y (k, b.succAbove 3)
+          * (m (b.succAbove 0) + m (b.succAbove 1) + m (b.succAbove 2))) := by
+  by_cases hk : k = i
+  · rw [hk]
+    have hz : ∀ j, repl i 0 Y (i, j) = 0 := fun j => repl_at i 0 Y j
+    have h0 := P4_zero_row b (repl i (fun j => repl i 0 Y (i, j)) (repl i m (fun _ => 1))) i
+      (fun j => by
+        rw [repl_at]
+        exact hz j)
+    rw [h0, hz, hz, hz, hz]
+    ring
+  · exact P4_repl2 b k i hk (fun j => repl i 0 Y (k, j)) m
+
+theorem kc1_formula (b : Fin 5) (i : Fin 4) (m : Fin 5 → ℂ) (Y : M45) :
+    kc1 b (repl i m (fun _ => 1)) (repl i 0 Y) =
+      2 * (tau (col (repl i 0 Y) (b.succAbove 0))
+          * (m (b.succAbove 1) + m (b.succAbove 2) + m (b.succAbove 3))
+        + tau (col (repl i 0 Y) (b.succAbove 1))
+          * (m (b.succAbove 0) + m (b.succAbove 2) + m (b.succAbove 3))
+        + tau (col (repl i 0 Y) (b.succAbove 2))
+          * (m (b.succAbove 0) + m (b.succAbove 1) + m (b.succAbove 3))
+        + tau (col (repl i 0 Y) (b.succAbove 3))
+          * (m (b.succAbove 0) + m (b.succAbove 1) + m (b.succAbove 2))) := by
+  rw [kc1_eq, d1_term b i 0 m Y, d1_term b i 1 m Y, d1_term b i 2 m Y, d1_term b i 3 m Y]
+  simp only [tau, col]
+  ring
+
+theorem split_eig (K : Submodule ℂ M45) (m : Fin 5 → ℂ) (hdef : DefLine K m) (i : Fin 4)
+    (hsplit : (fun p : Fin 4 × Fin 5 => if p.1 = i then m p.2 else 0) ∈ K)
+    (Y : M45) (hYK : Y ∈ K) :
+    ∃ μ : ℂ, ∀ b, P4 b (repl i m (fun p => 1 + Y p)) = μ * m b := by
+  obtain ⟨θ, hθ⟩ := hdef Y hYK
+  obtain ⟨θ1, hθ1⟩ := hdef _ (K.add_mem hYK hsplit)
+  have eN : repl i (fun j => 1 + Y (i, j)) (fun p => 1 + Y p) = fun p => 1 + Y p :=
+    repl_self i (fun p => 1 + Y p)
+  have eN1 : (fun p : Fin 4 × Fin 5 =>
+      1 + (Y + fun p : Fin 4 × Fin 5 => if p.1 = i then m p.2 else 0) p) =
+      repl i ((fun j => 1 + Y (i, j)) + m) (fun p => 1 + Y p) := by
+    funext ⟨k, j⟩
+    by_cases h : k = i
+    · rw [h, repl_at]
+      show 1 + (Y (i, j) + if i = i then m j else 0) = 1 + Y (i, j) + m j
+      rw [if_pos rfl]
+      ring
+    · rw [repl_ne i k h]
+      show 1 + (Y (k, j) + if k = i then m j else 0) = 1 + Y (k, j)
+      rw [if_neg h]
+      ring
+  have h0 : ∀ b, P4 b (repl i (fun j => 1 + Y (i, j)) (fun p => 1 + Y p)) = 24 + θ * m b := by
+    intro b
+    rw [eN]
+    exact hθ b
+  refine ⟨θ1 - θ, fun b => ?_⟩
+  have h1 := hθ1 b
+  rw [eN1] at h1
+  have hadd := P4_repl_add b i (fun j => 1 + Y (i, j)) m (fun p => 1 + Y p)
+  linear_combination h1 - h0 b - hadd
+
+theorem ncol_lin (K : Submodule ℂ M45) (m : Fin 5 → ℂ) (hdef : DefLine K m) (i : Fin 4)
+    (hsplit : (fun p : Fin 4 × Fin 5 => if p.1 = i then m p.2 else 0) ∈ K)
+    (Y : M45) (hY : Y ∈ K) (b b' : Fin 5) :
+    m b' * kc1 b (repl i m (fun _ => 1)) (repl i 0 Y) =
+      m b * kc1 b' (repl i m (fun _ => 1)) (repl i 0 Y) := by
+  obtain ⟨p2, p3, p4, hp⟩ := P4_poly1 b (repl i m (fun _ => 1)) (repl i 0 Y)
+  obtain ⟨q2, q3, q4, hq⟩ := P4_poly1 b' (repl i m (fun _ => 1)) (repl i 0 Y)
+  have hall : ∀ c : ℂ,
+      (m b' * P4 b (repl i m (fun _ => 1)) - m b * P4 b' (repl i m (fun _ => 1)))
+      + (m b' * kc1 b (repl i m (fun _ => 1)) (repl i 0 Y)
+          - m b * kc1 b' (repl i m (fun _ => 1)) (repl i 0 Y)) * c
+      + (m b' * p2 - m b * q2) * c ^ 2 + (m b' * p3 - m b * q3) * c ^ 3
+      + (m b' * p4 - m b * q4) * c ^ 4 = 0 := by
+    intro c
+    obtain ⟨μ, hμ⟩ := split_eig K m hdef i hsplit (c • Y) (K.smul_mem c hY)
+    have e1 : (fun p : Fin 4 × Fin 5 => 1 + (c • Y) p) = fun p => 1 + c * Y p := by
+      funext p
+      simp only [Pi.smul_apply, smul_eq_mul]
+    have e2 : repl i m (fun p => 1 + c * Y p) =
+        fun p => repl i m (fun _ => 1) p + c * repl i 0 Y p := by
+      funext ⟨k, j⟩
+      show repl i m (fun p => 1 + c * Y p) (k, j) =
+        repl i m (fun _ => 1) (k, j) + c * repl i 0 Y (k, j)
+      by_cases hk : k = i
+      · rw [hk, repl_at, repl_at, repl_at]
+        simp only [Pi.zero_apply]
+        ring
+      · rw [repl_ne i k hk, repl_ne i k hk, repl_ne i k hk]
+    have h1 := hμ b
+    have h2 := hμ b'
+    rw [e1, e2, hp c] at h1
+    rw [e1, e2, hq c] at h2
+    linear_combination (m b') * h1 - (m b) * h2
+  have hr := roots5 (fun k : Fin 5 => ((k : ℕ) : ℂ) + 1) inj_succ5
+    (m b' * P4 b (repl i m (fun _ => 1)) - m b * P4 b' (repl i m (fun _ => 1)))
+    (m b' * kc1 b (repl i m (fun _ => 1)) (repl i 0 Y)
+      - m b * kc1 b' (repl i m (fun _ => 1)) (repl i 0 Y))
+    (m b' * p2 - m b * q2) (m b' * p3 - m b * q3) (m b' * p4 - m b * q4) (fun k => hall _)
+  linear_combination hr.2.1
+
+theorem tau_repl0 (i : Fin 4) (Y : M45) (b : Fin 5) :
+    tau (col Y b) = Y (i, b) + tau (col (repl i 0 Y) b) := by
+  have e1 : tau (col Y b) = ∑ k : Fin 4, Y (k, b) := by
+    rw [Fin.sum_univ_four]
+    rfl
+  have e2 : tau (col (repl i 0 Y) b) = ∑ k : Fin 4, (if k = i then (0 : ℂ) else Y (k, b)) := by
+    rw [Fin.sum_univ_four]
+    rfl
+  have e3 : ∑ k : Fin 4, Y (k, b) = ∑ k : Fin 4, ((if k = i then Y (i, b) else 0)
+      + (if k = i then (0 : ℂ) else Y (k, b))) := by
+    refine Finset.sum_congr rfl (fun k _ => ?_)
+    by_cases h : k = i
+    · rw [if_pos h, if_pos h, h, add_zero]
+    · rw [if_neg h, if_neg h, zero_add]
+  rw [e1, e2, e3, Finset.sum_add_distrib]
+  simp
+
+theorem NCOL_S_a (K : Submodule ℂ M45) (m : Fin 5 → ℂ) (hdef : DefLine K m)
+    (hm : ∑ a, m a = 0) (hmm : ∑ a, m a * m a ≠ 0) (i : Fin 4)
+    (hsplit : (fun p : Fin 4 × Fin 5 => if p.1 = i then m p.2 else 0) ∈ K)
+    (hm0 : ∀ j, m j ≠ 0) :
+    (∀ Y ∈ (K ⊓ LinearMap.ker (phiRow i m) : Submodule ℂ M45), ∀ j, Y (i, j) = 0) ∧
+      Module.finrank ℂ K ≤ 3 := by
+  have hS := (ThmSplit K m hdef hm hmm i hsplit).1
+  have hrow : ∀ Y ∈ (K ⊓ LinearMap.ker (phiRow i m) : Submodule ℂ M45), ∀ j, Y (i, j) = 0 := by
+    intro Y hY
+    have hYK : Y ∈ K := (Submodule.mem_inf.mp hY).1
+    have E0 := kc1_formula 0 i m Y
+    have E1 := kc1_formula 1 i m Y
+    have E2 := kc1_formula 2 i m Y
+    have E3 := kc1_formula 3 i m Y
+    have E4 := kc1_formula 4 i m Y
+    rw [sa0.1, sa0.2.1, sa0.2.2.1, sa0.2.2.2] at E0
+    rw [sa1.1, sa1.2.1, sa1.2.2.1, sa1.2.2.2] at E1
+    rw [sa2.1, sa2.2.1, sa2.2.2.1, sa2.2.2.2] at E2
+    rw [sa3.1, sa3.2.1, sa3.2.2.1, sa3.2.2.2] at E3
+    rw [sa4.1, sa4.2.1, sa4.2.2.1, sa4.2.2.2] at E4
+    have L1 := ncol_lin K m hdef i hsplit Y hYK 1 0
+    have L2 := ncol_lin K m hdef i hsplit Y hYK 2 0
+    have L3 := ncol_lin K m hdef i hsplit Y hYK 3 0
+    have L4 := ncol_lin K m hdef i hsplit Y hYK 4 0
+    obtain ⟨c, hc⟩ : ∃ c : Fin 5 → ℂ, ∀ j, tau (col (repl i 0 Y) j) = c j :=
+      ⟨fun j => tau (col (repl i 0 Y) j), fun j => rfl⟩
+    obtain ⟨D, hD⟩ : ∃ D : Fin 5 → ℂ,
+        ∀ b, kc1 b (repl i m (fun _ => 1)) (repl i 0 Y) = D b :=
+      ⟨fun b => kc1 b (repl i m (fun _ => 1)) (repl i 0 Y), fun b => rfl⟩
+    simp only [hc, hD] at E0 E1 E2 E3 E4 L1 L2 L3 L4
+    have hm' := hm
+    rw [Fin.sum_univ_five] at hm'
+    have hcm : c 0 * m 0 + c 1 * m 1 + c 2 * m 2 + c 3 * m 3 + c 4 * m 4 = 0 := by
+      apply mul_left_cancel₀ (hm0 0)
+      linear_combination (m 0 * (c 0 + c 1 + c 2 + c 3 + c 4) - D 0 / 6) * hm'
+        + (m 0 / 6) * (E0 + E1 + E2 + E3 + E4) - (1 / 6 : ℂ) * (L1 + L2 + L3 + L4)
+    have hc1 : c 1 = c 0 := by
+      have h : 4 * m 0 * m 1 * (c 1 - c 0) = 0 := by
+        linear_combination L1 - m 0 * E1 + m 1 * E0
+          - 2 * (m 0 * (c 0 + c 1 + c 2 + c 3 + c 4 - c 1) - m 1 * (c 0 + c 1 + c 2 + c 3 + c 4 - c 0)) * hm' - 2 * (m 1 - m 0) * hcm
+      rcases mul_eq_zero.mp h with h' | h'
+      · rcases mul_eq_zero.mp h' with h'' | h''
+        · rcases mul_eq_zero.mp h'' with h3 | h3
+          · norm_num at h3
+          · exact (hm0 0 h3).elim
+        · exact (hm0 1 h'').elim
+      · exact sub_eq_zero.mp h'
+    have hc2 : c 2 = c 0 := by
+      have h : 4 * m 0 * m 2 * (c 2 - c 0) = 0 := by
+        linear_combination L2 - m 0 * E2 + m 2 * E0
+          - 2 * (m 0 * (c 0 + c 1 + c 2 + c 3 + c 4 - c 2) - m 2 * (c 0 + c 1 + c 2 + c 3 + c 4 - c 0)) * hm' - 2 * (m 2 - m 0) * hcm
+      rcases mul_eq_zero.mp h with h' | h'
+      · rcases mul_eq_zero.mp h' with h'' | h''
+        · rcases mul_eq_zero.mp h'' with h3 | h3
+          · norm_num at h3
+          · exact (hm0 0 h3).elim
+        · exact (hm0 2 h'').elim
+      · exact sub_eq_zero.mp h'
+    have hc3 : c 3 = c 0 := by
+      have h : 4 * m 0 * m 3 * (c 3 - c 0) = 0 := by
+        linear_combination L3 - m 0 * E3 + m 3 * E0
+          - 2 * (m 0 * (c 0 + c 1 + c 2 + c 3 + c 4 - c 3) - m 3 * (c 0 + c 1 + c 2 + c 3 + c 4 - c 0)) * hm' - 2 * (m 3 - m 0) * hcm
+      rcases mul_eq_zero.mp h with h' | h'
+      · rcases mul_eq_zero.mp h' with h'' | h''
+        · rcases mul_eq_zero.mp h'' with h3 | h3
+          · norm_num at h3
+          · exact (hm0 0 h3).elim
+        · exact (hm0 3 h'').elim
+      · exact sub_eq_zero.mp h'
+    have hc4 : c 4 = c 0 := by
+      have h : 4 * m 0 * m 4 * (c 4 - c 0) = 0 := by
+        linear_combination L4 - m 0 * E4 + m 4 * E0
+          - 2 * (m 0 * (c 0 + c 1 + c 2 + c 3 + c 4 - c 4) - m 4 * (c 0 + c 1 + c 2 + c 3 + c 4 - c 0)) * hm' - 2 * (m 4 - m 0) * hcm
+      rcases mul_eq_zero.mp h with h' | h'
+      · rcases mul_eq_zero.mp h' with h'' | h''
+        · rcases mul_eq_zero.mp h'' with h3 | h3
+          · norm_num at h3
+          · exact (hm0 0 h3).elim
+        · exact (hm0 4 h'').elim
+      · exact sub_eq_zero.mp h'
+    have hcb : ∀ b, c b = c 0 := fin5 (fun b => c b = c 0) rfl hc1 hc2 hc3 hc4
+    have hC1 := C1 _ hS Y hY
+    have hyi : ∀ b, Y (i, b) = -c 0 := by
+      intro b
+      have h1 := hC1 b
+      rw [tau_repl0 i Y b, hc b, hcb b] at h1
+      linear_combination h1
+    by_cases hα : c 0 = 0
+    · intro j
+      rw [hyi j, hα, neg_zero]
+    · exfalso
+      have hY1 : (1 / c 0) • Y ∈ (K ⊓ LinearMap.ker (phiRow i m) : Submodule ℂ M45) :=
+        Submodule.smul_mem _ _ hY
+      have h24 := hS _ hY1 0
+      have hz := P4_zero_row 0 (fun p => 1 + ((1 / c 0) • Y) p) i (fun j => by
+        show 1 + (1 / c 0) * Y (i, j) = 0
+        rw [hyi j]
+        have h1 : 1 / c 0 * c 0 = 1 := one_div_mul_cancel hα
+        linear_combination (-1 : ℂ) * h1)
+      rw [hz] at h24
+      norm_num at h24
+  refine ⟨hrow, ?_⟩
+  have h3 := LemmaSL3 _ hS i hrow
+  have rn := rank_nullity K (phiRow i m)
+  have h1 : Module.finrank ℂ (K.map (phiRow i m)) ≤ 1 := by
+    have h := Submodule.finrank_le (K.map (phiRow i m))
+    rw [Module.finrank_self] at h
+    exact h
+  omega
