@@ -1,0 +1,8 @@
+#Reduced Groebner basis data
+#---
+#field characteristic: 2147483629
+#variable order:       E00, E01, E02, E03, E04, E10, E11, E12, E13, E14, E20, E21, E22, E23, E24, E30, E31, E32, E33, E34
+#monomial order:       graded reverse lexicographical
+#length of basis:      1 element
+#---
+[1]:

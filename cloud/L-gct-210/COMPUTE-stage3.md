@@ -1,4 +1,5 @@
-# COMPUTE-stage3 -- heavy computations that would help (S3) of L-gct-210   (stage3, written 19:31, round 7)
+# COMPUTE-stage3 -- heavy computations that would help (S3) of L-gct-210   (stage3, written 19:31, round 7; errata A1, A2 of
+# COMPUTE-ERRATA.md applied 20:20, round 8)
 Self-contained. Everything is over C. All scripts named below are in /home/claude/work/L-gct-210/stage3/ and run with
 `python3 -I <script> <args>` (numpy/scipy only; they are small and can be copied). Hand proofs they relate to: NOTES-stage3.md, sections
 named below. Order = priority. For every numerical item a CALIBRATION is listed that must succeed before a negative result means anything.
@@ -7,7 +8,9 @@ named below. Order = priority. For every numerical item a CALIBRATION is listed 
  * 5x5 matrices; rows are indexed a,b,c,d,e = 0..4, columns 1..5. J = all-ones matrix. e_r w^T = the matrix with row r equal to w, 0 elsewhere.
  * LEVEL SPACE: a linear subspace L of Mat_5(C) with perm(J + t) = 120 for all t in L. Equivalent (L is linear): sigma_k(t) = 0 for all t
    in L and k = 1..5, where sigma_k(t) = sum of the permanents of ALL k x k submatrices of t  [perm(J + t) = sum_k (5-k)! sigma_k(t)].
-   The gap L-gct-210 claims: every level space has dim <= 8. Level spaces of dim 8 exist.
+   The gap L-gct-210 claims: every level space has dim <= 8. [CORRECTED, errata A1: NO 8-dim level space is known; the largest known
+   dimension is 7. So every calibration below is at dim 7; dim 8 is a TARGET: a verified 8-dim level space would be new (it would not
+   refute the gap) and must be reported at once.]
  * SQUAREFREE ALGEBRA A = C[y_1..y_5]/(y_1^2, ..., y_5^2), graded; to v in C^5 attach V = sum_j v_j y_j in A_1. For k vectors v^1..v^k
    (the rows of a k x 5 matrix N):  V^1 ... V^k = sum over k-subsets S of columns of perm(N restricted to the columns S) * y_S.
    So "V^1 V^2 V^3 V^4 = 0 in A_4" means: the five 4x4 subpermanents of the 4x5 matrix N vanish; "= 0 in A_3" : the ten 3x3 subpermanents.
@@ -44,13 +47,14 @@ named below. Order = priority. For every numerical item a CALIBRATION is listed 
  CALIBRATION (must succeed first): the same code with t_1..t_5 only (dim 7) must find solutions in a positive fraction of starts:
    the 7-dim spaces M = L' (+) e_e (x) (C(L') + C1)^perp built from a 4x5 level space L' with 2-dim defect are known solutions
    (/home/claude/work/L-gct-210/rows/build7.py, data rows/c52_*.npy; my check stage3/t1_defect.py lists them). Then run dim 8
-   (t_1..t_6) and REPORT whether 8-dim level spaces with z_e = 2 exist and their invariants (a_r, lam, z, column analogues).
+   (t_1..t_6) as a TARGET (not a calibration): report at once any 8-dim level space with z_e = 2 and its invariants (a_r, lam, z, columns).
  DECISION. A dim-9 solution verified in high precision (then rationalised or certified by alpha-theory) REFUTES L-gct-210 -- report
    immediately with the matrices. No solution in >= 2000 starts for (i) and (ii) while dim 7/8 calibrate: strong evidence for (S3-a);
    then item 2 is the route to a proof.
  Start from: stage3/s3_planes_z2.py for the least-squares skeleton (unpack / residual / hinges / classification), numerics/core.py.
  SAME SEARCH for the whole of (S3): replace e_e (x) span(z_1,z_2) by ONE single-row element e_e w^T (w in 1^perp, not a multiple of
-   e_j - e_l is NOT assumed) and 8 free matrices; calibration at dim 8. This covers every z-pattern at once.
+   e_j - e_l is NOT assumed) and 8 free matrices; calibration at dim 7 (6 free matrices; the lifts of rows' (5,2) and (4,1) spaces are known solutions), dim 8 as
+   a target. This covers every z-pattern at once.
 
 ## 2. THE 7-DIM CORES OF (S3-a): sample the variety, test the missing identity, run FO2   [route to a PROOF of (S3-a)]
  Facts proved by hand (NOTES-stage3.md 24 (C), 26 (C)): if L is in the regime with z_e = 2, Z := Z_e, R = {a,b,c,d}, then
@@ -123,7 +127,7 @@ named below. Order = priority. For every numerical item a CALIBRATION is listed 
 
 ## 4. SEVERAL ROWS WITH SINGLE-ROW ELEMENTS (z = (1,1,*,*,*), (2,1,*,*,*), (2,2,..) with degenerate planes) -- not analysed by hand
  Direct search as in item 1 with prescribed single-row elements e_e w^T and e_d w'^T (two different rows; proved: s(w) = s(w') = 0 and
-   <w,w'> = 0), 7 free matrices, dim 9; hinges all a_r = 1. Calibration at dim 8 (report which z-vectors occur among 8-dim spaces).
+   <w,w'> = 0), 7 free matrices, dim 9; hinges all a_r = 1. Calibration at dim 7 (5 free matrices); dim 8 is a target (report any solution at once).
    Variant "degenerate planes" (e_e (x) Z and e_d (x) Z' with <,> degenerate on both 2-planes): NOW PROVED IMPOSSIBLE by hand
    (Theorem Z22, NOTES-stage3.md 26 (B')); together with rows' FL2* no two rows carry 2-dim single-row parts. A numerical confirmation
    is welcome but has low priority: 9-dim level L containing e_d (x) span(n,h) (+) e_e (x) span(n,h') with <n,n> = <n,h> = <n,h'> =
@@ -146,10 +150,15 @@ named below. Order = priority. For every numerical item a CALIBRATION is listed 
       planes and w lie in one coordinate 3-space. Numerics here: stage3/s3_planes_line.py and s3_planes_lineW.py
       (`python3 -I s3_planes_lineW.py SEED 0.2 NVAN 150 1500`, NVAN = number of columns allowed to vanish; 52 solutions, all of the
       two claimed types).
- (5c) The plane problem of Theorem N2-X (section 21): five 2-planes P_a..P_e, vectors rho_a in P_a, rho_b in P_b, with
-      P_a P_b P_k P_l = 0 for {k,l} inside {c,d,e}; rho_a . P_c P_d P_e = 0; rho_b . P_c P_d P_e = 0; all ten triple products of the
-      planes nonzero. CLAIM: all five planes lie in one coordinate 3-space. Numerics: stage3/n2_planes.py
-      (`python3 -I n2_planes.py SEED 0.25 110 NVAN 1500`; 75 of 76 solutions in 3 columns, none with >= 4 columns).
+ (5c) The plane problem of Theorem N2-X (section 21) [CORRECTED, errata A2: the claim "all five planes lie in one coordinate 3-space"
+      is FALSE for the plane equations alone; counterexample of verify2: g = e_2 + e_3, g* = e_2 - e_3, P_c = P_d = P_e = span(e_1, g),
+      P_a = P_b = span(g*, e_4)]. Five 2-planes P_a..P_e with P_a P_b P_k P_l = 0 in A_4 for the three pairs {k,l} inside {c,d,e} and
+      (NT) no three of the five planes equal to one coordinate plane. CORRECT CLAIM (what section 21 proves from these plane equations):
+          all five planes lie in one coordinate 3-space,  OR  P_c = P_d = P_e,  OR  two of P_c, P_d, P_e are equal to one coordinate plane.
+      Test this three-way conclusion (rho_a, rho_b are not needed for it). The second alternative is excluded in section 21 by (Qb),
+      (Q5J) and (P2), which are level conditions of X_ab and not plane equations. Numerics: stage3/n2_planes.py
+      (`python3 -I n2_planes.py SEED 0.25 110 NVAN 1500`; its hinge "all ten triple products nonzero" with (Qa), (Qb) imposed:
+      75 of 76 solutions in 3 columns).
  (5d) LEMMA 5V: five nonzero vectors of C^4 with all ten triple products zero in (A on 4 variables)_3: three of them are multiples of
       one unit vector, or all five lie in a coordinate 2-plane. (Tiny: 20 unknowns, 40 cubics -- exact primary decomposition is feasible.)
  (5e) Annihilator table of section 21 (exact linear algebra over Q(parameters)); stage3/kcheck.py does it at random rational points.

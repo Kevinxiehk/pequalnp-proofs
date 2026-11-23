@@ -1,0 +1,175 @@
+def ZF (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)) (r : Fin 5) : Prop :=
+  4 ≤ Module.finrank ℂ (L.map (rowMap r)) ∧
+    ∀ κ : Fin 5 → ℂ, (∀ t ∈ L, dotL κ (rowMap r t) = 0) → dotL κ 1 = 1 → ∀ j, κ j ≠ 0
+
+def PairI (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)) (r r' : Fin 5) : Prop :=
+  ∃ κ κ' ν ν' : Fin 5 → ℂ, ∃ a b : Fin 5,
+    (∀ t ∈ L, dotL κ (rowMap r t) = 0) ∧ dotL κ 1 = 1 ∧
+    (∀ t ∈ L, dotL κ' (rowMap r' t) = 0) ∧ dotL κ' 1 = 1 ∧
+    (∀ t ∈ L, dotL ν (rowMap r t) + dotL ν' (rowMap r' t) = 0) ∧
+    dotL ν 1 + dotL ν' 1 = 0 ∧ (∀ j, κ j ≠ 0) ∧ (∀ j, κ' j ≠ 0) ∧ TypeCl κ κ' ν ν' a b ∧
+    ∀ m, ¬ (ν m / κ m = ν a / κ a ∧ ν' m / κ' m = ν' b / κ' b)
+
+def PairII (L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)) (r r' : Fin 5) : Prop :=
+  ∃ κ κ' ν ν' : Fin 5 → ℂ, ∃ a b : Fin 5,
+    (∀ t ∈ L, dotL κ (rowMap r t) = 0) ∧ dotL κ 1 = 1 ∧
+    (∀ t ∈ L, dotL κ' (rowMap r' t) = 0) ∧ dotL κ' 1 = 1 ∧
+    (∀ t ∈ L, dotL ν (rowMap r t) + dotL ν' (rowMap r' t) = 0) ∧
+    dotL ν 1 + dotL ν' 1 = 0 ∧ (∀ j, κ j ≠ 0) ∧ (∀ j, κ' j ≠ 0) ∧ TypeCl κ κ' ν ν' a b ∧
+    ∃ m, ν m / κ m = ν a / κ a ∧ ν' m / κ' m = ν' b / κ' b
+
+theorem pair_I_or_II {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L) (r r' : Fin 5)
+    (hr : r ≠ r')
+    (hmin : Module.finrank ℂ L = Module.finrank ℂ (rowsZero L r r') + 7)
+    (hz : ZF L r) (hz' : ZF L r') : PairI L r r' ∨ PairII L r r' := by
+  obtain ⟨κ, κ', ν, ν', h1, h2, h3, h4, h5, h6, h7⟩ := c7_final_cl hL r r' hr hmin hz.1 hz'.1
+  have hκ0 := hz.2 κ h1 h2
+  have hκ'0 := hz'.2 κ' h3 h4
+  obtain ⟨a, b, hcl⟩ := h7 hκ0 hκ'0
+  by_cases hc : ∃ m, ν m / κ m = ν a / κ a ∧ ν' m / κ' m = ν' b / κ' b
+  · exact Or.inr ⟨κ, κ', ν, ν', a, b, h1, h2, h3, h4, h5, h6, hκ0, hκ'0, hcl, hc⟩
+  · exact Or.inl ⟨κ, κ', ν, ν', a, b, h1, h2, h3, h4, h5, h6, hκ0, hκ'0, hcl,
+      fun m hm => hc ⟨m, hm⟩⟩
+
+def T1Hyp : Prop :=
+  ∀ L : Submodule ℂ (Fin 5 × Fin 5 → ℂ), Lev 5 L → Module.finrank ℂ L = 9 →
+    ∀ r1 r2 r3 : Fin 5, r1 ≠ r2 → r1 ≠ r3 → r2 ≠ r3 → ZF L r1 → ZF L r2 → ZF L r3 →
+    Module.finrank ℂ (rowsZeroS L {r1, r2}) = 2 →
+    Module.finrank ℂ (rowsZeroS L {r1, r3}) = 2 →
+    Module.finrank ℂ (rowsZeroS L {r2, r3}) = 2 → rowsZeroS L {r1, r2, r3} ≠ ⊥
+
+def TripleStmt (P Q : Submodule ℂ (Fin 5 × Fin 5 → ℂ) → Fin 5 → Fin 5 → Prop) : Prop :=
+  ∀ L : Submodule ℂ (Fin 5 × Fin 5 → ℂ), Lev 5 L → Module.finrank ℂ L = 9 →
+    ∀ r1 r2 r3 : Fin 5, r1 ≠ r2 → r1 ≠ r3 → r2 ≠ r3 → ZF L r1 → ZF L r2 → ZF L r3 →
+    Module.finrank ℂ (rowsZeroS L {r1, r2}) = 2 →
+    Module.finrank ℂ (rowsZeroS L {r1, r3}) = 2 →
+    Module.finrank ℂ (rowsZeroS L {r2, r3}) = 3 → P L r1 r2 → Q L r1 r3 →
+    rowsZeroS L {r1, r2, r3} ≠ ⊥
+
+def T2Hyp : Prop := TripleStmt PairI PairI
+
+def T2ppHyp : Prop := TripleStmt PairI PairII
+
+def R31Hyp : Prop := TripleStmt PairII PairII
+
+theorem set3_swap (r1 r2 r3 : Fin 5) : ({r1, r3, r2} : Finset (Fin 5)) = {r1, r2, r3} := by
+  ext x
+  simp only [Finset.mem_insert, Finset.mem_singleton]
+  tauto
+
+theorem set3_rot (r1 r2 r3 : Fin 5) : ({r2, r1, r3} : Finset (Fin 5)) = {r1, r2, r3} := by
+  ext x
+  simp only [Finset.mem_insert, Finset.mem_singleton]
+  tauto
+
+theorem set3_rot2 (r1 r2 r3 : Fin 5) : ({r3, r1, r2} : Finset (Fin 5)) = {r1, r2, r3} := by
+  ext x
+  simp only [Finset.mem_insert, Finset.mem_singleton]
+  tauto
+
+theorem pair_min {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (h9 : Module.finrank ℂ L = 9)
+    (r r' : Fin 5) (x : Module.finrank ℂ (rowsZeroS L {r, r'}) = 2) :
+    Module.finrank ℂ L = Module.finrank ℂ (rowsZero L r r') + 7 := by
+  rw [rowsZeroS_pair] at x
+  omega
+
+theorem s2_core (hT2 : T2Hyp) (hT2pp : T2ppHyp) {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)}
+    (hL : Lev 5 L) (h9 : Module.finrank ℂ L = 9) (r1 r2 r3 : Fin 5) (h12 : r1 ≠ r2)
+    (h13 : r1 ≠ r3) (h23 : r2 ≠ r3) (z1 : ZF L r1) (z2 : ZF L r2) (z3 : ZF L r3)
+    (h0 : rowsZeroS L {r1, r2, r3} = ⊥)
+    (x12 : Module.finrank ℂ (rowsZeroS L {r1, r2}) = 2)
+    (x13 : Module.finrank ℂ (rowsZeroS L {r1, r3}) = 2)
+    (x23 : Module.finrank ℂ (rowsZeroS L {r2, r3}) = 3) :
+    PairII L r1 r2 ∧ PairII L r1 r3 := by
+  have x32 : Module.finrank ℂ (rowsZeroS L {r3, r2}) = 3 := by
+    rw [Finset.pair_comm r3 r2]
+    exact x23
+  rcases pair_I_or_II hL r1 r2 h12 (pair_min h9 r1 r2 x12) z1 z2 with p | p
+  · rcases pair_I_or_II hL r1 r3 h13 (pair_min h9 r1 r3 x13) z1 z3 with q | q
+    · exact absurd h0 (hT2 L hL h9 r1 r2 r3 h12 h13 h23 z1 z2 z3 x12 x13 x23 p q)
+    · exact absurd h0 (hT2pp L hL h9 r1 r2 r3 h12 h13 h23 z1 z2 z3 x12 x13 x23 p q)
+  · rcases pair_I_or_II hL r1 r3 h13 (pair_min h9 r1 r3 x13) z1 z3 with q | q
+    · have h5 := hT2pp L hL h9 r1 r3 r2 h13 h12 h23.symm z1 z3 z2 x13 x12 x32 q p
+      rw [set3_swap] at h5
+      exact absurd h0 h5
+    · exact ⟨p, q⟩
+
+theorem zf_five {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L)
+    (h9 : Module.finrank ℂ L = 9) (r : Fin 5) (z : ZF L r) :
+    Module.finrank ℂ (rowsZeroS L {r}) = 5 := by
+  have hle : Module.finrank ℂ (L.map (rowMap r)) ≤ 4 := row_proj_le (m := 3) hL r
+  have h1 := rowsZeroS_single_finrank L r
+  have h2 := z.1
+  omega
+
+theorem pair_ge_two {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L)
+    (h9 : Module.finrank ℂ L = 9) (r r' : Fin 5) (hr : r ≠ r') :
+    2 ≤ Module.finrank ℂ (rowsZeroS L {r, r'}) := by
+  rw [rowsZeroS_pair]
+  have h := lemmaC hL r r' hr
+  omega
+
+theorem s2 (hT1 : T1Hyp) (hT2 : T2Hyp) (hT2pp : T2ppHyp)
+    {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L) (h9 : Module.finrank ℂ L = 9)
+    (r1 r2 r3 : Fin 5) (h12 : r1 ≠ r2) (h13 : r1 ≠ r3) (h23 : r2 ≠ r3) (z1 : ZF L r1)
+    (z2 : ZF L r2) (z3 : ZF L r3) (h0 : rowsZeroS L {r1, r2, r3} = ⊥) :
+    (Module.finrank ℂ (rowsZeroS L {r2, r3}) = 3 ∧ PairII L r1 r2 ∧ PairII L r1 r3) ∨
+      (Module.finrank ℂ (rowsZeroS L {r1, r3}) = 3 ∧ PairII L r2 r1 ∧ PairII L r2 r3) ∨
+      (Module.finrank ℂ (rowsZeroS L {r1, r2}) = 3 ∧ PairII L r3 r1 ∧ PairII L r3 r2) := by
+  rcases s2_count L r1 r2 r3 (zf_five hL h9 r1 z1) (zf_five hL h9 r2 z2) (zf_five hL h9 r3 z3)
+    h0 (pair_ge_two hL h9 r1 r2 h12) (pair_ge_two hL h9 r1 r3 h13)
+    (pair_ge_two hL h9 r2 r3 h23) with ⟨a, b, c⟩ | ⟨a, b, c⟩ | ⟨a, b, c⟩ | ⟨a, b, c⟩
+  · exact absurd h0 (hT1 L hL h9 r1 r2 r3 h12 h13 h23 z1 z2 z3 a b c)
+  · exact Or.inl ⟨c, s2_core hT2 hT2pp hL h9 r1 r2 r3 h12 h13 h23 z1 z2 z3 h0 a b c⟩
+  · have a' : Module.finrank ℂ (rowsZeroS L {r2, r1}) = 2 := by
+      rw [Finset.pair_comm r2 r1]
+      exact a
+    have h0' : rowsZeroS L {r2, r1, r3} = ⊥ := by
+      rw [set3_rot]
+      exact h0
+    exact Or.inr (Or.inl ⟨b, s2_core hT2 hT2pp hL h9 r2 r1 r3 h12.symm h23 h13 z2 z1 z3 h0'
+      a' c b⟩)
+  · have b' : Module.finrank ℂ (rowsZeroS L {r3, r1}) = 2 := by
+      rw [Finset.pair_comm r3 r1]
+      exact b
+    have c' : Module.finrank ℂ (rowsZeroS L {r3, r2}) = 2 := by
+      rw [Finset.pair_comm r3 r2]
+      exact c
+    have h0' : rowsZeroS L {r3, r1, r2} = ⊥ := by
+      rw [set3_rot2]
+      exact h0
+    exact Or.inr (Or.inr ⟨a, s2_core hT2 hT2pp hL h9 r3 r1 r2 h13.symm h23.symm h12 z3 z1 z2
+      h0' b' c' a⟩)
+
+theorem s2_star (hT1 : T1Hyp) (hT2 : T2Hyp) (hT2pp : T2ppHyp) (hR31 : R31Hyp)
+    {L : Submodule ℂ (Fin 5 × Fin 5 → ℂ)} (hL : Lev 5 L) (h9 : Module.finrank ℂ L = 9)
+    (r1 r2 r3 : Fin 5) (h12 : r1 ≠ r2) (h13 : r1 ≠ r3) (h23 : r2 ≠ r3) (z1 : ZF L r1)
+    (z2 : ZF L r2) (z3 : ZF L r3) : rowsZeroS L {r1, r2, r3} ≠ ⊥ := by
+  intro h0
+  have l12 := pair_ge_two hL h9 r1 r2 h12
+  have l13 := pair_ge_two hL h9 r1 r3 h13
+  have l23 := pair_ge_two hL h9 r2 r3 h23
+  have b12 := s2_count L r1 r2 r3 (zf_five hL h9 r1 z1) (zf_five hL h9 r2 z2)
+    (zf_five hL h9 r3 z3) h0 l12 l13 l23
+  rcases s2 hT1 hT2 hT2pp hL h9 r1 r2 r3 h12 h13 h23 z1 z2 z3 h0 with
+    ⟨c, p, q⟩ | ⟨c, p, q⟩ | ⟨c, p, q⟩
+  · have a : Module.finrank ℂ (rowsZeroS L {r1, r2}) = 2 := by omega
+    have b : Module.finrank ℂ (rowsZeroS L {r1, r3}) = 2 := by omega
+    exact hR31 L hL h9 r1 r2 r3 h12 h13 h23 z1 z2 z3 a b c p q h0
+  · have a : Module.finrank ℂ (rowsZeroS L {r2, r1}) = 2 := by
+      rw [Finset.pair_comm r2 r1]
+      omega
+    have b : Module.finrank ℂ (rowsZeroS L {r2, r3}) = 2 := by omega
+    have h5 := hR31 L hL h9 r2 r1 r3 h12.symm h23 h13 z2 z1 z3 a b c p q
+    rw [set3_rot] at h5
+    exact h5 h0
+  · have a : Module.finrank ℂ (rowsZeroS L {r3, r1}) = 2 := by
+      rw [Finset.pair_comm r3 r1]
+      omega
+    have b : Module.finrank ℂ (rowsZeroS L {r3, r2}) = 2 := by
+      rw [Finset.pair_comm r3 r2]
+      omega
+    have h5 := hR31 L hL h9 r3 r1 r2 h13.symm h23.symm h12 z3 z1 z2 a b c p q
+    rw [set3_rot2] at h5
+    exact h5 h0
+

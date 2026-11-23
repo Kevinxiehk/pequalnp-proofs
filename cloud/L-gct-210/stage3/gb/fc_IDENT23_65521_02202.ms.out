@@ -1,0 +1,8 @@
+#Reduced Groebner basis data
+#---
+#field characteristic: 65521
+#variable order:       qa1, qa2, qb0, qb1, qb2, qc0, qc1, qd0, qd1, qd2, w0, w1, pp0, pp1, pp2, tb, td
+#monomial order:       graded reverse lexicographical
+#length of basis:      1 element
+#---
+[1]:

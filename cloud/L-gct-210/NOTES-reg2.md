@@ -258,3 +258,44 @@ STATUS 20:08: (2) the families with a 3-dim single-row part (M*, EC moves, DR3) 
         by SP8(b) -- an example where SP8 is strictly stronger than FO2; drop the EC element: (0, 5, 15, 10), m two-column: SP8(a).
    5-dim census of round 1 (ext5.py, 53 spaces): Omega = C^5 with Phi = 0 in 10 of them: 9 with a full free row, 1 without.
  So (F2) removes most 5-dim level spaces, and what survives so far all contains a 3-dim piece of a free row, i.e. reduces by (F3) to (5,1).
+
+## 7. Deletable lines, maximality and the 7-dim question (targets 1 and 3)   [rigorous unless marked]
+ 7.1 LEMMA DL. For a 4x5 level space M:  (a) row i is deletable (pi_i(M) is a 3x5 level space)  <=>  d_i := (e_i - (1/4) 1) (x) 1 lies in E_0(M);
+     (b) column c neutral (N_c(J'+Y) = 24 on M)  =>  d^c := 1 (x) (e_c - (1/5) 1) lies in E_0(M);
+     (c) P_2(d_i + Y) = -15/2 and P_2(d^c + Y) = -24/5 for every Y in M.
+     Proof. (a) D_{e_i 1^T} F(J'+Y) = 2 F_3(rows != i of J'+Y) (each injection of three rows into five columns misses two columns) and
+     D_{J'} F(J'+Y) = 480 (L1(c)); so D_{d_i} F = 2 F_3 - 120 vanishes iff F_3 = 60. (b) Let p = perm_4, A = J_4 + Y^(c), v = 1 + y_c.
+     Level and neutral: F = p(A) + D_{v 1^T} p(A) = 120, p(A) = 24, so D_{v 1^T} p(A) = 96; M^(c) is a linear level space, so
+     D_{Y^(c)} p(A) = 0 and D_{J_4} p(A) = 4 p(A) = 96; hence D_{1 e_c^T} F(J'+Y) = D_{J_4} p(A) = 96 = D_{J'}F / 5.
+     (c) b'(d, Y) = D_d P_2(Y) = 0 for d in E_0(M), and P_2(x (x) 1) = -10 sum x_i^2, P_2(1 (x) y) = -6 sum y_j^2 for sum-zero x, y.  QED
+ 7.2 PROPOSITION MAX. If M has a deletable row or a neutral column and dim E_0(M) = dim M + 1, then M is a maximal 4x5 level space.
+     (Any level space containing M lies in E_0(M) = M + C d, and P_2(d + Y) != 0.)  All 41 spaces of sections 2.1-2.2 and the
+     exact members of sections 2.5, 4.3 satisfy the hypotheses numerically (dim E_0 = 7).
+ 7.3 COROLLARY (what a 7-dim 4x5 level space M_7 must look like). (i) no full free row (rows' SL_3 corollary); (ii) no two equal
+     columns (upstream L_gct_215, abbrev eI, Lean-checked); (iii) every 6-dim subspace M_6 has E_0(M_6) containing M_7; if M_6 has a
+     deletable row or neutral column then dim E_0(M_6) >= 8 (the direction d is in E_0(M_6) but not in M_7). In particular a 7-dim space
+     with a neutral column c (or deletable row) has ALL its 6-dim subspaces of this kind -- never seen: every 6-dim level space found
+     (about 250 by now) has a deletable line and dim E_0 = 7 [numerical].
+     So: "every 6-dim 4x5 level space has a deletable row or neutral column and dim E_0 = 7"  ==>  no 7-dim 4x5 level space  ==>  a_r <= 2.
+     (iv) [numerical] extension search for dimension 7 through 45 known 3-,4-,5-dim spaces: 0 of 132 starts (ext7.py; N = 330 sample
+     points = number of monomials, see COMPUTE-ERRATA A5: to be redone with N >= 400 on the 24-core machine).
+     For a 9-dim L with a_r = 3: M_7 = L_r must in addition have dim Omega(M_7) >= 3 (criterion A) and e(M_7) <= 4 - z_r (5.1).
+ 7.4 What upstream L_gct_215 contains (read: statements only; proofs are 7.5k obfuscated lines). Case tree for an 8-dim L by u_i = dim of the
+     single-row part of row i and p_ij = rank of the projection to rows i, j:  u_i >= 4 (aG7: then dim <= 7);  2 <= u_i <= 3 (MidCase);
+     u_i = 1 (mI: produces a 7-dim level space with two equal columns; eI: none exists; the 7-dim lemmas vR, uQ, aAp, aGk, xQ, aEu, vU,
+     aEv, aDh are all UNDER the equal-columns hypothesis);  all u_i = 0 (HighPair: some p_ij = 7; vK: all p_ij <= 6).
+     General tool (aBu, pure linear algebra, any dimension d):  d + r_i <= p_ij + p_ik + u_l  for distinct rows i, j, k, l.
+     Nothing in the file classifies 6- or 7-dim spaces; at dim 6 the tree gives only the case distinction itself. With 5.1 the cases read,
+     for M = L_r (dim 6) inside a 9-dim L and a row i != r:  u_i = 4: FL;  u_i = 3: L_i is a (5 or 6, 1) space with line C m (SP8 closes
+     m two-column and the split non-isotropic case);  u_i = 2: L_i is a (5,2) space [or (6,2)], a_i = 1;  u_i <= 1 for all i: the
+     neutral-column / single-column side (transposed 5.1 for the column c).  Target (1) is NOT proved.
+ 7.5 EMPIRICAL LAW (EL) [numerical, reg2/autest.py: 55 rows of 29 six-dim spaces, 0 violations, equality in 47]:
+        for a 6-dim 4x5 level space M and every row i with single-row part e_i (x) U_i:   Omega(M) lies in A(U_i) := {s : U_i o s in U_i + C1}.
+     It is NOT a formal consequence of "e_i w^T in M": for (X;rho) in T_1(M), w in U_i, Y in M one has the exact identity
+        perm[pi_i(J+Y) ; w o rho] = sum_k perm[pi_i(J+Y) with row k replaced by X_k - rho - Y_k o rho ; w]      (rows k != i, r)
+     (column scaling of perm[Z ; w], which vanishes on pi_i(CJ + M) by 5.1), and the right side need not be a multiple of F: (EL) fails
+     for one 3-dim subspace of a line-spanned space (lemA_test.py; deviation 5e-2), while it holds to 1e-14 on all 6-dim spaces.
+     CONSEQUENCE IF (EL) HOLDS for L_r in regime a_r = 2 (Omega contains k^perp, dim 4): every single-row part U_i (i != r) of L is
+     0, C k, k^perp cap 1^perp or 1^perp, and k = e_a - e_b is a two-column vector as soon as some U_i != 0, 1^perp [A(Cw) has dim
+     6 - |supp w| or <= 2]. The last two cases are excluded (SP8(a), FL), so all single-row elements of L outside row r would be
+     multiples of e_i (e_a - e_b)^T with u_ra = u_rb on L^.  (Stated as a target; not proved.)
