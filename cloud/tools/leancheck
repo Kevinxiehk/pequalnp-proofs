@@ -1,0 +1,42 @@
+#!/bin/bash
+# Usage: leancheck FILE.lean [GAP.json]
+# Compiles one Lean file against the shared project build (Mathlib + PEqualNP.Defs),
+# at most two compiles at a time, with a 15 minute limit. Prints Lean's messages
+# (including the axioms the main theorem uses), then a format report.
+set -u
+FILE=$(readlink -f "$1")
+GAPJSON=${2:+$(readlink -f "$2")}
+PROJ=/home/claude/pequalnp-proofs/lean
+source /root/.elan/env
+cd "$PROJ" || exit 2
+run() {
+  local NAME TMPD rc
+  NAME=$(grep -oE '^theorem PEqualNP\.Outside\.L_[a-z0-9_]+' "$FILE" | head -1 | cut -d' ' -f2)
+  TMPD=$(mktemp -d)
+  cp "$FILE" "$TMPD/check.lean"
+  [ -n "$NAME" ] && printf '\n#print axioms %s\n' "$NAME" >> "$TMPD/check.lean"
+  timeout 900 lake env lean "$TMPD/check.lean" 2>&1 | grep -v 'designed for use with the module system'
+  rc=${PIPESTATUS[0]}
+  rm -rf "$TMPD"
+  echo "== lean exit code: $rc (0 means it compiled; check the axioms line above: only propext, Classical.choice, Quot.sound are allowed)"
+  echo "== theorem name found: ${NAME:-NONE}"
+  if [ -n "${GAPJSON:-}" ]; then
+    python3 -I -c "import json,sys; g=json.load(open(sys.argv[1]))['gap']; t=open(sys.argv[2],encoding='utf-8').read(); print('== statement verbatim:', ('theorem '+g['module']+' : '+g['statement']+' := by') in t, '(must be True)')" "$GAPJSON" "$FILE"
+  fi
+  echo "== guard: lines_starting_with_add_=$(grep -cE '^[[:space:]]*add_' "$FILE") namespaces_outside_L_gct_210=$(grep -E '^(namespace|end) ' "$FILE" | grep -vcE 'PEqualNP\.Outside\.L_gct_210') (both must be 0 for a final file; the project guard refuses helpers outside PEqualNP.Outside.L_gct_210 / ..._aux and any line beginning with add_)"
+  echo "== format: quotes=$(grep -c '"' "$FILE") hash=$(grep -c '#' "$FILE") import_after_header=$(awk 'f&&/import/{c++} !/^import/{f=1} END{print c+0}' "$FILE") banned=$(grep -cE 'sorry|axiom|native_decide|initialize|macro|syntax|notation|elab|attribute|instance|structure|inductive' "$FILE") comments=$(grep -cE -- '--|/-' "$FILE")  (all must be 0)"
+  return $rc
+}
+while true; do
+  for i in 1 2; do
+    exec {fd}>/tmp/leanslot$i.lock
+    if flock -n "$fd"; then
+      run
+      rc=$?
+      flock -u "$fd"
+      exit $rc
+    fi
+    exec {fd}>&-
+  done
+  sleep 3
+done

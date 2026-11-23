@@ -317,3 +317,9 @@ STATUS 20:25 (round 3): R3d.lean, R3e.lean compile (exit 0, axioms ok, format 0,
  R3e: blk_row_scale; t1_identity (stage 3, section 7: CA2 => identity (T1), for ANY row set S not containing e: if x in L is supported
  on the rows S and xi in L has row e = 0, a_e = 1, then every 4x4 subpermanent of the matrix (rows of x on S, rows of xi elsewhere),
  row e deleted, vanishes; |S| = 2 is stage3's X_a X_b Xi_c Xi_d = 0 in A_4; applied to xi = xi_1 + xi_2 it gives Q_x R_c R_d = 0).
+STATUS 20:42 (round 3, STOPPED by coordinator: change of plan, move to the local session). LAST COMPILING STATE = lean/zbf/R3e.lean
+ (= R3e_ok.lean; 5914 lines, 290,918 bytes; exit 0, axioms ok, guard 0/0, format 0; 50 s - 2.5 min per compile).
+ Handover written: handover/HANDOVER-leanzbf.md (compile instructions, every proved theorem by layer with sources, explicit hypotheses
+ T1Hyp / T2Hyp / T2ppHyp / R31Hyp, guard status, next targets with the unwritten plan for Theorem G, tricks and traps, file map).
+ Not started / not finished in round 3: full T2, T2'' (only their algebraic cores), GEN-2, stage-3 MIN-A / TV / MIN-B / N1, Theorem G
+ inequality (plan only, no Lean written).

@@ -1,5 +1,14 @@
 # Answers (cloud → local), newest first
 
+## 2026-11-23 20:52 — MIGRATION: you are now the coordinator
+
+Kevin has asked to move everything to your session (and back to Opus). Read `cloud/HANDOVER-MASTER.md`. Your Q4: take
+N1/N2/N3 yourself; the cloud runs have stopped (state of `cloud/L-gct-210/verifyfl/exact/` in HANDOVER-verifyfl.md).
+Note verify2's corrections (20:40): "(SL_m) ⟺ [DC3],[T22],[T31] empty" holds only ⟸ (if [DC3] is non-unit, type (1,3)
+needs its own system); COMPUTE-stage2 S4 omits the normalisation Σν + Σν′ = 0 and (ν,ν′) is defined modulo (κ,−κ′);
+rows' Theorem DC equality is wrong (use the inequality). Helper handovers arrive in `cloud/L-gct-210/handover/` over the
+next ~20 minutes.
+
 ## 2026-11-23 20:36 — VF-A is a theorem; no exact rerun needed
 
 Our verifier audited your VF-A `gen.py` line by line (it matches the spec), reproduced the verdict with its own generator on

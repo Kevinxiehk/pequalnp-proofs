@@ -1,0 +1,254 @@
+n1s_SL_p2147483629_k3_rho2_piv0_l0_ab_ab.ms case=(3, 2, (0,), 0, 'ab', 'ab') nvars=19 npolys=117 verdict=UNIT basis=1 time=3.04s
+n1s_SL_p2147483629_k3_rho2_piv0_l0_ab_z1.ms case=(3, 2, (0,), 0, 'ab', 'z1') nvars=17 npolys=116 verdict=UNIT basis=1 time=0.04s
+n1s_SL_p2147483629_k3_rho2_piv0_l0_ab_z2.ms case=(3, 2, (0,), 0, 'ab', 'z2') nvars=17 npolys=116 verdict=UNIT basis=1 time=0.04s
+n1s_SL_p2147483629_k3_rho2_piv0_l0_z1_ab.ms case=(3, 2, (0,), 0, 'z1', 'ab') nvars=17 npolys=116 verdict=UNIT basis=1 time=0.04s
+n1s_SL_p2147483629_k3_rho2_piv0_l0_z1_z1.ms case=(3, 2, (0,), 0, 'z1', 'z1') nvars=15 npolys=115 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho2_piv0_l0_z1_z2.ms case=(3, 2, (0,), 0, 'z1', 'z2') nvars=15 npolys=109 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho2_piv0_l0_z2_ab.ms case=(3, 2, (0,), 0, 'z2', 'ab') nvars=17 npolys=116 verdict=UNIT basis=1 time=0.04s
+n1s_SL_p2147483629_k3_rho2_piv0_l0_z2_z1.ms case=(3, 2, (0,), 0, 'z2', 'z1') nvars=15 npolys=109 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho2_piv0_l0_z2_z2.ms case=(3, 2, (0,), 0, 'z2', 'z2') nvars=15 npolys=115 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho2_piv1_l0_ab_ab.ms case=(3, 2, (1,), 0, 'ab', 'ab') nvars=18 npolys=117 verdict=UNIT basis=1 time=0.06s
+n1s_SL_p2147483629_k3_rho2_piv1_l0_ab_z1.ms case=(3, 2, (1,), 0, 'ab', 'z1') nvars=16 npolys=116 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho2_piv1_l0_ab_z2.ms case=(3, 2, (1,), 0, 'ab', 'z2') nvars=16 npolys=116 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho2_piv1_l0_z1_ab.ms case=(3, 2, (1,), 0, 'z1', 'ab') nvars=16 npolys=116 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho2_piv1_l0_z1_z1.ms case=(3, 2, (1,), 0, 'z1', 'z1') nvars=14 npolys=115 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho2_piv1_l0_z1_z2.ms case=(3, 2, (1,), 0, 'z1', 'z2') nvars=14 npolys=113 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho2_piv1_l0_z2_ab.ms case=(3, 2, (1,), 0, 'z2', 'ab') nvars=16 npolys=116 verdict=UNIT basis=1 time=0.04s
+n1s_SL_p2147483629_k3_rho2_piv1_l0_z2_z1.ms case=(3, 2, (1,), 0, 'z2', 'z1') nvars=14 npolys=113 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho2_piv1_l0_z2_z2.ms case=(3, 2, (1,), 0, 'z2', 'z2') nvars=14 npolys=115 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho2_piv2_l0_ab_ab.ms case=(3, 2, (2,), 0, 'ab', 'ab') nvars=17 npolys=117 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho2_piv2_l0_ab_z1.ms case=(3, 2, (2,), 0, 'ab', 'z1') nvars=15 npolys=116 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho2_piv2_l0_ab_z2.ms case=(3, 2, (2,), 0, 'ab', 'z2') nvars=15 npolys=116 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho2_piv2_l0_z1_ab.ms case=(3, 2, (2,), 0, 'z1', 'ab') nvars=15 npolys=116 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho2_piv2_l0_z1_z1.ms case=(3, 2, (2,), 0, 'z1', 'z1') nvars=13 npolys=115 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho2_piv2_l0_z1_z2.ms case=(3, 2, (2,), 0, 'z1', 'z2') nvars=13 npolys=113 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho2_piv2_l0_z2_ab.ms case=(3, 2, (2,), 0, 'z2', 'ab') nvars=15 npolys=116 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho2_piv2_l0_z2_z1.ms case=(3, 2, (2,), 0, 'z2', 'z1') nvars=13 npolys=113 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho2_piv2_l0_z2_z2.ms case=(3, 2, (2,), 0, 'z2', 'z2') nvars=13 npolys=115 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho2_piv3_l0_ab_ab.ms case=(3, 2, (3,), 0, 'ab', 'ab') nvars=16 npolys=105 verdict=UNIT basis=1 time=0.64s
+n1s_SL_p2147483629_k3_rho2_piv3_l0_ab_z1.ms case=(3, 2, (3,), 0, 'ab', 'z1') nvars=14 npolys=104 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho2_piv3_l0_ab_z2.ms case=(3, 2, (3,), 0, 'ab', 'z2') nvars=14 npolys=104 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho2_piv3_l0_z1_ab.ms case=(3, 2, (3,), 0, 'z1', 'ab') nvars=14 npolys=104 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho2_piv3_l0_z1_z1.ms case=(3, 2, (3,), 0, 'z1', 'z1') nvars=12 npolys=103 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho2_piv3_l0_z1_z2.ms case=(3, 2, (3,), 0, 'z1', 'z2') nvars=12 npolys=97 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho2_piv3_l0_z2_ab.ms case=(3, 2, (3,), 0, 'z2', 'ab') nvars=14 npolys=104 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho2_piv3_l0_z2_z1.ms case=(3, 2, (3,), 0, 'z2', 'z1') nvars=12 npolys=97 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho2_piv3_l0_z2_z2.ms case=(3, 2, (3,), 0, 'z2', 'z2') nvars=12 npolys=103 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho2_piv4_l0_ab_ab.ms case=(3, 2, (4,), 0, 'ab', 'ab') nvars=15 npolys=105 verdict=UNIT basis=1 time=0.04s
+n1s_SL_p2147483629_k3_rho2_piv4_l0_ab_z1.ms case=(3, 2, (4,), 0, 'ab', 'z1') nvars=13 npolys=104 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho2_piv4_l0_ab_z2.ms case=(3, 2, (4,), 0, 'ab', 'z2') nvars=13 npolys=104 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho2_piv4_l0_z1_ab.ms case=(3, 2, (4,), 0, 'z1', 'ab') nvars=13 npolys=104 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho2_piv4_l0_z1_z1.ms case=(3, 2, (4,), 0, 'z1', 'z1') nvars=11 npolys=102 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho2_piv4_l0_z1_z2.ms case=(3, 2, (4,), 0, 'z1', 'z2') nvars=11 npolys=96 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho2_piv4_l0_z2_ab.ms case=(3, 2, (4,), 0, 'z2', 'ab') nvars=13 npolys=104 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho2_piv4_l0_z2_z1.ms case=(3, 2, (4,), 0, 'z2', 'z1') nvars=11 npolys=96 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho2_piv4_l0_z2_z2.ms case=(3, 2, (4,), 0, 'z2', 'z2') nvars=11 npolys=102 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho2_piv5_l0_ab_ab.ms case=(3, 2, (5,), 0, 'ab', 'ab') nvars=14 npolys=105 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho2_piv5_l0_ab_z1.ms case=(3, 2, (5,), 0, 'ab', 'z1') nvars=12 npolys=104 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho2_piv5_l0_ab_z2.ms case=(3, 2, (5,), 0, 'ab', 'z2') nvars=12 npolys=104 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho2_piv5_l0_z1_ab.ms case=(3, 2, (5,), 0, 'z1', 'ab') nvars=12 npolys=104 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho2_piv5_l0_z1_z1.ms case=(3, 2, (5,), 0, 'z1', 'z1') nvars=10 npolys=102 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho2_piv5_l0_z1_z2.ms case=(3, 2, (5,), 0, 'z1', 'z2') nvars=10 npolys=96 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho2_piv5_l0_z2_ab.ms case=(3, 2, (5,), 0, 'z2', 'ab') nvars=12 npolys=104 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho2_piv5_l0_z2_z1.ms case=(3, 2, (5,), 0, 'z2', 'z1') nvars=10 npolys=96 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho2_piv5_l0_z2_z2.ms case=(3, 2, (5,), 0, 'z2', 'z2') nvars=10 npolys=102 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv01_l0_ab_ab.ms case=(3, 1, (0, 1), 0, 'ab', 'ab') nvars=17 npolys=108 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv01_l0_ab_z1.ms case=(3, 1, (0, 1), 0, 'ab', 'z1') nvars=15 npolys=107 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv01_l0_ab_z2.ms case=(3, 1, (0, 1), 0, 'ab', 'z2') nvars=15 npolys=107 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv01_l0_z1_ab.ms case=(3, 1, (0, 1), 0, 'z1', 'ab') nvars=15 npolys=107 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv01_l0_z1_z1.ms case=(3, 1, (0, 1), 0, 'z1', 'z1') nvars=13 npolys=106 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv01_l0_z1_z2.ms case=(3, 1, (0, 1), 0, 'z1', 'z2') nvars=13 npolys=100 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv01_l0_z2_ab.ms case=(3, 1, (0, 1), 0, 'z2', 'ab') nvars=15 npolys=107 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv01_l0_z2_z1.ms case=(3, 1, (0, 1), 0, 'z2', 'z1') nvars=13 npolys=100 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv01_l0_z2_z2.ms case=(3, 1, (0, 1), 0, 'z2', 'z2') nvars=13 npolys=106 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv01_l1_x_ab.ms case=(3, 1, (0, 1), 1, '-', 'ab') nvars=14 npolys=79 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv01_l1_x_z1.ms case=(3, 1, (0, 1), 1, '-', 'z1') nvars=12 npolys=78 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv01_l1_x_z2.ms case=(3, 1, (0, 1), 1, '-', 'z2') nvars=12 npolys=78 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv02_l0_ab_ab.ms case=(3, 1, (0, 2), 0, 'ab', 'ab') nvars=16 npolys=108 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv02_l0_ab_z1.ms case=(3, 1, (0, 2), 0, 'ab', 'z1') nvars=14 npolys=107 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv02_l0_ab_z2.ms case=(3, 1, (0, 2), 0, 'ab', 'z2') nvars=14 npolys=107 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv02_l0_z1_ab.ms case=(3, 1, (0, 2), 0, 'z1', 'ab') nvars=14 npolys=107 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv02_l0_z1_z1.ms case=(3, 1, (0, 2), 0, 'z1', 'z1') nvars=12 npolys=106 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv02_l0_z1_z2.ms case=(3, 1, (0, 2), 0, 'z1', 'z2') nvars=12 npolys=100 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv02_l0_z2_ab.ms case=(3, 1, (0, 2), 0, 'z2', 'ab') nvars=14 npolys=107 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv02_l0_z2_z1.ms case=(3, 1, (0, 2), 0, 'z2', 'z1') nvars=12 npolys=100 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv02_l0_z2_z2.ms case=(3, 1, (0, 2), 0, 'z2', 'z2') nvars=12 npolys=106 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv02_l1_x_ab.ms case=(3, 1, (0, 2), 1, '-', 'ab') nvars=13 npolys=79 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv02_l1_x_z1.ms case=(3, 1, (0, 2), 1, '-', 'z1') nvars=11 npolys=78 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv02_l1_x_z2.ms case=(3, 1, (0, 2), 1, '-', 'z2') nvars=11 npolys=78 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv03_l0_ab_ab.ms case=(3, 1, (0, 3), 0, 'ab', 'ab') nvars=15 npolys=98 verdict=UNIT basis=1 time=0.08s
+n1s_SL_p2147483629_k3_rho1_piv03_l0_ab_z1.ms case=(3, 1, (0, 3), 0, 'ab', 'z1') nvars=13 npolys=97 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv03_l0_ab_z2.ms case=(3, 1, (0, 3), 0, 'ab', 'z2') nvars=13 npolys=97 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv03_l0_z1_ab.ms case=(3, 1, (0, 3), 0, 'z1', 'ab') nvars=13 npolys=97 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv03_l0_z1_z1.ms case=(3, 1, (0, 3), 0, 'z1', 'z1') nvars=11 npolys=91 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv03_l0_z1_z2.ms case=(3, 1, (0, 3), 0, 'z1', 'z2') nvars=11 npolys=83 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv03_l0_z2_ab.ms case=(3, 1, (0, 3), 0, 'z2', 'ab') nvars=13 npolys=97 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv03_l0_z2_z1.ms case=(3, 1, (0, 3), 0, 'z2', 'z1') nvars=11 npolys=83 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv03_l0_z2_z2.ms case=(3, 1, (0, 3), 0, 'z2', 'z2') nvars=11 npolys=91 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv03_l1_x_ab.ms case=(3, 1, (0, 3), 1, '-', 'ab') nvars=12 npolys=72 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv03_l1_x_z1.ms case=(3, 1, (0, 3), 1, '-', 'z1') nvars=10 npolys=70 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv03_l1_x_z2.ms case=(3, 1, (0, 3), 1, '-', 'z2') nvars=10 npolys=70 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv04_l0_ab_ab.ms case=(3, 1, (0, 4), 0, 'ab', 'ab') nvars=14 npolys=98 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv04_l0_ab_z1.ms case=(3, 1, (0, 4), 0, 'ab', 'z1') nvars=12 npolys=96 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv04_l0_ab_z2.ms case=(3, 1, (0, 4), 0, 'ab', 'z2') nvars=12 npolys=96 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv04_l0_z1_ab.ms case=(3, 1, (0, 4), 0, 'z1', 'ab') nvars=12 npolys=96 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv04_l0_z1_z1.ms case=(3, 1, (0, 4), 0, 'z1', 'z1') nvars=10 npolys=91 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv04_l0_z1_z2.ms case=(3, 1, (0, 4), 0, 'z1', 'z2') nvars=10 npolys=85 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv04_l0_z2_ab.ms case=(3, 1, (0, 4), 0, 'z2', 'ab') nvars=12 npolys=96 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv04_l0_z2_z1.ms case=(3, 1, (0, 4), 0, 'z2', 'z1') nvars=10 npolys=85 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv04_l0_z2_z2.ms case=(3, 1, (0, 4), 0, 'z2', 'z2') nvars=10 npolys=91 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv04_l1_x_ab.ms case=(3, 1, (0, 4), 1, '-', 'ab') nvars=11 npolys=72 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv04_l1_x_z1.ms case=(3, 1, (0, 4), 1, '-', 'z1') nvars=9 npolys=70 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv04_l1_x_z2.ms case=(3, 1, (0, 4), 1, '-', 'z2') nvars=9 npolys=70 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv05_l0_ab_ab.ms case=(3, 1, (0, 5), 0, 'ab', 'ab') nvars=13 npolys=98 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv05_l0_ab_z1.ms case=(3, 1, (0, 5), 0, 'ab', 'z1') nvars=11 npolys=96 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv05_l0_ab_z2.ms case=(3, 1, (0, 5), 0, 'ab', 'z2') nvars=11 npolys=96 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv05_l0_z1_ab.ms case=(3, 1, (0, 5), 0, 'z1', 'ab') nvars=11 npolys=96 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv05_l0_z1_z1.ms case=(3, 1, (0, 5), 0, 'z1', 'z1') nvars=9 npolys=91 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv05_l0_z1_z2.ms case=(3, 1, (0, 5), 0, 'z1', 'z2') nvars=9 npolys=85 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv05_l0_z2_ab.ms case=(3, 1, (0, 5), 0, 'z2', 'ab') nvars=11 npolys=96 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv05_l0_z2_z1.ms case=(3, 1, (0, 5), 0, 'z2', 'z1') nvars=9 npolys=85 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv05_l0_z2_z2.ms case=(3, 1, (0, 5), 0, 'z2', 'z2') nvars=9 npolys=91 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv05_l1_x_ab.ms case=(3, 1, (0, 5), 1, '-', 'ab') nvars=10 npolys=72 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv05_l1_x_z1.ms case=(3, 1, (0, 5), 1, '-', 'z1') nvars=8 npolys=70 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv05_l1_x_z2.ms case=(3, 1, (0, 5), 1, '-', 'z2') nvars=8 npolys=70 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv12_l0_ab_ab.ms case=(3, 1, (1, 2), 0, 'ab', 'ab') nvars=15 npolys=108 verdict=UNIT basis=1 time=0.04s
+n1s_SL_p2147483629_k3_rho1_piv12_l0_ab_z1.ms case=(3, 1, (1, 2), 0, 'ab', 'z1') nvars=13 npolys=107 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv12_l0_ab_z2.ms case=(3, 1, (1, 2), 0, 'ab', 'z2') nvars=13 npolys=107 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv12_l0_z1_ab.ms case=(3, 1, (1, 2), 0, 'z1', 'ab') nvars=13 npolys=107 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv12_l0_z1_z1.ms case=(3, 1, (1, 2), 0, 'z1', 'z1') nvars=11 npolys=106 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv12_l0_z1_z2.ms case=(3, 1, (1, 2), 0, 'z1', 'z2') nvars=11 npolys=100 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv12_l0_z2_ab.ms case=(3, 1, (1, 2), 0, 'z2', 'ab') nvars=13 npolys=107 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv12_l0_z2_z1.ms case=(3, 1, (1, 2), 0, 'z2', 'z1') nvars=11 npolys=100 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv12_l0_z2_z2.ms case=(3, 1, (1, 2), 0, 'z2', 'z2') nvars=11 npolys=106 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv12_l1_x_ab.ms case=(3, 1, (1, 2), 1, '-', 'ab') nvars=12 npolys=79 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv12_l1_x_z1.ms case=(3, 1, (1, 2), 1, '-', 'z1') nvars=10 npolys=78 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv12_l1_x_z2.ms case=(3, 1, (1, 2), 1, '-', 'z2') nvars=10 npolys=78 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv13_l0_ab_ab.ms case=(3, 1, (1, 3), 0, 'ab', 'ab') nvars=14 npolys=98 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv13_l0_ab_z1.ms case=(3, 1, (1, 3), 0, 'ab', 'z1') nvars=12 npolys=96 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv13_l0_ab_z2.ms case=(3, 1, (1, 3), 0, 'ab', 'z2') nvars=12 npolys=96 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv13_l0_z1_ab.ms case=(3, 1, (1, 3), 0, 'z1', 'ab') nvars=12 npolys=96 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv13_l0_z1_z1.ms case=(3, 1, (1, 3), 0, 'z1', 'z1') nvars=10 npolys=91 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv13_l0_z1_z2.ms case=(3, 1, (1, 3), 0, 'z1', 'z2') nvars=10 npolys=83 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv13_l0_z2_ab.ms case=(3, 1, (1, 3), 0, 'z2', 'ab') nvars=12 npolys=96 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv13_l0_z2_z1.ms case=(3, 1, (1, 3), 0, 'z2', 'z1') nvars=10 npolys=83 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv13_l0_z2_z2.ms case=(3, 1, (1, 3), 0, 'z2', 'z2') nvars=10 npolys=91 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv13_l1_x_ab.ms case=(3, 1, (1, 3), 1, '-', 'ab') nvars=11 npolys=72 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv13_l1_x_z1.ms case=(3, 1, (1, 3), 1, '-', 'z1') nvars=9 npolys=70 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv13_l1_x_z2.ms case=(3, 1, (1, 3), 1, '-', 'z2') nvars=9 npolys=70 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv14_l0_ab_ab.ms case=(3, 1, (1, 4), 0, 'ab', 'ab') nvars=13 npolys=98 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv14_l0_ab_z1.ms case=(3, 1, (1, 4), 0, 'ab', 'z1') nvars=11 npolys=96 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv14_l0_ab_z2.ms case=(3, 1, (1, 4), 0, 'ab', 'z2') nvars=11 npolys=96 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv14_l0_z1_ab.ms case=(3, 1, (1, 4), 0, 'z1', 'ab') nvars=11 npolys=96 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv14_l0_z1_z1.ms case=(3, 1, (1, 4), 0, 'z1', 'z1') nvars=9 npolys=91 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv14_l0_z1_z2.ms case=(3, 1, (1, 4), 0, 'z1', 'z2') nvars=9 npolys=85 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv14_l0_z2_ab.ms case=(3, 1, (1, 4), 0, 'z2', 'ab') nvars=11 npolys=96 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv14_l0_z2_z1.ms case=(3, 1, (1, 4), 0, 'z2', 'z1') nvars=9 npolys=85 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv14_l0_z2_z2.ms case=(3, 1, (1, 4), 0, 'z2', 'z2') nvars=9 npolys=91 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv14_l1_x_ab.ms case=(3, 1, (1, 4), 1, '-', 'ab') nvars=10 npolys=72 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv14_l1_x_z1.ms case=(3, 1, (1, 4), 1, '-', 'z1') nvars=8 npolys=70 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv14_l1_x_z2.ms case=(3, 1, (1, 4), 1, '-', 'z2') nvars=8 npolys=70 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv15_l0_ab_ab.ms case=(3, 1, (1, 5), 0, 'ab', 'ab') nvars=12 npolys=98 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv15_l0_ab_z1.ms case=(3, 1, (1, 5), 0, 'ab', 'z1') nvars=10 npolys=96 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv15_l0_ab_z2.ms case=(3, 1, (1, 5), 0, 'ab', 'z2') nvars=10 npolys=96 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv15_l0_z1_ab.ms case=(3, 1, (1, 5), 0, 'z1', 'ab') nvars=10 npolys=96 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv15_l0_z1_z1.ms case=(3, 1, (1, 5), 0, 'z1', 'z1') nvars=8 npolys=91 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv15_l0_z1_z2.ms case=(3, 1, (1, 5), 0, 'z1', 'z2') nvars=8 npolys=85 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv15_l0_z2_ab.ms case=(3, 1, (1, 5), 0, 'z2', 'ab') nvars=10 npolys=96 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv15_l0_z2_z1.ms case=(3, 1, (1, 5), 0, 'z2', 'z1') nvars=8 npolys=85 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv15_l0_z2_z2.ms case=(3, 1, (1, 5), 0, 'z2', 'z2') nvars=8 npolys=91 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv15_l1_x_ab.ms case=(3, 1, (1, 5), 1, '-', 'ab') nvars=9 npolys=72 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv15_l1_x_z1.ms case=(3, 1, (1, 5), 1, '-', 'z1') nvars=7 npolys=70 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv15_l1_x_z2.ms case=(3, 1, (1, 5), 1, '-', 'z2') nvars=7 npolys=70 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv23_l0_ab_ab.ms case=(3, 1, (2, 3), 0, 'ab', 'ab') nvars=13 npolys=98 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv23_l0_ab_z1.ms case=(3, 1, (2, 3), 0, 'ab', 'z1') nvars=11 npolys=96 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv23_l0_ab_z2.ms case=(3, 1, (2, 3), 0, 'ab', 'z2') nvars=11 npolys=96 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv23_l0_z1_ab.ms case=(3, 1, (2, 3), 0, 'z1', 'ab') nvars=11 npolys=96 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv23_l0_z1_z1.ms case=(3, 1, (2, 3), 0, 'z1', 'z1') nvars=9 npolys=91 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv23_l0_z1_z2.ms case=(3, 1, (2, 3), 0, 'z1', 'z2') nvars=9 npolys=83 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv23_l0_z2_ab.ms case=(3, 1, (2, 3), 0, 'z2', 'ab') nvars=11 npolys=96 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv23_l0_z2_z1.ms case=(3, 1, (2, 3), 0, 'z2', 'z1') nvars=9 npolys=83 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv23_l0_z2_z2.ms case=(3, 1, (2, 3), 0, 'z2', 'z2') nvars=9 npolys=91 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv23_l1_x_ab.ms case=(3, 1, (2, 3), 1, '-', 'ab') nvars=10 npolys=72 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv23_l1_x_z1.ms case=(3, 1, (2, 3), 1, '-', 'z1') nvars=8 npolys=70 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv23_l1_x_z2.ms case=(3, 1, (2, 3), 1, '-', 'z2') nvars=8 npolys=70 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv24_l0_ab_ab.ms case=(3, 1, (2, 4), 0, 'ab', 'ab') nvars=12 npolys=98 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv24_l0_ab_z1.ms case=(3, 1, (2, 4), 0, 'ab', 'z1') nvars=10 npolys=96 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv24_l0_ab_z2.ms case=(3, 1, (2, 4), 0, 'ab', 'z2') nvars=10 npolys=96 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv24_l0_z1_ab.ms case=(3, 1, (2, 4), 0, 'z1', 'ab') nvars=10 npolys=96 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv24_l0_z1_z1.ms case=(3, 1, (2, 4), 0, 'z1', 'z1') nvars=8 npolys=91 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv24_l0_z1_z2.ms case=(3, 1, (2, 4), 0, 'z1', 'z2') nvars=8 npolys=85 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv24_l0_z2_ab.ms case=(3, 1, (2, 4), 0, 'z2', 'ab') nvars=10 npolys=96 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv24_l0_z2_z1.ms case=(3, 1, (2, 4), 0, 'z2', 'z1') nvars=8 npolys=85 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv24_l0_z2_z2.ms case=(3, 1, (2, 4), 0, 'z2', 'z2') nvars=8 npolys=91 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv24_l1_x_ab.ms case=(3, 1, (2, 4), 1, '-', 'ab') nvars=9 npolys=72 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv24_l1_x_z1.ms case=(3, 1, (2, 4), 1, '-', 'z1') nvars=7 npolys=70 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv24_l1_x_z2.ms case=(3, 1, (2, 4), 1, '-', 'z2') nvars=7 npolys=70 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv25_l0_ab_ab.ms case=(3, 1, (2, 5), 0, 'ab', 'ab') nvars=11 npolys=94 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv25_l0_ab_z1.ms case=(3, 1, (2, 5), 0, 'ab', 'z1') nvars=9 npolys=93 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv25_l0_ab_z2.ms case=(3, 1, (2, 5), 0, 'ab', 'z2') nvars=9 npolys=93 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv25_l0_z1_ab.ms case=(3, 1, (2, 5), 0, 'z1', 'ab') nvars=9 npolys=93 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv25_l0_z1_z1.ms case=(3, 1, (2, 5), 0, 'z1', 'z1') nvars=7 npolys=89 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv25_l0_z1_z2.ms case=(3, 1, (2, 5), 0, 'z1', 'z2') nvars=7 npolys=83 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv25_l0_z2_ab.ms case=(3, 1, (2, 5), 0, 'z2', 'ab') nvars=9 npolys=93 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv25_l0_z2_z1.ms case=(3, 1, (2, 5), 0, 'z2', 'z1') nvars=7 npolys=83 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv25_l0_z2_z2.ms case=(3, 1, (2, 5), 0, 'z2', 'z2') nvars=7 npolys=89 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv25_l1_x_ab.ms case=(3, 1, (2, 5), 1, '-', 'ab') nvars=8 npolys=69 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv25_l1_x_z1.ms case=(3, 1, (2, 5), 1, '-', 'z1') nvars=6 npolys=68 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv25_l1_x_z2.ms case=(3, 1, (2, 5), 1, '-', 'z2') nvars=6 npolys=68 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv34_l0_ab_ab.ms case=(3, 1, (3, 4), 0, 'ab', 'ab') nvars=11 npolys=74 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv34_l0_ab_z1.ms case=(3, 1, (3, 4), 0, 'ab', 'z1') nvars=9 npolys=73 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv34_l0_ab_z2.ms case=(3, 1, (3, 4), 0, 'ab', 'z2') nvars=9 npolys=73 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv34_l0_z1_ab.ms case=(3, 1, (3, 4), 0, 'z1', 'ab') nvars=9 npolys=73 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv34_l0_z1_z1.ms case=(3, 1, (3, 4), 0, 'z1', 'z1') nvars=7 npolys=71 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv34_l0_z1_z2.ms case=(3, 1, (3, 4), 0, 'z1', 'z2') nvars=7 npolys=65 verdict=UNIT basis=1 time=0.07s
+n1s_SL_p2147483629_k3_rho1_piv34_l0_z2_ab.ms case=(3, 1, (3, 4), 0, 'z2', 'ab') nvars=9 npolys=73 verdict=UNIT basis=1 time=0.03s
+n1s_SL_p2147483629_k3_rho1_piv34_l0_z2_z1.ms case=(3, 1, (3, 4), 0, 'z2', 'z1') nvars=7 npolys=65 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv34_l0_z2_z2.ms case=(3, 1, (3, 4), 0, 'z2', 'z2') nvars=7 npolys=71 verdict=UNIT basis=1 time=0.07s
+n1s_SL_p2147483629_k3_rho1_piv34_l1_x_ab.ms case=(3, 1, (3, 4), 1, '-', 'ab') nvars=8 npolys=55 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv34_l1_x_z1.ms case=(3, 1, (3, 4), 1, '-', 'z1') nvars=6 npolys=54 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho1_piv34_l1_x_z2.ms case=(3, 1, (3, 4), 1, '-', 'z2') nvars=6 npolys=54 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho1_piv35_l0_ab_ab.ms case=(3, 1, (3, 5), 0, 'ab', 'ab') nvars=10 npolys=74 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv35_l0_ab_z1.ms case=(3, 1, (3, 5), 0, 'ab', 'z1') nvars=8 npolys=73 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv35_l0_ab_z2.ms case=(3, 1, (3, 5), 0, 'ab', 'z2') nvars=8 npolys=73 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv35_l0_z1_ab.ms case=(3, 1, (3, 5), 0, 'z1', 'ab') nvars=8 npolys=73 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv35_l0_z1_z1.ms case=(3, 1, (3, 5), 0, 'z1', 'z1') nvars=6 npolys=71 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv35_l0_z1_z2.ms case=(3, 1, (3, 5), 0, 'z1', 'z2') nvars=6 npolys=65 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv35_l0_z2_ab.ms case=(3, 1, (3, 5), 0, 'z2', 'ab') nvars=8 npolys=73 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv35_l0_z2_z1.ms case=(3, 1, (3, 5), 0, 'z2', 'z1') nvars=6 npolys=65 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv35_l0_z2_z2.ms case=(3, 1, (3, 5), 0, 'z2', 'z2') nvars=6 npolys=71 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv35_l1_x_ab.ms case=(3, 1, (3, 5), 1, '-', 'ab') nvars=7 npolys=55 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv35_l1_x_z1.ms case=(3, 1, (3, 5), 1, '-', 'z1') nvars=5 npolys=54 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv35_l1_x_z2.ms case=(3, 1, (3, 5), 1, '-', 'z2') nvars=5 npolys=54 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv45_l0_ab_ab.ms case=(3, 1, (4, 5), 0, 'ab', 'ab') nvars=9 npolys=74 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv45_l0_ab_z1.ms case=(3, 1, (4, 5), 0, 'ab', 'z1') nvars=7 npolys=73 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv45_l0_ab_z2.ms case=(3, 1, (4, 5), 0, 'ab', 'z2') nvars=7 npolys=73 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv45_l0_z1_ab.ms case=(3, 1, (4, 5), 0, 'z1', 'ab') nvars=7 npolys=73 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv45_l0_z1_z1.ms case=(3, 1, (4, 5), 0, 'z1', 'z1') nvars=5 npolys=69 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv45_l0_z1_z2.ms case=(3, 1, (4, 5), 0, 'z1', 'z2') nvars=5 npolys=63 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv45_l0_z2_ab.ms case=(3, 1, (4, 5), 0, 'z2', 'ab') nvars=7 npolys=73 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv45_l0_z2_z1.ms case=(3, 1, (4, 5), 0, 'z2', 'z1') nvars=5 npolys=63 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv45_l0_z2_z2.ms case=(3, 1, (4, 5), 0, 'z2', 'z2') nvars=5 npolys=69 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv45_l1_x_ab.ms case=(3, 1, (4, 5), 1, '-', 'ab') nvars=6 npolys=55 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv45_l1_x_z1.ms case=(3, 1, (4, 5), 1, '-', 'z1') nvars=4 npolys=54 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho1_piv45_l1_x_z2.ms case=(3, 1, (4, 5), 1, '-', 'z2') nvars=4 npolys=54 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho0_piv012_l0_x_x.ms case=(3, 0, (0, 1, 2), 0, '-', '-') nvars=9 npolys=50 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho0_piv013_l0_x_x.ms case=(3, 0, (0, 1, 3), 0, '-', '-') nvars=8 npolys=46 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho0_piv014_l0_x_x.ms case=(3, 0, (0, 1, 4), 0, '-', '-') nvars=7 npolys=46 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho0_piv015_l0_x_x.ms case=(3, 0, (0, 1, 5), 0, '-', '-') nvars=6 npolys=46 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho0_piv023_l0_x_x.ms case=(3, 0, (0, 2, 3), 0, '-', '-') nvars=7 npolys=46 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho0_piv024_l0_x_x.ms case=(3, 0, (0, 2, 4), 0, '-', '-') nvars=6 npolys=46 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho0_piv025_l0_x_x.ms case=(3, 0, (0, 2, 5), 0, '-', '-') nvars=5 npolys=44 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho0_piv034_l0_x_x.ms case=(3, 0, (0, 3, 4), 0, '-', '-') nvars=5 npolys=36 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho0_piv035_l0_x_x.ms case=(3, 0, (0, 3, 5), 0, '-', '-') nvars=4 npolys=36 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho0_piv045_l0_x_x.ms case=(3, 0, (0, 4, 5), 0, '-', '-') nvars=3 npolys=36 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho0_piv123_l0_x_x.ms case=(3, 0, (1, 2, 3), 0, '-', '-') nvars=6 npolys=46 verdict=UNIT basis=1 time=0.02s
+n1s_SL_p2147483629_k3_rho0_piv124_l0_x_x.ms case=(3, 0, (1, 2, 4), 0, '-', '-') nvars=5 npolys=46 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho0_piv125_l0_x_x.ms case=(3, 0, (1, 2, 5), 0, '-', '-') nvars=4 npolys=44 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho0_piv134_l0_x_x.ms case=(3, 0, (1, 3, 4), 0, '-', '-') nvars=4 npolys=36 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho0_piv135_l0_x_x.ms case=(3, 0, (1, 3, 5), 0, '-', '-') nvars=3 npolys=36 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho0_piv145_l0_x_x.ms case=(3, 0, (1, 4, 5), 0, '-', '-') nvars=2 npolys=36 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho0_piv234_l0_x_x.ms case=(3, 0, (2, 3, 4), 0, '-', '-') nvars=3 npolys=34 verdict=UNIT basis=1 time=0.01s
+n1s_SL_p2147483629_k3_rho0_piv235_l0_x_x.ms case=(3, 0, (2, 3, 5), 0, '-', '-') nvars=2 npolys=34 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho0_piv245_l0_x_x.ms case=(3, 0, (2, 4, 5), 0, '-', '-') nvars=1 npolys=34 verdict=UNIT(constant-equation)
+n1s_SL_p2147483629_k3_rho0_piv345_l0_x_x.ms case=(3, 0, (3, 4, 5), 0, '-', '-') nvars=0 npolys=18 verdict=UNIT(constant-equation)

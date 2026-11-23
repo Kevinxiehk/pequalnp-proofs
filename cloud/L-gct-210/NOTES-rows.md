@@ -1,4 +1,9 @@
 # NOTES-rows (role rows; start 14:17, budget 90 min -> ends ~15:47)
+## RESULT, ROUND 6 (rows; 20:04-20:35, stopped early) -- no new theorem; X4 reduced to strongly level PLANES and queued (R6-1); handover written
+ Details: section R6.  [rigorous] reduction of "principal K lives on <= 3 columns" to (PL) "a strongly level plane with injective row
+ sums has <= 3 nonzero columns" (R6.1); row-wise form of strongly level (R6.2); erratum to R5.3(b) and remarks (R6.3).
+ [numerical] (PL) holds in 169/169 planes; single strongly level matrices with 4 and even 5 nonzero columns EXIST, so the statement is
+ about planes, not matrices.  Not done: targets (2)-(4).  Everything a successor needs: handover/HANDOVER-rows.md.
 ## RESULT, ROUND 5 (rows; final 20:00) -- (NC') NOT proved; (NCOL_1) PROVED in the principal case (Theorem NCOL-P3), exact 4x4 statement found
  Details and proofs: section R5 (R5.1 - R5.13).  Heavy-computation requests: COMPUTE-rows.md (H1-H6, exact systems X1-X4).
  V1 [RIGOROUS, R5.9] THEOREM NCOL-P3: let L' be a 4 x 5 level space with defect line C m (ANY m, isotropic allowed), K in L' a 3-dim strongly
@@ -967,3 +972,30 @@ STATUS 19:59: R5.12 (R-LAW) written.
 STATUS 20:00: R5.13 written.  Round 5 final: see RESULT ROUND 5 at the top.
 STATUS 20:04 (ROUND 6 started 20:04, about 2 h -> ~22:04; targets: (1) principal K on <= 3 columns by hand, (2) non-principal (4,1) and (5,1) strata, (3) (DC-COST), (4) (R-LAW)).
 STATUS 20:22: target (1) by hand not finished; reduction to strongly level PLANES (claims (A),(B)) + generator rows/gb/x4gen.py written, queued in COMPUTE-rows.md "NEW (round 6)"; local Groebner runs of A4 too slow (>100 s). Numerics: planes with injective row sums: <= 3 columns in 169/169; single strongly level matrices with 4 columns exist.
+## Section R6 (round 6, 20:04 - 20:35; stopped early on the coordinator's instruction; nothing here is verified by verify2)
+ R6.1 REDUCTION OF X4 TO PLANES [rigorous]. If a principal K (3-dim strongly level, s(K) = V) has >= 4 nonzero columns, a generic 2-dim
+   subspace is a strongly level plane with the same nonzero columns and injective row sums. So "K lives on <= 3 columns" follows from
+        (PL)  a strongly level plane {s h + t h'} with s(h), s(h') independent has at most three nonzero columns.
+   The single-matrix analogue is FALSE [numerical]: strongly level matrices with 4 nonzero columns are common (rows/sle_d1_s*.npy) and
+   one with 5 nonzero columns exists (rows/sle5_s1005.npy, error 2e-16).  Evidence for (PL) [numerical]: 45 + 124 strongly level planes
+   with injective row sums, all on 2 or 3 columns (types (2,2), (1,1,1), (2,2,1)); 128 strongly level 3-spaces with one column forced
+   to zero, all on <= 3 columns; the only plane on 4 columns found has row-sum rank 1.  Exact formulation and generator: COMPUTE-rows.md
+   "NEW (round 6)", rows/gb/x4gen.py (cases B, C; calibrations A4, B3).  Local Groebner runs of the calibration A4 did not finish in 100 s.
+ R6.2 ROW-WISE FORM OF "STRONGLY LEVEL" [rigorous, derived by hand; (S4) NOT yet checked numerically].  For a column-centred 4 x 5 matrix h
+   with rows rho_i, columns h_a, Gram g_ab = <h_a,h_b>, rho_i^(j) := row i without entry j:   P_2 = -sum_i e_2(rho_i), P_3 = 2 sum_i e_3(rho_i).
+   h strongly level  <=>  column sums 0 and for every j:
+        sum_i e_2(rho_i^(j)) = 0,   sum_i e_3(rho_i^(j)) = 0,   6 sum_i prod_{a != j} h_ia = g_ab g_cd + g_ac g_bd + g_ad g_bc  ({a,b,c,d} = [5] - j);
+   equivalently (S2_j) <s - h_j, h_j> = 0, (S3_j) sum_i h_ij e_2(rho_i^(j)) = 0, (S4_j) 6 sum_i h_ij e_3(rho_i^(j)) = sum_{a != j} g_aj^2.
+   (perm_4 of four sum-zero vectors = sum of the three pairings - 6 sum_i x_i y_i z_w w_i.)  Consequences: a principal K on three columns
+   a,b,c  <=>  B_a + B_b + B_c = 1 and sum_i (h_a h_b h_c)_i = 0 on K; its columns are pairwise orthogonal.  On four columns the Gram
+   matrix has g_12 = g_34, g_13 = g_24, g_14 = g_23 with sum 0 (seen in all 4-column examples) and all four triple products vanish.
+   In Walsh coordinates the triple product is 4 perm_3 of the coordinate vectors.
+ R6.3 REMARKS [rigorous unless said]. (i) ERRATUM to R5.3(b): "(NCOL_3) + (DI_4x4) => no (7,3)" also needs no (5,1), no (6,2) (C-UP uses
+   the induction hypothesis).  (ii) If ker c is 3-dimensional then dim L' = 3 + rank c <= e + 3: spaces with a 3-dim column-centred part
+   satisfy (DI_5) trivially; the problem lives in ker c of dim >= 4.  (iii) (PRIN): "every extremal (e+3,e) space with rank c = e has a
+   strongly level ker c" would exclude every (e+4,e) space with rank c = e (its 4-dim ker c would be strongly level, against SL); this is
+   verifyfl's (K4) argument for all e.  [numerical] (PRIN) holds in 90 of the 95 extremal examples with rank c = e ... but FAILS for
+   rows/clm_p4_d5_defect2_s9.npy (a (5,2) space with rank c = 2 and e(ker c) = 1).  (iv) Non-principal (4,1) with ker c = K strongly level
+   of row-sum rank q < 3: Theorem DC forces rank s(L') = q and L'_dc = K_dc; for K = chi (x) C^S (zeros' R3, chi = (1,i,-1,-i), |S| = 3)
+   and m not two-column the quadratic conditions give <chi, z_j> = 0 for every column of the row-centred generator Z [by hand, unchecked].
+STATUS 20:33 (round 6 closed): handover written to handover/HANDOVER-rows.md.

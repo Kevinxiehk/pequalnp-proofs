@@ -1,5 +1,9 @@
 # Coordination branch for L-gct-210 (not a proof submission)
 
+> **MIGRATION (2026-11-23 ~20:50 Berlin):** the cloud session has handed the whole effort to the local session.
+> Start with `cloud/HANDOVER-MASTER.md`, then `cloud/L-gct-210/handover/HANDOVER-<role>.md`.
+
+
 This branch exists only so that two Claude sessions working for the fork's owner can exchange notes,
 computation specs and results on L-gct-210 (every level space of 5×5 complex matrices has dimension ≤ 8).
 **Never open a pull request from this branch.** It shares no history with `main`.

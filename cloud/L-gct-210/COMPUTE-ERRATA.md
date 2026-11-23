@@ -249,8 +249,10 @@ own_gen_B.py; outputs in vf/run and vf/runB.
    empty at the same prime with reductions that are valid in characteristic p (the hand lemmas (F2)-(F4), Lemma N, "7 pairs" use only
    nondegenerate forms and Newton's identities: fine for p > 5, but each use should be named), or the typed systems are run over Q.
  N1 calibrations (type I, type II, N_V; Lemma NP for v_4 = v_5 = 0), N2 calibration (Zs = chi_1 (1,1,-2,0,0): SL3-RED case (i)),
-   N3 calibrations (Props I-ALL, II-ALL), N4: consistent with the hand results, all of which I have verified (round 5 and round 6:
-   Lemma 3C, NP, T, Props I', V, I-ALL, II-ALL, SL3-RED). In N4, "extension variety of chi_1 (x) Lam_M = exactly one point": correct
+   N3 calibrations (Props I-ALL, II-ALL), N4: consistent with the hand results. VERIFIED by me (round 5): Lemma 3C, NP, T, Props I', V,
+   SL3-RED. NOT YET VERIFIED by me: Props I-ALL and II-ALL (NOTES-verifyfl R5.9; text read, no step re-derived when the round was
+   stopped at 20:30) -- so the N3 calibrations rest on verifyfl's own proof and numerics only; if an N3 calibration run disagrees,
+   suspect R5.9 first. In N4, "extension variety of chi_1 (x) Lam_M = exactly one point": correct
    (the second alternative of Prop I', chi_3 (e_n - e_n')^T, is not an extension: its quartic term is 8 c^2 l_p l_p' != 0).
  N6: (SL_C) => dim L' <= e + 3 correct; (F2) for general C reads <z_j,z_j> = th(Z)_j with th(Z) in C (Lemma QB for general e, verified).
    The listed planes / 3-spaces C contain no two-column vector except the two marked controls (checked).

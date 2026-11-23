@@ -150,7 +150,9 @@ Every hit: run `handoff/oracle.py file.npy` -> prints (d,e), level error, dimens
  REDUCTION (rigorous, rows NOTES R6.1): a principal K (3-dim strongly level, s(K) = 1^perp) with >= 4 nonzero columns contains a 2-dim
  strongly level subspace with the SAME nonzero columns on which the row-sum map s is injective; and a space with 5 nonzero columns
  contains a single strongly level matrix with 5 nonzero columns. So X4 follows from the two claims
-   (A) there is no strongly level 4x5 MATRIX with five nonzero columns   (15 unknowns, 15 homogeneous equations of degree 2,3,4);
+   (A) [FALSE as stated, found 20:27: rows/sle5_s1005.npy is a strongly level matrix with five nonzero columns, error 2e-16;
+       so five columns need the PLANE version, case C of the generator: planes with five nonzero columns and independent row sums]
+       there is no strongly level 4x5 MATRIX with five nonzero columns   (15 unknowns, 15 homogeneous equations of degree 2,3,4);
    (B) there is no strongly level PLANE {s h + t h'} with column 4 identically zero, the other four columns nonzero, and s(h), s(h')
        linearly independent   (20 unknowns after normalising the row sums to (1,0,u), (0,1,v) in Walsh coordinates; 33 equations).
  ("strongly level": c(Y) = 0 for every Y of the space, i.e. all five 4x4 deletion permanents of J + Y equal 24.)
@@ -166,7 +168,7 @@ Every hit: run `handoff/oracle.py file.npy` -> prints (d,e), level error, dimens
    "RESULT case .. : 1" if the saturated ideal is the unit ideal.  CHART = one character per active column: a digit k (the k-th
    coordinate of that column is inverted), r (a pseudo-random linear combination is inverted), - (no condition); output OUT.ms.
  Here (2 shared cores) std(I) for A4 did not finish in 100 s, neither in Singular nor in msolve with CHART rrrr; so run A, A4, B, B3 on
- the 24-core machine at >= 3 primes (e.g. 2147483629, 2147483497, 2147483077).  DECISION: A unit and B unit with A4, B3 non-unit
+ the 24-core machine at >= 3 primes (e.g. 2147483629, 2147483497, 2147483077).  DECISION (corrected): B unit and C unit, with the calibrations A4, B3 (and A) non-unit
  => every principal K lives on <= 3 columns [modular], which makes Theorem NCOL-P3 unconditional for principal (4,1) spaces.
  If B is NOT unit: send the primary decomposition / a point (it would be a new kind of strongly level plane).
 

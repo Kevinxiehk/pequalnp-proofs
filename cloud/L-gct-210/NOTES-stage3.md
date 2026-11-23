@@ -1,4 +1,12 @@
 # NOTES-stage3 (role: stage3; start 14:37, budget 90 min -> ends ~16:07)
+## RESULT, ROUND 8 (stage3, 20:31; round stopped early by the coordinator -- see handover/HANDOVER-stage3.md) -- details in section 27
+ (1) [exact] + [modular, 3 primes] THEOREM FC: the FREE-COLUMN SUB-FAMILY of F4b (y_a = y_b = y_c = y_d = e_1) is impossible: the system
+     "core level + (ii'),(iii')" is the UNIT ideal on all 81 charts (Singular std over Q; msolve at p = 65521, 2147483629, 2147483497);
+     calibration "core level only" is NON-unit on all 81 charts at the 3 primes (and M_0 is an exact solution).
+ (2) [rigorous] if y_a, y_b, y_c, y_d are pairwise parallel then the core is of free-column type. So F4b is left only with y_r NOT all parallel.
+ (3) [rigorous remarks] z = (2,1,..) is a sub-case of the z = 2 structure (S3-a) with one extra single-row element; degree-1 identities.
+ (4) COMPUTE-stage3.md corrected (errata A1, A2). [numerical] Newton search for general F4b level cores: inconclusive.
+
 ## RESULT, ROUND 7 (stage3, 20:10; final) -- details in section 26; requests for the heavy machine in COMPUTE-stage3.md
  Regime: 9-dim level L, all a_r = 1, all lam >= 3 ("no minimal row pair"), z = vector of the dims of the single-row parts.
  (1) z = (1,0,0,0,0) (exactly one single-row direction) is IMPOSSIBLE in the families F1 (all lam = 3), F3 (lam_ae = 4), F4a (lam_ab = 4,
@@ -1396,3 +1404,33 @@ STATUS 19:31: COMPUTE-stage3.md written (requests for the 24-core machine).
 STATUS 19:58: F4b: (CA2) gives exactly (i)-(iii); exact level space M_0 of F4b-core shape found (violates (iii), dim T_1 = 8); F4b stays OPEN.
 STATUS 20:02: Lemma DEG for the degenerate two-plane case added (section 26 (B')).
 STATUS 20:10: THEOREM Z22 proved (two rows with 2-dim single-row parts are impossible, degenerate planes included). Final report of round 7.
+
+## 27. ROUND 8 (stopped early): the free-column sub-family of F4b by exact computation; parallel y_r; z = (2,1,..)
+ (A) THEOREM FC [exact; scripts stage3/gb/gbl.py, fc_gen.py, fc_exact.py]. Free-column sub-family of F4b (section 26 (A5')): y_r = e_1,
+     p = -e_1 + p', and q_a, q_b, q_c, q_d, w, p' zero-sum vectors of C^N (N = columns 2..5), q_r != 0, w != 0. Unknowns: 3 free
+     coordinates per vector. CHARTS: by the S_4-symmetry of the columns N, (q_a)_1 = 1; (q_c)_i = 1 and w_i = 1 for i in {1,2,3} (scalings of
+     (q_c,q_d) and of w); q_b != 0 and q_d != 0 by Rabinowitsch variables on coordinate i in {1,2,3}; gauge p'_i = 0 at the chart
+     coordinate of w (p' -> p' + al w): 81 charts. Equations: LEVEL = all 123 coefficients (in c_a..c_d, mu, ga, de) of perm(J + m) - 120,
+     generated mechanically from the 5x5 permanent; IDENT23 = LEVEL + q_a q_b . {w, p'} = q_c q_d . {w, p'} = 0 in (A_N)_3; FULL = IDENT23 +
+     the four triple products of the q's + q_a q_b q_c q_d.
+       [modular] msolve -g 2, p = 65521, 2147483629, 2147483497: LEVEL non-unit on 81/81 charts (17-22 basis elements, finite solution
+                 sets, p' = 0 in every printed basis); IDENT23 unit on 81/81; FULL unit on 81/81.   (about 20 s per mode and prime)
+       [exact]   Singular std over Q (integer coefficients recovered with the modulus 2^127 - 1, all |coeff| < 10^9 asserted):
+                 IDENT23 unit on 81/81 charts (16 s), FULL unit on 81/81 charts (12 s). Exact calibration: M_0 solves LEVEL
+                 (f4b_example.py); the exact std of LEVEL with dim/vdim on all charts did not finish in 100 s (not needed).
+     CONSEQUENCE: no F4b space has y_a = y_b = y_c = y_d (up to scaling). REMARK: in all LEVEL solutions seen p' lies in C w, so M contains
+     the FULL free column 1; then Theorem FL applied to the transposed space also excludes them (independent confirmation).
+ (B) [rigorous] PARALLEL y_r ARE OF FREE-COLUMN TYPE. Let y_r = la_r y. If s != 0: all la_r are equal, y_r = y, and eps(Y_T) = 0 (|T| = 2,3,4)
+     give e_2(y) = e_3(y) = e_4(y) = 0; (i) gives Y^4 = 0, i.e. y has >= 2 zero entries; so y = s e_j. If s = 0: e_1 = .. = e_4 = 0 and Y^4 = 0
+     (two zero entries, so e_5 = 0) give y = 0. Hence with (A): in F4b the vectors y_a, y_b, y_c, y_d are NOT all parallel.
+ (C) [rigorous remarks, not verified] z = (2,1,..): let z_d = 2 (U := Z_d), e_e w'^T in L. Counting ((c2)): lam_{rd} = 3 and pi_d(L_r) = U for
+     every r != d, so L_r = X_{rd} (+) e_d U and M_d := L_d (+) e_d U (7-dim) contains every L_r: this is exactly the structure of (S3-a),
+     with the extra single-row element e_e w'^T inside L_d and w' in U' = (U + C1)^perp. Degree-1 identities of 26 (B') STEP 1 for x in L,
+     c = column sums of the rows a,b,c:  <c, u o w'> = 0,  x_e + c in U^perp = U' + C1,  <w', x_d + c> = 0.  For x in X_de: (CA2) on L_e and
+     L_d gives that B_{X_a X_b X_c} kills U + C w'; if w' is not in U its image lies in span(1, k) (k in U', <k,w'> = 0, s(k) = 0), so
+     X_a X_b X_c = 0 on X_de unless k is two-valued (k proportional to |B| 1_A - |A| 1_B). NOT pursued further.
+ (D) [numerical, inconclusive] stage3/f4b_newton.py (holomorphic LM with analytic Jacobian for the general F4b core, level only):
+     without non-degeneracy constraints 19 of 28 starts converge, all to degenerate cores; with Rabinowitsch non-degeneracy 0 of 8
+     (residual floor 2e-3 .. 5e-3). No conclusion.
+STATUS 20:31 (round 8): Theorem FC (exact), parallel case, errata applied; round stopped by the coordinator; handover written.
+

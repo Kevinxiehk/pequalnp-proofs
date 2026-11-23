@@ -1,5 +1,21 @@
 # NOTES-verifyfl (role: verifyfl; start 14:17, budget 80 min)
 
+## RESULT ROUND 6 (verifyfl, 20:09-20:45; STOPPED EARLY on the coordinator's instruction; hand-over: handover/HANDOVER-verifyfl.md)
+
+ H1 [exact object; verified numerically to 1e-13, not yet mod p]  K_2 := span( zeta (e_0 - e_1)^T, zb e_2^T, zb e_3^T, h e_3^T ),
+    zeta = (1,w,w^2,0), zb = conj(zeta), h = (1,1,1,-3), is a 4-dim COLUMN-CENTRED space with defect exactly C (e_0 - e_1): type (q,d) = (2,2),
+    N = type II plane, S = zb^perp.  It is the two-column counterexample to (SL_m) in closed form (the control for [T22], [T31]).
+ H2 [tested] Generators verifyfl/exact/: exactlib.py, gen_n1.py ([DC-k], all cells of Gr(k,12); 3-column mode), gen_n1s.py ([DC-k] structured);
+    substitution tests pass in both directions (16/16).  gen_n2.py ([T31]) and gen_n3.py ([T22]) are NOT written.
+ H3 [modular, ONE prime 2147483629, msolve] calibrations: Lemma 3C (3-column, k = 4) UNIT in all 126 cells for m = (1,2,-3,0,0) and (1,w,w^2,0,0),
+    k = 3 non-unit; Lemma SL as [DC3]: UNIT in all 254 structured cases.   [DC3] for m = (1,2,-3,0,0): UNIT in 252 of 254 structured cases;
+    the two generic rank-2 cells (both neutral lines in the chart v_0 = 1, Z_0 with first or second coordinate 1) TIMED OUT here
+    (> 115 s) and are saved for the 24-core machine: verifyfl/exact/run/n1s_m12m3_..._rho2_piv{0,1}_l0_ab_ab.ms.  NOT yet a verdict.
+ H4 [rigorous, 3 lines, DI5-R6] in a 3-dim doubly centred N with both neutral columns active (kind (R4)), the element Z_0 of N_P is not of the
+    form chi_1 l^T with all l_j != 0; and [DC3] in the rank-2 case follows from the statement "every 2-dim doubly centred space with exactly
+    one neutral column active and dim N_P = 1 is a type I or type II plane" (then Props I-ALL, II-ALL apply) - a 12-unknown exact problem.
+ NOT DONE this round: gen_n2/gen_n3; more primes; (R1)-(R4) by hand; isotropic and |supp m| = 4 strata.  The table STATE OF (5,1) is in the hand-over.
+
 ## RESULT ROUND 5 (verifyfl, 19:14-20:54; details in section DI5-R5; compute requests in COMPUTE-verifyfl.md)
 
  (SL_m) IS NOT PROVED IN ANY FULL STRATUM.  It is reduced, for |supp m| = 3 and m non-isotropic, to four explicit residual kinds.
@@ -1109,6 +1125,25 @@
    separate arguments (TC5 at e = 1).  Lemma C' and the neutral-column facts of R5.1 hold verbatim for C (vartheta becomes C-valued,
    "neutral" = every vector of C vanishes there), and the typed systems [DC3], [T22], [T31] are the same; requested as N6.
 
+## DI5-R6 (round 6, stopped early): exact generators, first modular verdicts, two remarks
+
+ R6.1 Generators and verdicts: see RESULT ROUND 6 (H2, H3) and verifyfl/exact/README.md (commands, manifests, decision rules).
+   Timings (msolve 0.10.1, one thread): 3-column cells 0.01-0.03 s; structured [DC3] cases mostly < 0.3 s; the unstructured big cell of
+   Gr(3,12) (27 unknowns) 54 s; the generic structured rank-2 cell (19 unknowns, defect line (1,2,-3,0,0)) > 115 s, while the same cell for
+   'SL' takes 2.4 s.  Isotropic-line charts: v = (1,a,b,-1-a-b) with one quadric is much better than v(theta) (lower degree).
+ R6.2 [rigorous] Kind (R4), first reduction.  Let N be doubly centred of dim 3, |supp m| = 3, m non-isotropic; by R5.6 N = C Z_0 (+) C Z_1 (+) C Z_2
+   with Z_0 in N_P and nu(Z_1) = (v_n, 0), nu(Z_2) = (0, v_n').  If Z_0 = chi_1 l^T with all l_j != 0 (l is then not proportional to 1/m), Lemma T
+   applied to K = N gives y_n = k chi_2 + rho_n chi_3 for all Y in N; y_n is isotropic, so k = 0 and v_n is a multiple of chi_3, likewise v_n';
+   then rho_n rho_n' is not identically 0 on N, contradicting Lemma T.  So Z_0 = v (e_a - e_b)^T (v isotropic) or vartheta(Z_0) != 0.
+ R6.3 [rigorous reduction] span(Z_0, Z_1) is a 2-dim doubly centred space with exactly one neutral column active and dim N_P = 1.  If every such
+   plane is of type I (chi_1 (x) Lam_M, M = {a,b,n}) or type II ({mu v (e_a - e_b)^T + mu' v' (e_c - e_n)^T}), Props I-ALL / II-ALL give dim N <= 2,
+   i.e. (R4) and the rank-2 case of [DC3] are empty.  This classification is the case k = 2, rho = 1, line cell 0 with al = 0 of gen_n1s.py
+   (at most 12 unknowns): decompose its solution set (Singular primdecGTZ / minAssGTZ) and compare with the two families.
+ R6.4 [exact object] K_2 (H1): for Y = mu zeta (e_0 - e_1)^T + al zb e_2^T + be zb e_3^T + ga h e_3^T one has q_0 = -3 mu (al + be) = -q_1 and
+   q_2 = q_3 = q_4 = 0, so vartheta = -3 mu (al + be); the full defect condition was checked numerically (level error 1.3e-13), and K_2
+   coincides with the space found by the climb r5_climb_r3.py.
+
+
 ## LOG
 STATUS 14:17: started; read BRIEF (+UPDATE, UPDATE 3), NOTES-zeros. Re-deriving reduction (i) and Lemma SL by hand first.
 STATUS 14:20: hand re-derivation of every step done once (reduction, C2/C3/C4 column forms, dim N <= 2, q=3 => N=0,
@@ -1175,3 +1210,5 @@ STATUS 20:00: R5.9 added: Props I-ALL and II-ALL (blueprint type I and type II p
 STATUS 20:05: result of request A folded in (G8, R5.10; modular, exact pending); ambient dimension corrected to 16; section NEXT (N1-N5: typed exact systems [DC3], [T22], [T31] deciding (SL_m) per m, with calibrations) appended to COMPUTE-verifyfl.md.
 STATUS 20:03 (round 5 final): WARNING on numerics: r5_climb_I.py shows that di_ext.ext finds NO extension of chi_1 (x) Lam_M (0/36 starts) although chi_1 e_j^T is one (a degenerate solution, presumably); so negative results of ext are reliable only where a positive control of the same kind succeeded (type II plane: control 3/3; isotropic planes N: now confirmed exactly by request A). The claim 'the planes for m = (1,2,-4,1,0) do not extend (0/64)' of R4.5 (ii) is therefore WEAK; an exact re-check is requested (COMPUTE N4). Rigorous this round: R5.1-R5.6, R5.9 (Lemma C', 3C, NP, T, Props I', V, I-ALL, II-ALL, Theorem SL3-RED), pencil remark in R5.7. Computational (modular): G8. Not achieved: (SL_m) in any full stratum; residual kinds (R1)-(R4) for |supp m| = 3 non-isotropic; nothing for (6,2), (7,3).
 NOTE (process, round 5): STATUS timestamps of round 5 are accurate to about +-5 minutes (some were written a few minutes ahead of the clock); round 5 closed at 20:04 with 50 minutes of budget unused, so that the exact programme (COMPUTE-verifyfl.md, NEXT) can be queued at once.
+STATUS 20:20 (ROUND 6 started 20:09): exact control K_2 found; exactlib/gen_n1/gen_n1s written and tested by substitution; msolve available.
+STATUS 20:31 (round 6 closed on instruction): verdicts recorded (RESULT ROUND 6 H3); generators and README saved under verifyfl/exact/; writing handover/HANDOVER-verifyfl.md.

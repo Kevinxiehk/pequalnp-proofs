@@ -4,3 +4,129 @@ n1_3col_m12m3_k4_p2147483629_c002.ms cell=2 pivots=(0, 1, 2, 5) nvars=18 npolys=
 n1_3col_m12m3_k4_p2147483629_c003.ms cell=3 pivots=(0, 1, 2, 6) nvars=17 npolys=68 verdict=UNIT basis=1 time=0.02s
 n1_3col_m12m3_k4_p2147483629_c004.ms cell=4 pivots=(0, 1, 2, 7) nvars=16 npolys=68 verdict=UNIT basis=1 time=0.01s
 n1_3col_m12m3_k4_p2147483629_c005.ms cell=5 pivots=(0, 1, 2, 8) nvars=15 npolys=68 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c000.ms cell=0 pivots=(0, 1, 2, 3) nvars=20 npolys=78 verdict=UNIT basis=1 time=0.04s
+n1_3col_m12m3_k4_p2147483629_c001.ms cell=1 pivots=(0, 1, 2, 4) nvars=19 npolys=78 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c002.ms cell=2 pivots=(0, 1, 2, 5) nvars=18 npolys=78 verdict=UNIT basis=1 time=0.03s
+n1_3col_m12m3_k4_p2147483629_c003.ms cell=3 pivots=(0, 1, 2, 6) nvars=17 npolys=68 verdict=UNIT basis=1 time=0.03s
+n1_3col_m12m3_k4_p2147483629_c004.ms cell=4 pivots=(0, 1, 2, 7) nvars=16 npolys=68 verdict=UNIT basis=1 time=0.03s
+n1_3col_m12m3_k4_p2147483629_c005.ms cell=5 pivots=(0, 1, 2, 8) nvars=15 npolys=68 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c006.ms cell=6 pivots=(0, 1, 3, 4) nvars=18 npolys=72 verdict=UNIT basis=1 time=0.42s
+n1_3col_m12m3_k4_p2147483629_c007.ms cell=7 pivots=(0, 1, 3, 5) nvars=17 npolys=72 verdict=UNIT basis=1 time=0.03s
+n1_3col_m12m3_k4_p2147483629_c008.ms cell=8 pivots=(0, 1, 3, 6) nvars=16 npolys=64 verdict=UNIT basis=1 time=0.06s
+n1_3col_m12m3_k4_p2147483629_c009.ms cell=9 pivots=(0, 1, 3, 7) nvars=15 npolys=64 verdict=UNIT basis=1 time=0.04s
+n1_3col_m12m3_k4_p2147483629_c010.ms cell=10 pivots=(0, 1, 3, 8) nvars=14 npolys=64 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c011.ms cell=11 pivots=(0, 1, 4, 5) nvars=16 npolys=72 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c012.ms cell=12 pivots=(0, 1, 4, 6) nvars=15 npolys=64 verdict=UNIT basis=1 time=0.03s
+n1_3col_m12m3_k4_p2147483629_c013.ms cell=13 pivots=(0, 1, 4, 7) nvars=14 npolys=64 verdict=UNIT basis=1 time=0.03s
+n1_3col_m12m3_k4_p2147483629_c014.ms cell=14 pivots=(0, 1, 4, 8) nvars=13 npolys=64 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c015.ms cell=15 pivots=(0, 1, 5, 6) nvars=14 npolys=64 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c016.ms cell=16 pivots=(0, 1, 5, 7) nvars=13 npolys=64 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c017.ms cell=17 pivots=(0, 1, 5, 8) nvars=12 npolys=64 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c018.ms cell=18 pivots=(0, 1, 6, 7) nvars=12 npolys=48 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c019.ms cell=19 pivots=(0, 1, 6, 8) nvars=11 npolys=48 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c020.ms cell=20 pivots=(0, 1, 7, 8) nvars=10 npolys=48 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c021.ms cell=21 pivots=(0, 2, 3, 4) nvars=17 npolys=72 verdict=UNIT basis=1 time=0.03s
+n1_3col_m12m3_k4_p2147483629_c022.ms cell=22 pivots=(0, 2, 3, 5) nvars=16 npolys=72 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c023.ms cell=23 pivots=(0, 2, 3, 6) nvars=15 npolys=64 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c024.ms cell=24 pivots=(0, 2, 3, 7) nvars=14 npolys=64 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c025.ms cell=25 pivots=(0, 2, 3, 8) nvars=13 npolys=64 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c026.ms cell=26 pivots=(0, 2, 4, 5) nvars=15 npolys=72 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c027.ms cell=27 pivots=(0, 2, 4, 6) nvars=14 npolys=64 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c028.ms cell=28 pivots=(0, 2, 4, 7) nvars=13 npolys=64 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c029.ms cell=29 pivots=(0, 2, 4, 8) nvars=12 npolys=64 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c030.ms cell=30 pivots=(0, 2, 5, 6) nvars=13 npolys=64 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c031.ms cell=31 pivots=(0, 2, 5, 7) nvars=12 npolys=64 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c032.ms cell=32 pivots=(0, 2, 5, 8) nvars=11 npolys=62 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c033.ms cell=33 pivots=(0, 2, 6, 7) nvars=11 npolys=48 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c034.ms cell=34 pivots=(0, 2, 6, 8) nvars=10 npolys=48 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c035.ms cell=35 pivots=(0, 2, 7, 8) nvars=9 npolys=48 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c036.ms cell=36 pivots=(0, 3, 4, 5) nvars=14 npolys=57 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c037.ms cell=37 pivots=(0, 3, 4, 6) nvars=13 npolys=54 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c038.ms cell=38 pivots=(0, 3, 4, 7) nvars=12 npolys=54 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c039.ms cell=39 pivots=(0, 3, 4, 8) nvars=11 npolys=54 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c040.ms cell=40 pivots=(0, 3, 5, 6) nvars=12 npolys=54 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c041.ms cell=41 pivots=(0, 3, 5, 7) nvars=11 npolys=54 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c042.ms cell=42 pivots=(0, 3, 5, 8) nvars=10 npolys=54 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c043.ms cell=43 pivots=(0, 3, 6, 7) nvars=10 npolys=42 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c044.ms cell=44 pivots=(0, 3, 6, 8) nvars=9 npolys=42 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c045.ms cell=45 pivots=(0, 3, 7, 8) nvars=8 npolys=42 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c046.ms cell=46 pivots=(0, 4, 5, 6) nvars=11 npolys=54 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c047.ms cell=47 pivots=(0, 4, 5, 7) nvars=10 npolys=54 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c048.ms cell=48 pivots=(0, 4, 5, 8) nvars=9 npolys=54 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c049.ms cell=49 pivots=(0, 4, 6, 7) nvars=9 npolys=42 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c050.ms cell=50 pivots=(0, 4, 6, 8) nvars=8 npolys=42 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c051.ms cell=51 pivots=(0, 4, 7, 8) nvars=7 npolys=42 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c052.ms cell=52 pivots=(0, 5, 6, 7) nvars=8 npolys=42 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c053.ms cell=53 pivots=(0, 5, 6, 8) nvars=7 npolys=42 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c054.ms cell=54 pivots=(0, 5, 7, 8) nvars=6 npolys=42 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c055.ms cell=55 pivots=(0, 6, 7, 8) nvars=5 npolys=21 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c056.ms cell=56 pivots=(1, 2, 3, 4) nvars=16 npolys=72 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c057.ms cell=57 pivots=(1, 2, 3, 5) nvars=15 npolys=72 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c058.ms cell=58 pivots=(1, 2, 3, 6) nvars=14 npolys=64 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c059.ms cell=59 pivots=(1, 2, 3, 7) nvars=13 npolys=64 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c060.ms cell=60 pivots=(1, 2, 3, 8) nvars=12 npolys=64 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c061.ms cell=61 pivots=(1, 2, 4, 5) nvars=14 npolys=72 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c062.ms cell=62 pivots=(1, 2, 4, 6) nvars=13 npolys=64 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c063.ms cell=63 pivots=(1, 2, 4, 7) nvars=12 npolys=64 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c064.ms cell=64 pivots=(1, 2, 4, 8) nvars=11 npolys=64 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c065.ms cell=65 pivots=(1, 2, 5, 6) nvars=12 npolys=64 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c066.ms cell=66 pivots=(1, 2, 5, 7) nvars=11 npolys=64 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c067.ms cell=67 pivots=(1, 2, 5, 8) nvars=10 npolys=62 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c068.ms cell=68 pivots=(1, 2, 6, 7) nvars=10 npolys=48 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c069.ms cell=69 pivots=(1, 2, 6, 8) nvars=9 npolys=48 verdict=UNIT basis=1 time=0.03s
+n1_3col_m12m3_k4_p2147483629_c070.ms cell=70 pivots=(1, 2, 7, 8) nvars=8 npolys=48 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c071.ms cell=71 pivots=(1, 3, 4, 5) nvars=13 npolys=57 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c072.ms cell=72 pivots=(1, 3, 4, 6) nvars=12 npolys=54 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c073.ms cell=73 pivots=(1, 3, 4, 7) nvars=11 npolys=54 verdict=UNIT basis=1 time=0.03s
+n1_3col_m12m3_k4_p2147483629_c074.ms cell=74 pivots=(1, 3, 4, 8) nvars=10 npolys=54 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c075.ms cell=75 pivots=(1, 3, 5, 6) nvars=11 npolys=54 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c076.ms cell=76 pivots=(1, 3, 5, 7) nvars=10 npolys=54 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c077.ms cell=77 pivots=(1, 3, 5, 8) nvars=9 npolys=54 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c078.ms cell=78 pivots=(1, 3, 6, 7) nvars=9 npolys=42 verdict=UNIT basis=1 time=0.04s
+n1_3col_m12m3_k4_p2147483629_c079.ms cell=79 pivots=(1, 3, 6, 8) nvars=8 npolys=42 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c080.ms cell=80 pivots=(1, 3, 7, 8) nvars=7 npolys=42 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c081.ms cell=81 pivots=(1, 4, 5, 6) nvars=10 npolys=54 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c082.ms cell=82 pivots=(1, 4, 5, 7) nvars=9 npolys=54 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c083.ms cell=83 pivots=(1, 4, 5, 8) nvars=8 npolys=54 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c084.ms cell=84 pivots=(1, 4, 6, 7) nvars=8 npolys=42 verdict=UNIT basis=1 time=0.03s
+n1_3col_m12m3_k4_p2147483629_c085.ms cell=85 pivots=(1, 4, 6, 8) nvars=7 npolys=42 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c086.ms cell=86 pivots=(1, 4, 7, 8) nvars=6 npolys=42 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c087.ms cell=87 pivots=(1, 5, 6, 7) nvars=7 npolys=42 verdict=UNIT basis=1 time=0.03s
+n1_3col_m12m3_k4_p2147483629_c088.ms cell=88 pivots=(1, 5, 6, 8) nvars=6 npolys=42 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c089.ms cell=89 pivots=(1, 5, 7, 8) nvars=5 npolys=42 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c090.ms cell=90 pivots=(1, 6, 7, 8) nvars=4 npolys=21 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c091.ms cell=91 pivots=(2, 3, 4, 5) nvars=12 npolys=57 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c092.ms cell=92 pivots=(2, 3, 4, 6) nvars=11 npolys=54 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c093.ms cell=93 pivots=(2, 3, 4, 7) nvars=10 npolys=54 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c094.ms cell=94 pivots=(2, 3, 4, 8) nvars=9 npolys=52 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c095.ms cell=95 pivots=(2, 3, 5, 6) nvars=10 npolys=54 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c096.ms cell=96 pivots=(2, 3, 5, 7) nvars=9 npolys=54 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c097.ms cell=97 pivots=(2, 3, 5, 8) nvars=8 npolys=52 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c098.ms cell=98 pivots=(2, 3, 6, 7) nvars=8 npolys=42 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c099.ms cell=99 pivots=(2, 3, 6, 8) nvars=7 npolys=42 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c100.ms cell=100 pivots=(2, 3, 7, 8) nvars=6 npolys=42 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c101.ms cell=101 pivots=(2, 4, 5, 6) nvars=9 npolys=54 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c102.ms cell=102 pivots=(2, 4, 5, 7) nvars=8 npolys=54 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c103.ms cell=103 pivots=(2, 4, 5, 8) nvars=7 npolys=52 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c104.ms cell=104 pivots=(2, 4, 6, 7) nvars=7 npolys=42 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c105.ms cell=105 pivots=(2, 4, 6, 8) nvars=6 npolys=42 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c106.ms cell=106 pivots=(2, 4, 7, 8) nvars=5 npolys=42 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c107.ms cell=107 pivots=(2, 5, 6, 7) nvars=6 npolys=40 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c108.ms cell=108 pivots=(2, 5, 6, 8) nvars=5 npolys=40 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c109.ms cell=109 pivots=(2, 5, 7, 8) nvars=4 npolys=40 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c110.ms cell=110 pivots=(2, 6, 7, 8) nvars=3 npolys=21 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c111.ms cell=111 pivots=(3, 4, 5, 6) nvars=8 npolys=36 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c112.ms cell=112 pivots=(3, 4, 5, 7) nvars=7 npolys=36 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c113.ms cell=113 pivots=(3, 4, 5, 8) nvars=6 npolys=36 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c114.ms cell=114 pivots=(3, 4, 6, 7) nvars=6 npolys=28 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c115.ms cell=115 pivots=(3, 4, 6, 8) nvars=5 npolys=28 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c116.ms cell=116 pivots=(3, 4, 7, 8) nvars=4 npolys=28 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c117.ms cell=117 pivots=(3, 5, 6, 7) nvars=5 npolys=28 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c118.ms cell=118 pivots=(3, 5, 6, 8) nvars=4 npolys=28 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c119.ms cell=119 pivots=(3, 5, 7, 8) nvars=3 npolys=28 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c120.ms cell=120 pivots=(3, 6, 7, 8) nvars=2 npolys=12 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c121.ms cell=121 pivots=(4, 5, 6, 7) nvars=4 npolys=28 verdict=UNIT basis=1 time=0.01s
+n1_3col_m12m3_k4_p2147483629_c122.ms cell=122 pivots=(4, 5, 6, 8) nvars=3 npolys=28 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c123.ms cell=123 pivots=(4, 5, 7, 8) nvars=2 npolys=28 verdict=UNIT(constant-equation)
+n1_3col_m12m3_k4_p2147483629_c124.ms cell=124 pivots=(4, 6, 7, 8) nvars=1 npolys=12 verdict=UNIT basis=1 time=0.02s
+n1_3col_m12m3_k4_p2147483629_c125.ms cell=125 pivots=(5, 6, 7, 8) nvars=0 npolys=12 verdict=UNIT(constant-equation)
