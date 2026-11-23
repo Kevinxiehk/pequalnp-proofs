@@ -1281,6 +1281,6 @@ STATUS 19:50: RESULT-R7 at the top. Runs: r6_extend.py on three files reached it
 # ROUND 8 (start 19:59, about 2 hours -> ends ~21:59). Targets: (1) "a (Q-r) solution passing (FO-r) and FO2 contains a 3-dim single-row
 # part"; (2) Case B of (2,4) by hand or as an exact ideal; (3) (B0) the identically vanishing entry; (4) z = 3 with isotropic m.
 # New input: reg2's inequality dim L <= dim L_r + dim Omega(L_r) - 1 (Omega = row-r projection of T_1(L_r)) = (FO-r) from the other side.
-STATUS 20:13: plan fixed. (B0) has a clean exact form: with the hook (row r, column c) free and u_0 = E_rc + B in L^,
+STATUS 20:03: plan fixed. (B0) has a clean exact form: with the hook (row r, column c) free and u_0 = E_rc + B in L^,
  L^ = {u = [[c, w],[y, M]] : M = cB + alpha(w) + beta(y) + lam x_0} and  c perm_4(M) + y^T Pi(M) w = 120 c^5  (Pi = matrix of 3x3
  subpermanents of the 4x4 minor). Working on it, then on the graded form of (FO-r).

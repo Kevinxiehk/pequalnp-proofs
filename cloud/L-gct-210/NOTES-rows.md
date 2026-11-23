@@ -965,3 +965,4 @@ STATUS 19:59: R5.12 (R-LAW) written.
    it shows that a (5,2) space of this kernel type without neutral column needs a relation between C o C and C.  The same argument for
    e = 1 is R5.7 (C cap e_n^perp = 0 forces F = 0).
 STATUS 20:00: R5.13 written.  Round 5 final: see RESULT ROUND 5 at the top.
+STATUS 20:04 (ROUND 6 started 20:04, about 2 h -> ~22:04; targets: (1) principal K on <= 3 columns by hand, (2) non-principal (4,1) and (5,1) strata, (3) (DC-COST), (4) (R-LAW)).

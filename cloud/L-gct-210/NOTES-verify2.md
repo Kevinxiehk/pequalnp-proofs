@@ -1,6 +1,6 @@
-# NOTES-verify2 (role: verify2; round 1: 16:09-16:49; round 2: 16:49-17:31; round 3: 18:06-18:49; round 4: 18:57-19:27; round 5: 19:33-20:10)
+# NOTES-verify2 (role: verify2; round 1: 16:09-16:49; round 2: 16:49-17:31; round 3: 18:06-18:49; round 4: 18:57-19:27; round 5: 19:33-20:04)
 
-## RESULT ROUND 5 (verify2, 20:05) -- spec audit (COMPUTE-ERRATA.md) + rows R4.10/R4.14/R4.15, verifyfl R4/R5, stage2 R6, stage3 sec. 26, reg2
+## RESULT ROUND 5 (verify2, 20:04) -- spec audit (COMPUTE-ERRATA.md) + rows R4.10/R4.14/R4.15, verifyfl R4/R5, stage2 R6, stage3 sec. 26, reg2
  PART 1: AUDIT of handoff/HANDOFF.md sec. 2, handoff/oracle.py, COMPUTE-{rows,verifyfl,stage3,reg2,stage2}.md -> /home/claude/work/L-gct-210/COMPUTE-ERRATA.md
   Six [A] items (would give a wrong conclusion or a meaningless run):
    A1 COMPUTE-stage3 sec. 0 says "Level spaces of dim 8 exist": false (largest known 7); two "calibrations at dim 8" cannot succeed.
@@ -390,23 +390,26 @@ STATUS 19:27: PL4 probe finished (35 starts: 8 (3col), 1 type I, 26 not converge
 # ROUND 5 (start 19:33, budget 90 min -> ends ~21:03). (1) audit COMPUTE-{rows,verifyfl,stage3,reg2}.md + handoff/HANDOFF.md sec. 2 + oracle.py
 #  -> COMPUTE-ERRATA.md; (2) rows R4.10, R4.14, R4.15; verifyfl round 4 (QB, PS, PR-RED, PR3) + round 5 (3C, NP); stage2 round 6 (R6-2, (T2),
 #  lam = 5 lemma, "z_i = 3 forces four minimal pairs"); stage3 round 7; reg2 (S6'), Type F / Type NC.
-STATUS 19:52: spec audit done -> /home/claude/work/L-gct-210/COMPUTE-ERRATA.md. [A] items: stage3 "level spaces of dim 8 exist" (false; breaks two
+STATUS 19:45: spec audit done -> /home/claude/work/L-gct-210/COMPUTE-ERRATA.md. [A] items: stage3 "level spaces of dim 8 exist" (false; breaks two
  calibrations); stage3 (5c) claim false as a plane statement (explicit counterexample P_c=P_d=P_e=span(e1,e2+e3), P_a=P_b=span(e2-e3,e4));
  verifyfl C/D acceptance lacks a fresh-point test while the scripts under-sample (28/44/40/60/45 points vs 34/69/69/125 monomials);
  mod-p unit ideals are not proofs; clm N = 140 too small for d = 7, 8. [B]: A_m has dim 16 not 17; (NCOL_3)+(DI_4x4) => no (7,3) needs
  (DI_5;2); C1 acceptance should be d - e >= 4. oracle.py: no errors. Now part (2): rows R4.10, R4.14, R4.15.
-STATUS 19:58: rows R4.10 (a)-(d) (transposed defect construction, padding lemma), R4.14 (Theorem NCOL-S: formula D^(1)(Y) m = -2S m + 4 c o m
+STATUS 19:47: rows R4.10 (a)-(d) (transposed defect construction, padding lemma), R4.14 (Theorem NCOL-S: formula D^(1)(Y) m = -2S m + 4 c o m
  - 2(c.m) 1 recomputed; (a), (b)), R4.15 ((F1), (F2), (FS-DEC) incl. the lists for e = 1, 2, 3, (F1^T)): re-derived, no error. Next: verifyfl R4/R5.
-STATUS 20:08: verifyfl R4: Lemma QB, Theorem PS (a)-(c), PR-RED, THEOREM PR3 (steps (1)-(4), all tau-values, det Q_m = -<m,m>/2, remark (i))
+STATUS 19:50: verifyfl R4: Lemma QB, Theorem PS (a)-(c), PR-RED, THEOREM PR3 (steps (1)-(4), all tau-values, det Q_m = -<m,m>/2, remark (i))
  re-derived, no error. R5: Lemma C', Lemma 3C (identity ID10, cases r = 0, 1, >= 2, sign contradiction), Lemma NP (a), (b) re-derived; the
  blueprint fact "7 pairs" confirmed numerically (verify2/seven_pairs.py: 14 ordered solutions, 7 disjoint pairs: 4 zeta, 3 chi). Next: stage2 R6.
-STATUS 20:20: stage2 R6: cross-family theorem R6-2 (permanent formula, all cofactors, <C(U),t>, degree 2/1/0 analysis -> T_1 of dim 10 for
+STATUS 19:52: stage2 R6: cross-family theorem R6-2 (permanent formula, all cofactors, <C(U),t>, degree 2/1/0 analysis -> T_1 of dim 10 for
  b != 0, a not in C1; block rank argument 2*2 + 1 = 5; numerics (10,5,7) from round 4; the polar formula for P_2 not recomputed), R6-5 (a),(b),
  (T2) (order-2 coefficient of <v, G(T(v)+xi)>), lam = 5 lemma (C Phi + Phi^T C = 0; diagonal argument), Lemma (z_i = 3): re-derived, no error.
-STATUS 20:35: stage3 sec. 26 (round 7): counting tools (c1)-(c5); (A1); (A2) lam-patterns F1/F3/F4a/F4b; (A3) F1 (graph connectivity, (QL) with
+STATUS 19:55: stage3 sec. 26 (round 7): counting tools (c1)-(c5); (A1); (A2) lam-patterns F1/F3/F4a/F4b; (A3) F1 (graph connectivity, (QL) with
  one/two/three rank-one maps); (A4) F3 and F4a: every input of N2-X re-derived for the pair with lam = 4 ((Q4) x 3 via (CA2) on L_m and the
  injectivity lemma, planes independent of m, (Qb), (Q5) by the hyperplane argument, (NT), (NT'), (M7)), and the isotropy count replacing
  (beta-0) (Q = (J_3 - I) (x) I_2 nondegenerate on P^3); (B) Lemma dim(U o U') >= 2 and its corollary: re-derived, no error. (A5), (C5)-(C8):
  structure statements read, (C5) checked, the rest not (open families).
-STATUS 20:05: stage2 COMPUTE spec read; reg2's M* confirmed (verify2/reg2_mstar.py, reg2_mstar_exact.py); verifyfl R5.4-R5.6 verified; errata
+STATUS 20:01: stage2 COMPUTE spec read; reg2's M* confirmed (verify2/reg2_mstar.py, reg2_mstar_exact.py); verifyfl R5.4-R5.6 verified; errata
  updated (A6, stage2, section F); RESULT ROUND 5 written. Lemma Z probe running (verify2/lemmaz_probe.py).
+STATUS 20:04: Lemma Z probe: 0 constrained solutions in 9 starts, control 20/20 (17 with an exact zero row or column). Conjugation handling
+ checked in all scripts that compute T_1 / Omega. Errata final (180+ lines). New files: verify2/{audit_verifyfl,audit_sampling,seven_pairs,
+ reg2_mstar,reg2_mstar_exact,lemmaz_probe}.py, verify2/spot/ (one (4,1) hit of run_clm.py), logs/lemmaz_s*.log. Handing back.

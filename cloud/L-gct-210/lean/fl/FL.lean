@@ -6759,6 +6759,155 @@ theorem TC5_normal (K : Submodule ℂ M45) :
       rw [m4, TC5_n4]
       linear_combination h4
 
+def qA1 (Y : M45) (b : Fin 5) : ℂ :=
+  6 * (tau (col Y (b.succAbove 0)) + tau (col Y (b.succAbove 1)) + tau (col Y (b.succAbove 2)) + tau (col Y (b.succAbove 3)))
+
+def qA2 (Y : M45) (b : Fin 5) : ℂ :=
+  2 * (tau (col Y (b.succAbove 0)) * tau (col Y (b.succAbove 1)) + tau (col Y (b.succAbove 0)) * tau (col Y (b.succAbove 2)) + tau (col Y (b.succAbove 0)) * tau (col Y (b.succAbove 3)) + tau (col Y (b.succAbove 1)) * tau (col Y (b.succAbove 2)) + tau (col Y (b.succAbove 1)) * tau (col Y (b.succAbove 3)) + tau (col Y (b.succAbove 2)) * tau (col Y (b.succAbove 3)))
+    - 2 * (ip (col Y (b.succAbove 0)) (col Y (b.succAbove 1)) + ip (col Y (b.succAbove 0)) (col Y (b.succAbove 2)) + ip (col Y (b.succAbove 0)) (col Y (b.succAbove 3)) + ip (col Y (b.succAbove 1)) (col Y (b.succAbove 2)) + ip (col Y (b.succAbove 1)) (col Y (b.succAbove 3)) + ip (col Y (b.succAbove 2)) (col Y (b.succAbove 3)))
+
+theorem P4_quad (b : Fin 5) (Y : M45) : ∃ A3 A4 : ℂ, ∀ c : ℂ,
+    P4 b (fun p => 1 + c * Y p) = 24 + c * qA1 Y b + c ^ 2 * qA2 Y b + c ^ 3 * A3
+      + c ^ 4 * A4 := by
+  have h := fun c : ℂ => (P4_cols b (fun p => 1 + c * Y p)).trans
+    (pc_expand (col Y (b.succAbove 0)) (col Y (b.succAbove 1)) (col Y (b.succAbove 2))
+      (col Y (b.succAbove 3)) c)
+  exact ⟨_, _, h⟩
+
+theorem qb_lin (K : Submodule ℂ M45) (m : Fin 5 → ℂ) (hdef : DefLine K m) (Y : M45)
+    (hY : Y ∈ K) (b b' : Fin 5) :
+    m b' * qA1 Y b = m b * qA1 Y b' ∧ m b' * qA2 Y b = m b * qA2 Y b' := by
+  obtain ⟨p3, p4, hp⟩ := P4_quad b Y
+  obtain ⟨q3, q4, hq⟩ := P4_quad b' Y
+  have hall : ∀ c : ℂ, 0 + (m b' * qA1 Y b - m b * qA1 Y b') * c
+      + (m b' * qA2 Y b - m b * qA2 Y b') * c ^ 2 + (m b' * p3 - m b * q3) * c ^ 3
+      + (m b' * p4 - m b * q4) * c ^ 4 = 0 := by
+    intro c
+    obtain ⟨θ, hθ⟩ := hdef (c • Y) (K.smul_mem c hY)
+    have e1 : (fun p : Fin 4 × Fin 5 => 1 + (c • Y) p) = fun p => 1 + c * Y p := by
+      funext p
+      simp only [Pi.smul_apply, smul_eq_mul]
+    have h1 := hθ b
+    have h2 := hθ b'
+    rw [e1, hp c] at h1
+    rw [e1, hq c] at h2
+    linear_combination (m b') * h1 - (m b) * h2
+  have hr := roots5 (fun k : Fin 5 => ((k : ℕ) : ℂ) + 1) inj_succ5 0
+    (m b' * qA1 Y b - m b * qA1 Y b') (m b' * qA2 Y b - m b * qA2 Y b')
+    (m b' * p3 - m b * q3) (m b' * p4 - m b * q4) (fun k => hall _)
+  exact ⟨by linear_combination hr.2.1, by linear_combination hr.2.2.1⟩
+
+theorem qA1_eq (Y : M45) : ∀ b, qA1 Y b = 6 * ((tau (col Y 0) + tau (col Y 1) + tau (col Y 2) + tau (col Y 3) + tau (col Y 4)) - tau (col Y b)) := by
+  apply fin5
+  · show qA1 Y 0 = 6 * ((tau (col Y 0) + tau (col Y 1) + tau (col Y 2) + tau (col Y 3) + tau (col Y 4)) - tau (col Y 0))
+    simp only [qA1, sa0.1, sa0.2.1, sa0.2.2.1, sa0.2.2.2]
+    ring
+  · show qA1 Y 1 = 6 * ((tau (col Y 0) + tau (col Y 1) + tau (col Y 2) + tau (col Y 3) + tau (col Y 4)) - tau (col Y 1))
+    simp only [qA1, sa1.1, sa1.2.1, sa1.2.2.1, sa1.2.2.2]
+    ring
+  · show qA1 Y 2 = 6 * ((tau (col Y 0) + tau (col Y 1) + tau (col Y 2) + tau (col Y 3) + tau (col Y 4)) - tau (col Y 2))
+    simp only [qA1, sa2.1, sa2.2.1, sa2.2.2.1, sa2.2.2.2]
+    ring
+  · show qA1 Y 3 = 6 * ((tau (col Y 0) + tau (col Y 1) + tau (col Y 2) + tau (col Y 3) + tau (col Y 4)) - tau (col Y 3))
+    simp only [qA1, sa3.1, sa3.2.1, sa3.2.2.1, sa3.2.2.2]
+    ring
+  · show qA1 Y 4 = 6 * ((tau (col Y 0) + tau (col Y 1) + tau (col Y 2) + tau (col Y 3) + tau (col Y 4)) - tau (col Y 4))
+    simp only [qA1, sa4.1, sa4.2.1, sa4.2.2.1, sa4.2.2.2]
+    ring
+
+theorem qA2_eq (Y : M45) : ∀ b, qA2 Y b =
+    ((tau (col Y 0) + tau (col Y 1) + tau (col Y 2) + tau (col Y 3) + tau (col Y 4)) - tau (col Y b)) ^ 2 - ((tau (col Y 0) ^ 2 + tau (col Y 1) ^ 2 + tau (col Y 2) ^ 2 + tau (col Y 3) ^ 2 + tau (col Y 4) ^ 2) - tau (col Y b) ^ 2) - ip (rs Y) (rs Y)
+      + 2 * ip (rs Y) (col Y b) - 2 * ip (col Y b) (col Y b) + (ip (col Y 0) (col Y 0) + ip (col Y 1) (col Y 1) + ip (col Y 2) (col Y 2) + ip (col Y 3) (col Y 3) + ip (col Y 4) (col Y 4)) := by
+  apply fin5
+  · show qA2 Y 0 =
+      ((tau (col Y 0) + tau (col Y 1) + tau (col Y 2) + tau (col Y 3) + tau (col Y 4)) - tau (col Y 0)) ^ 2 - ((tau (col Y 0) ^ 2 + tau (col Y 1) ^ 2 + tau (col Y 2) ^ 2 + tau (col Y 3) ^ 2 + tau (col Y 4) ^ 2) - tau (col Y 0) ^ 2) - ip (rs Y) (rs Y)
+      + 2 * ip (rs Y) (col Y 0) - 2 * ip (col Y 0) (col Y 0) + (ip (col Y 0) (col Y 0) + ip (col Y 1) (col Y 1) + ip (col Y 2) (col Y 2) + ip (col Y 3) (col Y 3) + ip (col Y 4) (col Y 4))
+    simp only [qA2, sa0.1, sa0.2.1, sa0.2.2.1, sa0.2.2.2, tau, ip, col, rs_apply]
+    ring
+  · show qA2 Y 1 =
+      ((tau (col Y 0) + tau (col Y 1) + tau (col Y 2) + tau (col Y 3) + tau (col Y 4)) - tau (col Y 1)) ^ 2 - ((tau (col Y 0) ^ 2 + tau (col Y 1) ^ 2 + tau (col Y 2) ^ 2 + tau (col Y 3) ^ 2 + tau (col Y 4) ^ 2) - tau (col Y 1) ^ 2) - ip (rs Y) (rs Y)
+      + 2 * ip (rs Y) (col Y 1) - 2 * ip (col Y 1) (col Y 1) + (ip (col Y 0) (col Y 0) + ip (col Y 1) (col Y 1) + ip (col Y 2) (col Y 2) + ip (col Y 3) (col Y 3) + ip (col Y 4) (col Y 4))
+    simp only [qA2, sa1.1, sa1.2.1, sa1.2.2.1, sa1.2.2.2, tau, ip, col, rs_apply]
+    ring
+  · show qA2 Y 2 =
+      ((tau (col Y 0) + tau (col Y 1) + tau (col Y 2) + tau (col Y 3) + tau (col Y 4)) - tau (col Y 2)) ^ 2 - ((tau (col Y 0) ^ 2 + tau (col Y 1) ^ 2 + tau (col Y 2) ^ 2 + tau (col Y 3) ^ 2 + tau (col Y 4) ^ 2) - tau (col Y 2) ^ 2) - ip (rs Y) (rs Y)
+      + 2 * ip (rs Y) (col Y 2) - 2 * ip (col Y 2) (col Y 2) + (ip (col Y 0) (col Y 0) + ip (col Y 1) (col Y 1) + ip (col Y 2) (col Y 2) + ip (col Y 3) (col Y 3) + ip (col Y 4) (col Y 4))
+    simp only [qA2, sa2.1, sa2.2.1, sa2.2.2.1, sa2.2.2.2, tau, ip, col, rs_apply]
+    ring
+  · show qA2 Y 3 =
+      ((tau (col Y 0) + tau (col Y 1) + tau (col Y 2) + tau (col Y 3) + tau (col Y 4)) - tau (col Y 3)) ^ 2 - ((tau (col Y 0) ^ 2 + tau (col Y 1) ^ 2 + tau (col Y 2) ^ 2 + tau (col Y 3) ^ 2 + tau (col Y 4) ^ 2) - tau (col Y 3) ^ 2) - ip (rs Y) (rs Y)
+      + 2 * ip (rs Y) (col Y 3) - 2 * ip (col Y 3) (col Y 3) + (ip (col Y 0) (col Y 0) + ip (col Y 1) (col Y 1) + ip (col Y 2) (col Y 2) + ip (col Y 3) (col Y 3) + ip (col Y 4) (col Y 4))
+    simp only [qA2, sa3.1, sa3.2.1, sa3.2.2.1, sa3.2.2.2, tau, ip, col, rs_apply]
+    ring
+  · show qA2 Y 4 =
+      ((tau (col Y 0) + tau (col Y 1) + tau (col Y 2) + tau (col Y 3) + tau (col Y 4)) - tau (col Y 4)) ^ 2 - ((tau (col Y 0) ^ 2 + tau (col Y 1) ^ 2 + tau (col Y 2) ^ 2 + tau (col Y 3) ^ 2 + tau (col Y 4) ^ 2) - tau (col Y 4) ^ 2) - ip (rs Y) (rs Y)
+      + 2 * ip (rs Y) (col Y 4) - 2 * ip (col Y 4) (col Y 4) + (ip (col Y 0) (col Y 0) + ip (col Y 1) (col Y 1) + ip (col Y 2) (col Y 2) + ip (col Y 3) (col Y 3) + ip (col Y 4) (col Y 4))
+    simp only [qA2, sa4.1, sa4.2.1, sa4.2.2.1, sa4.2.2.2, tau, ip, col, rs_apply]
+    ring
+
+theorem LemmaQB (K : Submodule ℂ M45) (m : Fin 5 → ℂ) (hdef : DefLine K m)
+    (hm : ∑ a, m a = 0) (hm0 : m ≠ 0) (Y : M45) (hY : Y ∈ K) :
+    ∃ κ θ2 : ℂ, (∀ j, tau (col Y j) = κ * m j) ∧
+      (ip (col Y 0) (col Y 0) + ip (col Y 1) (col Y 1) + ip (col Y 2) (col Y 2)
+        + ip (col Y 3) (col Y 3) + ip (col Y 4) (col Y 4) =
+        ip (rs Y) (rs Y) + κ ^ 2 * (m 0 * m 0 + m 1 * m 1 + m 2 * m 2 + m 3 * m 3 + m 4 * m 4)) ∧
+      (∀ j, ip (col Y j) (col Y j) - ip (rs Y) (col Y j) - κ ^ 2 * m j ^ 2
+        = -(θ2 / 2) * m j) := by
+  obtain ⟨b0, hb0⟩ := Function.ne_iff.mp hm0
+  have hb0' : m b0 ≠ 0 := hb0
+  have hsum0 : ip (rs Y) (col Y 0) + ip (rs Y) (col Y 1) + ip (rs Y) (col Y 2)
+      + ip (rs Y) (col Y 3) + ip (rs Y) (col Y 4) = ip (rs Y) (rs Y) := by
+    simp only [ip, col, rs_apply]
+    ring
+  have B1 := qA1_eq Y
+  have B2 := qA2_eq Y
+  have L := fun b => qb_lin K m hdef Y hY b b0
+  obtain ⟨t, ht⟩ : ∃ t : Fin 5 → ℂ, ∀ j, tau (col Y j) = t j :=
+    ⟨fun j => tau (col Y j), fun j => rfl⟩
+  obtain ⟨I, hI⟩ : ∃ I : Fin 5 → ℂ, ∀ j, ip (col Y j) (col Y j) = I j :=
+    ⟨fun j => ip (col Y j) (col Y j), fun j => rfl⟩
+  obtain ⟨sy, hsy⟩ : ∃ sy : Fin 5 → ℂ, ∀ j, ip (rs Y) (col Y j) = sy j :=
+    ⟨fun j => ip (rs Y) (col Y j), fun j => rfl⟩
+  obtain ⟨ss, hss⟩ : ∃ ss : ℂ, ip (rs Y) (rs Y) = ss := ⟨ip (rs Y) (rs Y), rfl⟩
+  simp only [ht, hI, hsy, hss] at B1 B2 hsum0
+  have L1 : ∀ b, m b0 * (6 * ((t 0 + t 1 + t 2 + t 3 + t 4) - t b)) = m b * (6 * ((t 0 + t 1 + t 2 + t 3 + t 4) - t b0)) := by
+    intro b
+    have h := (L b).1
+    rw [B1 b, B1 b0] at h
+    exact h
+  have L2 : ∀ b, m b0 * (((t 0 + t 1 + t 2 + t 3 + t 4) - t b) ^ 2 - ((t 0 ^ 2 + t 1 ^ 2 + t 2 ^ 2 + t 3 ^ 2 + t 4 ^ 2) - t b ^ 2) - ss + 2 * sy b - 2 * I b + (I 0 + I 1 + I 2 + I 3 + I 4)) =
+      m b * (((t 0 + t 1 + t 2 + t 3 + t 4) - t b0) ^ 2 - ((t 0 ^ 2 + t 1 ^ 2 + t 2 ^ 2 + t 3 ^ 2 + t 4 ^ 2) - t b0 ^ 2) - ss + 2 * sy b0 - 2 * I b0 + (I 0 + I 1 + I 2 + I 3 + I 4)) := by
+    intro b
+    have h := (L b).2
+    rw [B2 b, B2 b0] at h
+    exact h
+  have hm' := hm
+  rw [Fin.sum_univ_five] at hm'
+  have hT : (t 0 + t 1 + t 2 + t 3 + t 4) = 0 := by
+    apply mul_left_cancel₀ hb0'
+    linear_combination (1 / 24 : ℂ) * (L1 0 + L1 1 + L1 2 + L1 3 + L1 4)
+      + (1 / 4 : ℂ) * ((t 0 + t 1 + t 2 + t 3 + t 4) - t b0) * hm'
+  obtain ⟨κ, hκ⟩ : ∃ κ : ℂ, κ * m b0 = t b0 := ⟨t b0 / m b0, div_mul_cancel₀ _ hb0'⟩
+  have hτ : ∀ b, t b = κ * m b := by
+    intro b
+    apply mul_left_cancel₀ hb0'
+    linear_combination (m b0 - m b) * hT - (1 / 6 : ℂ) * L1 b - m b * hκ
+  obtain ⟨θ2, hθ⟩ : ∃ θ2 : ℂ, θ2 * m b0 = ((t 0 + t 1 + t 2 + t 3 + t 4) - t b0) ^ 2 - ((t 0 ^ 2 + t 1 ^ 2 + t 2 ^ 2 + t 3 ^ 2 + t 4 ^ 2) - t b0 ^ 2) - ss + 2 * sy b0 - 2 * I b0 + (I 0 + I 1 + I 2 + I 3 + I 4) :=
+    ⟨(((t 0 + t 1 + t 2 + t 3 + t 4) - t b0) ^ 2 - ((t 0 ^ 2 + t 1 ^ 2 + t 2 ^ 2 + t 3 ^ 2 + t 4 ^ 2) - t b0 ^ 2) - ss + 2 * sy b0 - 2 * I b0 + (I 0 + I 1 + I 2 + I 3 + I 4)) / m b0, div_mul_cancel₀ _ hb0'⟩
+  have R : ∀ b, ((t 0 + t 1 + t 2 + t 3 + t 4) - t b) ^ 2 - ((t 0 ^ 2 + t 1 ^ 2 + t 2 ^ 2 + t 3 ^ 2 + t 4 ^ 2) - t b ^ 2) - ss + 2 * sy b - 2 * I b + (I 0 + I 1 + I 2 + I 3 + I 4) = θ2 * m b := by
+    intro b
+    apply mul_left_cancel₀ hb0'
+    linear_combination L2 b - m b * hθ
+  have ha : (I 0 + I 1 + I 2 + I 3 + I 4) = ss + κ ^ 2 * (m 0 * m 0 + m 1 * m 1 + m 2 * m 2 + m 3 * m 3 + m 4 * m 4) := by
+    linear_combination (1 / 3 : ℂ) * (R 0 + R 1 + R 2 + R 3 + R 4) + (θ2 / 3) * hm'
+      - (t 0 + t 1 + t 2 + t 3 + t 4) * hT - (2 / 3 : ℂ) * hsum0 + (t 0 + κ * m 0) * hτ 0 + (t 1 + κ * m 1) * hτ 1 + (t 2 + κ * m 2) * hτ 2 + (t 3 + κ * m 3) * hτ 3 + (t 4 + κ * m 4) * hτ 4
+  refine ⟨κ, θ2, fun j => (ht j).trans (hτ j), ?_, fun j => ?_⟩
+  · simp only [hI, hss]
+    linear_combination ha
+  · rw [hI j, hsy j]
+    linear_combination (-1 / 2 : ℂ) * R j + (1 / 2 : ℂ) * ((t 0 + t 1 + t 2 + t 3 + t 4) - 2 * t j) * hT
+      + (t j + κ * m j) * hτ j - (1 / 2 : ℂ) * ((t 0 + κ * m 0) * hτ 0 + (t 1 + κ * m 1) * hτ 1 + (t 2 + κ * m 2) * hτ 2 + (t 3 + κ * m 3) * hτ 3 + (t 4 + κ * m 4) * hτ 4) + (1 / 2 : ℂ) * ha
+
 end
 
 end PEqualNP.Outside.L_gct_210_aux.FL

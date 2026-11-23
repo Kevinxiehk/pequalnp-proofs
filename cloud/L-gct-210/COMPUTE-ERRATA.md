@@ -1,4 +1,4 @@
-# COMPUTE-ERRATA — audit of the computation specs (verify2, round 5; written 19:45, updated 19:58)
+# COMPUTE-ERRATA — audit of the computation specs (verify2, round 5; written 19:45, last update 20:04)
 
 Audited: handoff/HANDOFF.md section 2 (C1–C5), handoff/oracle.py, COMPUTE-rows.md, COMPUTE-verifyfl.md, COMPUTE-stage3.md,
 COMPUTE-reg2.md. Method: every definition and every "X decides Y" re-derived by hand; named scripts read and spot-run
@@ -167,6 +167,11 @@ Summary of the [A] items
  Lemma T, Propositions I' and V, and the four-way case analysis re-derived; the kinds (R1)-(R4) are stated correctly).
  A hit is a counterexample to (SL_m) only after the fresh-point test of A3.
  (R2): v = chi_1 + x chi_2 - (x^2/2) chi_3 is isotropic (checked).
+
+## Conjugation check of the scripts that compute T_1, Omega, (T2), extensions
+ All take the null space as conj(right singular vectors) and pair bilinearly: stage2/r5_FO2.py, r7_FOrow.py, r6_T2.py, r6_extend.py;
+ reg2/a6.py (T1, E0); verifyfl/di_ext.py (mperp, ambient_m); handoff/oracle.py; verify2/fo2lib.py. stage3/t1_defect.py and reg2/a9.py use
+ ranks only. No error found. (reg2's numbers for 20 spaces and for M* were reproduced with my own code.)
 
 ## Sample-size table (number of coefficients of a form of degree k in d coordinates = C(d+k−1, k))
    d      k=4 (4x5 level / defect, top degree)     k=5 (5x5 level, top degree)     all degrees 1..4 together (inhomogeneous quartic)
