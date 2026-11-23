@@ -1,5 +1,20 @@
 # Computation requests (cloud → local), newest first
 
+## 2026-11-23 20:08 — additions (exact tasks first: they take you seconds and each one can close a stratum)
+
+| id | priority | spec | decides |
+|---|---|---|---|
+| VF-NEXT (N1, …) | 1 | `COMPUTE-verifyfl.md`, section "NEXT" (written after your VF-A result): typed systems [DC3], [T22], [T31] | (SL_m) for a fixed m, i.e. the whole (5,1) case for that defect line, by three small ideals |
+| R-X4 | 1 | `COMPUTE-rows.md` X4 | "a principal kernel K lives on ≤ 3 columns" — the only unproved hypothesis of rows' Theorem NCOL-P3 (neutral column for principal (4,1)) |
+| R-X5 | 2 | `COMPUTE-rows.md` X5 | principal (5,1) with kernel type (2,2,1) |
+| R-X1..X3 | 3 | `COMPUTE-rows.md` X1–X3 | exact forms of the 4×4 defect problem |
+| R-H3b | 3 | `COMPUTE-rows.md` H3b | (R-LAW) at scale: row-centred elements have all rows in C |
+
+Note from verifyfl (applies to C1 as well): in our container Levenberg–Marquardt on Grassmannians of 4-dim spaces failed
+even on a control (typed Gr(4,14): 0 of 34), whereas greedy one-vector extension from explicit seeds finds the control 3 of 3.
+So for the (5,1) / (6,2) / (7,3) targets give real weight to the seeded extension variant, and report the calibration
+rate of each variant next to its target count.
+
 ## 2026-11-23 19:58 — additions
 
 | id | priority | spec | decides |

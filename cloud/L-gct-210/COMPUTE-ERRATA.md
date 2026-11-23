@@ -7,16 +7,10 @@ stage2/r5_FO2.py). Severity: [A] = would produce a wrong conclusion or make a ru
 statement, harmless if the oracle is applied; [C] = clarification.
 
 Versions audited: HANDOFF.md (19:28), oracle.py (19:27), COMPUTE-stage3.md (19:31), COMPUTE-rows.md (19:32 version in full; the 19:47
-version only checked for new sections: none), COMPUTE-verifyfl.md (19:29 version in full; section F added 19:45: read, see below),
+version checked for new sections: (X4) added, no error), COMPUTE-verifyfl.md (19:29 version in full; section F added 19:45: read, see below),
 COMPUTE-reg2.md (19:31 version in full; the 19:52 update read: sections 0, 3b, 6), COMPUTE-stage2.md (19:44; not on my list, read once).
 
 Summary of the [A] items
- A6 (HANDOFF sec. 1 "Blocked 4" and C2; COMPUTE-reg2 sections 1-3 in their 19:31 wording): the statement "(S6') a 6-dim 4x5 level space
-    without a full free row has dim Omega <= 2" is FALSE. reg2's exact family M*(x,y) has no full free row, dim Omega = 4, dim T_1 = 11,
-    FO2 bound 8 — confirmed by me (exact level identity for three rational members; (11, 4, 5, 8) with my own code). So the first-order
-    criterion does not close a_r = 2; the target is (S6-FO2): "no full free row => FO2 bound <= 8". COMPUTE-reg2 (19:52) says this in its
-    READ FIRST; HANDOFF does not. C2's decision rule must read: report (dim Omega, dim T_1, FO2 bound); the decisive event is a 6-dim
-    space without a full free row and FO2 bound >= 9.
  A1 (COMPUTE-stage3 sec. 0, 1, 4): "Level spaces of dim 8 exist" is FALSE as far as anyone knows (largest known: 7). So "calibration at
     dim 8" can never succeed; calibrate at dim 7, treat dim 8 as a target.
  A2 (COMPUTE-stage3 item 5c): the CLAIM is false as a statement about planes (explicit counterexample below). An exact run would
@@ -28,6 +22,12 @@ Summary of the [A] items
     primes)" is evidence, not a proof of the characteristic-0 statement; "not unit modulo p" is not a counterexample either.
  A5 (COMPUTE-rows sec. 1, H1/H2/H5; COMPUTE-reg2 sec. 2 and ext7): clm.Problem samples N = 140 points; that is fewer than the number of
     monomials for d = 7 (4x5) and d = 7, 8 (5x5). run_clm.py does not pass N. Raise it (table below).
+ A6 (HANDOFF sec. 1 "Blocked 4" and C2; COMPUTE-reg2 sections 1-3 in their 19:31 wording): the statement "(S6') a 6-dim 4x5 level space
+    without a full free row has dim Omega <= 2" is FALSE. reg2's exact family M*(x,y) has no full free row, dim Omega = 4, dim T_1 = 11,
+    FO2 bound 8 — confirmed by me (exact level identity for three rational members; (11, 4, 5, 8) with my own code). So the first-order
+    criterion does not close a_r = 2; the target is (S6-FO2): "no full free row => FO2 bound <= 8". COMPUTE-reg2 (19:52) says this in its
+    READ FIRST; HANDOFF does not. C2's decision rule must read: report (dim Omega, dim T_1, FO2 bound); the decisive event is a 6-dim
+    space without a full free row and FO2 bound >= 9.
 
 --------------------------------------------------------------------------------------------------------------------------
 ## handoff/oracle.py — no errors found
@@ -59,6 +59,10 @@ Summary of the [A] items
  C4  [A4] the equivalence "Lemma Z <=> the successive saturation is the unit ideal" is correct over an algebraically closed field of
         characteristic 0, i.e. for the computation over Q. Over F_p it is evidence only (bad primes exist in principle in both
         directions). For a proof: compute over Q, or reconstruct the certificate over Q and verify it.
+     [C] Quick numerical probe of Lemma Z itself (verify2/lemmaz_probe.py): with all row and column norms^2 forced >= 0.1 resp. 0.02,
+        0 solutions in 9 LM starts (smallest residuals 1.6e-3, 2.6e-5); without the constraint 20 of 20 starts converge, 17 to a matrix
+        with a zero row or column at machine precision and 3 LM-limited ones (smallest row/column norm 1e-4 .. 1e-6). Consistent with
+        Lemma Z; tiny sample.
  C5  no errors found (the scripts' own sample sizes: see A5-type remark under COMPUTE-rows; verify every reported solution at fresh points).
 
 ## COMPUTE-rows.md
@@ -76,6 +80,8 @@ Summary of the [A] items
  [B] sec. 0, last line: "(NCOL_3) + (DI_4x4) => no (7,3)" needs in addition "no (5,1) and no (6,2)" (the hyperplane lemma R4.1 is
    what gives a (7,3) space the neutral column of its hyperplanes). Correct form: (DI_5; 2) + (NCOL_3) + (DI_4x4) => no (7,3).
  [C] The code's p_k has no factor (4−k)! (same span, no effect).
+ [C] (X4) (added 19:47): K = {(A_0 sigma | ... | A_4 sigma)}, sum A_j = id; "the quadratic part says exactly that B_j = id − 2A_j are
+   isometries" is correct (b_j = −B_j sigma; the five conditions <y_j,y_j> = <s,y_j> are equivalent to <b_j,b_j> = <s,s>); 36 unknowns.
  [C] H5: for a 7-dim hit with deletable line and rest of type (d,e): d − e >= 3 always; d − e >= 4 is itself a counterexample to (DI_5)
    — report it as such, not only as an (NCOL) test.
  Spot run: `run_clm.py 4 4 defect 1 0 4 80` -> 1 hit in 4 starts (5 s), confirmed (4,1) by the oracle.

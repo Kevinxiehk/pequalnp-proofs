@@ -6569,6 +6569,196 @@ theorem NCOL_S_b (K : Submodule ℂ M45) (m : Fin 5 → ℂ) (hdef : DefLine K m
     exact h
   omega
 
+def rowL (i : Fin 4) : M45 →ₗ[ℂ] (Fin 5 → ℂ) := LinearMap.funLeft ℂ ℂ (fun j : Fin 5 => (i, j))
+
+def fsMap (i : Fin 4) (Cs : Submodule ℂ (Fin 5 → ℂ)) : M45 →ₗ[ℂ] Module.Dual ℂ Cs :=
+  (Submodule.dualRestrict Cs).comp (dotL.flip.comp (rowL i))
+
+theorem fsMap_apply (i : Fin 4) (Cs : Submodule ℂ (Fin 5 → ℂ)) (Y : M45) (v : Fin 5 → ℂ)
+    (hv : v ∈ Cs) : fsMap i Cs Y ⟨v, hv⟩ =
+      v 0 * Y (i, 0) + v 1 * Y (i, 1) + v 2 * Y (i, 2) + v 3 * Y (i, 3) + v 4 * Y (i, 4) := rfl
+
+theorem ThmFS (K : Submodule ℂ M45) (Cs : Submodule ℂ (Fin 5 → ℂ))
+    (hdefC : ∀ Y ∈ K, (fun a => P4 a (fun p => 1 + Y p) - 24) ∈ Cs)
+    (hC1 : ∀ u ∈ Cs, ∑ a, u a = 0) (i : Fin 4)
+    (hsplit : ∀ u ∈ Cs, (fun p : Fin 4 × Fin 5 => if p.1 = i then u p.2 else 0) ∈ K)
+    (hnd : ∀ x ∈ Cs, (∀ u ∈ Cs, ∑ a, u a * x a = 0) → x = 0) :
+    SLev (K ⊓ LinearMap.ker (fsMap i Cs)) ∧
+      Module.finrank ℂ K ≤ 3 + Module.finrank ℂ Cs := by
+  have hS : SLev (K ⊓ LinearMap.ker (fsMap i Cs)) := by
+    intro Y hY a
+    obtain ⟨hYK, hYψ⟩ := Submodule.mem_inf.mp hY
+    have hψ : fsMap i Cs Y = 0 := LinearMap.mem_ker.mp hYψ
+    have hc := hdefC Y hYK
+    have eN : repl i (fun j => 1 + Y (i, j)) (fun p => 1 + Y p) = fun p => 1 + Y p :=
+      repl_self i (fun p => 1 + Y p)
+    have key : ∀ u ∈ Cs, ∑ b, u b * (P4 b (fun p => 1 + Y p) - 24) = 0 := by
+      intro u hu
+      have hE := hdefC _ (K.add_mem hYK (hsplit u hu))
+      have eN1 : (fun p : Fin 4 × Fin 5 =>
+          1 + (Y + fun p : Fin 4 × Fin 5 => if p.1 = i then u p.2 else 0) p) =
+          repl i ((fun j => 1 + Y (i, j)) + u) (fun p => 1 + Y p) := by
+        funext ⟨k, j⟩
+        by_cases h : k = i
+        · rw [h, repl_at]
+          show 1 + (Y (i, j) + if i = i then u j else 0) = 1 + Y (i, j) + u j
+          rw [if_pos rfl]
+          ring
+        · rw [repl_ne i k h]
+          show 1 + (Y (k, j) + if k = i then u j else 0) = 1 + Y (k, j)
+          rw [if_neg h]
+          ring
+      have hDu : (fun b => P4 b (repl i u (fun p => 1 + Y p))) ∈ Cs := by
+        have e : (fun b => P4 b (repl i u (fun p => 1 + Y p))) =
+            (fun a => P4 a (fun p : Fin 4 × Fin 5 =>
+              1 + (Y + fun p : Fin 4 × Fin 5 => if p.1 = i then u p.2 else 0) p) - 24)
+            - (fun a => P4 a (fun p => 1 + Y p) - 24) := by
+          funext b
+          have hadd := P4_repl_add b i (fun j => 1 + Y (i, j)) u (fun p => 1 + Y p)
+          rw [eN] at hadd
+          show P4 b (repl i u (fun p => 1 + Y p)) =
+            (P4 b (fun p : Fin 4 × Fin 5 =>
+              1 + (Y + fun p : Fin 4 × Fin 5 => if p.1 = i then u p.2 else 0) p) - 24)
+            - (P4 b (fun p => 1 + Y p) - 24)
+          rw [eN1]
+          linear_combination (-1 : ℂ) * hadd
+        rw [e]
+        exact Cs.sub_mem hE hc
+      have hs := P4_sym 0 i u (fun j => 1 + Y (i, j)) (fun p => 1 + Y p)
+      rw [eN] at hs
+      have h1 := hC1 _ hDu
+      have h2 := fsMap_apply i Cs Y _ hDu
+      rw [hψ] at h2
+      have h3 := hC1 u hu
+      rw [Fin.sum_univ_five] at h1 h3 hs ⊢
+      rw [Fin.sum_univ_five] at hs
+      have h2' : P4 0 (repl i u (fun p => 1 + Y p)) * Y (i, 0)
+          + P4 1 (repl i u (fun p => 1 + Y p)) * Y (i, 1)
+          + P4 2 (repl i u (fun p => 1 + Y p)) * Y (i, 2)
+          + P4 3 (repl i u (fun p => 1 + Y p)) * Y (i, 3)
+          + P4 4 (repl i u (fun p => 1 + Y p)) * Y (i, 4) = 0 := h2.symm
+      linear_combination hs - 24 * h3 + h1 + h2'
+    have hz := hnd _ hc key
+    have hza := congrFun hz a
+    have hza' : P4 a (fun p => 1 + Y p) - 24 = 0 := hza
+    linear_combination hza'
+  refine ⟨hS, ?_⟩
+  have rn := rank_nullity K (fsMap i Cs)
+  have h1 : Module.finrank ℂ (K.map (fsMap i Cs)) ≤ Module.finrank ℂ Cs := by
+    have h := Submodule.finrank_le (K.map (fsMap i Cs))
+    rw [Subspace.dual_finrank_eq] at h
+    exact h
+  have h3 := LemmaSL _ hS
+  omega
+
+def uY (Y : M45) : V4 := fun k => (Y (k, 0) + Y (k, 1)) / 2
+
+def dY (Y : M45) : V4 := fun k => (Y (k, 0) - Y (k, 1)) / 2
+
+def e2 (d : V4) : ℂ := (tau d ^ 2 - ip d d) / 2
+
+def Ed (d : V4) : V4 := fun k => e2 d - tau d * d k + d k ^ 2
+
+theorem TC5_sum (Y : M45) :
+    P4 0 (fun p => 1 + Y p) + P4 1 (fun p => 1 + Y p) =
+      2 * pc (fun k => 1 + uY Y k) (fun k => 1 + Y (k, 2)) (fun k => 1 + Y (k, 3)) (fun k => 1 + Y (k, 4)) := by
+  rw [P4_c0, P4_c1]
+  simp (config := {decide := true}) only [pc, col, uY, dY, Fin.sum_univ_four, ite_true,
+    ite_false, add_zero, zero_add]
+  ring
+
+theorem TC5_diff (Y : M45) :
+    P4 1 (fun p => 1 + Y p) - P4 0 (fun p => 1 + Y p) =
+      2 * pc (dY Y) (fun k => 1 + Y (k, 2)) (fun k => 1 + Y (k, 3)) (fun k => 1 + Y (k, 4)) := by
+  rw [P4_c0, P4_c1]
+  simp (config := {decide := true}) only [pc, col, uY, dY, Fin.sum_univ_four, ite_true,
+    ite_false, add_zero, zero_add]
+  ring
+
+theorem TC5_n2 (Y : M45) :
+    P4 2 (fun p => 1 + Y p) = pc (fun k => 1 + uY Y k) (fun k => 1 + uY Y k) (fun k => 1 + Y (k, 3)) (fun k => 1 + Y (k, 4)) - pc (dY Y) (dY Y) (fun k => 1 + Y (k, 3)) (fun k => 1 + Y (k, 4)) := by
+  rw [P4_c2]
+  simp (config := {decide := true}) only [pc, col, uY, dY, Fin.sum_univ_four, ite_true,
+    ite_false, add_zero, zero_add]
+  ring
+
+theorem TC5_n3 (Y : M45) :
+    P4 3 (fun p => 1 + Y p) = pc (fun k => 1 + uY Y k) (fun k => 1 + uY Y k) (fun k => 1 + Y (k, 2)) (fun k => 1 + Y (k, 4)) - pc (dY Y) (dY Y) (fun k => 1 + Y (k, 2)) (fun k => 1 + Y (k, 4)) := by
+  rw [P4_c3]
+  simp (config := {decide := true}) only [pc, col, uY, dY, Fin.sum_univ_four, ite_true,
+    ite_false, add_zero, zero_add]
+  ring
+
+theorem TC5_n4 (Y : M45) :
+    P4 4 (fun p => 1 + Y p) = pc (fun k => 1 + uY Y k) (fun k => 1 + uY Y k) (fun k => 1 + Y (k, 2)) (fun k => 1 + Y (k, 3)) - pc (dY Y) (dY Y) (fun k => 1 + Y (k, 2)) (fun k => 1 + Y (k, 3)) := by
+  rw [P4_c4]
+  simp (config := {decide := true}) only [pc, col, uY, dY, Fin.sum_univ_four, ite_true,
+    ite_false, add_zero, zero_add]
+  ring
+
+theorem TC5_dd (d a b : V4) :
+    pc d d (fun k => 1 + a k) (fun k => 1 + b k) =
+      4 * e2 d + 2 * ip (a + b) (Ed d) + pc d d a b := by
+  simp (config := {decide := true}) only [pc, e2, Ed, tau, ip, Pi.add_apply, Fin.sum_univ_four,
+    ite_true, ite_false, add_zero, zero_add]
+  ring
+
+def mTC : Fin 5 → ℂ := fun a => if a = 0 then 1 else if a = 1 then -1 else 0
+
+theorem TC5_normal (K : Submodule ℂ M45) :
+    DefLine K mTC ↔ ∀ Y ∈ K,
+      pc (fun k => 1 + uY Y k) (fun k => 1 + Y (k, 2)) (fun k => 1 + Y (k, 3)) (fun k => 1 + Y (k, 4)) = 24 ∧
+      pc (fun k => 1 + uY Y k) (fun k => 1 + uY Y k) (fun k => 1 + Y (k, 3)) (fun k => 1 + Y (k, 4)) - pc (dY Y) (dY Y) (fun k => 1 + Y (k, 3)) (fun k => 1 + Y (k, 4)) = 24 ∧
+      pc (fun k => 1 + uY Y k) (fun k => 1 + uY Y k) (fun k => 1 + Y (k, 2)) (fun k => 1 + Y (k, 4)) - pc (dY Y) (dY Y) (fun k => 1 + Y (k, 2)) (fun k => 1 + Y (k, 4)) = 24 ∧
+      pc (fun k => 1 + uY Y k) (fun k => 1 + uY Y k) (fun k => 1 + Y (k, 2)) (fun k => 1 + Y (k, 3)) - pc (dY Y) (dY Y) (fun k => 1 + Y (k, 2)) (fun k => 1 + Y (k, 3)) = 24 := by
+  have m0 : mTC 0 = 1 := by simp [mTC]
+  have m1 : mTC 1 = -1 := by simp [mTC]
+  have m2 : mTC 2 = 0 := by simp [mTC]
+  have m3 : mTC 3 = 0 := by simp [mTC]
+  have m4 : mTC 4 = 0 := by simp [mTC]
+  constructor
+  · intro h Y hY
+    obtain ⟨θ, hθ⟩ := h Y hY
+    have c0 := hθ 0
+    have c1 := hθ 1
+    have c2 := hθ 2
+    have c3 := hθ 3
+    have c4 := hθ 4
+    rw [m0] at c0
+    rw [m1] at c1
+    rw [m2] at c2
+    rw [m3] at c3
+    rw [m4] at c4
+    have t1 := TC5_sum Y
+    refine ⟨?_, ?_, ?_, ?_⟩
+    · linear_combination (-1 / 2 : ℂ) * t1 + (1 / 2 : ℂ) * c0 + (1 / 2 : ℂ) * c1
+    · rw [← TC5_n2]
+      linear_combination c2
+    · rw [← TC5_n3]
+      linear_combination c3
+    · rw [← TC5_n4]
+      linear_combination c4
+  · intro h Y hY
+    obtain ⟨h1, h2, h3, h4⟩ := h Y hY
+    refine ⟨P4 0 (fun p => 1 + Y p) - 24, ?_⟩
+    apply fin5
+    · show P4 0 (fun p => 1 + Y p) = 24 + (P4 0 (fun p => 1 + Y p) - 24) * mTC 0
+      rw [m0]
+      ring
+    · show P4 1 (fun p => 1 + Y p) = 24 + (P4 0 (fun p => 1 + Y p) - 24) * mTC 1
+      rw [m1]
+      have t1 := TC5_sum Y
+      linear_combination t1 + 2 * h1
+    · show P4 2 (fun p => 1 + Y p) = 24 + (P4 0 (fun p => 1 + Y p) - 24) * mTC 2
+      rw [m2, TC5_n2]
+      linear_combination h2
+    · show P4 3 (fun p => 1 + Y p) = 24 + (P4 0 (fun p => 1 + Y p) - 24) * mTC 3
+      rw [m3, TC5_n3]
+      linear_combination h3
+    · show P4 4 (fun p => 1 + Y p) = 24 + (P4 0 (fun p => 1 + Y p) - 24) * mTC 4
+      rw [m4, TC5_n4]
+      linear_combination h4
+
 end
 
 end PEqualNP.Outside.L_gct_210_aux.FL

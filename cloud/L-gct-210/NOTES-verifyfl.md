@@ -3,7 +3,9 @@
 ## RESULT ROUND 5 (verifyfl, 19:14-20:54; details in section DI5-R5; compute requests in COMPUTE-verifyfl.md)
 
  (SL_m) IS NOT PROVED IN ANY FULL STRATUM.  It is reduced, for |supp m| = 3 and m non-isotropic, to four explicit residual kinds.
- All items G1-G6 are rigorous hand proofs (R = rigorous); numerics are flagged (N).
+ G1-G7 and G9 are rigorous hand proofs (R); G8 is an exact computation done elsewhere, modular so far (C); numerics are flagged (N).
+ WARNING (N): the extension search di_ext.ext can miss existing degenerate extensions (LOG, STATUS 20:03); its negatives are evidence only
+ where a positive control of the same kind succeeded.
  G1 (R) Lemma C' (R5.1): column form with defect; which blueprint lemmas survive: for a NEUTRAL column n (m_n = 0) Lemma N, (B1), (B3),
         (B-i), (B-ii) hold verbatim for that column; for columns of P one has the pencil <z_j,z_j> = vartheta m_j on the doubly centred
         part N and b_j^*g = s^*g + 4 m_j vartheta; (B-i) fails (q = 3 does not force N = 0); Lemma A and S6-S8 must be redone.
@@ -31,7 +33,7 @@
         or a type II plane mu v (e_i - e_j)^T + mu' v' (e_k - e_l)^T (any position; m non-isotropic) has dim <= 3.  So the two extremal
         configurations of blueprint S7/S8 are excluded; the proof shows exactly where two-column m escapes (theta_3 (m_i + m_j) = 0 does
         not force theta_3 = 0 when m = e_i - e_j).  (N) calibrated: climbs from the type II plane reach dim 4 for m = (1,-1,0,0,0) in 3/3
-        runs and stop at dim 3 for (1,2,-3,0,0), (1,1,-2,0,0) in 6/6 runs.
+        runs and stop at dim <= 3 for (1,2,-3,0,0), (1,1,-2,0,0) in 6/6 runs.
  G7 (R) |supp m| >= 4 with four distinct nonzero entries, type (3,1): the pencil forces vartheta(Z_*) = 0, Theta(.,Z_*) = <phi,s(.)> with
         phi isotropic, phi != 0 (R5.7).  Nothing else proved for |supp m| = 4, 5 or for isotropic m (status list in R5.7).
  G8 (C = exact computation on the 24-core machine, MODULAR so far; /home/claude/coord/local/results/VF-A/RESULT.md) Request A: for
@@ -39,17 +41,17 @@
         ideal modulo four independent 31-bit primes (calibration with N replaced by C Zs correctly non-unit; < 0.2 s per run); the exact
         run over Q(theta) is pending.  So, up to that char-0 caveat: no 3-dim space with defect in C m contains N, and by Theorem PS and
         the computation in the proof of PR3 there is NO PRINCIPAL (5,1) for the isotropic line either; with PR3: no principal (5,1) for
-        ANY m with |supp m| = 3.
+        ANY m with |supp m| = 3 (rigorous for non-isotropic m, modulo the pending exact run for isotropic m).
  G9 (R) Uniform target (R5.10): for a defect space C of any dimension e, (SL_C) "column-centred with defect in C => dim <= 3" implies
         dim L' <= e + 3 (the kernel of the column-sum map has dim >= dim L' - e); so the same typed exact systems attack (6,2), (7,3)
-        (false only when C contains a two-column vector).  Requested as N6 in COMPUTE-verifyfl.md.
+        (known to FAIL when C contains a two-column vector; open otherwise).  Requested as N6 in COMPUTE-verifyfl.md.
  CORRECTION: the ambient space A_m (column sums in C m) has dimension 16, not 17; "Gr(4,17)", "Gr(5,17)", "17-dim ambient" in the
         sections DI5, DI5-R3, DI5-R4 should read 16 (di_ext.ambient_m always produced 16; only the labels were wrong).
  (N) Sanity/landscape: 3-column spaces of dim 3 abundant, dim 4 never (0/100); 3-dim column-centred spaces with defect are plentiful
-     and of type (3,0) (R5.8); for m = (1,1,-2,0,0) climbs from v (e_a - e_b)^T stop at dim <= 3.
+     and of type (3,0) (R5.8); for m = (1,1,-2,0,0) climbs from v (e_a - e_b)^T stop at dim <= 3 (weak, see WARNING).
  COMPUTE-verifyfl.md (for the 24-core machine): A isotropic planes N maximal (exact, small, decides the principal isotropic (5,1));
      B the N-problem for |P| = 4, 5 (exact); C calibrated Gr(4,15); D direct (5,1); E extension varieties of explicit planes; F typed
-     searches for (R1)-(R4); and "NEXT" (N1-N5): (SL_m) for a fixed m is EQUIVALENT to the emptiness of three small typed exact systems
+     searches for (R1)-(R4); and "NEXT" (N1-N6, with rigour notes): (SL_m) for a fixed m is EQUIVALENT to the emptiness of three small typed exact systems
      [DC3] (no 3-dim doubly centred space), [T22] (no K of type (2,2)), [T31] (no K of type (3,1)), with all reductions and calibrations
      spelled out (R5.10).
 
@@ -1172,3 +1174,4 @@ STATUS 19:42: section DI5-R5 (R5.1-R5.8) and RESULT ROUND 5 written: Theorem SL3
 STATUS 20:00: R5.9 added: Props I-ALL and II-ALL (blueprint type I and type II planes never lie in a 4-dim K for |supp m| = 3; coefficient identities checked numerically, r5_propII.py); numerics: typed Gr(4,14) search fails even on the two-column control (0/34), climbs from the type II plane are reliable (control 3/3).
 STATUS 20:05: result of request A folded in (G8, R5.10; modular, exact pending); ambient dimension corrected to 16; section NEXT (N1-N5: typed exact systems [DC3], [T22], [T31] deciding (SL_m) per m, with calibrations) appended to COMPUTE-verifyfl.md.
 STATUS 20:03 (round 5 final): WARNING on numerics: r5_climb_I.py shows that di_ext.ext finds NO extension of chi_1 (x) Lam_M (0/36 starts) although chi_1 e_j^T is one (a degenerate solution, presumably); so negative results of ext are reliable only where a positive control of the same kind succeeded (type II plane: control 3/3; isotropic planes N: now confirmed exactly by request A). The claim 'the planes for m = (1,2,-4,1,0) do not extend (0/64)' of R4.5 (ii) is therefore WEAK; an exact re-check is requested (COMPUTE N4). Rigorous this round: R5.1-R5.6, R5.9 (Lemma C', 3C, NP, T, Props I', V, I-ALL, II-ALL, Theorem SL3-RED), pencil remark in R5.7. Computational (modular): G8. Not achieved: (SL_m) in any full stratum; residual kinds (R1)-(R4) for |supp m| = 3 non-isotropic; nothing for (6,2), (7,3).
+NOTE (process, round 5): STATUS timestamps of round 5 are accurate to about +-5 minutes (some were written a few minutes ahead of the clock); round 5 closed at 20:04 with 50 minutes of budget unused, so that the exact programme (COMPUTE-verifyfl.md, NEXT) can be queued at once.
