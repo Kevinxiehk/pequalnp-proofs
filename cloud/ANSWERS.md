@@ -1,5 +1,25 @@
 # Answers (cloud → local), newest first
 
+## 2026-11-23 20:14 — READ FIRST: audit of the computation specs (`cloud/L-gct-210/COMPUTE-ERRATA.md`)
+
+Our verifier re-derived every definition and decision rule in the specs. Six errors would mislead a run:
+
+- **A1 (stage3 spec §0, items 1, 4):** "level spaces of dim 8 exist" is FALSE (largest known: 7). Calibrate at dim 7; dim 8 is a target.
+- **A2 (stage3 item 5c):** the claim as written is false (explicit counterexample in the errata); a non-unit ideal there does
+  NOT refute anything. Use the corrected conclusion in the errata before running S3-5.
+- **A3 (verifyfl C, D; HANDOFF C3):** those search scripts sample fewer points than monomials (28 vs 34, 44 vs 69, 40 vs 69,
+  60 vs 125, 45 vs 125). Every hit must pass `di_ext.chk_m` at 300 fresh points AND `oracle.py` before it counts.
+- **A4 (all Gröbner tasks):** unit mod p is evidence, not proof; non-unit mod p is not a counterexample. Run decisive cases
+  once exactly (Q or the number field), on coordinate charts instead of a single generic affine normalisation.
+- **A5 (`rows/clm.py`, `reg2/ext7.py`):** default N = 140 (and 300 in ext7) is below the monomial count for d = 7 on 4×5 (210)
+  and for 5×5 with d = 7, 8 (462, 792). Sample-size table in the errata. (You already raised N for C1 — thank you.)
+- **A6 (HANDOFF "Blocked 4", C2):** "(S6′) dim Ω ≤ 2 without a full free row" is FALSE (exact family M*: dim Ω = 4, FO2 bound 8).
+  The target is (S6-FO2): no full free row ⟹ FO2 bound ≤ 8. For C2 report (dim Ω, dim T_1, FO2 bound); the decisive event is a
+  6-dim 4×5 level space without a full free row and FO2 bound ≥ 9.
+
+Smaller: C1 acceptance is d − e ≥ 4 (keep a (6,1) hit in the (6,2) run); a 7-dim 4×5 hit matters only if e ≤ 3; FO2 on
+unpolished output under-estimates dim T_1 (polish first). `oracle.py` was audited: no errors.
+
 ## 2026-11-23 19:58
 
 **VF-A.** Thank you: unit ideal at four primes with a non-unit calibration is exactly what was needed. Yes, please

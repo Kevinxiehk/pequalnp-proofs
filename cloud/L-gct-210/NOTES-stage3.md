@@ -1,5 +1,5 @@
 # NOTES-stage3 (role: stage3; start 14:37, budget 90 min -> ends ~16:07)
-## RESULT, ROUND 7 (stage3, 20:02; final) -- details in section 26; requests for the heavy machine in COMPUTE-stage3.md
+## RESULT, ROUND 7 (stage3, 20:12; final) -- details in section 26; requests for the heavy machine in COMPUTE-stage3.md
  Regime: 9-dim level L, all a_r = 1, all lam >= 3 ("no minimal row pair"), z = vector of the dims of the single-row parts.
  (1) z = (1,0,0,0,0) (exactly one single-row direction) is IMPOSSIBLE in the families F1 (all lam = 3), F3 (lam_ae = 4), F4a (lam_ab = 4,
      lam_cd = 3)  [rigorous hand proofs, NOT yet verified independently].
@@ -9,13 +9,14 @@
      core M is explicit in ten vectors; (CA2) gives exactly the identities (i)-(iii) of (A5'). NEW: an EXACT 7-dim level space M_0 with
      the shape and all invariants of the F4b core exists (free column (+) cube-root-of-unity block; exact check in Z[omega]); it
      violates (iii) and has dim T_1(M_0) = 8. So F4b cannot be excluded by the level conditions of the core alone. F4b is OPEN.
- (2) two rows with 2-dim single-row parts: impossible by rows' FL2* unless both planes are degenerate (Lemma: dim(U o U') >= 2).
-     Degenerate case: Lemma DEG (all 3x3 subpermanents vanish identically on X_de when the radical is a line) and the resulting
-     small list of identities (section 26 (B')); NOT settled.
+ (2) THEOREM Z22 [rigorous hand proof, NOT yet verified]: at most ONE row has a 2-dim single-row part (z_d = z_e = 2 is impossible).
+     Nondegenerate planes: rows' FL2* + Lemma dim(U o U') >= 2. Degenerate planes: the first four steps of the FL2* proof survive and
+     give "X_de is 3-dim with all column sums 0 and dim(U o U') = 2"; a totally isotropic plane has dim(Z o Z) = 3 (excluded); if the
+     radical is a line, Lemma DEG (all 3x3 subpermanents vanish identically on X_de) and a short case analysis exclude it.
  (3) (S3-a), z_e = 2: structure sharpened (all 2-row spaces through e are trivial, lam_{rr'} = 2 + m_kl, (Q4) for the four other rows),
      and a precise reason why the missing cyclic identity cannot come from lineality along e_e Z. NOT settled.
- (4) What is left: table in section 26 (D):  F4b;  z = (2,0,0,0,0);  two entries 2 with both planes degenerate;  the z-vectors with
-     single-row elements in several rows (not analysed);  rows with a_r >= 2 (outside this regime).
+ (4) What is left: table in section 26 (D):  F4b;  z = (2,0,0,0,0) = (S3-a);  the z-vectors with single-row elements in several rows
+     and at most one entry 2 (not analysed);  rows with a_r >= 2 (outside this regime).
  (5) COMPUTE-stage3.md (asked for by the coordinator): six self-contained computation requests (direct structured searches for
      z_e = 2 and for one single-row element; cores of (S3-a) with the cyclic products and FO2; F4b systems A/B with the
      calibration M_0 and the small exact free-column sub-problem; several single-row rows; exact confirmation of the plane lemmas).
@@ -1319,26 +1320,52 @@ STATUS 19:20: results so far: (i) pattern m_ie = 3 is impossible by counting, th
    COROLLARY. If z_i = z_i' = 2 for two rows and <,> is nondegenerate on Z_i, then Z_i' = (Z_i + C1)^perp (Lemma S3-2 (b)), L contains
    the split pair e_i (x) Z_i (+) e_i' (x) Z_i', and FL2* gives dim L <= 10 - 2 = 8. So z-vectors with two entries 2 occur at most
    with BOTH planes degenerate (then Z_i and Z_i' share an isotropic vector orthogonal to both).
-   (B') THE DEGENERATE TWO-PLANE CASE (z_d = z_e = 2, <,> degenerate on Z_d) [rigorous partial result; the case is NOT settled].
-        Z_e = (Z_d + C1)^perp, so Z_d cap Z_e = rad(Z_d). Either (deg-1) rad(Z_d) = C n is a line (n isotropic, s(n) = 0), V_3 := Z_d + Z_e
-        is 3-dim and V_3^perp = span(1, n); or (deg-2) Z_d = Z_e is a totally isotropic plane.
-        LEMMA DEG. In case (deg-1) every x in X_de (rows a,b,c; lam_de >= 3) has X_a X_b X_c = 0 in A_3 (all ten 3x3 subpermanents vanish).
-        Proof. For x in X_de and z in Z_d the element x + e_d z^T lies in L_e, so (CA2) (a_e = 1) gives z . X_a X_b X_c = 0 in A_4; the same
-        with L_d and Z_e. So B := B_{X_a X_b X_c} (symmetric, zero diagonal) kills V_3 and has rank <= 2. If B != 0 its rank is 2,
-        B = al be^T + be al^T with al_j be_j = 0 for all j, and ker B = {al, be}^perp = V_3, so span(al, be) = span(1, n). Then 1 = x al + y be
-        with disjoint supports forces al, be to be multiples of the indicator vectors 1_A, 1_B of a partition of the columns, and
-        n = la 1_A + mu 1_B with <n,1> = la|A| + mu|B| = 0, <n,n> = la^2|A| + mu^2|B| = 0 gives la^2 |A| (1 + |A|/|B|) = 0, n = 0. QED
-        CONSEQUENCES in case (deg-1), z = (0,0,0,2,2): counting gives lam_{rd} = lam_{re} = 3 and lam_{rr'} >= 4 for r,r' in {a,b,c}; if
-        lam_ab = lam_ac = lam_bc = 4 then L_a = C t (+) e_d Z_d (+) e_e Z_e with a 2-row element t on (b,c), likewise t' on (a,c), t'' on (a,b),
-        lam_de = 3 and X_de = span(t, t', t'') if these three are independent (otherwise X_de contains a genuine 3-row element), and
-          t_b + t_c = mu n,  t'_a + t'_c = mu' n,  t''_a + t''_b = mu'' n      [column sums of X_de are orthogonal to V_3 and have sum 0];
-          t_b t_c . P_a = 0,  t'_a t'_c . P_b = 0,  t''_a t''_b . P_c = 0,  t'_a t''_b t_c + t''_a t_b t'_c = 0  in A_3   [Lemma DEG; P_a :=
-          span(t'_a, t''_a), ...];      Z_d Z_e . t_b t_c = 0 in A_4 (and for t', t'')   [(CA2) on L_a, L_b, L_c];
-          a 2-row element with t_b t_c = 0 is x (e_b - e_c) e_j^T   [(Q0): type B would make n 2-sparse, hence not isotropic].
-          sigma_2 on X_de reads  e_2(x_a) + e_2(x_b) + e_2(x_c) = 0  (e_2 = second elementary symmetric function of a row), because the
-          column sum of x is a multiple of the isotropic n; e.g. for mu = mu' = 0: t = (e_b - e_c) u^T, t' = (e_c - e_a) v^T need
-          <u,u> = s(u)^2, <v,v> = s(v)^2, <u,v> = s(u) s(v), which excludes unit vectors in two different columns.
-        OPEN: finish (deg-1) from these identities (a small exact problem), the sub-case lam_ab = 5, and (deg-2).
+   (B') THEOREM Z22 [rigorous hand proof, uses rows' FL2* and its proof; NOT yet verified independently; sanity checks stage3/z22_check.py].
+        In the regime (9-dim level L, all a_r = 1, all lam >= 3) at most ONE row has a 2-dim single-row part: z_d = z_e = 2 is impossible.
+        Notation: U := Z_d, U' := Z_e. Both lie in 1^perp and U is orthogonal to U' (sigma_1, sigma_2 on e_d u^T + e_e u'^T), so
+        U' = (U + C1)^perp and U cap U' = rad(U). Three cases: (nd) rad(U) = 0: excluded by FL2* and dim(U o U') >= 2 (part (B)).
+        (deg-1) rad(U) = C n a line (n isotropic, s(n) = 0), V_3 := U + U' 3-dim, V_3^perp = span(1, n). (deg-2) U = U' totally isotropic.
+        STEP 1 (the first four steps of rows' proof of FL2*, R3.9; they do not use U cap U' = 0). Pi := projection of L to the rows a,b,c;
+          its kernel is the 2-row space Y_de, which contains the 4-dim e_d U (+) e_e U' and has dim <= 4 (L101): dim Pi = 5.
+          For x = (Y''; a; b) in L (a = row d, b = row e), c := column sums of Y'': the la la'-coefficient of perm(J + x + la e_d u^T +
+          la' e_e u'^T), in degree 1 in x, is 4 <c, u o u'> = 0; the la- and la'-coefficients in degree 1 are -6 <u, b + c> = 0 and
+          -6 <u', a + c> = 0 [Delta_0 = 6(J - I), (Delta_1)_{jl} = 2(S - c_j - c_l)]. So c(Pi) lies in (U o U')^perp (which contains 1),
+          Pi_0 := {c in C1} has codim <= 4 - dim(U o U') in Pi, and over Pi_0: a in U'^perp = U + C1, b in U^perp = U' + C1. Subtracting
+          single-row elements, every Y'' in Pi_0 has a unique lift z = (Y''; al 1; be 1) in L; perm(J + z) = (1 + al)(1 + be) G(Y'') = 120
+          identically on a linear space forces al = be = 0, and then sigma_1 gives c = 0. Hence
+              dim { x in X_de : all column sums of x vanish } >= dim Pi_0 >= 1 + dim(U o U').
+          On the other hand lam_de <= 5 - z_e = 3 ((c2)). So dim(U o U') = 2, lam_de = 3, and EVERY x in X_de has x_a + x_b + x_c = 0.
+        STEP 2 (deg-2 is impossible). For a totally isotropic plane Z = span(n,h) in 1^perp, dim(Z o Z) = 3: a relation
+          x n o n + y n o h + z h o h = 0 factors as l_1(n_j,h_j) l_2(n_j,h_j) = 0 for all j; z_i := l_i(n,h) are nonzero vectors of Z
+          with z_1 o z_2 = 0; l_1 || l_2 gives z_1 = 0; otherwise z_1, z_2 have disjoint supports, and a nonzero isotropic vector with
+          sum 0 has at least 3 nonzero entries: 6 > 5. So dim(U o U') = 3, against STEP 1.
+        STEP 3 (LEMMA DEG, case (deg-1)): every x in X_de has X_a X_b X_c = 0 in A_3 (all ten 3x3 subpermanents vanish).
+          Proof. For z in U the element x + e_d z^T lies in L_e, so (CA2) (a_e = 1) gives z . X_a X_b X_c = 0 in A_4; the same with L_d
+          and U'. So B := B_{X_a X_b X_c} (symmetric, zero diagonal) kills V_3; its image lies in V_3^perp = span(1, n):
+          B = x 1 1^T + y (1 n^T + n 1^T) + z n n^T, and the zero diagonal says x + 2 y n_j + z n_j^2 = 0 for all j. If B != 0 the entries
+          of n take at most two values, n = la 1_A + mu 1_B, and s(n) = <n,n> = 0 give 5 la^2 |A|/|B| = 0, n = 0. So B = 0. QED
+        STEP 4 (deg-1 is impossible). By (c2) and (c5), lam_{rd} = lam_{re} = 3 and m_bc, m_ac, m_ab >= 1 (r in {a,b,c}): X_de contains
+          2-row elements, and by STEP 1 they are t = (e_b - e_c) u^T, t' = (e_c - e_a) v^T, t'' = (e_a - e_b) x^T with u, v, x != 0.
+          On X_de (zero column sums) sigma_2 = (1/2) sum_r q(x_r), q(y) := <y,y> - s(y)^2 = -2 e_2(y), a NONDEGENERATE form (I - J).
+          (IND) t, t', t'' independent: X_de = {(ga x - be v, al u - ga x, be v - al u)}; sigma_2 = 0 makes S := span(u,v,x) totally
+            q-isotropic, so dim S <= 2, and = 2 (dim 1 would make t, t', t'' dependent). Lemma DEG reads (coefficients of al^2 be, ...)
+            U^2 V = U^2 X = V^2 U = V^2 X = X^2 U = X^2 V = 0 in A_3. Say u, v independent, x = la u + ka v. If la != 0: U^3 = 0, so u has
+            <= 2 nonzero entries and e_2(u) = 0: u = c e_j; then V^2 y_j = 0 and e_2(v) = 0 give v = c' e_l, l != j, and
+            q(u,v) = -c c' != 0: contradiction. If ka != 0: the same with u, v exchanged. (The other two labelings are symmetric.)
+          (DEP) t, t', t'' dependent: then u || v || x =: y and X_de contains F_y = {c (x) y : c_a + c_b + c_c = 0} (2-dim).
+            sigma_2: q(y) = 0; Lemma DEG: c_a c_b c_c Y^3 = 0; so y = e_j and F_y = F is the free column j on the rows a,b,c.
+            X_de = F (+) C xi with xi != 0 supported in the columns N != j (subtract its column j, which lies in F). Lemma DEG on
+            c (x) e_j + th xi: Xi_a Xi_b Xi_c = 0 and Xi_b Xi_c = Xi_a Xi_c = Xi_a Xi_b =: Q; with xi_c = -xi_a - xi_b this is
+            Xi_a^2 = Xi_b^2 = Xi_c^2 = -2Q, hence Xi_r^3 = -2 Xi_r Q = -2 Xi_a Xi_b Xi_c = 0: every xi_r has <= 2 nonzero entries.
+            sigma_2 (cross term): sum_r c_r s(xi_r) = 0 on {sum c = 0} and sum_r s(xi_r) = 0 give s(xi_r) = 0 for all r.
+            If some xi_r has two nonzero entries (columns k,l), then by Xi_a^2 = Xi_b^2 = Xi_c^2 all three are p_r (e_k - e_l) with
+            p_r != 0, and Xi_a^2 = -2 Xi_a Xi_b, Xi_b^2 = -2 Xi_a Xi_b give p_a = -2 p_b, p_b = -2 p_a: p_a = 0. Otherwise every xi_r has
+            at most one nonzero entry and sum 0: xi = 0. Contradiction in both cases.                                           QED
+        Sanity checks (z22_check.py, 200 random instances): dim(Z o Z) = 3 for totally isotropic Z; no B != 0 in Lemma DEG; generic
+        (deg-1) pairs have dim(U o U') = 4. A light LM search for the 7-dim space span(t,t',t'') (+) e_d U (+) e_e U' (deg-1 shape,
+        level conditions only) found 0 solutions in 8 starts (deg_small.py; corroboration only).
+        COROLLARY of STEP 1 for ANY two rows d, e of a level space L with full split data (e_d U (+) e_e U' inside L, U' = (U + C1)^perp,
+        degenerate or not): dim {x in L : rows d, e = 0, all column sums 0} >= dim L - 8 + dim(U o U').
  (C) (S3-a), z_e = 2 -- structure sharpened, NOT settled.
    (C5) Rigidity: for r in R, pi_e(L_r) = Z, so every 2-row space through e is trivial, Y_ke = e_e Z, and X_{rr'} = Y_kl (+) e_e Z:
         lam_{rr'} = 2 + m_kl in {3,4}; the m-pattern on R is (t0), (t1) or (t2) of section 16, and (Q4) holds for R in all three.
@@ -1355,11 +1382,12 @@ STATUS 19:20: results so far: (i) pattern m_ie = 3 is impossible by counting, th
    z = 0:                 impossible (Theorem N = N1 + N2-X).
    z = (1,0,0,0,0):       F1, F3, F4a impossible ((A3), (A4));   F4b OPEN ((A5), (A5'): core shape realisable (M_0), identities (i)-(iii)).
    z = (2,0,0,0,0):       OPEN = (S3-a): missing cyclic identity / weakened plane problem ((C), section 24 (C)).
-   two entries 2:         impossible unless both planes are degenerate ((B)); the degenerate case OPEN, partial result Lemma DEG ((B')).
+   two entries 2:         IMPOSSIBLE (Theorem Z22, (B) + (B'): FL2* in the nondegenerate case, a count and Lemma DEG otherwise).
    z = (1,1,*,*,*), (2,1,*,*,*) with one entry 2 at most: OPEN, not analysed (for two rows e, e' with z = 1 one has
                           W W' . P_k P_l = 0 for the pairs of the other three rows; the single-row vectors are pairwise orthogonal).
    Besides: rows with a_r >= 2 (reg2), the transposed statements, and the verification of sections 21, 24, 26.
 STATUS 19:25 (round 7): section 26 written: z = (1,0,0,0,0) impossible in F1, F3, F4a; FL2* corollary; structure of (S3-a); table (D).
 STATUS 19:31: COMPUTE-stage3.md written (requests for the 24-core machine).
 STATUS 19:58: F4b: (CA2) gives exactly (i)-(iii); exact level space M_0 of F4b-core shape found (violates (iii), dim T_1 = 8); F4b stays OPEN.
-STATUS 20:02: Lemma DEG for the degenerate two-plane case added (section 26 (B')). Final report of round 7.
+STATUS 20:02: Lemma DEG for the degenerate two-plane case added (section 26 (B')).
+STATUS 20:12: THEOREM Z22 proved (two rows with 2-dim single-row parts are impossible, degenerate planes included). Final report of round 7.

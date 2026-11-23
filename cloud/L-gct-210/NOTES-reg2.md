@@ -206,3 +206,55 @@ STATUS 19:56: final. Scripts added since 19:40: linespan.py, drsearch.py, look3.
  ecmove2.py, ext55.py, ext55b.py, ext7.py; data: Mstar2.npy, dr_u3_*.npy, ec_*.npy, ec2_*.npy, linespan_other_*.npy.
  4.7 (reg2/ecmove3.py) EC moves of the Type F row-4 kernels of ex2, ex3, fam2 and the s-family (their N lives on two columns, three
      zero columns): 24 more spaces, all level, all (dim Omega, dim T_1, FO2) = (4, 11, 8). Total: 54 single-move spaces, all (4,11,8).
+
+# ROUND 2 (start 19:59, budget ~2 h). Targets: (1) deletable line at dim 6, (2) (S6-FO2) family by family, (3) a_r = 3, (4) FILTER.
+STATUS 20:08: (2) the families with a 3-dim single-row part (M*, EC moves, DR3) are now excluded from 9-dim level spaces by a HAND proof
+ (Theorem SP8 below: stage2's (Z3) + verifyfl's TC5 / SPLIT), no computation. (4) FILTER tested. NC family: 10 random members (2,9,7).
+
+## 5. Theorem SP8 and the family-by-family status of "L_r = M, dim L = 9" (round 2)
+ 5.1 (Z3) in the form used [rigorous; = stage2 (Z3) / rows' saturation; 3 lines]. L level 5x5, i a row, Z_i := {w : e_i w^T in L} (single-row
+     part, inside 1^perp), L_i := L cap {row i = 0} (a 4x5 level space), W_i := row-i projection of L. Then
+        (a) C(L_i) lies in Z_i^perp cap 1^perp (dim 4 - z_i),      (b) dim L = dim L_i + dim W_i <= dim L_i + 4.
+     Proof: for t in L_i, w in Z_i: perm(J + t + e_i w^T) = perm(J + t) + <w, N(J' + pi_i t)>, both permanents are 120.  QED
+     So in a 9-dim level space, for EVERY row i (and column), L_i is a 4x5 level space of type (4 + a_i, <= 4 - z_i).
+ 5.2 THEOREM SP8 [rigorous given verifyfl's TC5, SPLIT and Lemma SL, all verified]. Let L be a level space of 5x5 matrices containing
+     e_i (x) U, U = {w : <1,w> = 0, <m,w> = 0} (dim 3), m in 1^perp. If  (a) m = e_a - e_b,  or  (b) <m,m> != 0 and e_i' m^T is in L for
+     some row i' != i,  then dim L_i <= 4 and dim L <= 8.
+     Proof: by 5.1(a) L_i is level with defect inside C m. (a): TC5 ("a 4x5 space with defect line inside C(e_a - e_b) has dim <= 4").
+     (b): e_i' m^T lies in L_i; defect 0: Lemma SL (dim <= 3); defect line C m, non-isotropic, split: Theorem SPLIT (dim <= 4).
+     Then 5.1(b).  QED      [Compare rows' FL2*: 10 - dim(U o m) = 7, 8, 9 for |supp m| = 4-5, 3, 2; SP8 gives 8 also for two columns.]
+     COROLLARY (regime a_r = 2, hand proof, all parameters): L_r cannot be a member of the families M*_1(x,y), M*_2, any single EC
+     move of a Type F space (they contain e_3 (x) {w_a = w_b} and e_i (e_a - e_b)^T), nor a DR3 space containing its split element
+     e_i' m^T with <m,m> != 0 (the four DR3 spaces found by drsearch do: m two-column up to 1e-3 in three of them, three-column in one).
+     Sanity (pfr_chk.py): in the 7-dim spaces M* (+) C t, row 3 has rank 4, L_3 is a (3,1) space with defect direction e_1 - e_2.
+     In general: a 3-dim single-row part e_i (x) {1,m}^perp in a 9-dim level space  <=>  L_i is a (5,1) [or (6,1)] space with line C m:
+     the team's open (DI_5) case e = 1, now only for the lines m NOT covered by TC5 / SPLIT / PR3.
+ 5.3 STATUS TABLE for M = L_r of dimension 6 in a 9-dim level space (census families of section 4):
+       F  (full free row)                                    excluded: Theorem FL                          [rigorous]
+       M*, EC moves, DR3-split (3-dim single-row part)       excluded: Theorem SP8                         [rigorous]
+       DR3 non-split or isotropic m                          none found; would need "no (5,1) with line C m"
+       DR2, NC (dim Omega = 2)                               excluded by criterion A: dim L <= 7           [rigorous GIVEN Omega(M) = span(1,e_c);
+                                                             Omega computed per space: exact for 2 spaces, numerical for the others]
+     So what is missing for a proof of the regime is (i) the classification "6-dim => one of these families" and (ii) a structural
+     proof of dim Omega = 2 for DR2 / NC (symbolic tasks G1, G2 in COMPUTE-reg2.md section 7).
+ 5.4 NC family of section 2.5: 10 random members (fam_nc2.py): (e, dim T_1, dim Omega, FO2, dim E_0) = (3, 9, 2, 7, 7) for all.
+
+## 6. FILTER for regime 1 (rows with 4-dim projection), from criterion A  [statement rigorous; tests numerical, reg2/filter1.py]
+ Let L be a 9-dim level space and r a row with a_r = 1 (W_r 4-dim, M := L_r 5-dim). NECESSARY:
+   (F1) M is a 4x5 level space with Phi = 0 on M (all five 4x4 subpermanents vanish identically)           [stage2 (Q-r)(ii)]
+   (F2) Omega(M) = C^5, i.e. dim T_1(M) = dim E_0(M) + 5: EVERY e_j (j = 0..4) is the row-r part of a first-order extension, equivalently
+        each deletion permanent N_j(J'+Y) restricted to M is of the form -D_X F(J'+Y) (g(M) = e(M) + 1: all defect functions twisted-
+        realisable). Proof: W_r (dim 4) lies in Omega(M) and misses 1, which is in Omega(M).   [new, cheap: one SVD]
+   (F3) for every OTHER row i: L_i is a (4 + a_i, <= 4 - z_i) space (5.1); in particular a 3-dim single-row part of M in row i forces a
+        (5,1) space with that line, impossible in the cases of SP8.
+   (F4) FO2 bound(M) >= 9.
+ Tests (5-dim spaces; invariants (Phi-rank, dim Omega, dim T_1, FO2)):
+   generic hyperplane of a Type F space with Omega = C^5 (F1 = free row (+) {x e_4^T}, F2 = free row (+) C x e_0^T (+) C y e_3^T):
+        (0, 5, 12, 9), single-row part of dim 3 with a GENERIC line m: passes F1, F2, F4. By (F3) it is a regime-1 candidate exactly if a
+        (5,1) space with a generic line exists: these hyperplanes are the "(5,1) problem" seen from the other side.
+   hyperplane of F1/F2 obtained by dropping a free-row direction: (0, 5, 13, 9): same remark (m two-column: excluded by SP8(a)).
+   generic hyperplane of M*_1, M*_2: (0, 4, 11, 8): FAILS (F2) and (F4).
+   special hyperplanes of M*: drop x e_0^T or y e_3^T: (0, 4 or 5, 15, 10): pass first/second order, but contain the split pair: excluded
+        by SP8(b) -- an example where SP8 is strictly stronger than FO2; drop the EC element: (0, 5, 15, 10), m two-column: SP8(a).
+   5-dim census of round 1 (ext5.py, 53 spaces): Omega = C^5 with Phi = 0 in 10 of them: 9 with a full free row, 1 without.
+ So (F2) removes most 5-dim level spaces, and what survives so far all contains a 3-dim piece of a free row, i.e. reduces by (F3) to (5,1).

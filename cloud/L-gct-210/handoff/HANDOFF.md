@@ -1,5 +1,11 @@
 # L-gct-210 handoff: cloud session → local 24-core session
 
+> **ERRATA (20:14, read first):** see `COMPUTE-ERRATA.md` next to the COMPUTE files. In particular: no 8-dim level space is
+> known (calibrate at dim 7); the statement "(S6′) dim Ω ≤ 2 without a full free row" used below under "Blocked 4" and C2 is
+> FALSE — the target is (S6-FO2): no full free row ⟹ FO2 bound ≤ 8; C1 acceptance is d − e ≥ 4; every numerical hit needs a
+> fresh-point test and `oracle.py`; unit ideals mod p are evidence, not proof.
+
+
 Written 2026-11-23 19:40 (Europe/Berlin). Everything referred to below is in the bundle
 `L-gct-210-bundle.tar.gz` (unpack anywhere; paths below are relative to its `L-gct-210/` folder).
 
