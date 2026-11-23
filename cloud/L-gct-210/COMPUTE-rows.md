@@ -144,6 +144,32 @@ Every hit: run `handoff/oracle.py file.npy` -> prints (d,e), level error, dimens
  (2,0,0,0), (0,0,0,0); (6,3) FS-type and column-type; and verify perm(J + t) = 120 symbolically on the lifts. Known exact examples:
  rows/exact7.py, rows/exact7b.py.
 
+## NEW (round 6) — queue these first (written 20:40)
+
+### R6-1 (replaces X4 by a much smaller system): strongly level planes live on <= 3 columns
+ REDUCTION (rigorous, rows NOTES R6.1): a principal K (3-dim strongly level, s(K) = 1^perp) with >= 4 nonzero columns contains a 2-dim
+ strongly level subspace with the SAME nonzero columns on which the row-sum map s is injective; and a space with 5 nonzero columns
+ contains a single strongly level matrix with 5 nonzero columns. So X4 follows from the two claims
+   (A) there is no strongly level 4x5 MATRIX with five nonzero columns   (15 unknowns, 15 homogeneous equations of degree 2,3,4);
+   (B) there is no strongly level PLANE {s h + t h'} with column 4 identically zero, the other four columns nonzero, and s(h), s(h')
+       linearly independent   (20 unknowns after normalising the row sums to (1,0,u), (0,1,v) in Walsh coordinates; 33 equations).
+ ("strongly level": c(Y) = 0 for every Y of the space, i.e. all five 4x4 deletion permanents of J + Y equal 24.)
+ Walsh coordinates: a column with zero sum is sum_p x_p chi_p, chi_1 = (1,1,-1,-1), chi_2 = (1,-1,1,-1), chi_3 = (1,-1,-1,1).
+ The chart in (B) is enough: the row permutations act on the Walsh coordinates by all signed permutations with an even number of signs,
+ so every plane of row sums can be moved to one whose projection to the first two Walsh coordinates is bijective.
+ Generator (pure Python, writes a Singular script and, with a 4th argument, an msolve file with Rabinowitsch localisations):
+   `python3 rows/gb/x4gen.py P CASE OUT [CHART]`,  CASE in {A, A4, B, B3, C}  (see the header of the file):
+     A  = claim (A);   A4 = one matrix with four nonzero columns (CALIBRATION: must be NON-unit, such matrices exist numerically);
+     B  = claim (B);   B3 = the same with three nonzero columns (CALIBRATION: must be NON-unit: kernel types (1,1,1), (2,2,1));
+     C  = planes with five nonzero columns (only needed if (A) is not the unit ideal).
+   The Singular script computes std(I) and then saturates successively by the column ideals (sat from elim.lib) and prints
+   "RESULT case .. : 1" if the saturated ideal is the unit ideal.  CHART = one character per active column: a digit k (the k-th
+   coordinate of that column is inverted), r (a pseudo-random linear combination is inverted), - (no condition); output OUT.ms.
+ Here (2 shared cores) std(I) for A4 did not finish in 100 s, neither in Singular nor in msolve with CHART rrrr; so run A, A4, B, B3 on
+ the 24-core machine at >= 3 primes (e.g. 2147483629, 2147483497, 2147483077).  DECISION: A unit and B unit with A4, B3 non-unit
+ => every principal K lives on <= 3 columns [modular], which makes Theorem NCOL-P3 unconditional for principal (4,1) spaces.
+ If B is NOT unit: send the primary decomposition / a point (it would be a new kind of strongly level plane).
+
 ## 3. What to send back
  For each task: number of starts, hit rate of the calibration, hit rate of the target, the .npy of every target hit or law violation
  (with oracle output), and the tables printed by the checking scripts.

@@ -7,7 +7,7 @@
 # mode e0: rho = 0 and X normalised modulo M + C d (column 0 of X zero, x_{0,ja} = x_{1,jb} = x_{3,jc} = 0); 13 charts x_ib = 1.
 import sys, itertools, time; sys.path.insert(0,"/home/claude/work/L-gct-210/reg2/gb")
 from polylib import *
-p=int(sys.argv[1]); cal=len(sys.argv)>2 and sys.argv[2]=='cal'; e0=len(sys.argv)>2 and sys.argv[2]=='e0'
+p=int(sys.argv[1]); cal=len(sys.argv)>2 and sys.argv[2]=='cal'; e0=len(sys.argv)>2 and sys.argv[2] in ('e0','e0cal'); e0cal=len(sys.argv)>2 and sys.argv[2]=='e0cal'
 RUN=(lambda polys,names,p,tag: run_singular(polys,names,tag)) if p==0 else run_msolve
 ys=['y%d'%i for i in range(1,7)]; av=['a%d'%i for i in range(1,5)]; bv=['b%d'%i for i in range(1,5)]; cv=['c%d'%i for i in range(1,5)]
 xv=['x%d%d'%(i,j) for i in range(4) for j in range(5)]; rv=['r%d'%j for j in range(5)]
@@ -57,6 +57,10 @@ for (ja,jb,jc) in charts:
         continue
     if e0:
         zero=['x%d0'%i for i in range(4)]+['x0%d'%ja,'x1%d'%jb,'x3%d'%jc]
+        if e0cal:
+            norm=[W(r) for r in rv]+[W(z) for z in zero[4:]]+[add(W('x00'),R2.const(-1))]
+            u,n,s=RUN(eqs+fam+par+norm,names,p,'nce0c'); tot+=s
+            print('chart a%d=b%d=c%d=1, E0-CALIBRATION (column 0 free, x00 = 1): unit=%s basis size %s (%.1f s)'%(ja,jb,jc,u,n,s),flush=True); continue
         for xn in [v for v in xv if v not in zero]:
             norm=[W(r) for r in rv]+[W(z) for z in zero]+[add(W(xn),R2.const(-1))]
             u,n,s=RUN(eqs+fam+par+norm,names,p,'nce0'); tot+=s; allunit=allunit and bool(u)

@@ -1,0 +1,8 @@
+#Reduced Groebner basis data
+#---
+#field characteristic: 2147483629
+#variable order:       u0_1, u0_2, u0_3, u0_4, u0_5, a3, b3, a4, b4, y0_1, y0_2, y0_3, y0_4, y0_5, y1_1, y1_2, y1_3, y1_4, y1_5
+#monomial order:       graded reverse lexicographical
+#length of basis:      1 element
+#---
+[1]:

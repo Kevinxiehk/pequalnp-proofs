@@ -34,19 +34,17 @@ theorem t1_identity {m : ℕ} {L : Submodule ℂ (Fin (m + 2) × Fin (m + 2) →
       · simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, if_neg hp]
         rw [hxS i hp j']
         ring
-    rw [e1, blk_row_scale]
+    rw [e1]
     have h3 := ca2_full hL e hrank (ξ + s⁻¹ • x) (L.add_mem hξ (L.smul_mem _ hx))
       (fun j' => by
         simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
         rw [hξe j', hxS e heS j']
         ring) j
-    rw [h3, mul_zero]
+    have h4 := blk_row_scale e.succAbove j.succAbove (fun i => if i ∈ S then s else 1)
+      (ξ + s⁻¹ • x)
+    exact h4.trans (by rw [h3, mul_zero])
   have hP0 := poly_zero_of_ne P hz
   have h0 := hP 0
-  rw [zero_smul, hP0, Polynomial.eval_zero] at h0
-  rw [← h0]
-  congr 1
-  funext p
-  simp only [Pi.add_apply, Pi.zero_apply]
-  ring
+  rw [zero_smul, add_zero, hP0, Polynomial.eval_zero] at h0
+  exact h0
 

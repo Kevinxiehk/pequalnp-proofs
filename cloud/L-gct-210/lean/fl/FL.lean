@@ -7082,6 +7082,121 @@ theorem single_row_t3 (K : Submodule ℂ M45) (hK : Lev45 K) (i k l : Fin 4) (hi
     + (3 / 2 : ℂ) * huu'' + (3 / 2 : ℂ) * hu'u'' + (1 / 2 : ℂ) * (u 0 + u 1 + u 2 + u 3 + u 4) * hu'u''
     + (1 / 2 : ℂ) * (u' 0 + u' 1 + u' 2 + u' 3 + u' 4) * huu''
 
+def zrow (i : Fin 4) : M45 →ₗ[ℂ] M45 where
+  toFun Y := fun p => if p.1 = i then 0 else Y p
+  map_add' Y Y' := by
+    funext p
+    by_cases h : p.1 = i
+    · simp only [Pi.add_apply, if_pos h, add_zero]
+    · simp only [Pi.add_apply, if_neg h]
+  map_smul' c Y := by
+    funext p
+    by_cases h : p.1 = i
+    · simp only [Pi.smul_apply, if_pos h, smul_zero, RingHom.id_apply]
+    · simp only [Pi.smul_apply, if_neg h, RingHom.id_apply]
+
+theorem one_add_zrow (i : Fin 4) (Y : M45) :
+    (fun p : Fin 4 × Fin 5 => 1 + zrow i Y p) = repl i (fun _ => 1) (fun p => 1 + Y p) := by
+  funext ⟨k, j⟩
+  by_cases h : k = i
+  · rw [h, repl_at]
+    show 1 + (if i = i then (0 : ℂ) else Y (i, j)) = 1
+    rw [if_pos rfl, add_zero]
+  · rw [repl_ne i k h]
+    show 1 + (if k = i then (0 : ℂ) else Y (k, j)) = 1 + Y (k, j)
+    rw [if_neg h]
+
+theorem FL45_core (K : Submodule ℂ M45) (hK : Lev45 K) (i : Fin 4)
+    (hF : ∀ w : Fin 5 → ℂ, ∑ j, w j = 0 → rowE i w ∈ K) (Y : M45) (hY : Y ∈ K) :
+    (∀ b, P4 b (repl i (fun _ => 1) (fun p => 1 + Y p)) = P4 0 (repl i (fun _ => 1) (fun p => 1 + Y p))) ∧
+    (5 + (Y (i, 0) + Y (i, 1) + Y (i, 2) + Y (i, 3) + Y (i, 4))) * P4 0 (repl i (fun _ => 1) (fun p => 1 + Y p)) = 120 := by
+  have gen : ∀ w : Fin 5 → ℂ, ∑ j, w j = 0 →
+      ∑ b, (1 + Y (i, b) + w b) * P4 b (repl i (fun _ => 1) (fun p => 1 + Y p)) = 120 := by
+    intro w hw
+    have h := hK _ (K.add_mem hY (hF w hw))
+    have eN1 : (fun p : Fin 4 × Fin 5 => 1 + (Y + rowE i w) p) =
+        repl i (fun j => 1 + Y (i, j) + w j) (fun p => 1 + Y p) := by
+      funext ⟨k, j⟩
+      by_cases hk : k = i
+      · rw [hk, repl_at]
+        show 1 + (Y (i, j) + if i = i then w j else 0) = 1 + Y (i, j) + w j
+        rw [if_pos rfl]
+        ring
+      · rw [repl_ne i k hk]
+        show 1 + (Y (k, j) + if k = i then w j else 0) = 1 + Y (k, j)
+        rw [if_neg hk, add_zero]
+    rw [eN1] at h
+    have hs := P4_sym 0 i (fun _ => 1) (fun j => 1 + Y (i, j) + w j) (fun p => 1 + Y p)
+    rw [Fin.sum_univ_five] at h
+    rw [Fin.sum_univ_five, Fin.sum_univ_five] at hs
+    rw [Fin.sum_univ_five]
+    linear_combination h - hs
+  have g0 : ∑ b, (1 + Y (i, b)) * P4 b (repl i (fun _ => 1) (fun p => 1 + Y p)) = 120 := by
+    have h := gen (fun _ => 0) (by simp)
+    simpa using h
+  have heq : ∀ a b, P4 a (repl i (fun _ => 1) (fun p => 1 + Y p)) = P4 b (repl i (fun _ => 1) (fun p => 1 + Y p)) := by
+    intro a b
+    have hw : ∑ j : Fin 5, ((if j = a then (1 : ℂ) else 0) - (if j = b then (1 : ℂ) else 0)) = 0 := by
+      simp [Finset.sum_sub_distrib]
+    have h := gen _ hw
+    have h3 : ∑ x, (1 + Y (i, x) + ((if x = a then (1 : ℂ) else 0) - (if x = b then (1 : ℂ) else 0))) *
+        P4 x (repl i (fun _ => 1) (fun p => 1 + Y p)) =
+        ∑ x, (1 + Y (i, x)) * P4 x (repl i (fun _ => 1) (fun p => 1 + Y p)) +
+        (P4 a (repl i (fun _ => 1) (fun p => 1 + Y p)) - P4 b (repl i (fun _ => 1) (fun p => 1 + Y p))) := by
+      simp only [add_mul, sub_mul, Finset.sum_add_distrib, Finset.sum_sub_distrib, ite_mul, one_mul,
+        zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    linear_combination h - g0 - h3
+  refine ⟨fun b => heq b 0, ?_⟩
+  rw [Fin.sum_univ_five] at g0
+  rw [heq 1 0, heq 2 0, heq 3 0, heq 4 0] at g0
+  linear_combination g0
+
+theorem FL45 (K : Submodule ℂ M45) (hK : Lev45 K) (i : Fin 4)
+    (hF : ∀ w : Fin 5 → ℂ, ∑ j, w j = 0 → rowE i w ∈ K) : Module.finrank ℂ K ≤ 6 := by
+  have hρ : ∀ Y ∈ K, Y (i, 0) + Y (i, 1) + Y (i, 2) + Y (i, 3) + Y (i, 4) = 0 := by
+    intro Y hY
+    by_contra hne
+    obtain ⟨c, hc⟩ : ∃ c : ℂ, c * (Y (i, 0) + Y (i, 1) + Y (i, 2) + Y (i, 3) + Y (i, 4)) = -5 :=
+      ⟨-5 / (Y (i, 0) + Y (i, 1) + Y (i, 2) + Y (i, 3) + Y (i, 4)), div_mul_cancel₀ _ hne⟩
+    have h := (FL45_core K hK i hF (c • Y) (K.smul_mem c hY)).2
+    have e : 5 + ((c • Y) (i, 0) + (c • Y) (i, 1) + (c • Y) (i, 2) + (c • Y) (i, 3)
+        + (c • Y) (i, 4)) = 0 := by
+      simp only [Pi.smul_apply, smul_eq_mul]
+      linear_combination hc
+    rw [e, zero_mul] at h
+    norm_num at h
+  have hS : SLev (K.map (zrow i)) := by
+    rintro _ ⟨Y, hY, rfl⟩ a
+    rw [one_add_zrow]
+    obtain ⟨h1, h2⟩ := FL45_core K hK i hF Y hY
+    rw [hρ Y hY] at h2
+    rw [h1 a]
+    linear_combination (1 / 5 : ℂ) * h2
+  have hrow : ∀ Y ∈ K.map (zrow i), ∀ j, Y (i, j) = 0 := by
+    rintro _ ⟨Y, hY, rfl⟩ j
+    show (if i = i then (0 : ℂ) else Y (i, j)) = 0
+    rw [if_pos rfl]
+  have h2 := LemmaSL3 _ hS i hrow
+  have rn := rank_nullity K (rowL i)
+  have hle : (K ⊓ LinearMap.ker (rowL i) : Submodule ℂ M45) ≤ K.map (zrow i) := by
+    intro Y hY
+    obtain ⟨hYK, hYr⟩ := Submodule.mem_inf.mp hY
+    have hr : rowL i Y = 0 := LinearMap.mem_ker.mp hYr
+    refine ⟨Y, hYK, ?_⟩
+    funext ⟨k, j⟩
+    show (if k = i then (0 : ℂ) else Y (k, j)) = Y (k, j)
+    by_cases h : k = i
+    · rw [if_pos h, h]
+      exact (congrFun hr j).symm
+    · rw [if_neg h]
+  have h3 := Submodule.finrank_mono hle
+  have h4 : K.map (rowL i) ≤ sumZero 5 := by
+    rintro _ ⟨Y, hY, rfl⟩
+    rw [mem_sumZero, Fin.sum_univ_five]
+    exact hρ Y hY
+  have h5 := (Submodule.finrank_mono h4).trans (finrank_sumZero (n := 5) (by norm_num))
+  omega
+
 end
 
 end PEqualNP.Outside.L_gct_210_aux.FL

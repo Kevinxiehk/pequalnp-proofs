@@ -966,3 +966,4 @@ STATUS 19:59: R5.12 (R-LAW) written.
    e = 1 is R5.7 (C cap e_n^perp = 0 forces F = 0).
 STATUS 20:00: R5.13 written.  Round 5 final: see RESULT ROUND 5 at the top.
 STATUS 20:04 (ROUND 6 started 20:04, about 2 h -> ~22:04; targets: (1) principal K on <= 3 columns by hand, (2) non-principal (4,1) and (5,1) strata, (3) (DC-COST), (4) (R-LAW)).
+STATUS 20:40: target (1) by hand not finished; reduction to strongly level PLANES (claims (A),(B)) + generator rows/gb/x4gen.py written, queued in COMPUTE-rows.md "NEW (round 6)"; local Groebner runs of A4 too slow (>100 s). Numerics: planes with injective row sums: <= 3 columns in 169/169; single strongly level matrices with 4 columns exist.

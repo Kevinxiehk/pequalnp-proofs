@@ -115,4 +115,24 @@ with open(out,'w') as f:
     for a in range(ncols):
         f.write('ideal J%d=%s;\nI=sat(I,J%d);\nprintf("  after saturation by column %d: basis size %%s, dim %%s, unit: %%s",size(I),dim(I),(reduce(1,I)==0));\n'%(a,','.join(colideal(a)),a,a))
     f.write('printf("RESULT case %s p=%d: %%s",(reduce(1,std(I))==0));\nquit;\n'%(case,p))
+# optional msolve output with Rabinowitsch localisation: argv[4] = chart string, one character per active column:
+#   digit k = k-th generator of that column ideal must be nonzero, 'r' = a fixed pseudo-random linear combination of the generators, '-' = no condition
+if len(sys.argv)>4:
+    import random
+    chart=sys.argv[4]; rnd=random.Random(12345+p%1000)
+    extra=[]; zn=[]
+    for a,ch in enumerate(chart):
+        if ch=='-': continue
+        gens=[Ch[a][q] for q in range(3)]+([Chp[a][q] for q in range(3)] if plane else [])
+        gens=[g for g in gens if g]
+        if ch=='r':
+            g={}
+            for h in gens: g=add(g,h,rnd.randrange(1,p))
+        else: g=gens[int(ch)]
+        extra.append(g); zn.append('z%d'%a)
+    with open(out+'.ms','w') as f:
+        f.write(','.join(uvars+zn)+'\n%d\n'%p)
+        pols=[show(e) for e in eqs]+['(%s)*%s-1'%(show(g),z) for g,z in zip(extra,zn)]
+        f.write(',\n'.join(pols)+'\n')
+    print('written',out+'.ms','with',len(extra),'localisations')
 print('written',out,'equations',len(eqs),'unknowns',len(uvars))
