@@ -7037,4 +7037,4 @@ theorem PEqualNP.Outside.L_meta_3283 : ∀ (x1 : PEqualNP.CircuitLowerBounds.Cir
   rw [h1]
   clear h1
   revert x
-  decide
+  decide +kernel
