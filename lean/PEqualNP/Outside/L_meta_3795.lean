@@ -22,7 +22,7 @@ theorem foldl_len (gs : List Gate) (d : List ℕ) :
   | nil => simp
   | cons g gs ih =>
     rw [List.foldl_cons, ih, stp]
-    simp only [List.length_append, List.length_singleton, List.length_cons]
+    simp only [List.length_append, List.length_cons, List.length_nil]
     omega
 
 theorem getD_app_lt (l l' : List ℕ) (i : ℕ) (h : i < l.length) :
@@ -63,12 +63,12 @@ theorem main (C : Circuit) (x2 : ℕ) (hx2 : x2 < 14)
   have hFsucc : ∀ k (hk : k < gs.length), F (k+1) = F k ++ [gs[k].lineDegree (F k)] := by
     intro k hk
     simp only [hF]
-    rw [List.take_succ, List.getElem?_eq_getElem hk, Option.toList_some, List.foldl_append]
+    rw [List.take_add_one, List.getElem?_eq_getElem hk, Option.toList_some, List.foldl_append]
     rfl
   have hRsucc : ∀ k (hk : k < gs.length), R (k+1) = R k ++ gs[k].inputs := by
     intro k hk
     simp only [hR]
-    rw [List.take_succ, List.getElem?_eq_getElem hk, Option.toList_some, List.flatMap_append]
+    rw [List.take_add_one, List.getElem?_eq_getElem hk, Option.toList_some, List.flatMap_append]
     simp
   have hD0 : ∀ w, w < 14 → D.getD w 0 = if w = x2 then 1 else 0 := by
     intro w hw
@@ -79,8 +79,11 @@ theorem main (C : Circuit) (x2 : ℕ) (hx2 : x2 < 14)
     intro k hk
     have e1 : gs = gs.take k ++ gs[k] :: gs.drop (k+1) := by
       rw [← List.drop_eq_getElem_cons hk, List.take_append_drop]
-    conv_lhs => rw [e1]
-    simp [hR, List.flatMap_append]
+    have e2 := congrArg (List.flatMap Gate.inputs) e1
+    rw [List.flatMap_append, List.flatMap_cons] at e2
+    simp only [hR]
+    rw [List.append_assoc]
+    exact e2
   have hRR : ∀ k (hk : k < gs.length) w, w ∈ gs[k].inputs → w ∈ R k → D.getD w 0 = 0 := by
     intro k hk w hw1 hw2
     have hcnt : 2 ≤ List.count w (gs.flatMap Gate.inputs) := by
@@ -91,8 +94,8 @@ theorem main (C : Circuit) (x2 : ℕ) (hx2 : x2 < 14)
     by_cases hw14 : 14 ≤ w
     · exfalso
       have h1 := List.nodup_iff_count_le_one.mp hnd w
-      have hsub : (gs.flatMap Gate.inputs).filter (fun (x5 : ℕ) => decide (14 ≤ x5)) <+
-          (C.output :: gs.flatMap Gate.inputs).filter (fun (x5 : ℕ) => decide (14 ≤ x5)) :=
+      have hsub : List.Sublist ((gs.flatMap Gate.inputs).filter (fun (x5 : ℕ) => decide (14 ≤ x5)))
+          ((C.output :: gs.flatMap Gate.inputs).filter (fun (x5 : ℕ) => decide (14 ≤ x5))) :=
         (List.sublist_cons_self _ _).filter _
       have h2 := hsub.count_le w
       rw [List.count_filter (by simpa using hw14)] at h2
@@ -134,9 +137,13 @@ theorem main (C : Circuit) (x2 : ℕ) (hx2 : x2 < 14)
         rw [hin]
         refine ⟨fun h => ?_, fun h => ?_⟩
         · rw [if_pos h]
-          simp [hFa, hFb]
+          simp only [List.map_cons, List.map_nil, List.sum_cons, List.sum_nil]
+          rw [hFa, hFb]
+          omega
         · rw [if_neg (by rw [h]; exact fun e => GateOp.noConfusion e)]
-          simp [hFa, hFb]
+          simp only [List.map_cons, List.map_nil, List.foldr_cons, List.foldr_nil]
+          rw [hFa, hFb]
+          omega
       have hpos : 0 < D.getD (14 + k) 0 → 0 < D.getD a 0 ∨ 0 < D.getD b 0 := by
         intro h
         rcases hop with h1 | h1
