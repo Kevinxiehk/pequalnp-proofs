@@ -1,7 +1,7 @@
 import Mathlib
 import PEqualNP.Defs
 
-namespace PEqualNP.Outside.L_meta_2804_aux
+namespace PEqualNP.Outside.L_meta_2804
 
 open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity
 
@@ -148,9 +148,9 @@ theorem split_unique (x2 : ℕ) : ∀ gs : List Gate, (gs.flatMap Gate.inputs).c
       have : x2 ∈ t.flatMap Gate.inputs := List.mem_flatMap.2 ⟨h', hh', hx⟩
       exact (List.count_eq_zero.1 h1) this
 
-end PEqualNP.Outside.L_meta_2804_aux
+end PEqualNP.Outside.L_meta_2804
 
-open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity PEqualNP.Outside.L_meta_2804_aux in
+open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity PEqualNP.Outside.L_meta_2804 in
 theorem PEqualNP.Outside.L_meta_2804 : ∀ (x1 x2 : ℕ) (x3 : PEqualNP.CircuitLowerBounds.Circuit), x2 < x1 → PEqualNP.MetaComplexity.FanInTwo x3 → x3.output ≠ x2 → List.count x2 (List.flatMap PEqualNP.CircuitLowerBounds.Gate.inputs x3.gates) = (1 : ℕ) → ∃ (x8 : PEqualNP.CircuitLowerBounds.Circuit) (x9 : ℕ) (x10 : PEqualNP.CircuitLowerBounds.Gate), PEqualNP.MetaComplexity.FanInTwo x8 ∧ x8.size + (1 : ℕ) = x3.size ∧ x1 ≤ x9 ∧ x9 ≤ x1 + x8.size ∧ (x10.op = PEqualNP.CircuitLowerBounds.GateOp.and ∨ x10.op = PEqualNP.CircuitLowerBounds.GateOp.or ∨ x10.op = PEqualNP.CircuitLowerBounds.GateOp.not) ∧ x10.inputs.length ≤ (2 : ℕ) ∧ x2 ∈ x10.inputs ∧ (∀ x11 ∈ List.take (x9 - x1) x8.gates, x2 ∉ x11.inputs) ∧ ∀ (x11 : List Bool), x11.length = x1 → x3.eval x11 = x8.eval (x11.set x2 (x10.op.eval (List.map (fun (x13 : ℕ) => if x13 < x9 then (x8.wires x11).getD x13 Bool.false else Bool.false) x10.inputs))) := by
   intro x1 x2 x3 hx2 hfan hout hcount
   obtain ⟨pre, g, post, hgs, hg, hpre, hpost⟩ := split_unique x2 x3.gates hcount
@@ -178,7 +178,7 @@ theorem PEqualNP.Outside.L_meta_2804 : ∀ (x1 x2 : ℕ) (x3 : PEqualNP.CircuitL
     rw [this] at hh
     exact hpre h hh
   · intro x11 hlen
-    -- the prefix wires
+    -- the wires before the removed gate
     set P := wf pre x11 with hP
     have hPlen : P.length = L := by rw [hP, length_wf, hlen]
     have hx2P : x2 < P.length := by rw [hPlen]; omega
