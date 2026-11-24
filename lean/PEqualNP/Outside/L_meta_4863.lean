@@ -369,7 +369,7 @@ theorem glue (n : ℕ) (G : SimpleGraph (Fin n)) [DecidableRel G.Adj] (A C : Fin
   have hIsub : G.incidenceSet v ⊆ G.edgeSet := G.incidenceSet_subset v
   have hIcard : (G.incidenceSet v).ncard = 3 := by
     have e := Nat.card_congr (G.incidenceSetEquivNeighborSet v)
-    rw [Set.Nat.card_coe_set_eq, Set.Nat.card_coe_set_eq] at e
+    rw [Nat.card_coe_set_eq, Nat.card_coe_set_eq] at e
     rw [e]
     exact hdeg v hvA
   have hHE : H.edgeSet = G.edgeSet \ G.incidenceSet v := SimpleGraph.edgeSet_deleteEdges _
