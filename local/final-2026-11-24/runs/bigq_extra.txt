@@ -1,0 +1,91 @@
+# ID|DIR|LOG|ULIMIT_KB|BOX_S|CMD   (coordinator-injected big-slot jobs; run once each at the extras() points of bigq3.sh)
+LEANPORT_TRK0P|/home/kevxhk/work/L-gct-210/leanfl|/home/kevxhk/work/L-gct-210/leanfl/TrK0p_port.log|unlimited|3700|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/leanfl/TrK0p.lean 3600
+LEANPORT_FLKFL|/home/kevxhk/work/L-gct-210/leanfl|/home/kevxhk/work/L-gct-210/leanfl/FLK_FL_port.log|unlimited|1900|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/leanfl/FLK_FL.lean 1800
+LEANFLQ_REBUILD|/home/kevxhk/work/L-gct-210/leanfl|/home/kevxhk/work/L-gct-210/leanfl/FLq_rebuild.log|unlimited|2500|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/lean/fl/FLq.lean 2400
+LEANPORT_TRK0P2|/home/kevxhk/work/L-gct-210/leanfl|/home/kevxhk/work/L-gct-210/leanfl/TrK0p2_port.log|unlimited|1900|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/leanfl/TrK0p.lean 1800
+DEFSBUILD2|/home/kevxhk/code/pequalnp-proofs-2/lean|/home/kevxhk/work/runs/defsbuild2.log|unlimited|3700|/home/kevxhk/work/runs/defsbuild2.sh
+LEANFLQ2|/home/kevxhk/work/L-gct-210/leanfl|/home/kevxhk/work/L-gct-210/leanfl/FLq2.log|unlimited|3100|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/lean/fl/FLq2.lean 3000 PEqualNP.Outside.L_gct_210_aux.FL.TC5_final
+ST2R1COFSING|/home/kevxhk/work/L-gct-210/stage2|/home/kevxhk/work/L-gct-210/stage2/r18/R1cof_sing.log|2000000|3300|python3 -I r19_R1cof_sing.py
+DEFSBUILD3|/home/kevxhk/code/pequalnp-proofs-2/lean|/home/kevxhk/work/runs/defsbuild3.log|unlimited|3700|/home/kevxhk/work/runs/defsbuild3.sh
+LEANZBF_R14TSHAPE|/home/kevxhk/work/L-gct-210/leanzbf|/home/kevxhk/work/L-gct-210/leanzbf/R14t_shape_x.log|unlimited|2500|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/lean/zbf/R14t_shape.lean 2400
+LEANZBF_R17LINT|/home/kevxhk/work/L-gct-210/leanzbf|/home/kevxhk/work/L-gct-210/leanzbf/R17lint_x.log|unlimited|1900|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/lean/zbf/R17lint.lean 1800
+ST2R1RDCERT|/home/kevxhk/work/L-gct-210/stage2|/home/kevxhk/work/runs/st2_r1rdcert.log|7000000|10800|/home/kevxhk/work/runs/st2_r1rdcert.sh
+LEANTCERT|/home/kevxhk/work/L-gct-210/leanfl/cert|/home/kevxhk/work/L-gct-210/leanfl/cert/Tcert.log|unlimited|1000|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/leanfl/cert/Tcert.lean 900
+LEANFLK_FIELD|/home/kevxhk/work/L-gct-210/leanfl|/home/kevxhk/work/L-gct-210/leanfl/FLK_field_x.log|unlimited|2800|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/lean/fl/FLK_field.lean 2700
+LEANTRK11|/home/kevxhk/work/L-gct-210/leanfl|/home/kevxhk/work/L-gct-210/leanfl/TrK11_x.log|unlimited|3700|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/leanfl/TrK11.lean 3600
+LEANTCERT2|/home/kevxhk/work/L-gct-210/leanfl/cert|/home/kevxhk/work/L-gct-210/leanfl/cert/Tcert2.log|unlimited|1900|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/leanfl/cert/Tcert2.lean 1800
+LEANFLK_FIELD2|/home/kevxhk/work/L-gct-210/leanfl|/home/kevxhk/work/L-gct-210/leanfl/FLK_field2_x.log|unlimited|1000|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/lean/fl/FLK_field.lean 900
+LEANTRK11B|/home/kevxhk/work/L-gct-210/leanfl|/home/kevxhk/work/L-gct-210/leanfl/TrK11b_x.log|unlimited|3700|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/leanfl/TrK11.lean 3600
+R19W4P|/home/kevxhk/work/L-gct-210/rows/r18|/home/kevxhk/work/L-gct-210/rows/r18/w4p.big.out|4500000|3600|/usr/bin/time -f '%e s %M KB' Singular -q w4_2147483629.sing
+R21W5R3P|/home/kevxhk/work/L-gct-210/rows/r21|/home/kevxhk/work/L-gct-210/rows/r21/w5r3p.big.out|4500000|3600|/usr/bin/time -f '%e s %M KB' Singular -q w5r3_2147483629.sing
+R18SP4P|/home/kevxhk/work/L-gct-210/rows/r18|/home/kevxhk/work/L-gct-210/rows/r18/sp4.big.out|4500000|3600|/usr/bin/time -f '%e s %M KB' Singular -q sp4.sing
+R17SMC5P|/home/kevxhk/work/L-gct-210/rows/r17|/home/kevxhk/work/L-gct-210/rows/r17/smc5.big.out|4500000|3600|/usr/bin/time -f '%e s %M KB' Singular -q smc5.sing
+R17SMC4P|/home/kevxhk/work/L-gct-210/rows/r17|/home/kevxhk/work/L-gct-210/rows/r17/smc4.big.out|4500000|3600|/usr/bin/time -f '%e s %M KB' Singular -q smc4.sing
+LEANZBF_R14SHAPE|/home/kevxhk/work/L-gct-210/leanzbf|/home/kevxhk/work/L-gct-210/leanzbf/R14s_shape_x.log|unlimited|3700|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/lean/zbf/R14s_shape.lean 3600
+LEANZBF_R9F|/home/kevxhk/work/L-gct-210/leanzbf|/home/kevxhk/work/L-gct-210/leanzbf/R9f_window4.log|unlimited|5700|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/lean/zbf/R9f.lean 5400
+LEANZBF_R19BUND|/home/kevxhk/work/L-gct-210/leanzbf|/home/kevxhk/work/L-gct-210/leanzbf/R19bund_x.log|unlimited|5500|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/lean/zbf/R19bund.lean 5400
+NCOLK0Q|/home/kevxhk/work/L-gct-210/ncol/r11|/home/kevxhk/work/L-gct-210/ncol/r11/K0Q_big1.log|9000000|10800|env ULIM=8000000 JT=7200 ./runK0Q.sh
+NCOLHB22T2|/home/kevxhk/work/L-gct-210/ncol/r8|/home/kevxhk/work/L-gct-210/ncol/r8/hconjB22T2_big.log|9000000|7500|env ULIM=8000000 CT=600 timeout 7200 ./hiter3.sh b22 2 6
+NCOLHCONJA3T0|/home/kevxhk/work/L-gct-210/ncol/r8|/home/kevxhk/work/L-gct-210/ncol/r8/hconjA3T0_big.log|9000000|7300|env ULIM=8000000 CT=600 ./hiter2.sh 0 6
+LEANZBF_R15E5|/home/kevxhk/work/L-gct-210/leanzbf|/home/kevxhk/work/L-gct-210/leanzbf/R15e5_x.log|unlimited|2500|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/lean/zbf/R15e5.lean 2400
+LEANPORT_TRC0P|/home/kevxhk/work/L-gct-210/leanfl|/home/kevxhk/work/L-gct-210/leanfl/TrC0p_port.log|unlimited|1300|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/leanfl/TrC0p.lean 1200
+REG2NTYPE4|/home/kevxhk/work/L-gct-210/reg2/p111|/home/kevxhk/work/L-gct-210/reg2/evidence/logs/r16_ntype_gen4_big.log|2500000|3700|sh -c "Singular -q < ntype_gen4.sing"
+SYMDC3V2_A0|/home/kevxhk/work/L-gct-210/verifyfl/r11|/home/kevxhk/work/runs/symcut2_A0_ne_v2.log|10000000|10800|env SYMTMO=10000 MSOLVE_THREADS=1 python3 -I sym_cut2_v2.py 2147483629 A 0 ne sc2/Q_A0_ne_v2
+VFB0SYM_A|/home/kevxhk/work/L-gct-210/verifyfl/r12|/home/kevxhk/work/runs/vf_b0sym_A.log|10000000|7200|env RAB=1 MSOLVE_THREADS=1 python3 -I b0sym_run.py 2147483629 2 b0/big_A_R2R 3000
+VFRAD_A0_01_RC4|/home/kevxhk/work/L-gct-210/verifyfl/r12|/home/kevxhk/work/runs/vf_rad_A0_01_rc4.log|10000000|7200|env RCS=4 RAB=1 MSOLVE_THREADS=1 python3 -I radcell3t.py 2147483629 A 0 t0c 01 rad/big_A0_t0c_01R 3000 t0/t0c_A_c0_01_None_N.ms.gb
+VFRAD_A0_02_RC4|/home/kevxhk/work/L-gct-210/verifyfl/r12|/home/kevxhk/work/runs/vf_rad_A0_02_rc4.log|10000000|7200|/home/kevxhk/work/runs/vf_rc4_guarded.sh 02
+VFRAD_A0_12_RC4|/home/kevxhk/work/L-gct-210/verifyfl/r12|/home/kevxhk/work/runs/vf_rad_A0_12_rc4.log|10000000|7200|/home/kevxhk/work/runs/vf_rc4_guarded.sh 12
+VFNLAM_A0_1|/home/kevxhk/work/L-gct-210/verifyfl/r12|/home/kevxhk/work/runs/vf_nlam_A0_1.log|2500000|10800|env NLAM_CAP=2400 MSOLVE_THREADS=1 ./nlam_batch1.sh
+VFNLAM_A0_2|/home/kevxhk/work/L-gct-210/verifyfl/r12|/home/kevxhk/work/runs/vf_nlam_A0_2.log|2500000|10800|env NLAM_CAP=2400 MSOLVE_THREADS=1 ./nlam_batch2.sh
+VFNLAM_9|/home/kevxhk/work/L-gct-210/verifyfl/r12|/home/kevxhk/work/runs/vf_nlam_9.log|2500000|10800|env NLAM_CAP=2400 MSOLVE_THREADS=1 ./nlam_batch3.sh
+R16P2z3R|/home/kevxhk/work/L-gct-210/rows/r21|/home/kevxhk/work/L-gct-210/rows/r21/bq5R_P2_z3.big.out|4500000|7200|/usr/bin/time -f '%e s %M KB' Singular -q bq5R_P2_z3.sing
+R16P2AR|/home/kevxhk/work/L-gct-210/rows/r21|/home/kevxhk/work/L-gct-210/rows/r21/bq5R_P2_A.big.out|6500000|10800|/usr/bin/time -f '%e s %M KB' Singular -q bq5R_P2_A.sing
+REG2E5BATCH|/home/kevxhk/work/L-gct-210/reg2/e5|/home/kevxhk/work/runs/reg2_e5batch_1.log|2500000|10800|python3 -I batch_e5.py ../evidence/logs/r17_e5_stage1.log ../evidence/logs/r18_e5_batch.log 600
+NCOLHB22T0|/home/kevxhk/work/L-gct-210/ncol/r8|/home/kevxhk/work/L-gct-210/ncol/r8/hconjB22T0_big.log|9000000|7500|env ULIM=8000000 CT=600 timeout 7200 ./hiter3.sh b22 0 6
+R19W4Q|/home/kevxhk/work/L-gct-210/rows/r18|/home/kevxhk/work/L-gct-210/rows/r18/w4q.big.out|6500000|10800|/usr/bin/time -f '%e s %M KB' Singular -q w4_0.sing
+R21W5R3Q|/home/kevxhk/work/L-gct-210/rows/r21|/home/kevxhk/work/L-gct-210/rows/r21/w5r3q.big.out|6500000|10800|/usr/bin/time -f '%e s %M KB' Singular -q w5r3_0.sing
+R18SP4Q|/home/kevxhk/work/L-gct-210/rows/r18|/home/kevxhk/work/L-gct-210/rows/r18/spQ4.big.out|6500000|10800|/usr/bin/time -f '%e s %M KB' Singular -q spQ4.sing
+R17SMC5QR|/home/kevxhk/work/L-gct-210/rows/r21|/home/kevxhk/work/L-gct-210/rows/r21/smcR5.big.out|6500000|10800|/usr/bin/time -f '%e s %M KB' Singular -q smcR5.sing
+R17SMC4Q|/home/kevxhk/work/L-gct-210/rows/r17|/home/kevxhk/work/L-gct-210/rows/r17/smcQ4.big.out|6500000|10800|/usr/bin/time -f '%e s %M KB' Singular -q smcQ4.sing
+ST3TWOCOLQ|/home/kevxhk/work/L-gct-210/stage3/r20|/home/kevxhk/work/L-gct-210/stage3/r20/staged_twocol_driver_big.log|6500000|14400|python3 -I staged_twocol.py s1,s0 0 3600 6000000 2
+ST3DLT0D|/home/kevxhk/work/L-gct-210/stage3/r24|/home/kevxhk/work/L-gct-210/stage3/r24/dlt0d_big.log|4500000|19000|sh -c "./run_dlt0d.sh 32003; ./run_dlt0d.sh 0"
+NCOLK3CLASS|/home/kevxhk/work/L-gct-210/ncol/r7|/home/kevxhk/work/L-gct-210/ncol/r7/kbig_big.log|9000000|7200|env ULIM=8000000 bash ../gb/runlog_big.sh kbig 3600 kbig.log
+R15R4QR|/home/kevxhk/work/L-gct-210/rows/r21|/home/kevxhk/work/L-gct-210/rows/r21/pl5R_R4.big.out|6500000|10800|/usr/bin/time -f '%e s %M KB' Singular -q pl5R_R4.sing
+R15R5QR|/home/kevxhk/work/L-gct-210/rows/r21|/home/kevxhk/work/L-gct-210/rows/r21/pl5R_R5.big.out|6500000|10800|/usr/bin/time -f '%e s %M KB' Singular -q pl5R_R5.sing
+R16V5mmmmm|/home/kevxhk/work/L-gct-210/rows/r13|/home/kevxhk/work/L-gct-210/rows/r13/v5_-----.big.out|6500000|7200|/usr/bin/time -f '%e s %M KB' Singular -q v5_-----.sing
+R16V5pmmmm|/home/kevxhk/work/L-gct-210/rows/r13|/home/kevxhk/work/L-gct-210/rows/r13/v5_+----.big.out|6500000|7200|/usr/bin/time -f '%e s %M KB' Singular -q v5_+----.sing
+R16V5ppmmm|/home/kevxhk/work/L-gct-210/rows/r13|/home/kevxhk/work/L-gct-210/rows/r13/v5_++---.big.out|6500000|7200|/usr/bin/time -f '%e s %M KB' Singular -q v5_++---.sing
+R16V5pppmm|/home/kevxhk/work/L-gct-210/rows/r13|/home/kevxhk/work/L-gct-210/rows/r13/v5_+++--.big.out|6500000|7200|/usr/bin/time -f '%e s %M KB' Singular -q v5_+++--.sing
+R16V5ppppm|/home/kevxhk/work/L-gct-210/rows/r13|/home/kevxhk/work/L-gct-210/rows/r13/v5_++++-.big.out|6500000|7200|/usr/bin/time -f '%e s %M KB' Singular -q v5_++++-.sing
+R16V5ppppp|/home/kevxhk/work/L-gct-210/rows/r13|/home/kevxhk/work/L-gct-210/rows/r13/v5_+++++.big.out|6500000|7200|/usr/bin/time -f '%e s %M KB' Singular -q v5_+++++.sing
+LOW_S2QNEQ1|/home/kevxhk/work/L-gct-210/verify2/r13|/home/kevxhk/work/L-gct-210/verify2/r13/s2c_neq_1_q_slim_big.log|6000000|5400|Singular -q s2c_neq_1_q_slim.sing
+LOW_S2QNEQ2|/home/kevxhk/work/L-gct-210/verify2/r13|/home/kevxhk/work/L-gct-210/verify2/r13/s2c_neq_2_q_slim_big.log|6000000|5400|Singular -q s2c_neq_2_q_slim.sing
+LOW_S2QNEQ3|/home/kevxhk/work/L-gct-210/verify2/r13|/home/kevxhk/work/L-gct-210/verify2/r13/s2c_neq_3_q_slim_big.log|6000000|5400|Singular -q s2c_neq_3_q_slim.sing
+SYMT22_A21|/home/kevxhk/work/L-gct-210/verifyfl/r11|/home/kevxhk/work/L-gct-210/verifyfl/r11/n3sym/Q_A_c21_big.log|10000000|3600|env MSOLVE_THREADS=1 python3 -I n3sym_case.py 2147483629 A 21 n3sym 3300 2400
+SYMT22_A18|/home/kevxhk/work/L-gct-210/verifyfl/r11|/home/kevxhk/work/L-gct-210/verifyfl/r11/n3sym/Q_A_c18_big.log|10000000|3600|env MSOLVE_THREADS=1 python3 -I n3sym_case.py 2147483629 A 18 n3sym 3300 2400
+LOW_CC3CHECK|/home/kevxhk/work/L-gct-210/ncol/gb|/home/kevxhk/work/L-gct-210/ncol/gb/cc3_queue_big.log|9000000|12000|env ULIM=8000000 bash ./cc3_queue.sh
+PRODCAL_free3_012|/home/kevxhk/work/L-gct-210/ncol/gb|/home/kevxhk/work/L-gct-210/ncol/gb/free3_orb_P1/free3_012_big.log|8000000|900|/home/kevxhk/work/runs/mschart.sh free3_orb_P1 free3_012
+PRODCAL_free3_015|/home/kevxhk/work/L-gct-210/ncol/gb|/home/kevxhk/work/L-gct-210/ncol/gb/free3_orb_P1/free3_015_big.log|8000000|900|/home/kevxhk/work/runs/mschart.sh free3_orb_P1 free3_015
+PRODCAL_free3_017|/home/kevxhk/work/L-gct-210/ncol/gb|/home/kevxhk/work/L-gct-210/ncol/gb/free3_orb_P1/free3_017_big.log|8000000|900|/home/kevxhk/work/runs/mschart.sh free3_orb_P1 free3_017
+PROD_free4_0123|/home/kevxhk/work/L-gct-210/ncol/gb|/home/kevxhk/work/L-gct-210/ncol/gb/prod_P1/free4_0123_big.log|8000000|5400|/home/kevxhk/work/runs/mschart.sh prod_P1 free4_0123
+PROD_free4_0125|/home/kevxhk/work/L-gct-210/ncol/gb|/home/kevxhk/work/L-gct-210/ncol/gb/prod_P1/free4_0125_big.log|8000000|5400|/home/kevxhk/work/runs/mschart.sh prod_P1 free4_0125
+PROD_free4_0128|/home/kevxhk/work/L-gct-210/ncol/gb|/home/kevxhk/work/L-gct-210/ncol/gb/prod_P1/free4_0128_big.log|8000000|5400|/home/kevxhk/work/runs/mschart.sh prod_P1 free4_0128
+LOW_R17SM5P|/home/kevxhk/work/L-gct-210/rows/r17|/home/kevxhk/work/L-gct-210/rows/r17/sm5.big.out|4500000|3600|/usr/bin/time -f '%e s %M KB' Singular -q sm5.sing
+LOW_R17SM4P|/home/kevxhk/work/L-gct-210/rows/r17|/home/kevxhk/work/L-gct-210/rows/r17/sm4.big.out|4500000|3600|/usr/bin/time -f '%e s %M KB' Singular -q sm4.sing
+LOW_R17SM5Q|/home/kevxhk/work/L-gct-210/rows/r17|/home/kevxhk/work/L-gct-210/rows/r17/smQ5.big.out|6500000|10800|/usr/bin/time -f '%e s %M KB' Singular -q smQ5.sing
+LOW_R17SM4Q|/home/kevxhk/work/L-gct-210/rows/r17|/home/kevxhk/work/L-gct-210/rows/r17/smQ4.big.out|6500000|10800|/usr/bin/time -f '%e s %M KB' Singular -q smQ4.sing
+LOW_NCOLHCONJB|/home/kevxhk/work/L-gct-210/ncol/r8|/home/kevxhk/work/L-gct-210/ncol/r8/hconjB_big.log|9000000|29500|/home/kevxhk/work/runs/ncol_hconjB.sh
+LOW_LEANZBF_R16SURV|/home/kevxhk/work/L-gct-210/leanzbf|/home/kevxhk/work/L-gct-210/leanzbf/R16surv_x.log|unlimited|2500|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/lean/zbf/R16surv.lean 2400
+LOW_NCOLHCASEA3T0|/home/kevxhk/work/L-gct-210/ncol/r9|/home/kevxhk/work/L-gct-210/ncol/r9/hcase_all_big.log|9000000|11000|env ULIM=8000000 RSSKB=7000000 CT=1200 ./hcase_all.sh 0
+LOW_ST2KTBIG|/home/kevxhk/work/L-gct-210/stage2|/home/kevxhk/work/L-gct-210/stage2/r18/ktbig.log|7000000|28800|bash r18/ktbig.sh
+LOW_REG2E5BATCH2|/home/kevxhk/work/L-gct-210/reg2/e5|/home/kevxhk/work/runs/reg2_e5batch_2.log|2500000|21600|python3 -I batch_e5.py ../evidence/logs/r17_e5_stage1.log ../evidence/logs/r18_e5_batch.log 600
+LOW_NCOLK0Q2|/home/kevxhk/work/L-gct-210/ncol/r11|/home/kevxhk/work/L-gct-210/ncol/r11/K0Q_big2.log|9000000|28800|env ULIM=8000000 JT=7200 ./runK0Q.sh
+LOW_R15GQ|/home/kevxhk/work/L-gct-210/rows/r15|/home/kevxhk/work/L-gct-210/rows/r15/pl4fQ.big.out|6500000|10800|/usr/bin/time -f '%e s %M KB' Singular -q pl4fQ.sing
+LOW_LEANTCERT3|/home/kevxhk/work/L-gct-210/leanfl/cert|/home/kevxhk/work/L-gct-210/leanfl/cert/Tcert3.log|unlimited|3700|/home/kevxhk/work/runs/leancompile.sh /home/kevxhk/work/L-gct-210/leanfl/cert/Tcert3.lean 3600
+LOW_R18SP5P|/home/kevxhk/work/L-gct-210/rows/r18|/home/kevxhk/work/L-gct-210/rows/r18/sp5.big.out|4500000|3600|/usr/bin/time -f '%e s %M KB' Singular -q sp5.sing
+LOW_R18SP5Q|/home/kevxhk/work/L-gct-210/rows/r18|/home/kevxhk/work/L-gct-210/rows/r18/spQ5.big.out|6500000|10800|/usr/bin/time -f '%e s %M KB' Singular -q spQ5.sing
+LOW_REG2E5SPLIT|/home/kevxhk/work/L-gct-210/reg2/e5|/home/kevxhk/work/runs/reg2_e5split.log|2500000|14400|python3 -I batch_e5.py ../evidence/logs/r17_e5_stage1.log ../evidence/logs/r19_e5_split.log 600 ../evidence/logs/r18_e5_batch.log
+LOW_R15G4P|/home/kevxhk/work/L-gct-210/rows/r15|/home/kevxhk/work/L-gct-210/rows/r15/pl5_G4_5f.big.out|4500000|3600|/usr/bin/time -f '%e s %M KB' Singular -q pl5_G4_5f.sing
+LOW_R15G4Q|/home/kevxhk/work/L-gct-210/rows/r15|/home/kevxhk/work/L-gct-210/rows/r15/pl5Q_G4_5f.big.out|6500000|10800|/usr/bin/time -f '%e s %M KB' Singular -q pl5Q_G4_5f.sing
+LOW_R15R4P|/home/kevxhk/work/L-gct-210/rows/r15|/home/kevxhk/work/L-gct-210/rows/r15/pl5_R4.big.out|4500000|3600|/usr/bin/time -f '%e s %M KB' Singular -q pl5_R4.sing
+LOW_R15R5P|/home/kevxhk/work/L-gct-210/rows/r15|/home/kevxhk/work/L-gct-210/rows/r15/pl5_R5.big.out|4500000|3600|/usr/bin/time -f '%e s %M KB' Singular -q pl5_R5.sing

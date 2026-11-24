@@ -1,0 +1,220 @@
+# COMPUTE-stage2 — heavy computations that would most help the regime REG1   (written by "stage2", 19:35)
+
+Self-contained. Everything over C. J = all-ones 5x5 matrix, J' = all-ones 4x5 matrix. Indices 0-based as in the scripts.
+
+## 0. Definitions
+
+* perm = permanent. 5x5 LEVEL SPACE: linear space L of 5x5 matrices with perm(J + t) = 120 for all t in L.
+* For a 4x5 matrix Y:  G(Y)_j := perm(Y without column j)  (j = 0..4; five 4x4 permanents),  N(Y) := sum_j G(Y)_j.
+  4x5 LEVEL SPACE: linear X with N(J' + xi) = 120 on X.
+* REG1: a 9-dim 5x5 level space L in which every row and every column projection of L is 4-dimensional.
+  L_r := {t in L : row r = 0} (dim 5), viewed as 4x5 matrices (rows != r).  Z_i := {w : e_i w^T in L}, z_i := dim Z_i (single-row part).
+* (Q-r)  [necessary for X = L_r, every row r with 4-dim projection; rigorous]: X is a 5-dim linear space of 4x5 matrices with
+    (i)   N(J' + xi) = 120 for all xi in X;
+    (ii)  G(xi) = 0 for all xi in X  (all five column-deletion 4x4 permanents vanish identically);
+    (iii) every ROW projection of X has dim <= 3; every COLUMN projection (in C^4) has dim <= 3, except possibly ONE column c
+          (the case "entry (r,c) vanishes identically on L"), where only <= 4 holds  [exception found by verify2].
+* BLOCK TYPE (s,t): X vanishes identically on an s x t block of cells. (ii) holds automatically if s + t >= 6:
+  (1,5) zero row; (2,4) two rows supported in one common column; (3,3) three rows supported in two common columns;
+  (4,2) two zero columns. CROSS: supported on one row and one column. NON-BLOCK solution: (i),(ii) hold and no such block exists.
+* FIRST/SECOND ORDER TESTS for a linear subspace M of a 5x5 level space L (here M = X placed in rows 1..4, row 0 = 0):
+    T_1(M) := {t in C^(5x5) : sum_ij t_ij * perm((J+m) without row i, column j) = 0 for all m in M}       (L lies in T_1(M));
+    q_m(t,t') := sum over i != k, j != l of t_ij t'_kl * perm((J+m) without rows i,k and columns j,l)       (symmetric BILINEAR form);
+    FO2 bound(M) := dim T_1(M) - ceil(rank(q restricted to T_1(M)) / 2), q a generic linear combination of q_m, m in M.
+  Every level space containing M has dimension <= FO2 bound(M).  [Lemma FO2, verified by verify2.]
+* (T2) for a candidate X = L_r: unknown T_0..T_4 in C^(4x5);  D_T G_j(xi) := derivative of G_j at xi in direction T.
+    (T2): D_{T_k} G_j(xi) + D_{T_j} G_k(xi) = 0 for all j <= k and all xi in X;   solvable := some solution has sum_k T_k in J' + X.
+  Necessary for X = L_r (order 2 at v = 0 of chief's identity <v, G(T(v) + xi)> = 120 <kappa,v>^5).  Linear in T.
+* (FO-r) [added 19:44, the sharpest first-order test]: for X = L_r the projection of T_1(X) to row r (row 0 in the scripts) must be ALL of
+  C^5 (T_1(X) contains L, whose row-r projection is a hyperplane not containing 1, and e_r 1^T - J/5).  Script: `r7_FOrow.py`,
+  function `report(name, B)` prints dim T_1 and the dimension of the row projection (must be 5).
+* A candidate X is DEAD if the (FO-r) projection has dim < 5, or FO2 bound <= 8, or (T2) is not solvable; ALIVE otherwise.  So far: 49 verified solutions, all of block
+  type; alive: only solutions with a 3-dim single-row or single-column part (cross spaces on two special loci, two (3,3) solutions).
+
+## 1. Scripts (numpy + scipy only; directory /home/claude/work/L-gct-210/stage2/)
+
+Copy the whole directory. The scripts `exec` each other through ABSOLUTE paths and were run as `python3 -I`; on another machine
+replace the prefix once:  `sed -i 's#/home/claude/work/L-gct-210/stage2#NEWDIR#g; s#/home/claude/work/L-gct-210/chief#NEWCHIEF#g' *.py`
+(chief/core.py is only needed by the sanity scripts). Outputs are written to /tmp.  One process per core, disjoint seeds.
+* `r6_census.py SEED NTR MAXIT [DM]` — LM (scipy least_squares, numerical Jacobian) for (Q-r)(i),(ii) with every row of rank <= 3
+  (rows parametrised as U_i V_i; DM = four digits = maximal row ranks, default 3333). Residuals at 50 + 28 random points; EVERY
+  solution is re-checked at 80 fresh points (a quartic in 5 variables has 70 coefficients — raise NL, NG to 140, 80 on the big machine).
+  Prints row/column projection dims, single-row/column dims, largest zero block, dim T_1, rank, FO2 bound; saves
+  `/tmp/r6_census_SEED_TRIAL.npy` (array (5,4,5) = basis of X).  One start = 15-30 s here; about 30% of the starts converge.
+* `r6_fk.py KIND SEED NTR MAXIT` — the same inside a block family, KIND in {24, 33, 15, 42}; only (i) remains. Rates here:
+  24: 20 of 28 starts; 33: 15 of 20; 15: 1 of 5; 42: 0 of 6.  Saves only solutions with FO2 bound >= 9 (`/tmp/r6_fk_KIND_SEED_TRIAL.npy`).
+* `r5_FO2.py` — function `FO2(Mb, rg)` (Mb = list/array of 5x5 matrices spanning M) -> (dim T_1, rank, bound). Running the file
+  prints the sanity table on the 7 known spaces (bound must be >= dim L; it is 7 for the six 7-dim spaces).
+* `r6_T2.py` — function `T2test(B, rg)` (B = (5,4,5) basis) -> (dim of the solution space, distance of J' from {sum_k T_k} + X);
+  distance < 1e-9 = solvable. `r6_T2_sanity.py` = sanity on the known spaces.
+* `r6_extend.py FILE1,FILE2,.. D NTRIAL` — direct LM search for a level space of dimension D containing a saved X (inside T_1(X)).
+* `r6_cross.py` (cross family, formula for T_1), `r6_lam5.py` (case lam = 5), `r5_FO_Mstar.py` (exact certificate for M*).
+
+## 2. Tasks (in order of value)
+
+### S1 — (Q-r) census at scale, with calibration
+ Run `r6_census.py SEED 40 400` for at least 5000 seeds (after raising NL, NG) and `r6_fk.py KIND SEED 40 400` for KIND = 24, 33, 15, 42,
+ 1000 seeds each.  CALIBRATION FIRST: 200 seeds of `r6_fk.py 24` and `r6_fk.py 33` must reproduce the rates above (about 70%) and
+ the table: (2,4): (dim T_1, rank, bound) = (9,3,7) mostly, sometimes (12,7,8), (8,3,6); (3,3): z = 2 -> (10,5,7), z = 3 -> bound 8 or 9.
+ Near misses (final residual < 1e-5): restart with MAXIT 3000 (singular solutions converge linearly).
+ For every verified solution record: block type, row/column projection dims, z (single-row dims), z' (single-column dims),
+ dim T_1, dim of the row-r projection of T_1 ((FO-r)), rank, FO2 bound, (T2) distance, and for ALIVE solutions the result of `r6_extend.py` with D = 8 and D = 9 (20 starts each).
+ DECISION: (a) an ALIVE solution with all z, z' <= 2 = a candidate L_r that the present tests do not exclude: send the .npy (it is
+ the next thing to exclude, or the seed of a construction); (b) a solution for which `r6_extend.py` with D = 8 or 9 converges
+ (residual < 1e-9, confirm with exact/high precision) = an 8- or 9-dim level space: STOP and report; (c) none: evidence for
+ "every (Q-r) solution with z, z' <= 2 is dead", the statement that would exclude every 9-dim level space with z <= 2 on a
+ full-projection line.
+
+### S2 — non-block solutions of (ii)
+ Question: is there a 5-dim X with (i), (ii), (iii) that does NOT vanish on any s x t block with s + t >= 6?  (In the fully generic regime
+ the L_r would have to be of this kind; their absence re-proves "no minimal pair" there.)  The plain census finds block solutions
+ only. Two ways:
+ (a) numerical: in `r6_census.py` add to the residual a repulsion from the block loci (e.g. require the 20 "cell norms"
+     n_ij := sum over the basis of |B[k,i,j]|^2 to be >= 0.05 by a slack parametrisation n_ij = 0.05 + w_ij^2), 20 000 starts;
+     also the same with dim X = 4 and 3 as calibration (non-block solutions of (ii) alone exist: rows 0,1 = (x,y,0,0,0), (-x,y,0,0,0),
+     rows 2,3 supported on the last three columns — a level 5-dim subspace of that 8-dim space is a legitimate non-block candidate;
+     search inside it separately: 5-dim level subspaces of {(x,y; -x,y) (+) two rows on columns 2,3,4}).
+ (b) exact (Macaulay2 / Singular / msolve / Bertini): chart of Gr(5,20): X = rowspace[I_5 | W], W a 5x15 matrix of unknowns after a
+     random permutation of the 20 cells; equations = all coefficients (in the 5 parameters c) of G_j(sum c_k B_k) (5 quartics, 70
+     coefficients each) and of N(J' + sum c_k B_k) - 120 (126 coefficients). Wanted: the irreducible components (numerical irreducible
+     decomposition is enough), their dimensions, and for a generic point of each: block type, z, z', FO2 bound, (T2).
+     Smaller exact warm-up with the same structure: all 2-dim spaces of 3x5 matrices on which the ten 3x3 subpermanents vanish
+     identically and P_1 = P_2 = 0 (the plane X_{rr'} of a minimal pair): Gr(2,15), 40 cubic + 5 low-degree coefficient equations.
+ DECISION: a non-block component with z, z' <= 2 and FO2 bound >= 9 and (T2) solvable is a genuine new candidate; if every component
+ is of block type the classification of (Q-r) reduces to the four block families.
+
+### S3 — exact FO2 for the block family (2,4)   (all solutions of the general census live here)
+ Coordinates: rows 0,1 of X = s_1 e_0, s_2 e_0 (multiples of the unit vector of column 0); rows 2,3 = p, q in C^5; p = (p_0, p'), q = (q_0, q').
+ With a = sum p', b = sum q', the level conditions on a linear subspace are EXACTLY:
+     s_1 + s_2 = -(p_0 + a + q_0 + b);    p_0 a + q_0 b + a^2 + a b + b^2 + <p',q'> = 0;    (p_0 + a + q_0 + b)(a b - <p',q'>) = 0.
+ Wanted (Sage/Macaulay2): the components of the variety of 5-dim subspaces X of C^12 = {(s_1,s_2,p,q)} satisfying these identities and
+ rank(p-projection) <= 3, rank(q-projection) <= 3; for a generic point and for the special strata of each component the exact
+ dim T_1 and rank (symbolic, over the function field of the component). Conjecture from 20 numerical solutions: dim T_1 = 9 (rank 3),
+ rarely 12 (rank 7) or 8 (rank 3); bound <= 8 always when z, z' <= 2.  Sharper target found after writing this (NOTES-stage2 R7-2): the cofactors of J + xi on this family are explicit,
+     C_00 = C_10 = C_20 = 2 gam, C_30 = 6 be, C_40 = 6 al, C_0j = (2+s) gam_j + h_j, C_1j = (2+s_2) gam_j + h_j, C_2j = (2+s_1) gam_j + h_j,
+     C_3j = 2(3+s) be_j + 6 Q_0, C_4j = 2(3+s) al_j + 6 P_0   (P = 1+p, Q = 1+q, al = sum P', be = sum Q', gam = al be - <P',Q'>,
+     al_j = al - P'_j, be_j = be - Q'_j, gam_j = al_j be_j - <P',Q'> + P'_j Q'_j, h_j = 2 P_0 be_j + 2 Q_0 al_j, s = s_1 + s_2),
+ and (FO-r) holds iff for every j = 1..4 the function s * gam_j, restricted to X, lies in the span of the restrictions of the C_ij, i >= 1.
+ CASE A (s = 0 on X): (FO-r) holds; numerically FO2 bound 8.  CASE B (ab = <p',q'> on X, s != 0): in all 20 numerical solutions the
+ row projection is 2-dim (DEAD at first order).  WANTED: (1) a symbolic proof that in Case B some s * gam_j is not in that span
+ (parametrise the 5-dim subspaces X of Case B; if a, b are independent on X then p_0 = -a - (1+mu) b, q_0 = (mu-1) a - b for a constant mu);
+ (2) for Case A (X = domino direction + 2-row level space on rows 3,4) the exact FO2 bound on every stratum.
+ DECISION: a stratum that passes (FO-r), has FO2 bound >= 9 and z, z' <= 2 = candidate.
+
+### S4 — minimal pairs with zero entries in the annihilators, as an exact problem
+ Data of a minimal row pair: kappa, kappa' in C^5 (sum = 1 each), (nu, nu') in C^5 x C^5 (defined modulo (kappa,0), (0,kappa') and
+ scaling). For a column pair T = {j,l}: p_i := (kappa_i, nu_i), pt_i := (-kappa'_i, nu'_i) in C^2,  R_T := [p_j p_l pt_j pt_l] (2x4),
+ Gamma_T := p_j pt_l^T + p_l pt_j^T (2x2), G_T := (Gamma_T + Gamma_T^T)/2, a_T := (Gamma_12 - Gamma_21)/2.  Condition for T:
+   rank R_T <= 1:  (kappa_j, kappa_l, 0, 0) lies in the row space of R_T;
+   rank R_T = 2 and (kappa_j, kappa_l, 0, 0) not in the row space:  G_T != 0, det G_T = 0, and (a_T = 0 or G_11 = G_12 = 0);
+   rank R_T = 2 and (kappa_j, kappa_l, 0, 0) in the row space: no condition.
+ (Closed form `gamma_check` and the independent test `pair_check` in `pairlib.py`.)  Wanted: for every zero pattern of (kappa, kappa')
+ (subsets of {0..4} for each, up to simultaneous column permutation and swapping the rows; at least one zero overall) the complete
+ solution set of "the condition holds for all ten T" (exact elimination per pattern and per assignment of the three cases to
+ the ten T, or a numerical irreducible decomposition), as a list of normal forms.  Known: no zeros -> Types I, II; one zero in kappa,
+ kappa' zero-free -> Type I_0 (7 structures).  DECISION: the list of types is the input for the triple arguments of the
+ non-generic regime; an empty list for a pattern excludes minimal pairs with that pattern.
+
+### S5 — diagonal N2 blocks with a two-row column (only needed if stage3's Theorem N2-X fails verification)
+ Unknown: weights g in C^(3x5) with a prescribed support pattern, binary linear forms lam_0..lam_4 (not all proportional), a form sigma:
+   sum_j g_ij lam_j = sigma (i = 0,1,2);   sum_j g_ij g_kj lam_j^2 = sigma^2 (three pairs);   sum_j g_0j g_1j g_2j lam_j^3 = sigma^3,
+ with each of the three row maps p -> (g_ij lam_j(p))_j injective. For each of the 75 support patterns having a column with exactly
+ two nonzero weights (list: `r4_patterns.py SEED 0 75 12 two` prints them): exact solution set. Numerically (12 starts each) only the
+ patterns 011 011 111 111 111 and 011 011 101 101 111 have solutions; "four full columns + one two-row column" has 7 equations in
+ 7 unknowns, so isolated solutions may have been missed.
+
+### S6 — the split free line (z_i = 3)
+ In REG1, z_i = 3 forces L_i to be a (5,1) space in rows' sense (COMPUTE-rows.md, H1) and L = M_i (+) C t_0 with
+ M_i = L_i (+) e_i (x) Z_i an 8-dim level space. So every hit of rows' H1 for (5,1) should be passed to `r5_FO2.py` (FO2 of the lift) and
+ to the extension search with D = 9. No extra script.
+
+Return for every task: counts (#starts, #verified solutions per type), the tables above, and all .npy files of ALIVE solutions.
+
+[merged 20:38 from the cloud copy: the predecessor's S3' and S7, written after the workspace was copied]
+## ADDED 20:32 (round 8, at the handover) -- two new exact tasks; S3 is replaced by S3'
+
+### S3' (replaces S3). Case B, sub-case (B1), of the (2,4) family: is Omega(X) = C^5 possible?   [notation: NOTES-stage2.md R8-2]
+ Parameters: mu and a maximal isotropic Y_0 (coordinates x1..x4), three charts (columns 1..4 may be permuted, so these are complete):
+   S1: p' = x1 (1, al2, al3, al4);  q' = sum_{i=1..3} x_{i+1} (sigma(n^i) 1' - 3 n^i),  n^1 = (-al2,1,0,0), n^2 = (-al3,0,1,0), n^3 = (-al4,0,0,1)
+   S2: p' = (x1, x2, a13 x1 + a23 x2, a14 x1 + a24 x2);  q' = x3 (sigma(n^1) 1' - 3 n^1) + x4 (sigma(n^2) 1' - 3 n^2),
+       n^1 = (-a13,-a23,1,0), n^2 = (-a14,-a24,0,1)
+   S3: p' = (x1, x2, x3, -n1 x1 - n2 x2 - n3 x3);  u = (-w12 x2 - w13 x3 + x4 n1, w12 x1 - w23 x3 + x4 n2, w13 x1 + w23 x2 + x4 n3, x4),
+       q' = sigma(u) 1' - 3 u      (w = 0: split case)
+ a = sum p', b = sum q', p_0 = -a - (1+mu) b, q_0 = (mu-1) a - b, s = (1-mu) a + (1+mu) b.
+ Linear system [CRIT] in the unknowns (v, e, x, y) in C^4 x C^4 x C x C: all coefficients (in x1..x4) of
+   g_e = sum_j e_j (2 p_j q_j - a q_j - b p_j)   and of
+   4 E_v + s (P_e + Q_e) - 2 p_0 Q_e - 2 q_0 P_e - s (x a + y b),  E_v = 2 sum_j v_j p_j q_j + (1-mu) a (2 P_v + Q_v) + (1+mu) b (P_v + 2 Q_v)
+ vanish: a 20 x 10 matrix S(parameters) = [S_v | S_exy].  dim Omega = 1 + (10 - rank S) - (6 - rank S_exy).
+ QUESTION: is there a parameter point with a, b linearly independent on Y_0 and  rank S = rank S_exy  (<=> Omega = C^5)?
+ Generator of the existential form (v = e_1, e_2, e_3; 18 unknowns): stage2/r8_gen.py STRATUM PRIME 3 -> Singular script. Here: std mod 32003
+ did not finish in 100 s (S1, S2, S3). Suggested: (i) msolve on the same ideal with the Rabinowitsch variable for one 2x2 minor of the
+ coefficient matrix of (a,b) (6 minors, each must give the unit ideal); (ii) or the closed necessary condition "all 6-minors of R S vanish"
+ for a few integer 6 x 20 matrices R; (iii) impose (iii) first: S3 split needs mu = -1 (3 parameters), S1 needs mu = 1 (3 parameters).
+ CALIBRATION (must be NON-unit): the same ideal with NV = 1 (v = e_1 only) in chart S3 with w = 0, mu = -1 has the solutions
+ n = (n1, 1, 1, 1) (dim Omega = 3 there, NOTES R8-2 (4)); numerical ground truth for 47 members: stage2/r8_caseB2.py.
+ DECISION: unit in all charts and all 6 minors, >= 3 primes  =>  Case B (B1) is dead at first order (dim L <= 8 by reg2's inequality).
+           non-unit  =>  list the components; a component with a, b independent and s != 0 is a NEW first-order survivor: run FO2 on it.
+ Also wanted: the same question for sub-case (B2) (a, b dependent on X; X need not contain xi_d), which is not parametrised yet.
+
+### S7. (B0a): (Q-r) solutions with a 4-dim column projection   [NOTES-stage2.md R8-3]
+ X = span{ [e_i | beta_i] (i = 1..4), [0 | x_0] }, beta_i, x_0 4x4 (80 complex unknowns), first column = coordinates y:
+ (i) N(J' + xi) = 120 and (ii) G_j(xi) = 0 (j = 0..4) on X; normalise |x_0| = 1.  Necessary by Lemma B0-1: all 3x3 subpermanents of x_0 vanish
+ (impose it as extra equations, or stratify: x_0 with two nonzero rows / two nonzero columns / A (+) A' with perm A = perm A' = 0).
+ Numerical: LM as in stage2/r6_census.py with fresh-point verification; report row/column projection dims, Omega (stage2/r7_FOrow.py), FO2.
+ DECISION: no solution in >= 200 starts per stratum (with a planted calibration: drop the condition "column 0 is 4-dim" and recover the
+ known (2,4)/(3,3) solutions at the usual rate) => (B0a) is numerically empty; any solution with all row projections <= 3 is a new (Q-r)
+ type and must go through (FO-r), FO2, (T2).
+
+NOTE (stage2 R9): the label "ST2-S7'" used in QUEUE.md and below means the B(dep) exact runs, NOT the predecessor's S7 ((B0a) census,
+numerical, not run this round). S3' is answered by NOTES R9-1 (incl. its (iii)-reductions (iii) and the (B2)=B(dep) question, R9-2..R9-6).
+
+## ROUND 9 additions (stage2, 2026-11-23 ~20:25 UTC; Kevin's 24-core machine)
+
+### Errata accepted (verify2): S4 must add the normalisation sum nu + sum nu' = 0, and (nu, nu') is defined modulo (kappa, -kappa') and scaling.
+
+### S3' (Case B of the (2,4) family, a, b independent) -- DONE, no queue needed
+ The predecessor's three mod-p Singular runs (strata S1, S2, S3 of r8_gen.py, NV = 3) timed out; they are SUPERSEDED: a hand reduction (NOTES-stage2
+ R9-1: criterion [CRIT] + necessary condition (N0) + pattern classification) leaves three small families FP0, FQ0, FM, and all three give the
+ UNIT ideal over QQ in <= 1 s (stage2/r9_gen.py; scripts stage2/r9/F_*_c0_*.sing). Independent second generator (raw permanents, no formulas):
+ stage2/r9_direct.py (FM reproduced exactly; FP0d/FQ0d scripts stage2/r9/Dir_FP0d_c0_v123.sing, Dir_FQ0d_c0_v123.sing).
+
+### S7' (Case B, a and b dependent) -- remaining exact runs (all Singular over QQ = char 0, single-threaded, elimination of the 60 t's)
+ Cwd: /home/kevxhk/work/L-gct-210/stage2/r9.  Tool: ./elim.sh SCRIPT 60 (env TMO = timeout in s, default 900; ulimit -v 2.5 GB inside).
+ (a) D0-4 families (lam = 0, dim Y = 4):  Dir_D04_<Q0|P0>_<A|B>_<i|ii>_c0_v123.sing; still needed: Q0_B_i, Q0_B_ii, P0_B_ii, P0_A_i
+     (P0_B_i running in my slot at 20:25). Q0_A_* and P0_A_ii are excluded by (iii), no run needed.
+ (b) D00-3 families (a = b = 0, dim Y = 3, non-PROP):  ./run_d003.sh TAG ...  (18 tags <pat>_<A|B>_<chart>; M_* done: no non-PROP survivor).
+ OUTPUT: per script "ELIM" (the parameter ideal) and "PRIMES" (its minimal primes) = Zariski closure of the set of parameters where
+ Omega = C^5 can hold.  DECISION: E = <1>: family closed.  Otherwise every prime component must be (1) PROP (rows 1,2 proportional on X with
+ ratio != 1 -- (FO-r) automatic by Lemma PROP; record it for the PROP survey), or (2) s = 0 (Case A), or (3) a 3-dim single-row part, or (4) a NEW
+ survivor: then build X at a generic point of the component, run r5_FO2.FO2 and r6_T2.T2test (template: stage2/r9_cand2.py) and report.
+ CALIBRATION (both directions, already done): v = e_1 alone is non-unit for FM/D1M/D0Q (expected), and the known passing loci are found
+ (D0Q: c_a = 0; D04_M_A_i: f0 = f3 = 2 and the Case-A line f0 = f3 = 0).  Cost: M families < 1 s; 4-5-parameter families 5 - 60 min each.
+
+### S8 (new): the PROP family is blind to (FO-r) -- survey it with FO2 and (T2)
+ X in the (2,4) family with rows 1, 2 proportional on X (s_2 = rho s_1, rho != 1; rho = -1 is Case A). (FO-r) always holds (Lemma PROP, NOTES R9-5).
+ Wanted: a census of PROP solutions of (Q-r) (LM inside the family: rows 1,2 = (s, rho s) e_0, rows 3,4 = p, q; level conditions (R6-1) with
+ s_1 + s_2 = (1+rho) s), and for each: FO2 bound, (T2), single-row dims. Known: (S3) (NOTES R9-4) has FO2 bound 9 and z = (2,2) and dies only
+ by (T2). DECISION: a PROP solution with FO2 >= 9, (T2) solvable and all z <= 2 = genuine candidate L_r (send the .npy).
+ UPDATE 20:52: Lemma N1 (NOTES R9-8) settles D0-4 Q0_B (z = 3 only) and P0_A (Case A only) without the big runs; P0_B case i is done (two
+ points, FO2 = 8); P0_B case ii is cut to six component scripts Dir_D04_P0_B_ii_{comp2,comp3,comp4,comp5,compB10,compB11}.sing (QUEUE addendum 3).
+ So of ST2-S7' only P0_B_ii (components) and D00-3 Q0_B_3, P0_B_3 still matter; D04 Q0_B_i/ii and P0_A_i runs may be stopped.
+
+## ROUND 10 additions (stage2, 21:20 UTC)
+### S9 (exact (T2), done for the candidates) -- tool stage2/r10_T2exact.py NAME (Singular over QQ, no sampling; parameters allowed; prints the parameter
+ locus where (T2) is solvable). verify2's caveat: r6_T2.py "solvable" verdicts are unreliable (30 < 35 sample points); use this tool.
+### S10 (next): FO2-JOINT, exact, on every candidate family (the new uniform test; lemma NOTES R10-4)
+ Tool: stage2/r10_FO2J_exact.py NAME k  (sympy over QQ: T_1(X), complement, span of the forms q_m on T_1/X; writes r9/FO2J_charts_NAME_kK.sing, which
+ tests ALL charts of Gr(k, dim T_1/X) in Singular over QQ; "non-unit charts 0" = no common isotropic k-space = no level space of dim dim X + k containing X).
+ Done: D003A (70 charts), D04Pa at sg = 2 and sg = -3 (126 charts each): all unit.  Running/next: S2s (z = 3, 210 charts), crossC1 (z = 3).
+ Needed for proofs: the parameter versions (T_1 over Q(sg) resp. Q(alpha); clear denominators; treat the finitely many special parameter values where
+ the complement choice degenerates separately), and explicit exact members of the (3,3) z = 3 family. Numerical pre-screen: r10_FO2J.py (LM; calibrated
+ on L_r of ex1) and r10_FO2J_alg.py (algebra dimension). Cost: Gr(4,8) 70 charts < 1 min; Gr(4,10) 210 charts with 24 variables: minutes.
+
+## REQUEST FROM leanzbf (relayed by the coordinator, 01:40 UTC): exact re-derivations for GEN-tri / GEN-2 steps 3-4 in Lean
+(NOTES-leanzbf "TARGET 4 SCOPE"; ~3400 Lean lines planned.) Please re-derive EXACTLY (explicit linear algebra, no shorthand):
+ 1. (SR) with its full hypothesis set.
+ 2. The X_12 parametrisation x(c)_ij = c_i zeta_j / K'_ij, incl. the scaling x_5 = x_3 + x_4 and zeta_j := kappa'^j_4 p_j.
+ 3. The coefficient identities P_ii'(u) = 0 and the Laplace expansion P_45 = sum_T Q_45[T] perm(u[123; T^c]).
+ 4. GEN-tri for |Sigma| = 5 and |Sigma| = 2 as explicit linear algebra (no squarefree-algebra shorthand).
+ 5. GEN-2 Step 3: dim U = 6 exactly, with the per-type annihilator computation; Step 4: rank B = 2 => B = a b^T + b a^T with disjoint
+    supports, the per-type annihilator shapes of I^d, and the non-onto subcase.
