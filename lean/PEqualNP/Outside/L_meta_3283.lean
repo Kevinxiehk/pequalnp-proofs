@@ -7035,5 +7035,6 @@ theorem PEqualNP.Outside.L_meta_3283 : ∀ (x1 : PEqualNP.CircuitLowerBounds.Cir
   have h1 := congrFun hf x
   simp only [PEqualNP.MetaComplexity.circuitFun] at h1
   rw [h1]
+  clear h1
   revert x
   decide
