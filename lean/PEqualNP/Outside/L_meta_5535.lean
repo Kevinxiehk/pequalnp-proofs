@@ -827,22 +827,22 @@ theorem q_back (St : ℕ → List ℕ) (len f : ℕ)
     rw [hSe] at hCS
     by_cases heC : e ∈ C
     · -- expand e into a and b
-      set D := C.erase e with hDdef
-      set C' := List.insert a (List.insert b D) with hC'def
-      have hDn : D.Nodup := hCn.erase e
-      have hDS : ∀ c ∈ D, c ∈ St (len - (d + 1)) := by
+      have hDn : (C.erase e).Nodup := hCn.erase e
+      have hDS : ∀ c ∈ C.erase e, c ∈ St (len - (d + 1)) := by
         intro c hc
         have hc2 := (hCn.mem_erase_iff).mp hc
         rcases List.mem_cons.mp (hCS c hc2.2) with h | h
         · exact absurd h hc2.1
         · exact h
-      have hDl : D.length + 1 = C.length := by
-        rw [hDdef, List.length_erase_of_mem heC]
+      have hDl : (C.erase e).length + 1 = C.length := by
+        rw [List.length_erase_of_mem heC]
         have := List.length_pos_of_mem heC
         omega
-      refine ⟨C', ?_, ?_, ?_, m + 1, by omega, ?_, ?_⟩
+      have h1 := length_insert_le a (List.insert b (C.erase e))
+      have h2 := length_insert_le b (C.erase e)
+      refine ⟨List.insert a (List.insert b (C.erase e)), ?_, ?_, ?_, m + 1, by omega, by omega, ?_⟩
       · intro c hc
-        rw [hC'def, List.mem_insert_iff, List.mem_insert_iff] at hc
+        rw [List.mem_insert_iff, List.mem_insert_iff] at hc
         rcases hc with rfl | rfl | hc
         · exact ha
         · exact hb
@@ -857,32 +857,28 @@ theorem q_back (St : ℕ → List ℕ) (len f : ℕ)
             · exact Or.inl hdc
             · exact Or.inr hdc
           rcases q_dif_op qv.1 a b h2 with h | h
-          · exact ⟨a, List.mem_insert_self _ _, h⟩
-          · exact ⟨b, List.mem_insert_of_mem (List.mem_insert_self _ _), h⟩
-        · have hcD : c ∈ D := (hCn.mem_erase_iff).mpr ⟨hce, hc⟩
-          exact ⟨c, List.mem_insert_of_mem (List.mem_insert_of_mem hcD), hdc⟩
-      · have h1 := length_insert_le a (List.insert b D)
-        have h2 := length_insert_le b D
-        omega
+          · exact ⟨a, List.mem_insert_iff.mpr (Or.inl rfl), h⟩
+          · exact ⟨b, List.mem_insert_iff.mpr (Or.inr (List.mem_insert_iff.mpr (Or.inl rfl))), h⟩
+        · have hcD : c ∈ C.erase e := (hCn.mem_erase_iff).mpr ⟨hce, hc⟩
+          exact ⟨c, List.mem_insert_iff.mpr (Or.inr (List.mem_insert_iff.mpr (Or.inr hcD))), hdc⟩
       · intro hlen
-        have h1 := length_insert_le a (List.insert b D)
-        have h2 := length_insert_le b D
-        have hbD : b ∉ D := by
+        have hbD : b ∉ C.erase e := by
           intro hbD
-          rw [hC'def, List.insert_of_mem hbD] at hlen
+          have h3 := length_insert_le a (C.erase e)
+          rw [List.insert_of_mem hbD] at hlen
           omega
-        have haD : a ∉ List.insert b D := by
+        have haD : a ∉ List.insert b (C.erase e) := by
           intro haD
-          rw [hC'def, List.insert_of_mem haD] at hlen
+          rw [List.insert_of_mem haD] at hlen
           omega
-        have hC'eq : C' = a :: b :: D := by
-          rw [hC'def, List.insert_of_not_mem haD, List.insert_of_not_mem hbD]
+        have hC'eq : List.insert a (List.insert b (C.erase e)) = a :: b :: C.erase e := by
+          rw [List.insert_of_not_mem haD, List.insert_of_not_mem hbD]
         have hMC : Mg C m f := hCM (by omega)
-        have hMe : Mg (e :: D) m f := Mg_perm hMC (List.perm_cons_erase heC)
+        have hMe : Mg (e :: C.erase e) m f := Mg_perm hMC (List.perm_cons_erase heC)
         rw [hC'eq]
         rcases he with rfl | rfl
-        · exact Mg.sand _ a b D m f (List.Perm.refl _) hMe
-        · exact Mg.sor _ a b D m f (List.Perm.refl _) hMe
+        · exact Mg.sand _ a b _ m f (List.Perm.refl _) hMe
+        · exact Mg.sor _ a b _ m f (List.Perm.refl _) hMe
     · -- e is not used: keep C
       refine ⟨C, ?_, hCn, hCc, m, by omega, hCl, hCM⟩
       intro c hc
