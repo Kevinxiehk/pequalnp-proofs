@@ -2,2071 +2,1178 @@ import PEqualNP.Defs
 
 namespace PEqualNP.Outside.L_meta_25664_aux
 
-open PEqualNP.CircuitLowerBounds PEqualNP.MetaComplexity PEqualNP.MetaComplexity.NestedCover PEqualNP.Represents
+open PEqualNP.CircuitLowerBounds
 
-def signZ (b : Bool) : ℤ := if b then -1 else 1
+/-! ## Part A: abstract programs over label coordinates -/
 
-lemma signZ_xor (a b : Bool) : signZ (xor a b) = signZ a * signZ b := by
-  cases a <;> cases b <;> rfl
+abbrev Lab (t : ℕ) := Fin t → Bool × Bool
 
-lemma signZ_not (a : Bool) : signZ (!a) = - signZ a := by
-  cases a <;> rfl
+def pi2 (α β : Bool × Bool) : Bool := (xor α.1 β.1) && (xor α.2 β.2)
 
-lemma signZ_mul_self (a : Bool) : signZ a * signZ a = 1 := by
-  cases a <;> rfl
+def sh {t : ℕ} (p : Bool) (c x : Lab t) : Lab t :=
+  fun i => (xor (x i).1 (p && (c i).1), xor (x i).2 (p && (c i).2))
 
-lemma signZ_eq_neg_iff (a b : Bool) : signZ a = - signZ b ↔ a = !b := by
-  cases a <;> cases b <;> simp [signZ]
+def AbsCls : (t : ℕ) → (Lab t → Lab t → Bool) → Prop
+  | 0, _ => True
+  | t+1, F => ∃ (e : Bool) (c : Lab t) (K : Lab t → Lab t → Bool), AbsCls t K ∧
+      ∀ a b, F a b = xor (e && pi2 (a 0) (b 0))
+        (K (sh (pi2 (a 0) (b 0)) c (Fin.tail a)) (Fin.tail b))
 
-lemma signZ_le_one (a : Bool) : signZ a ≤ 1 := by
-  cases a <;> simp [signZ]
+def chi (b : Bool) : ℤ := if b then -1 else 1
 
-lemma neg_one_le_signZ (a : Bool) : -1 ≤ signZ a := by
-  cases a <;> simp [signZ]
+def RowHad {t : ℕ} (F : Lab t → Lab t → Bool) : Prop :=
+  ∀ a a' : Lab t, a ≠ a' → ∑ b, chi (xor (F a b) (F a' b)) = 0
 
-lemma sum_signZ_ge_neg_card {ι : Type} (S : Finset ι) (f : ι → Bool) :
-    -(S.card : ℤ) ≤ ∑ x ∈ S, signZ (f x) := by
-  have h1 : ∑ x ∈ S, (-1 : ℤ) ≤ ∑ x ∈ S, signZ (f x) :=
-    Finset.sum_le_sum (fun x _ => neg_one_le_signZ (f x))
-  simp only [Finset.sum_const, nsmul_eq_mul, mul_neg, mul_one] at h1
-  exact h1
+def Closed3 {t : ℕ} (F : Lab t → Lab t → Bool) : Prop :=
+  ∀ a1 a2 a3 : Lab t, ∃ (a4 : Lab t) (c : Bool), ∀ b,
+    xor (xor (xor (F a1 b) (F a2 b)) (F a3 b)) (F a4 b) = c
 
-lemma sum_signZ_le_card {ι : Type} (S : Finset ι) (f : ι → Bool) :
-    ∑ x ∈ S, signZ (f x) ≤ (S.card : ℤ) := by
-  have h1 : ∑ x ∈ S, signZ (f x) ≤ ∑ x ∈ S, (1 : ℤ) :=
-    Finset.sum_le_sum (fun x _ => signZ_le_one (f x))
-  simp only [Finset.sum_const, nsmul_eq_mul, mul_one] at h1
-  exact h1
+def T {t : ℕ} (K : Lab t → Lab t → Bool) (x y : Lab t) : ℤ :=
+  ∑ b, chi (xor (K x b) (K y b))
 
-lemma sum_signZ_extremal {ι : Type} [DecidableEq ι] (S : Finset ι) (f : ι → Bool) (c : Bool)
-    (hsum : ∑ x ∈ S, signZ (f x) = -(signZ c) * (S.card : ℤ)) :
-    ∀ x ∈ S, f x = !c := by
-  intro x0 hx0
-  by_contra hne
-  have hfx0 : f x0 = c := by
-    cases h1 : f x0 <;> cases c <;> simp_all
-  have hmul : signZ c * (∑ x ∈ S, signZ (f x)) = -(S.card : ℤ) := by
-    rw [hsum]
-    have hs := signZ_mul_self c
-    calc
-      signZ c * (-(signZ c) * (S.card : ℤ)) = -((signZ c * signZ c) * (S.card : ℤ)) := by ring
-      _ = -(S.card : ℤ) := by rw [hs, one_mul]
-  have hsplit : signZ c * (∑ x ∈ S, signZ (f x)) =
-      1 + ∑ x ∈ S.erase x0, signZ (xor c (f x)) := by
-    rw [Finset.mul_sum, ← Finset.add_sum_erase S (fun x => signZ c * signZ (f x)) hx0]
-    rw [hfx0, signZ_mul_self]
-    congr 1
-    apply Finset.sum_congr rfl
-    intro x _
-    rw [signZ_xor]
-  have hge := sum_signZ_ge_neg_card (S.erase x0) (fun x => xor c (f x))
-  have hcard : ((S.erase x0).card : ℤ) + 1 = (S.card : ℤ) := by
-    have h1 := Finset.card_erase_add_one hx0
-    omega
-  omega
+lemma sh_false {t : ℕ} (c x : Lab t) : sh false c x = x := by
+  funext i; simp [sh]
 
-lemma sum_signZ_eq_zero_of_invol {α : Type} [Fintype α] (f : α → Bool)
-    (σ : α → α) (hinv : ∀ x, σ (σ x) = x) (hflip : ∀ x, f (σ x) = !(f x)) :
-    ∑ x : α, signZ (f x) = 0 := by
-  let e : α ≃ α := ⟨σ, σ, hinv, hinv⟩
-  have h1 : ∑ x : α, signZ (f (e x)) = ∑ x : α, signZ (f x) :=
-    Fintype.sum_equiv e (fun x => signZ (f (e x))) (fun x => signZ (f x)) (fun _ => rfl)
-  have h2 : ∑ x : α, signZ (f (e x)) = -(∑ x : α, signZ (f x)) := by
-    rw [← Finset.sum_neg_distrib]
-    apply Finset.sum_congr rfl
-    intro x _
-    exact (congrArg signZ (hflip x)).trans (signZ_not (f x))
-  omega
+lemma sh_sh {t : ℕ} (c x : Lab t) : sh true c (sh true c x) = x := by
+  funext i; simp [sh, Bool.xor_assoc]
 
-def b2z (b : Bool) : ZMod 2 := if b then 1 else 0
+lemma chi_xor (a b : Bool) : chi (xor a b) = chi a * chi b := by
+  cases a <;> cases b <;> simp [chi]
 
-def z2b (x : ZMod 2) : Bool := decide (x = 1)
+lemma chi_not (b : Bool) : chi (!b) = - chi b := by
+  cases b <;> simp [chi]
 
-lemma b2z_xor (a b : Bool) : b2z (xor a b) = b2z a + b2z b := by
-  cases a <;> cases b <;> decide
+lemma sum_lab_succ {t : ℕ} (f : Lab (t+1) → ℤ) :
+    ∑ b, f b = ∑ b0 : Bool × Bool, ∑ b' : Lab t, f (Fin.cons b0 b') := by
+  rw [← Fintype.sum_prod_type']
+  exact (Fintype.sum_equiv (Fin.consEquiv (fun _ => Bool × Bool)) _ _ (fun _ => rfl)).symm
 
-lemma b2z_and (a b : Bool) : b2z (a && b) = b2z a * b2z b := by
-  cases a <;> cases b <;> decide
+lemma card_lab (t : ℕ) : Fintype.card (Lab t) = 4 ^ t := by
+  simp [Lab, Fintype.card_fun, Fintype.card_prod, Fintype.card_bool]
 
-lemma z2b_b2z (a : Bool) : z2b (b2z a) = a := by
-  cases a <;> decide
+lemma T_self {t : ℕ} (K : Lab t → Lab t → Bool) (x : Lab t) : T K x x = 4 ^ t := by
+  have : ∀ b : Lab t, chi (xor (K x b) (K x b)) = 1 := by intro b; simp [chi]
+  simp only [T, this, Finset.sum_const, Finset.card_univ, card_lab, nsmul_eq_mul, mul_one]
+  push_cast; ring
 
-lemma b2z_z2b (x : ZMod 2) : b2z (z2b x) = x := by
-  fin_cases x
-  · rfl
-  · rfl
+lemma T_comm {t : ℕ} (K : Lab t → Lab t → Bool) (x y : Lab t) : T K x y = T K y x := by
+  unfold T; congr 1; funext b; rw [Bool.xor_comm]
 
-lemma z2b_add (x y : ZMod 2) : z2b (x + y) = xor (z2b x) (z2b y) := by
-  fin_cases x <;> fin_cases y <;> rfl
+lemma pi2_sum (α1 α2 α3 β : Bool × Bool) :
+    xor (xor (xor (pi2 α1 β) (pi2 α2 β)) (pi2 α3 β))
+      (pi2 (xor (xor α1.1 α2.1) α3.1, xor (xor α1.2 α2.2) α3.2) β) =
+    xor (xor (xor (α1.1 && α1.2) (α2.1 && α2.2)) (α3.1 && α3.2))
+      ((xor (xor α1.1 α2.1) α3.1) && (xor (xor α1.2 α2.2) α3.2)) := by
+  obtain ⟨a, b⟩ := α1; obtain ⟨c, d⟩ := α2; obtain ⟨e, f⟩ := α3; obtain ⟨g, h⟩ := β
+  simp only [pi2]
+  revert a b c d e f g h; decide
 
-lemma z2b_sum_b2z_eq_card_mod2 {ι : Type} [Fintype ι] (f : ι → Bool) :
-    z2b (∑ i : ι, b2z (f i)) =
-      (((Finset.univ : Finset ι).filter (fun i => f i = true)).card % 2 == 1) := by
-  have hsum : ∑ i : ι, b2z (f i) =
-      ((((Finset.univ : Finset ι).filter (fun i => f i = true)).card : ℕ) : ZMod 2) := by
-    rw [Finset.card_eq_sum_ones, Nat.cast_sum, Finset.sum_filter]
-    apply Finset.sum_congr rfl
-    intro i _
-    cases f i <;> simp [b2z]
-  rw [hsum]
-  set m := ((Finset.univ : Finset ι).filter (fun i => f i = true)).card
-  have hm : ((m : ℕ) : ZMod 2) = ((m % 2 : ℕ) : ZMod 2) := by
-    have hdiv := Nat.div_add_mod m 2
-    have hcast : ((2 * (m / 2) + m % 2 : ℕ) : ZMod 2) = (m : ZMod 2) := by rw [hdiv]
-    rw [← hcast, Nat.cast_add, Nat.cast_mul, Nat.cast_ofNat]
-    have h2 : (2 : ZMod 2) = 0 := rfl
-    rw [h2, zero_mul, zero_add]
-  rw [hm]
-  have hlt : m % 2 < 2 := Nat.mod_lt m (by omega)
-  interval_cases (m % 2) <;> decide
+lemma xor_rearr (p1 p2 p3 p4 k1 k2 k3 k4 : Bool) :
+    xor (xor (xor (xor p1 k1) (xor p2 k2)) (xor p3 k3)) (xor p4 k4) =
+    xor (xor (xor (xor k1 k2) k3) k4) (xor (xor (xor p1 p2) p3) p4) := by
+  revert p1 p2 p3 p4 k1 k2 k3 k4; decide
 
-def IsHadamard {α β : Type} [Fintype α] [Fintype β] (G : α → β → Bool) : Prop :=
-  ∀ u1 u2 : α, u1 ≠ u2 → ∑ v : β, signZ (xor (G u1 v) (G u2 v)) = 0
-
-lemma hadamard_transpose {N : ℕ} (hN : 0 < N) {G : Fin N → Fin N → Bool}
-    (hH : IsHadamard G) : IsHadamard (fun v u => G u v) := by
-  let M : Matrix (Fin N) (Fin N) ℚ := fun u v => (signZ (G u v) : ℚ)
-  let M' : Matrix (Fin N) (Fin N) ℚ := fun v u => ((N : ℚ)⁻¹) * (signZ (G u v) : ℚ)
-  have hNq : (N : ℚ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.ne_of_gt hN)
-  have hmul : M * M' = 1 := by
-    ext u1 u2
-    rw [Matrix.mul_apply, Matrix.one_apply]
-    dsimp only [M, M']
-    have hpull : ∑ v : Fin N, (signZ (G u1 v) : ℚ) * ((N : ℚ)⁻¹ * (signZ (G u2 v) : ℚ)) =
-        (N : ℚ)⁻¹ * ((∑ v : Fin N, signZ (xor (G u1 v) (G u2 v)) : ℤ) : ℚ) := by
-      rw [Int.cast_sum, Finset.mul_sum]
+theorem had_closed : ∀ (t : ℕ) (F : Lab t → Lab t → Bool), AbsCls t F → RowHad F → Closed3 F
+  | 0, F, _, _ => by
+    intro a1 a2 a3
+    let b0 : Lab 0 := fun i => i.elim0
+    refine ⟨a1, xor (xor (xor (F a1 b0) (F a2 b0)) (F a3 b0)) (F a1 b0), fun b => ?_⟩
+    have : b = b0 := funext fun i => i.elim0
+    rw [this]
+  | t+1, F, hF, hH => by
+    obtain ⟨e, c, K, hK, hFK⟩ := hF
+    have inner : ∀ (α α' : Bool × Bool) (x x' : Lab t) (b0 : Bool × Bool),
+        ∑ b' : Lab t, chi (xor (F (Fin.cons α x) (Fin.cons b0 b')) (F (Fin.cons α' x') (Fin.cons b0 b')))
+        = chi (xor (e && pi2 α b0) (e && pi2 α' b0)) *
+            T K (sh (pi2 α b0) c x) (sh (pi2 α' b0) c x') := by
+      intro α α' x x' b0
+      rw [T, Finset.mul_sum]
       apply Finset.sum_congr rfl
-      intro v _
-      rw [signZ_xor, Int.cast_mul]
-      ring
-    rw [hpull]
-    by_cases heq : u1 = u2
-    · subst heq
-      have hdiag : ∑ v : Fin N, signZ (xor (G u1 v) (G u1 v)) = (N : ℤ) := by
-        simp [signZ]
-      rw [hdiag, Int.cast_natCast, if_pos rfl, inv_mul_cancel₀ hNq]
-    · rw [hH u1 u2 heq, Int.cast_zero, mul_zero, if_neg heq]
-  have hmul' : M' * M = 1 := by
-    let f : (Fin N → ℚ) →ₗ[ℚ] (Fin N → ℚ) := Matrix.mulVecLin M
-    let g : (Fin N → ℚ) →ₗ[ℚ] (Fin N → ℚ) := Matrix.mulVecLin M'
-    have hfg : f.comp g = LinearMap.id := by
-      dsimp only [f, g]
-      rw [← Matrix.mulVecLin_mul, hmul, Matrix.mulVecLin_one]
-    have hsurj : Function.Surjective f := fun y => ⟨g y, by simpa using LinearMap.congr_fun hfg y⟩
-    have hinj : Function.Injective f := LinearMap.injective_iff_surjective.mpr hsurj
-    have hgf : g.comp f = LinearMap.id := by
-      apply LinearMap.ext
+      intro b' _
+      rw [hFK, hFK]
+      simp only [Fin.cons_zero, Fin.tail_cons]
+      rw [← chi_xor]
+      congr 1
+      generalize (e && pi2 α b0) = p; generalize (e && pi2 α' b0) = q
+      generalize K (sh (pi2 α b0) c x) b' = r; generalize K (sh (pi2 α' b0) c x') b' = w
+      revert p q r w; decide
+    have hdiag : ∀ x y : Lab t, x ≠ y → 3 * T K x y + T K (sh true c x) (sh true c y) = 0 := by
+      intro x y hxy
+      have hne : (Fin.cons (false, false) x : Lab (t+1)) ≠ Fin.cons (false, false) y := by
+        intro h; apply hxy
+        have := congrArg (fun z : Lab (t+1) => Fin.tail z) h
+        simpa using this
+      have h1 := hH _ _ hne
+      rw [sum_lab_succ] at h1
+      simp only [inner] at h1
+      simp only [Fintype.sum_prod_type, Fintype.sum_bool, pi2, Bool.xor_self, chi,
+        Bool.xor_true, Bool.xor_false, Bool.not_false, Bool.not_true, Bool.and_true,
+        Bool.and_false, Bool.and_self, sh_false, Bool.false_eq_true, ↓reduceIte, one_mul] at h1
+      linarith
+    have hKH : RowHad K := by
+      intro x y hxy
+      have h1 := hdiag x y hxy
+      have hne' : sh true c x ≠ sh true c y := by
+        intro h; apply hxy; rw [← sh_sh c x, h, sh_sh]
+      have h2 := hdiag _ _ hne'
+      rw [sh_sh, sh_sh] at h2
+      show T K x y = 0
+      linarith
+    have hoff : ∀ x : Lab t,
+        2 * 4 ^ t + chi e * (T K x (sh true c x) + T K (sh true c x) x) = 0 := by
       intro x
-      apply hinj
-      change (f.comp g) (f x) = f x
-      rw [hfg]; rfl
-    ext v1 v2
-    let e : Fin N → ℚ := fun i => if i = v2 then 1 else 0
-    have h1 := congrFun (LinearMap.congr_fun hgf e) v1
-    have hL : ((g.comp f) e) v1 = (M' * M) v1 v2 := by
-      have hcomp : g.comp f = Matrix.mulVecLin (M' * M) := by
-        dsimp only [f, g]
-        rw [Matrix.mulVecLin_mul]
-      rw [hcomp]
-      simp [Matrix.mulVec, dotProduct, e]
-      rw [Matrix.mul_apply]
-    have hR : ((LinearMap.id : (Fin N → ℚ) →ₗ[ℚ] (Fin N → ℚ)) e) v1 = (1 : Matrix (Fin N) (Fin N) ℚ) v1 v2 := by
-      simp [e, Matrix.one_apply]
-    rw [← hL, h1, hR]
-  intro v1 v2 hne
-  have hent := congrFun (congrFun hmul' v1) v2
-  rw [Matrix.mul_apply, Matrix.one_apply, if_neg hne] at hent
-  dsimp only [M, M'] at hent
-  have hpull : ∑ u : Fin N, ((N : ℚ)⁻¹ * (signZ (G u v1) : ℚ)) * (signZ (G u v2) : ℚ) =
-      (N : ℚ)⁻¹ * ((∑ u : Fin N, signZ (xor (G u v1) (G u v2)) : ℤ) : ℚ) := by
-    rw [Int.cast_sum, Finset.mul_sum]
+      have hne : (Fin.cons (false, false) x : Lab (t+1)) ≠ Fin.cons (true, false) x := by
+        intro h; have := congrFun h 0; simp at this
+      have h1 := hH _ _ hne
+      rw [sum_lab_succ] at h1
+      simp only [inner] at h1
+      simp only [Fintype.sum_prod_type, Fintype.sum_bool, pi2, Bool.xor_self,
+        Bool.xor_true, Bool.xor_false, Bool.true_xor, Bool.false_xor, Bool.not_false,
+        Bool.not_true, Bool.and_true, Bool.and_false, Bool.and_self, sh_false, T_self] at h1
+      have hc0 : chi false = 1 := rfl
+      rw [hc0] at h1
+      linarith
+    have hc : ∀ x : Lab t, sh true c x = x := by
+      intro x
+      by_contra hne
+      have h1 := hoff x
+      have e1 : T K x (sh true c x) = 0 := hKH _ _ (Ne.symm hne)
+      have e2 : T K (sh true c x) x = 0 := hKH _ _ hne
+      rw [e1, e2] at h1
+      have : (0 : ℤ) < 4 ^ t := by positivity
+      linarith
+    have hsh : ∀ (p : Bool) (x : Lab t), sh p c x = x := by
+      intro p x; cases p
+      · exact sh_false c x
+      · exact hc x
+    have he : e = true := by
+      have h1 := hoff (fun _ => (false, false))
+      rw [hc, T_self] at h1
+      have : (0 : ℤ) < 4 ^ t := by positivity
+      cases e
+      · simp [chi] at h1; linarith
+      · rfl
+    have IH := had_closed t K hK hKH
+    intro a1 a2 a3
+    obtain ⟨x4, cK, hx4⟩ := IH (Fin.tail a1) (Fin.tail a2) (Fin.tail a3)
+    let α4 : Bool × Bool := (xor (xor (a1 0).1 (a2 0).1) (a3 0).1, xor (xor (a1 0).2 (a2 0).2) (a3 0).2)
+    refine ⟨Fin.cons α4 x4, xor cK (xor (xor (xor ((a1 0).1 && (a1 0).2) ((a2 0).1 && (a2 0).2))
+      ((a3 0).1 && (a3 0).2)) (α4.1 && α4.2)), fun b => ?_⟩
+    rw [hFK, hFK, hFK, hFK]
+    simp only [Fin.cons_zero, Fin.tail_cons, hsh, he, Bool.true_and]
+    rw [xor_rearr, hx4 (Fin.tail b)]
+    congr 1
+    exact pi2_sum (a1 0) (a2 0) (a3 0) (b 0)
+
+/-! ## Part B: extraction of the abstract program from a circuit -/
+
+def nl (g : Gate) : Bool := (g.inputs.length == 2) &&
+  xor (xor (g.op.eval [false,false]) (g.op.eval [false,true]))
+    (xor (g.op.eval [true,false]) (g.op.eval [true,true]))
+
+def stepW (w : List Bool) (g : Gate) : List Bool :=
+  w ++ [g.op.eval (g.inputs.map fun i => w.getD i false)]
+
+lemma wires_eq (C : Circuit) (x : List Bool) : C.wires x = C.gates.foldl stepW x := rfl
+
+lemma gate_aff (g : Gate) (hl : g.inputs.length ≤ 2) :
+    ∃ (k0 k1 k2 : Bool) (i j : ℕ), ∀ W : ℕ → Bool,
+      g.op.eval (g.inputs.map W) =
+        xor (xor (xor k0 (k1 && W i)) (k2 && W j)) (nl g && (W i && W j)) := by
+  rcases g with ⟨op, ins⟩
+  rcases ins with _ | ⟨i, _ | ⟨j, _ | ⟨l, rest⟩⟩⟩
+  · exact ⟨op.eval [], false, false, 0, 0, fun W => by simp [nl]⟩
+  · refine ⟨op.eval [false], xor (op.eval [false]) (op.eval [true]), false, i, i, fun W => ?_⟩
+    simp only [nl, List.map_cons, List.map_nil, List.length_cons, List.length_nil]
+    cases W i <;> simp
+  · refine ⟨op.eval [false,false], xor (op.eval [false,false]) (op.eval [true,false]),
+      xor (op.eval [false,false]) (op.eval [false,true]), i, j, fun W => ?_⟩
+    simp only [nl, List.map_cons, List.map_nil, List.length_cons, List.length_nil]
+    have h22 : ((0 + 1 + 1 : ℕ) == 2) = true := rfl
+    rw [h22, Bool.true_and]
+    cases W i <;> cases W j <;>
+    · generalize op.eval [false, false] = a
+      generalize op.eval [false, true] = b
+      generalize op.eval [true, false] = c
+      generalize op.eval [true, true] = d
+      revert a b c d; decide
+  · simp at hl
+
+def Z4 {R : Type} (Aw : R → ℕ → Bool) (r1 r2 r3 r4 : R) : Prop :=
+  ∀ w, xor (xor (xor (Aw r1 w) (Aw r2 w)) (Aw r3 w)) (Aw r4 w) = false
+
+def AffL {R : Type} {t : ℕ} (Aw : R → ℕ → Bool) (ℓ : R → Lab t) : Prop :=
+  ∀ r1 r2 r3 r4, Z4 Aw r1 r2 r3 r4 → ∀ i,
+    xor (xor (xor (ℓ r1 i).1 (ℓ r2 i).1) (ℓ r3 i).1) (ℓ r4 i).1 = false ∧
+    xor (xor (xor (ℓ r1 i).2 (ℓ r2 i).2) (ℓ r3 i).2) (ℓ r4 i).2 = false
+
+def AffB {R : Type} (Aw : R → ℕ → Bool) (A : R → Bool) : Prop :=
+  ∀ r1 r2 r3 r4, Z4 Aw r1 r2 r3 r4 → xor (xor (xor (A r1) (A r2)) (A r3)) (A r4) = false
+
+lemma getD_snoc (l : List Bool) (y : Bool) (w : ℕ) :
+    (l ++ [y]).getD w false = if w = l.length then y else l.getD w false := by
+  rcases lt_trichotomy w l.length with h | h | h
+  · rw [if_neg h.ne, List.getD_append _ _ _ _ h]
+  · subst h; rw [if_pos rfl, List.getD_append_right _ _ _ _ le_rfl]; simp
+  · rw [if_neg h.ne', List.getD_eq_default _ _ (by simp; omega),
+      List.getD_eq_default _ _ (by omega)]
+
+lemma aff_z4 (k0 k1 k2 a1 a2 a3 a4 b1 b2 b3 b4 : Bool)
+    (ha : xor (xor (xor a1 a2) a3) a4 = false) (hb : xor (xor (xor b1 b2) b3) b4 = false) :
+    xor (xor (xor (xor (xor k0 (k1 && a1)) (k2 && b1)) (xor (xor k0 (k1 && a2)) (k2 && b2)))
+      (xor (xor k0 (k1 && a3)) (k2 && b3))) (xor (xor k0 (k1 && a4)) (k2 && b4)) = false := by
+  have ha' : a4 = xor (xor a1 a2) a3 := by
+    revert ha; cases a1 <;> cases a2 <;> cases a3 <;> cases a4 <;> decide
+  have hb' : b4 = xor (xor b1 b2) b3 := by
+    revert hb; cases b1 <;> cases b2 <;> cases b3 <;> cases b4 <;> decide
+  subst ha' hb'
+  revert k0 k1 k2 a1 a2 a3 b1 b2 b3; decide
+
+lemma bid1 (k0 k1 k2 a b a' b' : Bool) :
+    xor (xor k0 (k1 && xor a a')) (k2 && xor b b') =
+      xor (xor (xor k0 (k1 && a)) (k2 && b)) (xor (k1 && a') (k2 && b')) := by
+  revert k0 k1 k2 a b a' b'; decide
+
+lemma bid2 (k0 k1 k2 a b a' b' : Bool) :
+    xor (xor (xor k0 (k1 && xor a a')) (k2 && xor b b')) (xor a a' && xor b b') =
+      xor (xor (xor (xor k0 (k1 && a)) (k2 && b)) (xor a a' && xor b b'))
+        (xor (k1 && a') (k2 && b')) := by
+  revert k0 k1 k2 a b a' b'; decide
+
+lemma bid3 (a p d b f : Bool) :
+    xor (xor (xor a (p && d)) b) f = xor (xor a b) (xor (d && p) f) := by
+  revert a p d b f; decide
+
+lemma xor4_eq (x1 x2 x3 x4 : Bool) (h : xor (xor (xor x1 x2) x3) x4 = false) :
+    x1 = xor x2 (xor x3 x4) := by
+  revert h; cases x1 <;> cases x2 <;> cases x3 <;> cases x4 <;> decide
+
+theorem extract {C : Type} (out : ℕ) : ∀ (gs : List Gate), (∀ g ∈ gs, g.inputs.length ≤ 2) →
+    ∀ (t : ℕ), gs.countP nl = t →
+    ∀ (R : Type) (L : ℕ) (x : R → C → List Bool) (Aw : R → ℕ → Bool) (Bw : C → ℕ → Bool),
+    (∀ r c, (x r c).length = L) → (∀ r c w, (x r c).getD w false = xor (Aw r w) (Bw c w)) →
+    ∃ (ℓ : R → Lab t) (m : C → Lab t) (F : Lab t → Lab t → Bool) (A : R → Bool) (B : C → Bool),
+      AbsCls t F ∧
+      (∀ r c, (gs.foldl stepW (x r c)).getD out false = xor (xor (A r) (B c)) (F (ℓ r) (m c))) ∧
+      AffL Aw ℓ ∧ AffB Aw A
+  | [], _, t, ht, R, L, x, Aw, Bw, _, hx => by
+    simp at ht; subst ht
+    refine ⟨fun _ i => i.elim0, fun _ i => i.elim0, fun _ _ => false, fun r => Aw r out,
+      fun c => Bw c out, trivial, ?_, ?_, ?_⟩
+    · intro r c; simp only [List.foldl_nil, Bool.xor_false]; exact hx r c out
+    · intro r1 r2 r3 r4 _ i; exact i.elim0
+    · intro r1 r2 r3 r4 hz; exact hz out
+  | g :: gs, hfan, t, ht, R, L, x, Aw, Bw, hlen, hx => by
+    obtain ⟨k0, k1, k2, i, j, hg⟩ := gate_aff g (hfan g (by simp))
+    have hfan' : ∀ g ∈ gs, g.inputs.length ≤ 2 := fun g' hg' => hfan g' (by simp [hg'])
+    rw [List.countP_cons] at ht
+    cases hng : nl g
+    · -- an affine gate
+      rw [hng] at ht
+      simp only [Bool.false_eq_true, if_false, add_zero] at ht
+      let Aw' : R → ℕ → Bool := fun r w =>
+        if w = L then xor (xor k0 (k1 && Aw r i)) (k2 && Aw r j) else Aw r w
+      let Bw' : C → ℕ → Bool := fun c w =>
+        if w = L then xor (k1 && Bw c i) (k2 && Bw c j) else Bw c w
+      have hlen' : ∀ r c, (stepW (x r c) g).length = L + 1 := by
+        intro r c; simp [stepW, hlen]
+      have hx' : ∀ r c w, (stepW (x r c) g).getD w false = xor (Aw' r w) (Bw' c w) := by
+        intro r c w
+        simp only [stepW]
+        rw [getD_snoc, hlen r c]
+        by_cases hw : w = L
+        · simp only [hw, if_true, Aw', Bw']
+          rw [hg]
+          simp only [hng, Bool.false_and, Bool.xor_false, hx]
+          exact bid1 _ _ _ _ _ _ _
+        · simp only [hw, if_false, Aw', Bw']; exact hx r c w
+      obtain ⟨ℓ, m, F, A, B, hF, hout, hℓ, hA⟩ :=
+        extract out gs hfan' t ht R (L+1) (fun r c => stepW (x r c) g) Aw' Bw' hlen' hx'
+      have hz' : ∀ r1 r2 r3 r4, Z4 Aw r1 r2 r3 r4 → Z4 Aw' r1 r2 r3 r4 := by
+        intro r1 r2 r3 r4 hz w
+        simp only [Aw']
+        by_cases hw : w = L
+        · simp only [hw, if_true]
+          exact aff_z4 _ _ _ _ _ _ _ _ _ _ _ (hz i) (hz j)
+        · simp only [hw, if_false]; exact hz w
+      refine ⟨ℓ, m, F, A, B, hF, fun r c => ?_, fun r1 r2 r3 r4 hz => hℓ _ _ _ _ (hz' _ _ _ _ hz),
+        fun r1 r2 r3 r4 hz => hA _ _ _ _ (hz' _ _ _ _ hz)⟩
+      rw [List.foldl_cons]; exact hout r c
+    · -- a nonlinear gate
+      rw [hng] at ht
+      simp only [if_true] at ht
+      obtain ⟨t', rfl⟩ : ∃ t', t = t' + 1 := ⟨gs.countP nl, by omega⟩
+      have ht' : gs.countP nl = t' := by omega
+      let Aw' : R × Bool → ℕ → Bool := fun rp w =>
+        if w = L then xor (xor (xor k0 (k1 && Aw rp.1 i)) (k2 && Aw rp.1 j)) rp.2 else Aw rp.1 w
+      let Bw' : C → ℕ → Bool := fun c w =>
+        if w = L then xor (k1 && Bw c i) (k2 && Bw c j) else Bw c w
+      let x' : R × Bool → C → List Bool := fun rp c => x rp.1 c ++ [xor (Aw' rp L) (Bw' c L)]
+      have hlen' : ∀ rp c, (x' rp c).length = L + 1 := by
+        intro rp c; simp [x', hlen]
+      have hx' : ∀ rp c w, (x' rp c).getD w false = xor (Aw' rp w) (Bw' c w) := by
+        intro rp c w
+        simp only [x']
+        rw [getD_snoc, hlen]
+        by_cases hw : w = L
+        · subst hw; simp
+        · simp only [hw, if_false, Aw', Bw']; exact hx rp.1 c w
+      obtain ⟨ℓ', m', F', A', B', hF', hout', hℓ', hA'⟩ :=
+        extract out gs hfan' t' ht' (R × Bool) (L+1) x' Aw' Bw' hlen' hx'
+      let π : R → C → Bool := fun r c => (x r c).getD i false && (x r c).getD j false
+      have hstep : ∀ r c, stepW (x r c) g = x' (r, π r c) c := by
+        intro r c
+        simp only [stepW, x']
+        congr 2
+        rw [hg]
+        simp only [hng, Bool.true_and, Aw', Bw', if_true, π, hx]
+        exact bid2 _ _ _ _ _ _ _
+      have hzL : ∀ r r0 : R, Z4 Aw' (r, true) (r, false) (r0, true) (r0, false) := by
+        intro r r0 w
+        simp only [Aw']
+        by_cases hw : w = L
+        · simp only [hw, if_true]
+          generalize xor (xor k0 (k1 && Aw r i)) (k2 && Aw r j) = a
+          generalize xor (xor k0 (k1 && Aw r0 i)) (k2 && Aw r0 j) = b
+          revert a b; decide
+        · simp only [hw, if_false]
+          generalize Aw r w = a; generalize Aw r0 w = b
+          revert a b; decide
+      obtain ⟨csh, d, hsh, hd⟩ : ∃ (csh : Lab t') (d : Bool),
+          (∀ r p, ℓ' (r, p) = sh p csh (ℓ' (r, false))) ∧
+          (∀ r p, A' (r, p) = xor (A' (r, false)) (p && d)) := by
+        rcases isEmpty_or_nonempty R with hR | ⟨⟨r0⟩⟩
+        · exact ⟨fun _ => (false, false), false, fun r => (IsEmpty.false r).elim,
+            fun r => (IsEmpty.false r).elim⟩
+        · refine ⟨fun k => (xor (ℓ' (r0, true) k).1 (ℓ' (r0, false) k).1,
+            xor (ℓ' (r0, true) k).2 (ℓ' (r0, false) k).2),
+            xor (A' (r0, true)) (A' (r0, false)), ?_, ?_⟩
+          · intro r p; cases p
+            · exact (sh_false _ _).symm
+            · funext k
+              obtain ⟨h1, h2⟩ := hℓ' _ _ _ _ (hzL r r0) k
+              simp only [sh, Bool.true_and]
+              ext
+              · exact xor4_eq _ _ _ _ h1
+              · exact xor4_eq _ _ _ _ h2
+          · intro r p; cases p
+            · simp
+            · have h1 := hA' _ _ _ _ (hzL r r0)
+              simp only [Bool.true_and]
+              exact xor4_eq _ _ _ _ h1
+      have hz' : ∀ r1 r2 r3 r4, Z4 Aw r1 r2 r3 r4 →
+          Z4 Aw' (r1, false) (r2, false) (r3, false) (r4, false) := by
+        intro r1 r2 r3 r4 hz w
+        simp only [Aw']
+        by_cases hw : w = L
+        · simp only [hw, if_true, Bool.xor_false]
+          exact aff_z4 _ _ _ _ _ _ _ _ _ _ _ (hz i) (hz j)
+        · simp only [hw, if_false]; exact hz w
+      refine ⟨fun r => Fin.cons (Aw r i, Aw r j) (ℓ' (r, false)),
+        fun c => Fin.cons (Bw c i, Bw c j) (m' c),
+        fun a b => xor (d && pi2 (a 0) (b 0)) (F' (sh (pi2 (a 0) (b 0)) csh (Fin.tail a)) (Fin.tail b)),
+        fun r => A' (r, false), B', ⟨d, csh, F', hF', fun a b => rfl⟩, ?_, ?_, ?_⟩
+      · intro r c
+        rw [List.foldl_cons, hstep, hout', hsh, hd]
+        simp only [Fin.cons_zero, Fin.tail_cons]
+        have hπ : pi2 (Aw r i, Aw r j) (Bw c i, Bw c j) = π r c := by
+          simp only [pi2, π, hx]
+        rw [hπ]
+        exact bid3 _ _ _ _ _
+      · intro r1 r2 r3 r4 hz k
+        refine Fin.cases ?_ (fun k' => ?_) k
+        · simp only [Fin.cons_zero]; exact ⟨hz i, hz j⟩
+        · simp only [Fin.cons_succ]
+          exact hℓ' _ _ _ _ (hz' _ _ _ _ hz) k'
+      · intro r1 r2 r3 r4 hz
+        exact hA' _ _ _ _ (hz' _ _ _ _ hz)
+
+/-! ## Part D: the switched inner product -/
+
+def dotp (k u v : ℕ) : Bool :=
+  ((Finset.univ : Finset (Fin k)).filter (fun i => u.testBit i.val && v.testBit i.val)).card % 2 == 1
+
+def Gf (s : ℕ) (u v : Fin (2 ^ (2 * s))) : Bool :=
+  xor (dotp (2 * s) u.val v.val)
+    ((u.val.testBit 0 && u.val.testBit 1) && (v.val.testBit 2 && v.val.testBit 3))
+
+lemma parity_flip (k : ℕ) (p q : Fin k → Bool) (j : Fin k) (h : ∀ i, i ≠ j → p i = q i) :
+    (((Finset.univ : Finset (Fin k)).filter (fun i => q i = true)).card % 2 == 1) =
+    xor (((Finset.univ : Finset (Fin k)).filter (fun i => p i = true)).card % 2 == 1)
+      (xor (p j) (q j)) := by
+  rw [Finset.card_filter, Finset.card_filter,
+    ← Finset.add_sum_erase _ _ (Finset.mem_univ j), ← Finset.add_sum_erase _ _ (Finset.mem_univ j)]
+  have hs : ∑ x ∈ Finset.univ.erase j, (if p x = true then 1 else 0) =
+      ∑ x ∈ Finset.univ.erase j, (if q x = true then 1 else 0) := by
     apply Finset.sum_congr rfl
-    intro u _
-    rw [signZ_xor, Int.cast_mul]
-    ring
-  rw [hpull] at hent
-  have hq : ((∑ u : Fin N, signZ (xor (G u v1) (G u v2)) : ℤ) : ℚ) = 0 := by
-    rcases mul_eq_zero.mp hent with hinv | h0
-    · exact absurd (inv_ne_zero hNq) (not_not.mpr hinv)
-    · exact h0
-  exact Int.cast_eq_zero.mp hq
+    intro i hi
+    rw [h i (Finset.ne_of_mem_erase hi)]
+  rw [hs]
+  generalize ∑ x ∈ Finset.univ.erase j, (if q x = true then 1 else 0) = X
+  cases hp : p j <;> cases hq : q j <;> rcases Nat.mod_two_eq_zero_or_one X with hX | hX <;>
+    simp [Nat.add_mod, hX]
 
-def nonlinear (g : Gate) : Bool :=
-  (g.inputs.length == 2) &&
-  xor (xor (g.op.eval [false, false]) (g.op.eval [false, true]))
-      (xor (g.op.eval [true, false]) (g.op.eval [true, true]))
+lemma testBit_flip (v j i : ℕ) : (v ^^^ 2 ^ j).testBit i = xor (v.testBit i) (decide (j = i)) := by
+  rw [Nat.testBit_xor, Nat.testBit_two_pow]
 
-lemma affine_gate_2 (f : Bool → Bool → Bool)
-    (hlin : xor (xor (f false false) (f false true)) (xor (f true false) (f true true)) = false) :
-    ∃ c0 c1 c2 : Bool, ∀ x y : Bool, f x y = xor c0 (xor (c1 && x) (c2 && y)) := by
-  refine ⟨f false false, xor (f false false) (f true false), xor (f false false) (f false true), ?_⟩
-  intro x y
-  cases h00 : f false false <;> cases h01 : f false true <;>
-    cases h10 : f true false <;> cases h11 : f true true <;>
-    simp [h00, h01, h10, h11] at hlin
-  all_goals (cases x <;> cases y <;> simp [h00, h01, h10, h11])
+lemma dot_flip (k u v j : ℕ) (hj : j < k) :
+    dotp k u (v ^^^ 2 ^ j) = xor (dotp k u v) (u.testBit j) := by
+  have key := parity_flip k (fun i => u.testBit i.val && v.testBit i.val)
+    (fun i => u.testBit i.val && (v ^^^ 2 ^ j).testBit i.val) ⟨j, hj⟩ (by
+      intro i hi
+      simp only [testBit_flip]
+      have : decide (j = i.val) = false := by
+        simp only [decide_eq_false_iff_not]; intro h; exact hi (Fin.ext h.symm)
+      rw [this, Bool.xor_false])
+  beta_reduce at key
+  unfold dotp
+  rw [key]
+  congr 1
+  simp only [testBit_flip, decide_true]
+  cases u.testBit j <;> cases v.testBit j <;> rfl
 
-lemma nonlinear_gate_2 (f : Bool → Bool → Bool)
-    (hnl : xor (xor (f false false) (f false true)) (xor (f true false) (f true true)) = true) :
-    ∃ c0 c1 c2 : Bool, ∀ x y : Bool, f x y = xor c0 ((xor x c1) && (xor y c2)) := by
-  refine ⟨xor (f false false) ((xor (f false false) (f false true)) && (xor (f false false) (f true false))),
-    xor (f false false) (f false true), xor (f false false) (f true false), ?_⟩
-  intro x y
-  cases h00 : f false false <;> cases h01 : f false true <;>
-    cases h10 : f true false <;> cases h11 : f true true <;>
-    simp [h00, h01, h10, h11] at hnl
-  all_goals (cases x <;> cases y <;> simp [h00, h01, h10, h11])
+def flipP (k j : ℕ) (hj : j < k) : Equiv.Perm (Fin (2 ^ k)) where
+  toFun v := ⟨v.val ^^^ 2 ^ j, Nat.xor_lt_two_pow v.isLt (Nat.pow_lt_pow_right (by norm_num) hj)⟩
+  invFun v := ⟨v.val ^^^ 2 ^ j, Nat.xor_lt_two_pow v.isLt (Nat.pow_lt_pow_right (by norm_num) hj)⟩
+  left_inv v := by ext; simp [Nat.xor_assoc]
+  right_inv v := by ext; simp [Nat.xor_assoc]
 
-lemma affine_gate_1 (f : Bool → Bool) :
-    ∃ c0 c1 : Bool, ∀ x : Bool, f x = xor c0 (c1 && x) := by
-  refine ⟨f false, xor (f false) (f true), ?_⟩
-  intro x
-  cases h0 : f false <;> cases h1 : f true <;> cases x <;> simp [h0, h1]
+lemma flipP_val (k j : ℕ) (hj : j < k) (v : Fin (2 ^ k)) :
+    (flipP k j hj v).val = v.val ^^^ 2 ^ j := rfl
 
-inductive GenGate (α β : Type) where
-  | pureU (f : α → Bool)
-  | pureV (g : β → Bool)
-  | real (g : Gate)
+lemma sum_anti {n : ℕ} (σ : Equiv.Perm (Fin n)) (f : Fin n → ℤ) (h : ∀ v, f (σ v) = - f v) :
+    ∑ v, f v = 0 := by
+  have h1 : ∑ v, f (σ v) = ∑ v, f v := Equiv.sum_comp σ f
+  simp only [h, Finset.sum_neg_distrib] at h1
+  linarith
 
-def GenGate.nl {α β : Type} : GenGate α β → Bool
-  | GenGate.real g => nonlinear g
-  | _ => false
+lemma testBit_high {k : ℕ} (u : Fin (2 ^ k)) {i : ℕ} (hi : k ≤ i) : u.val.testBit i = false :=
+  Nat.testBit_eq_false_of_lt (lt_of_lt_of_le u.isLt (Nat.pow_le_pow_right (by norm_num) hi))
 
-def GenGate.eval {α β : Type} (u : α) (v : β) (w : List Bool) : GenGate α β → Bool
-  | GenGate.pureU f => f u
-  | GenGate.pureV g => g v
-  | GenGate.real g => g.op.eval (g.inputs.map (fun i => w.getD i false))
+lemma bool_row (S S' V V' D D' b b' : Bool) (hb : b ≠ b') (hV : S ≠ S' → V' = V) :
+    xor (xor (xor D b) (S && V')) (xor (xor D' b') (S' && V')) =
+      !(xor (xor D (S && V)) (xor D' (S' && V))) := by
+  revert hb hV; revert S S' V V' D D' b b'; decide
 
-def evalGen {α β : Type} (gs : List (GenGate α β)) (init : List Bool) (u : α) (v : β) : List Bool :=
-  gs.foldl (fun w g => w ++ [g.eval u v w]) init
+lemma row_bal (s : ℕ) (hs : 2 ≤ s) (u u' : Fin (2 ^ (2 * s))) (hne : u ≠ u') :
+    ∑ v, chi (xor (Gf s u v) (Gf s u' v)) = 0 := by
+  obtain ⟨j, hj, hbit, hsw⟩ : ∃ j, j < 2 * s ∧ u.val.testBit j ≠ u'.val.testBit j ∧
+      ((u.val.testBit 0 && u.val.testBit 1) ≠ (u'.val.testBit 0 && u'.val.testBit 1) → j < 2) := by
+    by_cases hsw : (u.val.testBit 0 && u.val.testBit 1) = (u'.val.testBit 0 && u'.val.testBit 1)
+    · obtain ⟨j, hj⟩ : ∃ j, u.val.testBit j ≠ u'.val.testBit j := by
+        by_contra hc; push_neg at hc; exact hne (Fin.ext (Nat.eq_of_testBit_eq hc))
+      have hjk : j < 2 * s := by
+        by_contra hjk; push_neg at hjk
+        exact hj (by rw [testBit_high u hjk, testBit_high u' hjk])
+      exact ⟨j, hjk, hj, fun h => absurd hsw h⟩
+    · by_cases h0 : u.val.testBit 0 = u'.val.testBit 0
+      · refine ⟨1, by omega, ?_, fun _ => by omega⟩
+        intro h1; apply hsw; rw [h0, h1]
+      · exact ⟨0, by omega, h0, fun _ => by omega⟩
+  apply sum_anti (flipP (2 * s) j hj)
+  intro v
+  rw [← chi_not]
+  congr 1
+  simp only [Gf, flipP_val, dot_flip _ _ _ _ hj, testBit_flip]
+  apply bool_row _ _ _ _ _ _ _ _ hbit
+  intro h
+  have hj2 := hsw h
+  have e2 : decide (j = 2) = false := by simp only [decide_eq_false_iff_not]; omega
+  have e3 : decide (j = 3) = false := by simp only [decide_eq_false_iff_not]; omega
+  rw [e2, e3, Bool.xor_false, Bool.xor_false]
 
-lemma evalGen_append {α β : Type} (gs1 gs2 : List (GenGate α β)) (init : List Bool) (u : α) (v : β) :
-    evalGen (gs1 ++ gs2) init u v = evalGen gs2 (evalGen gs1 init u v) u v := by
-  simp [evalGen, List.foldl_append]
+lemma dot_zero_left (k v : ℕ) : dotp k 0 v = false := by simp [dotp]
 
-lemma evalGen_length {α β : Type} (gs : List (GenGate α β)) (init : List Bool) (u : α) (v : β) :
-    (evalGen gs init u v).length = init.length + gs.length := by
-  induction gs generalizing init with
-  | nil => simp [evalGen]
-  | cons g gs ih =>
-    simp only [evalGen, List.foldl_cons]
-    have h1 := ih (init ++ [g.eval u v init])
-    simp only [evalGen, List.length_append, List.length_singleton] at h1
-    simp only [List.length_cons]
-    omega
+lemma dot_zero_right (k u : ℕ) : dotp k u 0 = false := by simp [dotp]
 
-def GenFanIn2 {α β : Type} (gs : List (GenGate α β)) : Prop :=
-  ∀ gg ∈ gs, match gg with
-    | GenGate.real g => g.inputs.length ≤ 2
-    | _ => True
+lemma dot_unit_right (k u j : ℕ) (hj : j < k) : dotp k u (2 ^ j) = u.testBit j := by
+  have key := parity_flip k (fun _ => false)
+    (fun i => u.testBit i.val && (2 ^ j).testBit i.val) ⟨j, hj⟩ (by
+      intro i hi
+      simp only [Nat.testBit_two_pow]
+      have : decide (j = i.val) = false := by
+        simp only [decide_eq_false_iff_not]; intro h; exact hi (Fin.ext h.symm)
+      rw [this, Bool.and_false])
+  beta_reduce at key
+  unfold dotp
+  rw [key]
+  simp [Nat.testBit_two_pow]
 
-def GenReadsBack {α β : Type} (n0 : ℕ) (gs : List (GenGate α β)) : Prop :=
-  ∀ j (hj : j < gs.length), match gs[j] with
-    | GenGate.real g => ∀ i ∈ g.inputs, i < n0 + j
-    | _ => True
+lemma dot_unit_left (k v j : ℕ) (hj : j < k) : dotp k (2 ^ j) v = v.testBit j := by
+  have key := parity_flip k (fun _ => false)
+    (fun i => (2 ^ j).testBit i.val && v.testBit i.val) ⟨j, hj⟩ (by
+      intro i hi
+      simp only [Nat.testBit_two_pow]
+      have : decide (j = i.val) = false := by
+        simp only [decide_eq_false_iff_not]; intro h; exact hi (Fin.ext h.symm)
+      rw [this, Bool.false_and])
+  beta_reduce at key
+  unfold dotp
+  rw [key]
+  simp [Nat.testBit_two_pow]
 
-lemma evalGen_cons {α β : Type} (g : GenGate α β) (gs : List (GenGate α β))
-    (init : List Bool) (u : α) (v : β) :
-    evalGen (g :: gs) init u v = evalGen gs (init ++ [g.eval u v init]) u v := rfl
+def zeroF (s : ℕ) : Fin (2 ^ (2 * s)) := ⟨0, by positivity⟩
 
-lemma evalGen_prefix_agree {α β : Type} (gs : List (GenGate α β)) (init : List Bool)
-    (u : α) (v : β) (i : ℕ) (hi : i < init.length) :
-    (evalGen gs init u v).getD i false = init.getD i false := by
-  induction gs generalizing init with
+def unitF (s j : ℕ) (hj : j < 2 * s) : Fin (2 ^ (2 * s)) :=
+  ⟨2 ^ j, Nat.pow_lt_pow_right (by norm_num) hj⟩
+
+lemma Gf_zero_left (s : ℕ) (v : Fin (2 ^ (2 * s))) : Gf s (zeroF s) v = false := by
+  simp [Gf, zeroF, dot_zero_left]
+
+lemma Gf_zero_right (s : ℕ) (u : Fin (2 ^ (2 * s))) : Gf s u (zeroF s) = false := by
+  simp [Gf, zeroF, dot_zero_right]
+
+lemma Gf_unit_left (s j : ℕ) (hj : j < 2 * s) (v : Fin (2 ^ (2 * s))) :
+    Gf s (unitF s j hj) v = v.val.testBit j := by
+  simp only [Gf, unitF, dot_unit_left _ _ _ hj, Nat.testBit_two_pow]
+  have : (decide (j = 0) && decide (j = 1)) = false := by
+    by_cases h : j = 0 <;> simp [h]
+  rw [this, Bool.false_and, Bool.xor_false]
+
+lemma Gf_unit_right (s j : ℕ) (hj : j < 2 * s) (u : Fin (2 ^ (2 * s))) :
+    Gf s u (unitF s j hj) = u.val.testBit j := by
+  simp only [Gf, unitF, dot_unit_right _ _ _ hj, Nat.testBit_two_pow]
+  have : (decide (j = 2) && decide (j = 3)) = false := by
+    by_cases h : j = 2 <;> simp [h]
+  rw [this, Bool.and_false, Bool.xor_false]
+
+lemma testBit12 (i : ℕ) : Nat.testBit 12 i = xor (decide (2 = i)) (decide (3 = i)) := by
+  have : (12 : ℕ) = 2 ^ 2 ^^^ 2 ^ 3 := by decide
+  rw [this, Nat.testBit_xor, Nat.testBit_two_pow, Nat.testBit_two_pow]
+
+lemma not_closed (s : ℕ) (hs : 2 ≤ s) : ¬ ∃ (u4 : Fin (2 ^ (2 * s))) (c : Bool), ∀ v,
+    xor (xor (xor (Gf s (zeroF s) v) (Gf s (unitF s 0 (by omega)) v)) (Gf s (unitF s 1 (by omega)) v))
+      (Gf s u4 v) = c := by
+  rintro ⟨u4, c, h⟩
+  have hc : c = false := by
+    have := h (zeroF s)
+    simp only [Gf_zero_right, Bool.xor_false] at this
+    exact this.symm
+  have hbits : ∀ i, i < 2 * s → u4.val.testBit i = xor (decide (0 = i)) (decide (1 = i)) := by
+    intro i hi
+    have := h (unitF s i hi)
+    rw [Gf_zero_left, Gf_unit_right, Gf_unit_right, Gf_unit_right, hc] at this
+    simp only [unitF, Nat.testBit_two_pow, Bool.false_xor] at this
+    generalize u4.val.testBit i = z at this ⊢
+    generalize decide (0 = i) = p at this ⊢
+    generalize decide (1 = i) = q at this ⊢
+    revert this; revert z p q; decide
+  have h12 : (12 : ℕ) < 2 ^ (2 * s) := by
+    calc (12 : ℕ) < 2 ^ 4 := by norm_num
+      _ ≤ 2 ^ (2 * s) := Nat.pow_le_pow_right (by norm_num) (by omega)
+  have := h ⟨12, h12⟩
+  rw [Gf_zero_left, Gf_unit_left, Gf_unit_left, hc] at this
+  have hdot : dotp (2 * s) u4.val 12 = false := by
+    unfold dotp
+    have : (Finset.univ.filter (fun i : Fin (2 * s) => u4.val.testBit i.val && Nat.testBit 12 i.val)) = ∅ := by
+      apply Finset.filter_false_of_mem
+      intro i _
+      rw [testBit12, hbits i.val i.isLt]
+      generalize i.val = n
+      by_cases h2 : n = 2
+      · subst h2; decide
+      · by_cases h3 : n = 3
+        · subst h3; decide
+        · have a1 : decide (2 = n) = false := by simp only [decide_eq_false_iff_not]; omega
+          have a2 : decide (3 = n) = false := by simp only [decide_eq_false_iff_not]; omega
+          rw [a1, a2]; simp
+    rw [this]; rfl
+  simp only [Gf, hdot, testBit12, hbits 0 (by omega), hbits 1 (by omega)] at this
+  revert this; decide
+
+/-! ## Part E: the upper bound construction -/
+
+def xr : ℕ → (ℕ → Bool) → Bool
+  | 0, _ => false
+  | n+1, f => xor (xr n f) (f n)
+
+lemma xr_congr (n : ℕ) (f g : ℕ → Bool) (h : ∀ i < n, f i = g i) : xr n f = xr n g := by
+  induction n with
+  | zero => rfl
+  | succ n ih => simp only [xr]; rw [ih (fun i hi => h i (by omega)), h n (by omega)]
+
+lemma bx4 (a b c d : Bool) : xor (xor a b) (xor c d) = xor (xor a c) (xor b d) := by
+  revert a b c d; decide
+
+lemma xr_xor (n : ℕ) (f g : ℕ → Bool) :
+    xr n (fun i => xor (f i) (g i)) = xor (xr n f) (xr n g) := by
+  induction n with
+  | zero => rfl
+  | succ n ih => simp only [xr, ih]; exact bx4 _ _ _ _
+
+lemma xr_delta (M a : ℕ) (c : ℕ → Bool) :
+    xr M (fun w => c w && decide (w = a)) = (decide (a < M) && c a) := by
+  induction M with
+  | zero => simp [xr]
+  | succ M ih =>
+    simp only [xr, ih]
+    by_cases h : M = a
+    · subst h; simp
+    · have h1 : decide (a < M + 1) = decide (a < M) := by
+        simp only [decide_eq_decide]; omega
+      rw [h1]; simp [h]
+
+lemma xr_pairs (n : ℕ) (f : ℕ → Bool) :
+    xr n (fun i => xor (f (2 * i)) (f (2 * i + 1))) = xr (2 * n) f := by
+  induction n with
+  | zero => rfl
+  | succ n ih =>
+    rw [show 2 * (n + 1) = 2 * n + 1 + 1 by ring]
+    simp only [xr, ih]
+    rw [Bool.xor_assoc]
+
+lemma xr_card (k : ℕ) (p : ℕ → Bool) :
+    xr k p = (((Finset.univ : Finset (Fin k)).filter (fun i => p i.val = true)).card % 2 == 1) := by
+  rw [Finset.card_filter, Fin.sum_univ_eq_sum_range (fun i => if p i = true then 1 else 0) k]
+  induction k with
+  | zero => simp [xr]
+  | succ k ih =>
+    rw [Finset.sum_range_succ, xr, ih]
+    generalize (∑ x ∈ Finset.range k, if p x = true then 1 else 0) = X
+    cases hp : p k <;> rcases Nat.mod_two_eq_zero_or_one X with h | h <;> simp [Nat.add_mod, h]
+
+lemma ip_pairs (s : ℕ) (a b : ℕ → Bool) :
+    xor (xor (xr s (fun i => a (2 * i) && a (2 * i + 1))) (xr s (fun i => b (2 * i) && b (2 * i + 1))))
+      (xr s (fun i => (xor (a (2 * i)) (b (2 * i + 1))) && (xor (a (2 * i + 1)) (b (2 * i))))) =
+    xr (2 * s) (fun i => a i && b i) := by
+  rw [← xr_xor, ← xr_xor, ← xr_pairs]
+  apply xr_congr; intro i _
+  generalize a (2 * i) = p; generalize a (2 * i + 1) = p'
+  generalize b (2 * i) = q; generalize b (2 * i + 1) = q'
+  revert p p' q q'; decide
+
+-- general circuit evaluation lemmas
+lemma foldl_len (gs : List Gate) (ys : List Bool) :
+    (gs.foldl stepW ys).length = ys.length + gs.length := by
+  induction gs generalizing ys with
+  | nil => simp
+  | cons g gs ih => rw [List.foldl_cons, ih]; simp [stepW]; ring
+
+lemma foldl_pre (gs : List Gate) (ys : List Bool) (w : ℕ) (hw : w < ys.length) :
+    (gs.foldl stepW ys).getD w false = ys.getD w false := by
+  induction gs generalizing ys with
   | nil => rfl
   | cons g gs ih =>
-    rw [evalGen_cons]
-    have hi' : i < (init ++ [g.eval u v init]).length := by simp; omega
-    rw [ih (init ++ [g.eval u v init]) hi']
-    simp [List.getD, List.getElem?_append_left hi]
+    rw [List.foldl_cons, ih _ (by simp [stepW]; omega)]
+    simp only [stepW]; rw [getD_snoc, if_neg (by omega)]
 
-lemma evalGen_zero_affine {α β : Type} (gs : List (GenGate α β)) (n0 : ℕ)
-    (init : α → β → List Bool)
-    (hlen : ∀ u v, (init u v).length = n0)
-    (hinit : ∀ i < n0, ∃ (a : α → Bool) (b : β → Bool),
-      ∀ u v, (init u v).getD i false = xor (a u) (b v))
-    (hfan : GenFanIn2 gs) (hnl0 : gs.countP GenGate.nl = 0) :
-    ∀ i, ∃ (a : α → Bool) (b : β → Bool),
-      ∀ u v, (evalGen gs (init u v) u v).getD i false = xor (a u) (b v) := by
-  induction gs generalizing n0 init with
-  | nil =>
-    intro i
-    by_cases hi : i < n0
-    · exact hinit i hi
-    · refine ⟨fun _ => false, fun _ => false, fun u v => ?_⟩
-      have hge : (init u v).length ≤ i := by rw [hlen u v]; omega
-      simp [evalGen, List.getD, List.getElem?_eq_none hge]
-  | cons gg gs ih =>
-    have hgg_nl : gg.nl = false := by
-      cases h : gg.nl
-      · rfl
-      · simp [List.countP_cons, h] at hnl0
-    have hgs_nl : gs.countP GenGate.nl = 0 := by
-      simpa [List.countP_cons, hgg_nl] using hnl0
-    have hgg_aff : ∃ (a : α → Bool) (b : β → Bool),
-        ∀ u v, gg.eval u v (init u v) = xor (a u) (b v) := by
-      cases gg with
-      | pureU f => exact ⟨f, fun _ => false, fun u v => by simp [GenGate.eval]⟩
-      | pureV g => exact ⟨fun _ => false, g, fun u v => by simp [GenGate.eval]⟩
-      | real g =>
-        have hgl : g.inputs.length ≤ 2 := hfan (GenGate.real g) (List.mem_cons_self ..)
-        have hwire : ∀ i : ℕ, ∃ (a : α → Bool) (b : β → Bool),
-            ∀ u v, (init u v).getD i false = xor (a u) (b v) := by
-          intro i
-          by_cases hi : i < n0
-          · exact hinit i hi
-          · refine ⟨fun _ => false, fun _ => false, fun u v => ?_⟩
-            have hge : (init u v).length ≤ i := by rw [hlen u v]; omega
-            simp [List.getD, List.getElem?_eq_none hge]
-        match hlist : g.inputs with
-        | [] =>
-          refine ⟨fun _ => g.op.eval [], fun _ => false, fun u v => ?_⟩
-          simp [GenGate.eval, hlist]
-        | [i1] =>
-          obtain ⟨a1, b1, h1⟩ := hwire i1
-          obtain ⟨c0, c1, hf⟩ := affine_gate_1 (fun x => g.op.eval [x])
-          refine ⟨fun u => xor c0 (c1 && a1 u), fun v => c1 && b1 v, fun u v => ?_⟩
-          simp only [GenGate.eval, hlist, List.map_cons, List.map_nil, h1 u v, hf]
-          cases c0 <;> cases c1 <;> cases a1 u <;> cases b1 v <;> rfl
-        | [i1, i2] =>
-          have hlin : xor (xor (g.op.eval [false, false]) (g.op.eval [false, true]))
-              (xor (g.op.eval [true, false]) (g.op.eval [true, true])) = false := by
-            simpa [GenGate.nl, nonlinear, hlist] using hgg_nl
-          obtain ⟨a1, b1, h1⟩ := hwire i1
-          obtain ⟨a2, b2, h2⟩ := hwire i2
-          obtain ⟨c0, c1, c2, hf⟩ := affine_gate_2 (fun x y => g.op.eval [x, y]) hlin
-          refine ⟨fun u => xor c0 (xor (c1 && a1 u) (c2 && a2 u)),
-            fun v => xor (c1 && b1 v) (c2 && b2 v), fun u v => ?_⟩
-          simp only [GenGate.eval, hlist, List.map_cons, List.map_nil, h1 u v, h2 u v, hf]
-          cases c0 <;> cases c1 <;> cases c2 <;>
-            cases a1 u <;> cases b1 v <;> cases a2 u <;> cases b2 v <;> rfl
-        | _ :: _ :: _ :: _ =>
-          simp [hlist] at hgl
-    obtain ⟨a0, b0, h0⟩ := hgg_aff
-    let init' : α → β → List Bool := fun u v => init u v ++ [gg.eval u v (init u v)]
-    have hlen' : ∀ u v, (init' u v).length = n0 + 1 := fun u v => by
-      simp [init', hlen u v]
-    have hinit' : ∀ i < n0 + 1, ∃ (a : α → Bool) (b : β → Bool),
-        ∀ u v, (init' u v).getD i false = xor (a u) (b v) := by
-      intro i hi
-      by_cases hlt : i < n0
-      · obtain ⟨a, b, hab⟩ := hinit i hlt
-        refine ⟨a, b, fun u v => ?_⟩
-        have hlt' : i < (init u v).length := by rw [hlen u v]; exact hlt
-        simp only [init', List.getD, List.getElem?_append_left hlt']
-        exact hab u v
-      · have heq : i = n0 := by omega
-        subst heq
-        refine ⟨a0, b0, fun u v => ?_⟩
-        simp only [init', List.getD, ← hlen u v, List.getElem?_append_right (le_refl _),
-          Nat.sub_self, List.getElem?_cons_zero, Option.getD_some]
-        exact h0 u v
-    have hfan' : GenFanIn2 gs := fun g hg => hfan g (List.mem_cons_of_mem _ hg)
-    have hres := ih (n0 + 1) init' hlen' hinit' hfan' hgs_nl
-    intro i
-    simpa [evalGen, List.foldl_cons, init'] using hres i
+lemma foldl_snoc_val (gs : List Gate) (g : Gate) (ys : List Bool) :
+    ((gs ++ [g]).foldl stepW ys).getD (ys.length + gs.length) false =
+      g.op.eval (g.inputs.map fun i => (gs.foldl stepW ys).getD i false) := by
+  rw [List.foldl_append, List.foldl_cons, List.foldl_nil]
+  simp only [stepW]; rw [getD_snoc, if_pos (by rw [foldl_len])]
 
-inductive HasNL : ℕ → {α β : Type} → (α → β → Bool) → Prop
-  | zero {α β : Type} (a : α → Bool) (b : β → Bool) :
-      HasNL 0 (fun u v => xor (a u) (b v))
-  | step {t : ℕ} {α β : Type} (G : α → β → Bool)
-      (a1 a2 : α → Bool) (b1 b2 : β → Bool)
-      (F0 F1 : α → β → Bool) :
-      HasNL t F0 → HasNL t F1 →
-      (∀ u v, G u v = if (xor (a1 u) (b1 v) && xor (a2 u) (b2 v)) then F1 u v else F0 u v) →
-      (∀ p q : Bool, HasNL t (fun (u : {u : α // a1 u = p ∧ a2 u = q}) (v : β) => G u.1 v)) →
-      (∀ r s : Bool, HasNL t (fun (u : α) (v : {v : β // b1 v = r ∧ b2 v = s}) => G u v.1)) →
-      HasNL (t + 1) G
+lemma mod2_eval (a b : Bool) : (GateOp.mod 2).eval [a, b] = !(xor a b) := by
+  cases a <;> cases b <;> rfl
 
-lemma hasNL_congr {t : ℕ} {α β : Type} {G1 G2 : α → β → Bool}
-    (h : HasNL t G1) (heq : ∀ u v, G1 u v = G2 u v) : HasNL t G2 := by
-  have hfun : G1 = G2 := funext (fun u => funext (fun v => heq u v))
-  rwa [← hfun]
+lemma not_eval (a : Bool) : GateOp.not.eval [a] = !a := rfl
 
-lemma hasNL_comap {t : ℕ} {α β α' β' : Type} {G : α → β → Bool}
-    (h : HasNL t G) (f : α' → α) (g : β' → β) :
-    HasNL t (fun u v => G (f u) (g v)) := by
-  induction h generalizing α' β' with
-  | zero a b =>
-    exact HasNL.zero (fun u => a (f u)) (fun v => b (g v))
-  | step G a1 a2 b1 b2 F0 F1 hF0 hF1 hEq hU hV ihF0 ihF1 ihU ihV =>
-    refine HasNL.step (fun u v => G (f u) (g v))
-      (fun u => a1 (f u)) (fun u => a2 (f u))
-      (fun v => b1 (g v)) (fun v => b2 (g v))
-      (fun u v => F0 (f u) (g v)) (fun u v => F1 (f u) (g v))
-      (ihF0 f g) (ihF1 f g) (fun u v => hEq (f u) (g v)) ?_ ?_
-    · intro p q
-      exact ihU p q (fun (u : {u : α' // a1 (f u) = p ∧ a2 (f u) = q}) => ⟨f u.1, u.2⟩) g
-    · intro r s
-      exact ihV r s f (fun (v : {v : β' // b1 (g v) = r ∧ b2 (g v) = s}) => ⟨g v.1, v.2⟩)
+lemma and_eval (a b : Bool) : GateOp.and.eval [a, b] = (a && b) := by
+  cases a <;> cases b <;> rfl
 
-lemma hasNL_succ {t : ℕ} {α β : Type} {G : α → β → Bool} (h : HasNL t G) :
-    HasNL (t + 1) G := by
-  refine HasNL.step G (fun _ => false) (fun _ => false) (fun _ => false) (fun _ => false)
-    G G h h (fun u v => by simp) ?_ ?_
-  · intro p q
-    exact hasNL_comap h Subtype.val id
-  · intro r s
-    exact hasNL_comap h id Subtype.val
+lemma or_eval1 (a : Bool) : GateOp.or.eval [a] = a := by
+  cases a <;> rfl
 
-lemma hasNL_mono {t1 t2 : ℕ} {α β : Type} {G : α → β → Bool}
-    (hle : t1 ≤ t2) (h : HasNL t1 G) : HasNL t2 G := by
-  induction hle with
-  | refl => exact h
-  | step _ ih => exact hasNL_succ ih
+def cstG (b : Bool) : Gate := ⟨if b then GateOp.and else GateOp.or, []⟩
 
-lemma list_split_first_countP {γ : Type} (p : γ → Bool) :
-    ∀ (l : List γ), 0 < l.countP p →
-      ∃ (pref suff : List γ) (x : γ),
-        l = pref ++ x :: suff ∧ pref.countP p = 0 ∧ p x = true ∧
-        suff.countP p + 1 = l.countP p := by
-  intro l
-  induction l with
-  | nil => simp
-  | cons a l ih =>
-    intro hpos
-    cases hpa : p a
-    · have hpos' : 0 < l.countP p := by
-        simp only [List.countP_cons, hpa, Bool.false_eq_true, ↓reduceIte] at hpos
-        exact hpos
-      obtain ⟨pref, suff, x, hl, hpref, hx, hsuff⟩ := ih hpos'
-      refine ⟨a :: pref, suff, x, by simp [hl], by simp [List.countP_cons, hpa, hpref], hx, ?_⟩
-      simp [List.countP_cons, hpa, hsuff]
-    · refine ⟨[], l, a, rfl, rfl, hpa, ?_⟩
-      simp [List.countP_cons, hpa]
+def lbG (c : ℕ → Bool) (base w : ℕ) : Gate :=
+  if c w then ⟨GateOp.mod 2, [base + w, w]⟩ else ⟨GateOp.not, [base + w]⟩
 
-lemma evalGen_hasNL :
-    ∀ (t : ℕ) {α β : Type} (gs : List (GenGate α β)) (n0 : ℕ)
-      (init : α → β → List Bool)
-      (hlen : ∀ u v, (init u v).length = n0)
-      (hinit : ∀ i < n0, ∃ (a : α → Bool) (b : β → Bool),
-        ∀ u v, (init u v).getD i false = xor (a u) (b v))
-      (hfan : GenFanIn2 gs) (hcnt : gs.countP GenGate.nl ≤ t) (out : ℕ),
-      HasNL t (fun u v => (evalGen gs (init u v) u v).getD out false) := by
-  intro t
-  induction t with
-  | zero =>
-    intro α β gs n0 init hlen hinit hfan hcnt out
-    have h0 : gs.countP GenGate.nl = 0 := Nat.eq_zero_of_le_zero hcnt
-    obtain ⟨a, b, hab⟩ := evalGen_zero_affine gs n0 init hlen hinit hfan h0 out
-    exact hasNL_congr (HasNL.zero a b) (fun u v => (hab u v).symm)
-  | succ t ih =>
-    intro α β gs n0 init hlen hinit hfan hcnt out
-    by_cases h0 : gs.countP GenGate.nl = 0
-    · obtain ⟨a, b, hab⟩ := evalGen_zero_affine gs n0 init hlen hinit hfan h0 out
-      exact hasNL_mono (Nat.zero_le _) (hasNL_congr (HasNL.zero a b) (fun u v => (hab u v).symm))
-    · have hpos : 0 < gs.countP GenGate.nl := Nat.pos_of_ne_zero h0
-      obtain ⟨pref, suff, gg, hgs_eq, hpref0, hgg_nl, hsuff_cnt⟩ :=
-        list_split_first_countP GenGate.nl gs hpos
-      have hsuff_le : suff.countP GenGate.nl ≤ t := by omega
-      cases gg with
-      | pureU _ => simp [GenGate.nl] at hgg_nl
-      | pureV _ => simp [GenGate.nl] at hgg_nl
-      | real g1 =>
-        have hlen2 : g1.inputs.length = 2 := by
-          simp only [GenGate.nl, nonlinear, Bool.and_eq_true, beq_iff_eq] at hgg_nl
-          exact hgg_nl.1
-        have hnl1 : xor (xor (g1.op.eval [false, false]) (g1.op.eval [false, true]))
-            (xor (g1.op.eval [true, false]) (g1.op.eval [true, true])) = true := by
-          simp only [GenGate.nl, nonlinear, Bool.and_eq_true] at hgg_nl
-          exact hgg_nl.2
-        match hlist : g1.inputs with
-        | [i1, i2] =>
-          have hfan_pref : GenFanIn2 pref := fun g hg =>
-            hfan g (by rw [hgs_eq]; exact List.mem_append_left _ hg)
-          have hfan_suff : GenFanIn2 suff := fun g hg =>
-            hfan g (by rw [hgs_eq]; exact List.mem_append_right _ (List.mem_cons_of_mem _ hg))
-          have hpref_aff := evalGen_zero_affine pref n0 init hlen hinit hfan_pref hpref0
-          obtain ⟨a1, b1, hi1⟩ := hpref_aff i1
-          obtain ⟨a2, b2, hi2⟩ := hpref_aff i2
-          obtain ⟨c0, c1, c2, hf⟩ := nonlinear_gate_2 (fun x y => g1.op.eval [x, y]) hnl1
-          let a1' : α → Bool := fun u => xor (a1 u) c1
-          let a2' : α → Bool := fun u => xor (a2 u) c2
-          have hg1_val : ∀ u v,
-              (GenGate.real g1 : GenGate α β).eval u v (evalGen pref (init u v) u v) =
-                xor c0 ((xor (a1' u) (b1 v)) && (xor (a2' u) (b2 v))) := by
-            intro u v
-            simp only [GenGate.eval, hlist, List.map_cons, List.map_nil, hi1 u v, hi2 u v, hf, a1', a2']
-            cases c0 <;> cases c1 <;> cases c2 <;>
-              cases a1 u <;> cases b1 v <;> cases a2 u <;> cases b2 v <;> rfl
-          let gs0 : List (GenGate α β) := pref ++ GenGate.pureU (fun _ => c0) :: suff
-          let gs1 : List (GenGate α β) := pref ++ GenGate.pureU (fun _ => !c0) :: suff
-          have hfan0 : GenFanIn2 gs0 := by
-            intro g hg
-            simp only [gs0, List.mem_append, List.mem_cons] at hg
-            rcases hg with h1 | rfl | h2
-            · exact hfan_pref g h1
-            · trivial
-            · exact hfan_suff g h2
-          have hfan1 : GenFanIn2 gs1 := by
-            intro g hg
-            simp only [gs1, List.mem_append, List.mem_cons] at hg
-            rcases hg with h1 | rfl | h2
-            · exact hfan_pref g h1
-            · trivial
-            · exact hfan_suff g h2
-          have hcnt0 : gs0.countP GenGate.nl ≤ t := by
-            simp [gs0, List.countP_append, List.countP_cons, GenGate.nl, hpref0]; omega
-          have hcnt1 : gs1.countP GenGate.nl ≤ t := by
-            simp [gs1, List.countP_append, List.countP_cons, GenGate.nl, hpref0]; omega
-          have hF0 := ih gs0 n0 init hlen hinit hfan0 hcnt0 out
-          have hF1 := ih gs1 n0 init hlen hinit hfan1 hcnt1 out
-          have hEq : ∀ u v,
-              (evalGen gs (init u v) u v).getD out false =
-                if (xor (a1' u) (b1 v) && xor (a2' u) (b2 v))
-                then (evalGen gs1 (init u v) u v).getD out false
-                else (evalGen gs0 (init u v) u v).getD out false := by
-            intro u v
-            rw [hgs_eq, evalGen_append, evalGen_cons]
-            dsimp only [gs0, gs1]
-            rw [evalGen_append, evalGen_cons, evalGen_append, evalGen_cons, hg1_val u v]
-            cases hcond : (xor (a1' u) (b1 v) && xor (a2' u) (b2 v)) <;>
-              simp [GenGate.eval]
-          refine HasNL.step (fun u v => (evalGen gs (init u v) u v).getD out false)
-            a1' a2' b1 b2
-            (fun u v => (evalGen gs0 (init u v) u v).getD out false)
-            (fun u v => (evalGen gs1 (init u v) u v).getD out false)
-            hF0 hF1 hEq ?_ ?_
-          · intro p q
-            let α' := {u : α // a1' u = p ∧ a2' u = q}
-            let liftG : GenGate α β → GenGate α' β
-              | GenGate.pureU f => GenGate.pureU (fun u => f u.1)
-              | GenGate.pureV g => GenGate.pureV g
-              | GenGate.real g => GenGate.real g
-            let gsU : List (GenGate α' β) :=
-              pref.map liftG ++
-                GenGate.pureV (fun v => xor c0 ((xor p (b1 v)) && (xor q (b2 v)))) ::
-                suff.map liftG
-            have hcomp : GenGate.nl ∘ liftG = GenGate.nl :=
-              funext (fun gg => by cases gg <;> rfl)
-            have hcntU : gsU.countP GenGate.nl ≤ t := by
-              have hp : (pref.map liftG).countP GenGate.nl = pref.countP GenGate.nl := by
-                rw [List.countP_map, hcomp]
-              have hs : (suff.map liftG).countP GenGate.nl = suff.countP GenGate.nl := by
-                rw [List.countP_map, hcomp]
-              simp [gsU, List.countP_append, List.countP_cons, GenGate.nl, hp, hs, hpref0]
-              omega
-            have hfanU : GenFanIn2 gsU := by
-              intro g hg
-              simp only [gsU, List.mem_append, List.mem_cons, List.mem_map] at hg
-              rcases hg with ⟨gg, hgg, rfl⟩ | rfl | ⟨gg, hgg, rfl⟩
-              · cases gg with
-                | pureU _ => trivial
-                | pureV _ => trivial
-                | real g => exact hfan_pref (GenGate.real g) hgg
-              · trivial
-              · cases gg with
-                | pureU _ => trivial
-                | pureV _ => trivial
-                | real g => exact hfan_suff (GenGate.real g) hgg
-            have heval_map : ∀ (l : List (GenGate α β)) (w : List Bool) (u : α') (v : β),
-                evalGen (l.map liftG) w u v = evalGen l w u.1 v := by
-              intro l
-              induction l with
-              | nil => intros; rfl
-              | cons g l ihl =>
-                intro w u v
-                simp only [List.map_cons, evalGen, List.foldl_cons]
-                have hg : (liftG g).eval u v w = g.eval u.1 v w := by
-                  cases g <;> rfl
-                rw [hg]
-                exact ihl _ u v
-            have hU := ih gsU n0 (fun u v => init u.1 v) (fun u v => hlen u.1 v)
-              (fun i hi => by
-                obtain ⟨a, b, hab⟩ := hinit i hi
-                exact ⟨fun u => a u.1, b, fun u v => hab u.1 v⟩)
-              hfanU hcntU out
-            apply hasNL_congr hU
-            intro u v
-            rw [hgs_eq, evalGen_append, evalGen_cons]
-            rw [evalGen_append, evalGen_cons, heval_map pref]
-            have heq1 : (GenGate.pureV (fun v => xor c0 ((xor p (b1 v)) && (xor q (b2 v)))) :
-                GenGate α' β).eval u v (evalGen pref (init u.1 v) u.1 v) =
-                (GenGate.real g1 : GenGate α β).eval u.1 v (evalGen pref (init u.1 v) u.1 v) := by
-              rw [hg1_val u.1 v, u.2.1, u.2.2]
-              rfl
-            rw [heq1, heval_map suff]
-          · intro r s
-            let β' := {v : β // b1 v = r ∧ b2 v = s}
-            let liftG : GenGate α β → GenGate α β'
-              | GenGate.pureU f => GenGate.pureU f
-              | GenGate.pureV g => GenGate.pureV (fun v => g v.1)
-              | GenGate.real g => GenGate.real g
-            let gsV : List (GenGate α β') :=
-              pref.map liftG ++
-                GenGate.pureU (fun u => xor c0 ((xor (a1' u) r) && (xor (a2' u) s))) ::
-                suff.map liftG
-            have hcomp : GenGate.nl ∘ liftG = GenGate.nl :=
-              funext (fun gg => by cases gg <;> rfl)
-            have hcntV : gsV.countP GenGate.nl ≤ t := by
-              have hp : (pref.map liftG).countP GenGate.nl = pref.countP GenGate.nl := by
-                rw [List.countP_map, hcomp]
-              have hs : (suff.map liftG).countP GenGate.nl = suff.countP GenGate.nl := by
-                rw [List.countP_map, hcomp]
-              simp [gsV, List.countP_append, List.countP_cons, GenGate.nl, hp, hs, hpref0]
-              omega
-            have hfanV : GenFanIn2 gsV := by
-              intro g hg
-              simp only [gsV, List.mem_append, List.mem_cons, List.mem_map] at hg
-              rcases hg with ⟨gg, hgg, rfl⟩ | rfl | ⟨gg, hgg, rfl⟩
-              · cases gg with
-                | pureU _ => trivial
-                | pureV _ => trivial
-                | real g => exact hfan_pref (GenGate.real g) hgg
-              · trivial
-              · cases gg with
-                | pureU _ => trivial
-                | pureV _ => trivial
-                | real g => exact hfan_suff (GenGate.real g) hgg
-            have heval_map : ∀ (l : List (GenGate α β)) (w : List Bool) (u : α) (v : β'),
-                evalGen (l.map liftG) w u v = evalGen l w u v.1 := by
-              intro l
-              induction l with
-              | nil => intros; rfl
-              | cons g l ihl =>
-                intro w u v
-                simp only [List.map_cons, evalGen, List.foldl_cons]
-                have hg : (liftG g).eval u v w = g.eval u v.1 w := by
-                  cases g <;> rfl
-                rw [hg]
-                exact ihl _ u v
-            have hV := ih gsV n0 (fun u v => init u v.1) (fun u v => hlen u v.1)
-              (fun i hi => by
-                obtain ⟨a, b, hab⟩ := hinit i hi
-                exact ⟨a, fun v => b v.1, fun u v => hab u v.1⟩)
-              hfanV hcntV out
-            apply hasNL_congr hV
-            intro u v
-            rw [hgs_eq, evalGen_append, evalGen_cons]
-            rw [evalGen_append, evalGen_cons, heval_map pref]
-            have heq1 : (GenGate.pureU (fun u => xor c0 ((xor (a1' u) r) && (xor (a2' u) s))) :
-                GenGate α β').eval u v (evalGen pref (init u v.1) u v.1) =
-                (GenGate.real g1 : GenGate α β).eval u v.1 (evalGen pref (init u v.1) u v.1) := by
-              rw [hg1_val u v.1, v.2.1, v.2.2]
-              rfl
-            rw [heq1, heval_map suff]
-        | [] => simp [hlist] at hlen2
-        | [_] => simp [hlist] at hlen2
-        | _ :: _ :: _ :: _ => simp [hlist] at hlen2
+def lb (M : ℕ) (c : ℕ → Bool) (base : ℕ) : ℕ → List Gate
+  | 0 => [cstG (M % 2 == 1)]
+  | m+1 => lb M c base m ++ [lbG c base m]
 
-lemma circuit_hasNL {n m t : ℕ} {G : Fin n → Fin m → Bool} (C : Circuit)
+lemma lb_len (M : ℕ) (c : ℕ → Bool) (base : ℕ) : ∀ m, (lb M c base m).length = m + 1
+  | 0 => rfl
+  | m+1 => by simp [lb, lb_len M c base m]
+
+lemma par_succ (m : ℕ) : ((m + 1) % 2 == 1) = !(m % 2 == 1) := by
+  rcases Nat.mod_two_eq_zero_or_one m with h | h <;> simp [Nat.add_mod, h]
+
+lemma lb_val (M : ℕ) (c : ℕ → Bool) (base : ℕ) (y : List Bool) (hy : y.length = base)
+    (hM : M ≤ base) : ∀ m, m ≤ M → ((lb M c base m).foldl stepW y).getD (base + m) false =
+      xor (xor (M % 2 == 1) (xr m (fun w => c w && y.getD w false))) (m % 2 == 1)
+  | 0, _ => by
+    simp only [lb, List.foldl_cons, List.foldl_nil, stepW, add_zero]
+    rw [getD_snoc, if_pos hy.symm]
+    simp only [cstG, xr, Bool.xor_false]
+    cases (M % 2 == 1) <;> rfl
+  | m+1, hm => by
+    have hprev := lb_val M c base y hy hM m (by omega)
+    simp only [lb]
+    rw [show base + (m + 1) = y.length + (lb M c base m).length by rw [lb_len]; omega]
+    rw [foldl_snoc_val]
+    have hm' : ((lb M c base m).foldl stepW y).getD m false = y.getD m false :=
+      foldl_pre _ _ _ (by omega)
+    simp only [lbG]
+    rw [par_succ]
+    split_ifs with hcm
+    · simp only [List.map_cons, List.map_nil, mod2_eval, hprev, hm', xr, hcm, Bool.true_and]
+      generalize (M % 2 == 1) = a; generalize xr m (fun w => c w && y.getD w false) = b
+      generalize (m % 2 == 1) = d; generalize y.getD m false = e
+      revert a b d e; decide
+    · simp only [List.map_cons, List.map_nil, not_eval, hprev, xr, hcm, Bool.false_and,
+        Bool.xor_false]
+      generalize (M % 2 == 1) = a; generalize xr m (fun w => c w && y.getD w false) = b
+      generalize (m % 2 == 1) = d
+      revert a b d; decide
+
+lemma lb_out (M : ℕ) (c : ℕ → Bool) (base : ℕ) (y : List Bool) (hy : y.length = base)
+    (hM : M ≤ base) : ((lb M c base M).foldl stepW y).getD (base + M) false =
+      xr M (fun w => c w && y.getD w false) := by
+  rw [lb_val M c base y hy hM M le_rfl]
+  generalize (M % 2 == 1) = a; generalize xr M (fun w => c w && y.getD w false) = b
+  revert a b; decide
+
+def allB (n2 : ℕ) (cf : ℕ → ℕ → Bool) : ℕ → List Gate
+  | 0 => []
+  | n+1 => allB n2 cf n ++ lb n2 (cf n) (n2 + n * (n2 + 1)) n2
+
+lemma allB_len (n2 : ℕ) (cf : ℕ → ℕ → Bool) : ∀ n, (allB n2 cf n).length = n * (n2 + 1)
+  | 0 => by simp [allB]
+  | n+1 => by simp only [allB, List.length_append, allB_len n2 cf n, lb_len]; ring
+
+lemma allB_val (n2 : ℕ) (cf : ℕ → ℕ → Bool) (x : List Bool) (hx : x.length = n2) :
+    ∀ n, ∀ j < n, ((allB n2 cf n).foldl stepW x).getD (n2 + j * (n2 + 1) + n2) false =
+      xr n2 (fun w => cf j w && x.getD w false)
+  | 0, j, hj => absurd hj (Nat.not_lt_zero _)
+  | n+1, j, hj => by
+    simp only [allB]
+    rw [List.foldl_append]
+    have hlen : ((allB n2 cf n).foldl stepW x).length = n2 + n * (n2 + 1) := by
+      rw [foldl_len, allB_len, hx]
+    by_cases hjn : j < n
+    · rw [foldl_pre _ _ _ (by rw [hlen]; nlinarith)]
+      exact allB_val n2 cf x hx n j hjn
+    · have hj' : j = n := by omega
+      subst hj'
+      rw [lb_out _ _ _ _ hlen (by omega)]
+      apply xr_congr
+      intro w hw
+      rw [foldl_pre _ _ _ (by rw [hx]; exact hw)]
+
+def andG (a b : ℕ) : Gate := ⟨GateOp.and, [a, b]⟩
+def modG (a b : ℕ) : Gate := ⟨GateOp.mod 2, [a, b]⟩
+def notG (a : ℕ) : Gate := ⟨GateOp.not, [a]⟩
+def cpyG (a : ℕ) : Gate := ⟨GateOp.or, [a]⟩
+
+def stg (P0 oL : ℕ) (oX oY : ℕ → ℕ) : ℕ → List Gate
+  | 0 => [cpyG oL]
+  | n+1 => ((stg P0 oL oX oY n ++ [andG (oX n) (oY n)]) ++
+      [modG (P0 + 3 * n) (P0 + 3 * n + 1)]) ++ [notG (P0 + 3 * n + 2)]
+
+lemma stg_len (P0 oL : ℕ) (oX oY : ℕ → ℕ) : ∀ n, (stg P0 oL oX oY n).length = 3 * n + 1
+  | 0 => rfl
+  | n+1 => by
+    simp only [stg, List.length_append, stg_len P0 oL oX oY n, List.length_singleton]; omega
+
+lemma stg_val (P0 oL : ℕ) (oX oY : ℕ → ℕ) (y : List Bool) (hy : y.length = P0) (hL : oL < P0) :
+    ∀ n, (∀ i < n, oX i < P0 ∧ oY i < P0) →
+      ((stg P0 oL oX oY n).foldl stepW y).getD (P0 + 3 * n) false =
+        xor (y.getD oL false) (xr n (fun i => y.getD (oX i) false && y.getD (oY i) false))
+  | 0, _ => by
+    simp only [stg, cpyG, List.foldl_cons, List.foldl_nil, stepW, List.map_cons, List.map_nil,
+      or_eval1, mul_zero, add_zero, xr, Bool.xor_false]
+    rw [getD_snoc, if_pos hy.symm]
+  | n+1, hXY => by
+    have hprev := stg_val P0 oL oX oY y hy hL n (fun i hi => hXY i (by omega))
+    have hlen0 : ((stg P0 oL oX oY n).foldl stepW y).length = P0 + 3 * n + 1 := by
+      rw [foldl_len, stg_len]; omega
+    simp only [stg]
+    rw [show P0 + 3 * (n + 1) = y.length + ((stg P0 oL oX oY n ++ [andG (oX n) (oY n)]) ++
+      [modG (P0 + 3 * n) (P0 + 3 * n + 1)]).length by
+        simp only [List.length_append, stg_len, List.length_singleton]; omega]
+    rw [foldl_snoc_val]
+    simp only [notG, List.map_cons, List.map_nil, not_eval]
+    rw [show P0 + 3 * n + 2 = y.length + (stg P0 oL oX oY n ++ [andG (oX n) (oY n)]).length by
+        simp only [List.length_append, stg_len, List.length_singleton]; omega]
+    rw [foldl_snoc_val]
+    simp only [modG, List.map_cons, List.map_nil, mod2_eval]
+    rw [List.foldl_append, foldl_pre [andG (oX n) (oY n)] _ (P0 + 3 * n) (by rw [hlen0]; omega)]
+    rw [← List.foldl_append]
+    rw [show P0 + 3 * n + 1 = y.length + (stg P0 oL oX oY n).length by rw [stg_len]; omega]
+    rw [foldl_snoc_val]
+    simp only [andG, List.map_cons, List.map_nil, and_eval]
+    have hX := (hXY n (by omega)).1
+    have hY := (hXY n (by omega)).2
+    rw [foldl_pre _ _ (oX n) (by rw [hy]; exact hX), foldl_pre _ _ (oY n) (by rw [hy]; exact hY)]
+    rw [hprev]
+    simp only [xr]
+    generalize y.getD oL false = a
+    generalize xr n (fun i => y.getD (oX i) false && y.getD (oY i) false) = b
+    generalize y.getD (oX n) false = c; generalize y.getD (oY n) false = d
+    revert a b c d; decide
+
+/-! ## Part C: the lower bound -/
+
+lemma oneEach_len (N : ℕ) (u v : Fin N) : (PEqualNP.Represents.oneEach u v).length = N + N := by
+  simp [PEqualNP.Represents.oneEach]
+
+lemma oneEach_getD (N : ℕ) (u v : Fin N) (w : ℕ) :
+    (PEqualNP.Represents.oneEach u v).getD w false =
+      xor (decide (w = u.val)) (decide (w = N + v.val)) := by
+  unfold PEqualNP.Represents.oneEach
+  by_cases h1 : w < N
+  · rw [List.getD_append _ _ _ _ (by simp; exact h1), List.getD_eq_getElem _ _ (by simp; exact h1),
+      List.getElem_ofFn]
+    have : decide (w = N + v.val) = false := by simp only [decide_eq_false_iff_not]; omega
+    rw [this, Bool.xor_false]
+    simp only [decide_eq_decide, Fin.ext_iff]
+  · by_cases h2 : w < N + N
+    · rw [List.getD_append_right _ _ _ _ (by simp; omega),
+        List.getD_eq_getElem _ _ (by simp; omega), List.getElem_ofFn]
+      have : decide (w = u.val) = false := by simp only [decide_eq_false_iff_not]; omega
+      rw [this, Bool.false_xor]
+      simp only [decide_eq_decide, Fin.ext_iff, List.length_ofFn]
+      constructor <;> intro h <;> omega
+    · rw [List.getD_eq_default _ _ (by simp; omega)]
+      have h3 : decide (w = u.val) = false := by simp only [decide_eq_false_iff_not]; omega
+      have h4 : decide (w = N + v.val) = false := by simp only [decide_eq_false_iff_not]; omega
+      rw [h3, h4]; rfl
+
+lemma bc1 (a1 a2 b f : Bool) : xor (xor (xor a1 b) f) (xor (xor a2 b) f) = xor a1 a2 := by
+  revert a1 a2 b f; decide
+
+lemma bc2 (a b1 b2 f : Bool) : xor (xor (xor a b1) f) (xor (xor a b2) f) = xor b1 b2 := by
+  revert a b1 b2 f; decide
+
+lemma bc3 (a1 a2 b f1 f2 : Bool) :
+    xor f1 f2 = xor (xor a1 a2) (xor (xor (xor a1 b) f1) (xor (xor a2 b) f2)) := by
+  revert a1 a2 b f1 f2; decide
+
+lemma bc4 (a1 a2 a3 a4 b f1 f2 f3 f4 : Bool) :
+    xor (xor (xor (xor (xor a1 b) f1) (xor (xor a2 b) f2)) (xor (xor a3 b) f3)) (xor (xor a4 b) f4) =
+      xor (xor (xor (xor f1 f2) f3) f4) (xor (xor (xor a1 a2) a3) a4) := by
+  revert a1 a2 a3 a4 b f1 f2 f3 f4; decide
+
+theorem lower (s : ℕ) (hs : 2 ≤ s) (C : Circuit)
     (hfan : ∀ g ∈ C.gates, g.inputs.length ≤ 2)
-    (hrep : Represents G C)
-    (hcnt : C.gates.countP nonlinear ≤ t) :
-    HasNL t G := by
-  let gs : List (GenGate (Fin n) (Fin m)) := C.gates.map GenGate.real
-  have heval : ∀ (l : List Gate) (w : List Bool) (u : Fin n) (v : Fin m),
-      evalGen (l.map GenGate.real) w u v =
-        l.foldl (fun w g => w ++ [g.op.eval (g.inputs.map (fun i => w.getD i false))]) w := by
-    intro l
-    induction l with
-    | nil => intros; rfl
-    | cons g l ihl =>
-      intro w u v
-      simp only [List.map_cons, evalGen, List.foldl_cons, GenGate.eval]
-      exact ihl _ u v
-  have hlen : ∀ (u : Fin n) (v : Fin m), (oneEach u v).length = n + m := fun u v => by
-    simp [oneEach]
-  have hinit : ∀ i < n + m, ∃ (a : Fin n → Bool) (b : Fin m → Bool),
-      ∀ u v, (oneEach u v).getD i false = xor (a u) (b v) := by
-    intro i hi
-    by_cases hlt : i < n
-    · refine ⟨fun u => decide (⟨i, hlt⟩ = u), fun _ => false, fun u v => ?_⟩
-      have hlenL : (List.ofFn (fun x : Fin n => decide (x = u))).length = n := by simp
-      simp only [oneEach, List.getD, List.getElem?_append_left (by omega : i < (List.ofFn (fun x : Fin n => decide (x = u))).length),
-        List.getElem?_ofFn, hlt, dite_true, Option.getD_some, Bool.xor_false]
-    · have hge : n ≤ i := by omega
-      have hlt2 : i - n < m := by omega
-      refine ⟨fun _ => false, fun v => decide (⟨i - n, hlt2⟩ = v), fun u v => ?_⟩
-      have hlenL : (List.ofFn (fun x : Fin n => decide (x = u))).length = n := by simp
-      simp only [oneEach, List.getD, List.getElem?_append_right (by omega : (List.ofFn (fun x : Fin n => decide (x = u))).length ≤ i),
-        hlenL, List.getElem?_ofFn, hlt2, dite_true, Option.getD_some, Bool.false_xor]
-  have hfanG : GenFanIn2 gs := by
-    intro gg hgg
-    rcases List.mem_map.mp hgg with ⟨g, hg, rfl⟩
-    exact hfan g hg
-  have hcntG : gs.countP GenGate.nl ≤ t := by
-    have : gs.countP GenGate.nl = C.gates.countP nonlinear := by
-      simp [gs, List.countP_map]; rfl
-    omega
-  have hres := evalGen_hasNL t gs (n + m) oneEach hlen hinit hfanG hcntG C.output
-  apply hasNL_congr hres
-  intro u v
-  rw [heval C.gates (oneEach u v) u v]
-  exact hrep u v
-
-lemma hasNL_row_tag {t : ℕ} {α β : Type} {G : α → β → Bool} (h : HasNL t G) :
-    ∃ tag : α → Fin (4 ^ t),
-      ∀ u1 u2, tag u1 = tag u2 → ∃ c : Bool, ∀ v, G u1 v = xor (G u2 v) c := by
-  induction h with
-  | zero a b =>
-    refine ⟨fun _ => ⟨0, by simp⟩, fun u1 u2 _ => ⟨xor (a u1) (a u2), fun v => ?_⟩⟩
-    dsimp only
-    cases a u1 <;> cases a u2 <;> cases b v <;> rfl
-  | @step t α β G a1 a2 b1 b2 F0 F1 _ _ _ _ _ _ _ ihU _ =>
-    choose tagU htagU using ihU
-    let pairIdx : Bool → Bool → ℕ := fun p q => (if p then 2 else 0) + (if q then 1 else 0)
-    have hpair_lt : ∀ p q, pairIdx p q < 4 := by
-      intro p q; cases p <;> cases q <;> decide
-    have hpair_inj : ∀ p1 q1 p2 q2, pairIdx p1 q1 = pairIdx p2 q2 → p1 = p2 ∧ q1 = q2 := by
-      intro p1 q1 p2 q2 h
-      cases p1 <;> cases q1 <;> cases p2 <;> cases q2 <;> simp [pairIdx] at h ⊢
-    refine ⟨fun u => ⟨pairIdx (a1 u) (a2 u) * 4 ^ t + (tagU (a1 u) (a2 u) ⟨u, rfl, rfl⟩).val, ?_⟩, ?_⟩
-    · have h1 := hpair_lt (a1 u) (a2 u)
-      have h2 := (tagU (a1 u) (a2 u) ⟨u, rfl, rfl⟩).isLt
-      have hpow : 4 ^ (t + 1) = 4 * 4 ^ t := by ring
-      rw [hpow]
-      have h3 : pairIdx (a1 u) (a2 u) * 4 ^ t + 4 ^ t ≤ 4 * 4 ^ t := by
-        have : (pairIdx (a1 u) (a2 u) + 1) * 4 ^ t ≤ 4 * 4 ^ t :=
-          Nat.mul_le_mul_right _ (by omega)
-        linarith
-      omega
-    · intro u1 u2 heq
-      have hval : pairIdx (a1 u1) (a2 u1) * 4 ^ t + (tagU (a1 u1) (a2 u1) ⟨u1, rfl, rfl⟩).val =
-          pairIdx (a1 u2) (a2 u2) * 4 ^ t + (tagU (a1 u2) (a2 u2) ⟨u2, rfl, rfl⟩).val :=
-        congrArg Fin.val heq
-      have hlt1 := (tagU (a1 u1) (a2 u1) ⟨u1, rfl, rfl⟩).isLt
-      have hlt2 := (tagU (a1 u2) (a2 u2) ⟨u2, rfl, rfl⟩).isLt
-      have hpos : 0 < 4 ^ t := Nat.pow_pos (by omega)
-      have hdiv1 : (pairIdx (a1 u1) (a2 u1) * 4 ^ t + (tagU (a1 u1) (a2 u1) ⟨u1, rfl, rfl⟩).val) / 4 ^ t =
-          pairIdx (a1 u1) (a2 u1) := by
-        rw [Nat.mul_comm (pairIdx _ _), Nat.mul_add_div hpos, Nat.div_eq_of_lt hlt1, Nat.add_zero]
-      have hdiv2 : (pairIdx (a1 u2) (a2 u2) * 4 ^ t + (tagU (a1 u2) (a2 u2) ⟨u2, rfl, rfl⟩).val) / 4 ^ t =
-          pairIdx (a1 u2) (a2 u2) := by
-        rw [Nat.mul_comm (pairIdx _ _), Nat.mul_add_div hpos, Nat.div_eq_of_lt hlt2, Nat.add_zero]
-      have hpq_eq : pairIdx (a1 u1) (a2 u1) = pairIdx (a1 u2) (a2 u2) := by
-        rw [← hdiv1, hval, hdiv2]
-      obtain ⟨ha1, ha2⟩ := hpair_inj _ _ _ _ hpq_eq
-      have hcast : ∀ (p' q' : Bool) (hp' : a1 u2 = p') (hq' : a2 u2 = q'),
-          (tagU p' q' ⟨u2, hp', hq'⟩).val = (tagU (a1 u2) (a2 u2) ⟨u2, rfl, rfl⟩).val := by
-        intro p' q' hp' hq'; subst hp'; subst hq'; rfl
-      have hsub : tagU (a1 u1) (a2 u1) ⟨u1, rfl, rfl⟩ = tagU (a1 u1) (a2 u1) ⟨u2, ha1.symm, ha2.symm⟩ := by
-        apply Fin.ext
-        rw [hcast (a1 u1) (a2 u1) ha1.symm ha2.symm]
-        rw [hpq_eq] at hval
-        omega
-      exact htagU (a1 u1) (a2 u1) ⟨u1, rfl, rfl⟩ ⟨u2, ha1.symm, ha2.symm⟩ hsub
-
-lemma hasNL_col_tag {t : ℕ} {α β : Type} {G : α → β → Bool} (h : HasNL t G) :
-    ∃ tag : β → Fin (4 ^ t),
-      ∀ v1 v2, tag v1 = tag v2 → ∃ c : Bool, ∀ u, G u v1 = xor (G u v2) c := by
-  induction h with
-  | zero a b =>
-    refine ⟨fun _ => ⟨0, by simp⟩, fun v1 v2 _ => ⟨xor (b v1) (b v2), fun u => ?_⟩⟩
-    dsimp only
-    cases a u <;> cases b v1 <;> cases b v2 <;> rfl
-  | @step t α β G a1 a2 b1 b2 F0 F1 _ _ _ _ _ _ _ _ ihV =>
-    choose tagV htagV using ihV
-    let pairIdx : Bool → Bool → ℕ := fun r s => (if r then 2 else 0) + (if s then 1 else 0)
-    have hpair_lt : ∀ r s, pairIdx r s < 4 := by
-      intro r s; cases r <;> cases s <;> decide
-    have hpair_inj : ∀ r1 s1 r2 s2, pairIdx r1 s1 = pairIdx r2 s2 → r1 = r2 ∧ s1 = s2 := by
-      intro r1 s1 r2 s2 h
-      cases r1 <;> cases s1 <;> cases r2 <;> cases s2 <;> simp [pairIdx] at h ⊢
-    refine ⟨fun v => ⟨pairIdx (b1 v) (b2 v) * 4 ^ t + (tagV (b1 v) (b2 v) ⟨v, rfl, rfl⟩).val, ?_⟩, ?_⟩
-    · have h1 := hpair_lt (b1 v) (b2 v)
-      have h2 := (tagV (b1 v) (b2 v) ⟨v, rfl, rfl⟩).isLt
-      have hpow : 4 ^ (t + 1) = 4 * 4 ^ t := by ring
-      rw [hpow]
-      have h3 : pairIdx (b1 v) (b2 v) * 4 ^ t + 4 ^ t ≤ 4 * 4 ^ t := by
-        have : (pairIdx (b1 v) (b2 v) + 1) * 4 ^ t ≤ 4 * 4 ^ t :=
-          Nat.mul_le_mul_right _ (by omega)
-        linarith
-      omega
-    · intro v1 v2 heq
-      have hval : pairIdx (b1 v1) (b2 v1) * 4 ^ t + (tagV (b1 v1) (b2 v1) ⟨v1, rfl, rfl⟩).val =
-          pairIdx (b1 v2) (b2 v2) * 4 ^ t + (tagV (b1 v2) (b2 v2) ⟨v2, rfl, rfl⟩).val :=
-        congrArg Fin.val heq
-      have hlt1 := (tagV (b1 v1) (b2 v1) ⟨v1, rfl, rfl⟩).isLt
-      have hlt2 := (tagV (b1 v2) (b2 v2) ⟨v2, rfl, rfl⟩).isLt
-      have hpos : 0 < 4 ^ t := Nat.pow_pos (by omega)
-      have hdiv1 : (pairIdx (b1 v1) (b2 v1) * 4 ^ t + (tagV (b1 v1) (b2 v1) ⟨v1, rfl, rfl⟩).val) / 4 ^ t =
-          pairIdx (b1 v1) (b2 v1) := by
-        rw [Nat.mul_comm (pairIdx _ _), Nat.mul_add_div hpos, Nat.div_eq_of_lt hlt1, Nat.add_zero]
-      have hdiv2 : (pairIdx (b1 v2) (b2 v2) * 4 ^ t + (tagV (b1 v2) (b2 v2) ⟨v2, rfl, rfl⟩).val) / 4 ^ t =
-          pairIdx (b1 v2) (b2 v2) := by
-        rw [Nat.mul_comm (pairIdx _ _), Nat.mul_add_div hpos, Nat.div_eq_of_lt hlt2, Nat.add_zero]
-      have hrs_eq : pairIdx (b1 v1) (b2 v1) = pairIdx (b1 v2) (b2 v2) := by
-        rw [← hdiv1, hval, hdiv2]
-      obtain ⟨hb1, hb2⟩ := hpair_inj _ _ _ _ hrs_eq
-      have hcast : ∀ (r' s' : Bool) (hr' : b1 v2 = r') (hs' : b2 v2 = s'),
-          (tagV r' s' ⟨v2, hr', hs'⟩).val = (tagV (b1 v2) (b2 v2) ⟨v2, rfl, rfl⟩).val := by
-        intro r' s' hr' hs'; subst hr'; subst hs'; rfl
-      have hsub : tagV (b1 v1) (b2 v1) ⟨v1, rfl, rfl⟩ = tagV (b1 v1) (b2 v1) ⟨v2, hb1.symm, hb2.symm⟩ := by
-        apply Fin.ext
-        rw [hcast (b1 v1) (b2 v1) hb1.symm hb2.symm]
-        rw [hrs_eq] at hval
-        omega
-      exact htagV (b1 v1) (b2 v1) ⟨v1, rfl, rfl⟩ ⟨v2, hb1.symm, hb2.symm⟩ hsub
-
-lemma hadamard_card_le {t : ℕ} {α β : Type} [Fintype α] [Fintype β]
-    {G : α → β → Bool} (hβ : 0 < Fintype.card β)
-    (hH : IsHadamard G) (hNL : HasNL t G) :
-    Fintype.card α ≤ 4 ^ t := by
-  obtain ⟨tag, htag⟩ := hasNL_row_tag hNL
-  have hinj : Function.Injective tag := by
-    intro u1 u2 heq
+    (hrep : PEqualNP.Represents.Represents (Gf s) C) :
+    s + 1 ≤ C.gates.countP nl := by
+  obtain ⟨ℓ, m, F, A, B, hF, hout, -, -⟩ := extract C.output C.gates hfan _ rfl
+    (Fin (2 ^ (2 * s))) (2 ^ (2 * s) + 2 ^ (2 * s))
+    (fun u v => PEqualNP.Represents.oneEach u v) (fun u w => decide (w = u.val))
+    (fun v w => decide (w = 2 ^ (2 * s) + v.val))
+    (fun u v => oneEach_len _ u v) (fun u v w => oneEach_getD _ u v w)
+  have hG : ∀ u v, Gf s u v = xor (xor (A u) (B v)) (F (ℓ u) (m v)) := by
+    intro u v; rw [← hrep u v]; exact hout u v
+  have hpos : (0 : ℤ) < 2 ^ (2 * s) := by positivity
+  have hℓ : Function.Injective ℓ := by
+    intro u u' h
     by_contra hne
-    obtain ⟨c, hc⟩ := htag u1 u2 heq
-    have hsum : ∑ v : β, signZ (xor (G u1 v) (G u2 v)) = (Fintype.card β : ℤ) * signZ c := by
-      have hterm : ∀ v : β, signZ (xor (G u1 v) (G u2 v)) = signZ c := fun v => by
-        rw [hc v]
-        cases G u2 v <;> cases c <;> rfl
-      simp [hterm]
-    have hz := hH u1 u2 hne
-    rw [hsum] at hz
-    have hsc : signZ c ≠ 0 := by cases c <;> decide
-    have hcard0 : (Fintype.card β : ℤ) = 0 := (mul_eq_zero.mp hz).resolve_right hsc
-    omega
-  have := Fintype.card_le_of_injective tag hinj
-  simpa using this
-
-def IsSignedIP (s : ℕ) (G : Fin (4 ^ s) → Fin (4 ^ s) → Bool) : Prop :=
-  ∃ (α β : Fin (4 ^ s) → Bool) (φ ψ : Fin (4 ^ s) → Fin (2 * s) → Bool),
-    ∀ u v, G u v = z2b (b2z (α u) + b2z (β v) + ∑ i : Fin (2 * s), b2z (φ u i) * b2z (ψ v i))
-
-lemma block_card_eq_of_le {N M : ℕ} (hNM : N = 4 * M)
-    (f1 f2 : Fin N → Bool)
-    (hle : ∀ p q : Bool, ((Finset.univ : Finset (Fin N)).filter (fun x => f1 x = p ∧ f2 x = q)).card ≤ M) :
-    ∀ p q : Bool, ((Finset.univ : Finset (Fin N)).filter (fun x => f1 x = p ∧ f2 x = q)).card = M := by
-  let S : Bool → Bool → Finset (Fin N) := fun p q =>
-    (Finset.univ : Finset (Fin N)).filter (fun x => f1 x = p ∧ f2 x = q)
-  have hsum : (S false false).card + (S false true).card + (S true false).card + (S true true).card = N := by
-    have h1 : S false false ∪ S false true = (Finset.univ : Finset (Fin N)).filter (fun x => f1 x = false) := by
-      ext x; simp [S]; cases f2 x <;> simp
-    have h2 : S true false ∪ S true true = (Finset.univ : Finset (Fin N)).filter (fun x => f1 x = true) := by
-      ext x; simp [S]; cases f2 x <;> simp
-    have hd1 : Disjoint (S false false) (S false true) := by
-      rw [Finset.disjoint_left]; intro x hx1 hx2; simp only [S, Finset.mem_filter, Finset.mem_univ, true_and] at hx1 hx2
-      rw [hx1.2] at hx2; exact Bool.false_ne_true hx2.2
-    have hd2 : Disjoint (S true false) (S true true) := by
-      rw [Finset.disjoint_left]; intro x hx1 hx2; simp only [S, Finset.mem_filter, Finset.mem_univ, true_and] at hx1 hx2
-      rw [hx1.2] at hx2; exact Bool.false_ne_true hx2.2
-    have hd3 : Disjoint ((Finset.univ : Finset (Fin N)).filter (fun x => f1 x = false))
-        ((Finset.univ : Finset (Fin N)).filter (fun x => f1 x = true)) := by
-      rw [Finset.disjoint_left]
-      intro x hx1 hx2
-      have h1 := (Finset.mem_filter.mp hx1).2
-      have h2 := (Finset.mem_filter.mp hx2).2
-      rw [h1] at h2
-      cases h2
-    have hun : ((Finset.univ : Finset (Fin N)).filter (fun x => f1 x = false)) ∪
-        ((Finset.univ : Finset (Fin N)).filter (fun x => f1 x = true)) = Finset.univ := by
-      ext x; simp
-    have hc1 := Finset.card_union_of_disjoint hd1
-    have hc2 := Finset.card_union_of_disjoint hd2
-    have hc3 := Finset.card_union_of_disjoint hd3
-    rw [h1] at hc1
-    rw [h2] at hc2
-    rw [hun, Finset.card_univ, Fintype.card_fin] at hc3
-    omega
-  have h00 : (S false false).card ≤ M := hle false false
-  have h01 : (S false true).card ≤ M := hle false true
-  have h10 : (S true false).card ≤ M := hle true false
-  have h11 : (S true true).card ≤ M := hle true true
-  intro p q
-  change (S p q).card = M
-  cases p <;> cases q <;> omega
-
-lemma xor_and_eq_true_iff (x1 x2 y1 y2 : Bool) :
-    (xor x1 y1 && xor x2 y2) = true ↔ x1 = !y1 ∧ x2 = !y2 := by
-  cases x1 <;> cases x2 <;> cases y1 <;> cases y2 <;> decide
-
-lemma classification :
-    ∀ (s : ℕ) (G : Fin (4 ^ s) → Fin (4 ^ s) → Bool),
-      IsHadamard G → HasNL s G → IsSignedIP s G := by
-  intro s
-  induction s with
-  | zero =>
-    intro G _ _
-    refine ⟨fun _ => G ⟨0, by decide⟩ ⟨0, by decide⟩, fun _ => false,
-      fun _ i => Fin.elim0 i, fun _ i => Fin.elim0 i, fun u v => ?_⟩
-    have hu : u = ⟨0, by decide⟩ := Fin.ext (by have := u.isLt; simp at this; omega)
-    have hv : v = ⟨0, by decide⟩ := Fin.ext (by have := v.isLt; simp at this; omega)
-    subst hu; subst hv
-    simp only [Nat.mul_zero, Finset.univ_eq_empty, Finset.sum_empty, add_zero]
-    rw [show b2z false = 0 from rfl, add_zero, z2b_b2z]
-  | succ s ih =>
-    intro G hH hNL
-    classical
-    cases hNL with
-    | step _ a1 a2 b1 b2 F0 F1 hF0 hF1 hEq hU hV =>
-      have hNpos : 0 < 4 ^ (s + 1) := Nat.pow_pos (by omega)
-      have hMpos : 0 < 4 ^ s := Nat.pow_pos (by omega)
-      have hMposZ : (0 : ℤ) < (4 : ℤ) ^ s := by positivity
-      have hNM : 4 ^ (s + 1) = 4 * 4 ^ s := by ring
-      have hHt : IsHadamard (fun v u => G u v) := hadamard_transpose hNpos hH
-      let U : Bool → Bool → Finset (Fin (4 ^ (s + 1))) := fun p q =>
-        (Finset.univ : Finset (Fin (4 ^ (s + 1)))).filter (fun u => a1 u = p ∧ a2 u = q)
-      let V : Bool → Bool → Finset (Fin (4 ^ (s + 1))) := fun r t =>
-        (Finset.univ : Finset (Fin (4 ^ (s + 1)))).filter (fun v => b1 v = r ∧ b2 v = t)
-      have hU_le : ∀ p q, (U p q).card ≤ 4 ^ s := by
-        intro p q
-        have hHu : IsHadamard (fun (u : {u : Fin (4 ^ (s + 1)) // a1 u = p ∧ a2 u = q})
-            (v : Fin (4 ^ (s + 1))) => G u.1 v) := by
-          intro u1 u2 hne
-          exact hH u1.1 u2.1 (fun h => hne (Subtype.ext h))
-        have hle := hadamard_card_le (by simp [hNpos]) hHu (hU p q)
-        have hcard : Fintype.card {u : Fin (4 ^ (s + 1)) // a1 u = p ∧ a2 u = q} = (U p q).card := by
-          rw [Fintype.card_subtype]
-        omega
-      have hV_le : ∀ r t, (V r t).card ≤ 4 ^ s := by
-        intro r t
-        have hHv : IsHadamard (fun (v : {v : Fin (4 ^ (s + 1)) // b1 v = r ∧ b2 v = t})
-            (u : Fin (4 ^ (s + 1))) => G u v.1) := by
-          intro v1 v2 hne
-          exact hHt v1.1 v2.1 (fun h => hne (Subtype.ext h))
-        have hNLt : HasNL s (fun (v : {v : Fin (4 ^ (s + 1)) // b1 v = r ∧ b2 v = t})
-            (u : Fin (4 ^ (s + 1))) => G u v.1) := by
-          clear hHv hHt hU_le hH hU hF0 hF1 hEq
-          have hVs := hV r t
-          have hswap : ∀ {k : ℕ} {α β : Type} {H : α → β → Bool}, HasNL k H → HasNL k (fun v u => H u v) := by
-            intro k α β H h
-            induction h with
-            | zero a b =>
-              exact hasNL_congr (HasNL.zero b a) (fun v u => Bool.xor_comm _ _)
-            | step H a1' a2' b1' b2' F0' F1' _ _ hE' _ _ ih0 ih1 ihU' ihV' =>
-              refine HasNL.step (fun v u => H u v) b1' b2' a1' a2'
-                (fun v u => F0' u v) (fun v u => F1' u v) ih0 ih1
-                (fun v u => by rw [hE' u v, Bool.xor_comm (a1' u), Bool.xor_comm (a2' u)])
-                ihV' ihU'
-          exact hswap hVs
-        have hle := hadamard_card_le (by simp [hNpos]) hHv hNLt
-        have hcard : Fintype.card {v : Fin (4 ^ (s + 1)) // b1 v = r ∧ b2 v = t} = (V r t).card := by
-          rw [Fintype.card_subtype]
-        omega
-      have hU_card : ∀ p q, (U p q).card = 4 ^ s := block_card_eq_of_le hNM a1 a2 hU_le
-      have hV_card : ∀ r t, (V r t).card = 4 ^ s := block_card_eq_of_le hNM b1 b2 hV_le
-      obtain ⟨tagU, htagU⟩ := hasNL_row_tag hF0
-      obtain ⟨tagV, htagV⟩ := hasNL_col_tag hF0
-      have hcond_eq : ∀ u v, (xor (a1 u) (b1 v) && xor (a2 u) (b2 v)) = true ↔
-          v ∈ V (!(a1 u)) (!(a2 u)) := by
-        intro u v
-        simp only [V, Finset.mem_filter, Finset.mem_univ, true_and]
-        rw [Bool.xor_comm (a1 u), Bool.xor_comm (a2 u)]
-        exact xor_and_eq_true_iff (b1 v) (b2 v) (a1 u) (a2 u)
-      have hU_inj : ∀ p q, ∀ u1 ∈ U p q, ∀ u2 ∈ U p q, tagU u1 = tagU u2 → u1 = u2 := by
-        intro p q u1 hu1 u2 hu2 heq
-        by_contra hne
-        obtain ⟨c, hc⟩ := htagU u1 u2 heq
-        have ha1 : a1 u1 = p ∧ a2 u1 = q := (Finset.mem_filter.mp hu1).2
-        have ha2 : a1 u2 = p ∧ a2 u2 = q := (Finset.mem_filter.mp hu2).2
-        let B := V (!p) (!q)
-        let S := (Finset.univ : Finset (Fin (4 ^ (s + 1)))) \ B
-        have hScard : S.card = 3 * 4 ^ s := by
-          rw [Finset.card_sdiff_of_subset (Finset.subset_univ _), Finset.card_univ, Fintype.card_fin, hV_card (!p) (!q)]
-          omega
-        have hBcard : B.card = 4 ^ s := hV_card (!p) (!q)
-        have hsum0 := hH u1 u2 hne
-        have hsplit : ∑ v : Fin (4 ^ (s + 1)), signZ (xor (G u1 v) (G u2 v)) =
-            (∑ v ∈ S, signZ (xor (G u1 v) (G u2 v))) + (∑ v ∈ B, signZ (xor (G u1 v) (G u2 v))) := by
-          rw [← Finset.sum_union disjoint_sdiff_self_left, Finset.sdiff_union_of_subset (Finset.subset_univ B)]
-        have hS_const : ∑ v ∈ S, signZ (xor (G u1 v) (G u2 v)) = (3 * 4 ^ s : ℤ) * signZ c := by
-          have hterm : ∀ v ∈ S, signZ (xor (G u1 v) (G u2 v)) = signZ c := by
-            intro v hv
-            have hnotB : v ∉ B := (Finset.mem_sdiff.mp hv).2
-            have hc1 : (xor (a1 u1) (b1 v) && xor (a2 u1) (b2 v)) = false := by
-              cases h : (xor (a1 u1) (b1 v) && xor (a2 u1) (b2 v))
-              · rfl
-              · exfalso; apply hnotB
-                have := (hcond_eq u1 v).mp h
-                simpa [B, ha1.1, ha1.2] using this
-            have hc2 : (xor (a1 u2) (b1 v) && xor (a2 u2) (b2 v)) = false := by
-              cases h : (xor (a1 u2) (b1 v) && xor (a2 u2) (b2 v))
-              · rfl
-              · exfalso; apply hnotB
-                have := (hcond_eq u2 v).mp h
-                simpa [B, ha2.1, ha2.2] using this
-            rw [hEq u1 v, hEq u2 v, hc1, hc2, if_neg Bool.false_ne_true, if_neg Bool.false_ne_true, hc v]
-            cases F0 u2 v <;> cases c <;> rfl
-          rw [Finset.sum_congr rfl hterm, Finset.sum_const, nsmul_eq_mul, hScard]
-          push_cast; rfl
-        have hBle := sum_signZ_le_card B (fun v => xor (G u1 v) (G u2 v))
-        have hBge := sum_signZ_ge_neg_card B (fun v => xor (G u1 v) (G u2 v))
-        have hBcardZ : (B.card : ℤ) = (4 : ℤ) ^ s := by rw [hBcard]; push_cast; rfl
-        rw [hBcardZ] at hBle hBge
-        rw [hsplit, hS_const] at hsum0
-        cases c
-        · rw [show signZ false = 1 from rfl, mul_one] at hsum0; linarith [hMposZ, hBge, hsum0]
-        · rw [show signZ true = -1 from rfl, mul_neg, mul_one] at hsum0; linarith [hMposZ, hBle, hsum0]
-      have hU_surj : ∀ p q, ∀ y : Fin (4 ^ s), ∃ u ∈ U p q, tagU u = y := by
-        intro p q y
-        have himg : ((U p q).image tagU).card = (U p q).card :=
-          Finset.card_image_of_injOn (fun u1 hu1 u2 hu2 h => hU_inj p q u1 hu1 u2 hu2 h)
-        have hfull : (U p q).image tagU = Finset.univ := by
-          apply Finset.eq_univ_of_card
-          rw [himg, hU_card p q, Fintype.card_fin]
-        have hy : y ∈ (U p q).image tagU := by rw [hfull]; exact Finset.mem_univ y
-        exact Finset.mem_image.mp hy
-      have hV_inj : ∀ r t, ∀ v1 ∈ V r t, ∀ v2 ∈ V r t, tagV v1 = tagV v2 → v1 = v2 := by
-        intro r t v1 hv1 v2 hv2 heq
-        by_contra hne
-        obtain ⟨c, hc⟩ := htagV v1 v2 heq
-        have hb1 : b1 v1 = r ∧ b2 v1 = t := (Finset.mem_filter.mp hv1).2
-        have hb2 : b1 v2 = r ∧ b2 v2 = t := (Finset.mem_filter.mp hv2).2
-        let B := U (!r) (!t)
-        let S := (Finset.univ : Finset (Fin (4 ^ (s + 1)))) \ B
-        have hScard : S.card = 3 * 4 ^ s := by
-          rw [Finset.card_sdiff_of_subset (Finset.subset_univ _), Finset.card_univ, Fintype.card_fin, hU_card (!r) (!t)]
-          omega
-        have hBcard : B.card = 4 ^ s := hU_card (!r) (!t)
-        have hsum0 := hHt v1 v2 hne
-        have hsplit : ∑ u : Fin (4 ^ (s + 1)), signZ (xor (G u v1) (G u v2)) =
-            (∑ u ∈ S, signZ (xor (G u v1) (G u v2))) + (∑ u ∈ B, signZ (xor (G u v1) (G u v2))) := by
-          rw [← Finset.sum_union disjoint_sdiff_self_left, Finset.sdiff_union_of_subset (Finset.subset_univ B)]
-        have hS_const : ∑ u ∈ S, signZ (xor (G u v1) (G u v2)) = (3 * 4 ^ s : ℤ) * signZ c := by
-          have hterm : ∀ u ∈ S, signZ (xor (G u v1) (G u v2)) = signZ c := by
-            intro u hu
-            have hnotB : u ∉ B := (Finset.mem_sdiff.mp hu).2
-            have hc1 : (xor (a1 u) (b1 v1) && xor (a2 u) (b2 v1)) = false := by
-              cases h : (xor (a1 u) (b1 v1) && xor (a2 u) (b2 v1))
-              · rfl
-              · exfalso; apply hnotB
-                rw [hb1.1, hb1.2] at h
-                exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, (xor_and_eq_true_iff (a1 u) (a2 u) r t).mp h⟩
-            have hc2 : (xor (a1 u) (b1 v2) && xor (a2 u) (b2 v2)) = false := by
-              cases h : (xor (a1 u) (b1 v2) && xor (a2 u) (b2 v2))
-              · rfl
-              · exfalso; apply hnotB
-                rw [hb2.1, hb2.2] at h
-                exact Finset.mem_filter.mpr ⟨Finset.mem_univ _, (xor_and_eq_true_iff (a1 u) (a2 u) r t).mp h⟩
-            rw [hEq u v1, hEq u v2, hc1, hc2, if_neg Bool.false_ne_true, if_neg Bool.false_ne_true, hc u]
-            cases F0 u v2 <;> cases c <;> rfl
-          rw [Finset.sum_congr rfl hterm, Finset.sum_const, nsmul_eq_mul, hScard]
-          push_cast; rfl
-        have hBle := sum_signZ_le_card B (fun u => xor (G u v1) (G u v2))
-        have hBge := sum_signZ_ge_neg_card B (fun u => xor (G u v1) (G u v2))
-        have hBcardZ : (B.card : ℤ) = (4 : ℤ) ^ s := by rw [hBcard]; push_cast; rfl
-        rw [hBcardZ] at hBle hBge
-        rw [hsplit, hS_const] at hsum0
-        cases c
-        · rw [show signZ false = 1 from rfl, mul_one] at hsum0; linarith [hMposZ, hBge, hsum0]
-        · rw [show signZ true = -1 from rfl, mul_neg, mul_one] at hsum0; linarith [hMposZ, hBle, hsum0]
-      have hV_surj : ∀ r t, ∀ y : Fin (4 ^ s), ∃ v ∈ V r t, tagV v = y := by
-        intro r t y
-        have himg : ((V r t).image tagV).card = (V r t).card :=
-          Finset.card_image_of_injOn (fun v1 hv1 v2 hv2 h => hV_inj r t v1 hv1 v2 hv2 h)
-        have hfull : (V r t).image tagV = Finset.univ := by
-          apply Finset.eq_univ_of_card
-          rw [himg, hV_card r t, Fintype.card_fin]
-        have hy : y ∈ (V r t).image tagV := by rw [hfull]; exact Finset.mem_univ y
-        exact Finset.mem_image.mp hy
-      have hF1_neg : ∀ u v, (xor (a1 u) (b1 v) && xor (a2 u) (b2 v)) = true →
-          F1 u v = !(F0 u v) := by
-        intro u v hcond
-        let p := a1 u
-        let q := a2 u
-        obtain ⟨u', hu', htag_eq⟩ := hU_surj (!p) q (tagU u)
-        have ha' : a1 u' = !p ∧ a2 u' = q := (Finset.mem_filter.mp hu').2
-        have hu_ne : u ≠ u' := by
-          intro h; subst h
-          have : p = !p := ha'.1
-          cases p <;> simp at this
-        obtain ⟨c, hc⟩ := htagU u u' htag_eq.symm
-        let B1 := V (!p) (!q)
-        let B2 := V p (!q)
-        have hdB : Disjoint B1 B2 := by
-          rw [Finset.disjoint_left]
-          intro w hw1 hw2
-          have h1 := (Finset.mem_filter.mp hw1).2.1
-          have h2 := (Finset.mem_filter.mp hw2).2.1
-          rw [h1] at h2
-          cases p <;> simp at h2
-        let B := B1 ∪ B2
-        let S := (Finset.univ : Finset (Fin (4 ^ (s + 1)))) \ B
-        have hBcard : B.card = 2 * 4 ^ s := by
-          rw [Finset.card_union_of_disjoint hdB, hV_card (!p) (!q), hV_card p (!q)]
-          omega
-        have hScard : S.card = 2 * 4 ^ s := by
-          rw [Finset.card_sdiff_of_subset (Finset.subset_univ _), Finset.card_univ, Fintype.card_fin, hBcard]
-          omega
-        have hsum0 := hH u u' hu_ne
-        have hsplit : ∑ w : Fin (4 ^ (s + 1)), signZ (xor (G u w) (G u' w)) =
-            (∑ w ∈ S, signZ (xor (G u w) (G u' w))) + (∑ w ∈ B, signZ (xor (G u w) (G u' w))) := by
-          rw [← Finset.sum_union disjoint_sdiff_self_left, Finset.sdiff_union_of_subset (Finset.subset_univ B)]
-        have hS_const : ∑ w ∈ S, signZ (xor (G u w) (G u' w)) = (2 * 4 ^ s : ℤ) * signZ c := by
-          have hterm : ∀ w ∈ S, signZ (xor (G u w) (G u' w)) = signZ c := by
-            intro w hw
-            have hnotB : w ∉ B := (Finset.mem_sdiff.mp hw).2
-            have hc1 : (xor (a1 u) (b1 w) && xor (a2 u) (b2 w)) = false := by
-              cases h : (xor (a1 u) (b1 w) && xor (a2 u) (b2 w))
-              · rfl
-              · exfalso; apply hnotB
-                exact Finset.mem_union_left _ ((hcond_eq u w).mp h)
-            have hc2 : (xor (a1 u') (b1 w) && xor (a2 u') (b2 w)) = false := by
-              cases h : (xor (a1 u') (b1 w) && xor (a2 u') (b2 w))
-              · rfl
-              · exfalso; apply hnotB
-                have hw' := (hcond_eq u' w).mp h
-                simp only [ha'.1, ha'.2, Bool.not_not] at hw'
-                exact Finset.mem_union_right _ hw'
-            rw [hEq u w, hEq u' w, hc1, hc2, if_neg Bool.false_ne_true, if_neg Bool.false_ne_true, hc w]
-            cases F0 u' w <;> cases c <;> rfl
-          rw [Finset.sum_congr rfl hterm, Finset.sum_const, nsmul_eq_mul, hScard]
-          push_cast; rfl
-        have hBsum : ∑ w ∈ B, signZ (xor (G u w) (G u' w)) = -(signZ c) * (B.card : ℤ) := by
-          rw [hsplit, hS_const] at hsum0
-          rw [hBcard]
-          push_cast
-          linarith
-        have hAll := sum_signZ_extremal B (fun w => xor (G u w) (G u' w)) c hBsum
-        have hvB1 : v ∈ B1 := (hcond_eq u v).mp hcond
-        have hvB : v ∈ B := Finset.mem_union_left _ hvB1
-        have hGu_v := hAll v hvB
-        have hv_notB2 : v ∉ B2 := Finset.disjoint_left.mp hdB hvB1
-        have hc2v : (xor (a1 u') (b1 v) && xor (a2 u') (b2 v)) = false := by
-          cases h : (xor (a1 u') (b1 v) && xor (a2 u') (b2 v))
-          · rfl
-          · exfalso; apply hv_notB2
-            have hw' := (hcond_eq u' v).mp h
-            simpa [ha'.1, ha'.2, Bool.not_not] using hw'
-        rw [hEq u v, hEq u' v, hcond, hc2v, if_pos rfl, if_neg Bool.false_ne_true] at hGu_v
-        have hF0v := hc v
-        rw [hF0v]
-        cases h1 : F1 u v <;> cases h2 : F0 u' v <;> cases hc' : c <;> simp [h1, h2, hc'] at hGu_v ⊢
-      have hG_xor : ∀ u v,
-          G u v = xor ((xor (a1 u) (b1 v)) && (xor (a2 u) (b2 v))) (F0 u v) := by
-        intro u v
-        rw [hEq u v]
-        cases hcond : (xor (a1 u) (b1 v) && xor (a2 u) (b2 v))
-        · simp
-        · simp [hF1_neg u v hcond]
-      let eU : Fin (4 ^ s) ≃ {u : Fin (4 ^ (s + 1)) // u ∈ U false false} :=
-        (Fintype.equivFinOfCardEq (by rw [Fintype.card_coe]; exact hU_card false false)).symm
-      let eV : Fin (4 ^ s) ≃ {v : Fin (4 ^ (s + 1)) // v ∈ V false false} :=
-        (Fintype.equivFinOfCardEq (by rw [Fintype.card_coe]; exact hV_card false false)).symm
-      let G0 : Fin (4 ^ s) → Fin (4 ^ s) → Bool := fun i j => F0 (eU i).1 (eV j).1
-      have hG0_NL : HasNL s G0 := hasNL_comap hF0 (fun i => (eU i).1) (fun j => (eV j).1)
-      have hG0_H : IsHadamard G0 := by
-        intro i1 i2 hne
-        have hu1_mem := (eU i1).2
-        have hu2_mem := (eU i2).2
-        have hu_ne : (eU i1).1 ≠ (eU i2).1 := fun h => hne (eU.injective (Subtype.ext h))
-        have ha1 : a1 (eU i1).1 = false ∧ a2 (eU i1).1 = false := (Finset.mem_filter.mp hu1_mem).2
-        have ha2 : a1 (eU i2).1 = false ∧ a2 (eU i2).1 = false := (Finset.mem_filter.mp hu2_mem).2
-        have hGF0 : ∀ v, xor (G (eU i1).1 v) (G (eU i2).1 v) = xor (F0 (eU i1).1 v) (F0 (eU i2).1 v) := by
-          intro v
-          rw [hG_xor (eU i1).1 v, hG_xor (eU i2).1 v, ha1.1, ha1.2, ha2.1, ha2.2]
-          cases (xor false (b1 v) && xor false (b2 v)) <;>
-            cases F0 (eU i1).1 v <;> cases F0 (eU i2).1 v <;> rfl
-        have hsum_all : ∑ v : Fin (4 ^ (s + 1)), signZ (xor (F0 (eU i1).1 v) (F0 (eU i2).1 v)) = 0 := by
-          have := hH (eU i1).1 (eU i2).1 hu_ne
-          simpa [hGF0] using this
-        have hblock_eq : ∀ r t : Bool,
-            ∑ v ∈ V r t, signZ (xor (F0 (eU i1).1 v) (F0 (eU i2).1 v)) =
-              ∑ v ∈ V false false, signZ (xor (F0 (eU i1).1 v) (F0 (eU i2).1 v)) := by
-          intro r t
-          choose toV0 htoV0_mem htoV0_tag using fun y => hV_surj false false y
-          refine Finset.sum_bij (fun v _ => toV0 (tagV v)) ?_ ?_ ?_ ?_
-          · intro v _; exact htoV0_mem (tagV v)
-          · intro v1 hv1 v2 hv2 heq
-            apply hV_inj r t v1 hv1 v2 hv2
-            have h1 := htoV0_tag (tagV v1)
-            have h2 := htoV0_tag (tagV v2)
-            rw [heq] at h1
-            exact h1.symm.trans h2
-          · intro v0 hv0
-            obtain ⟨v, hv, htv⟩ := hV_surj r t (tagV v0)
-            refine ⟨v, hv, ?_⟩
-            apply hV_inj false false (toV0 (tagV v)) (htoV0_mem _) v0 hv0
-            rw [htoV0_tag, htv]
-          · intro v _
-            obtain ⟨c, hc⟩ := htagV v (toV0 (tagV v)) (htoV0_tag (tagV v)).symm
-            rw [hc (eU i1).1, hc (eU i2).1]
-            cases F0 (eU i1).1 (toV0 (tagV v)) <;> cases F0 (eU i2).1 (toV0 (tagV v)) <;> cases c <;> rfl
-        have hpart : ∑ v : Fin (4 ^ (s + 1)), signZ (xor (F0 (eU i1).1 v) (F0 (eU i2).1 v)) =
-            (∑ v ∈ V false false, signZ (xor (F0 (eU i1).1 v) (F0 (eU i2).1 v))) +
-            (∑ v ∈ V false true, signZ (xor (F0 (eU i1).1 v) (F0 (eU i2).1 v))) +
-            (∑ v ∈ V true false, signZ (xor (F0 (eU i1).1 v) (F0 (eU i2).1 v))) +
-            (∑ v ∈ V true true, signZ (xor (F0 (eU i1).1 v) (F0 (eU i2).1 v))) := by
-          have hd1 : Disjoint (V false false) (V false true) := by
-            rw [Finset.disjoint_left]; intro x h1 h2; simp [V] at h1 h2; rw [h1.2] at h2; cases h2.2
-          have hd2 : Disjoint (V true false) (V true true) := by
-            rw [Finset.disjoint_left]; intro x h1 h2; simp [V] at h1 h2; rw [h1.2] at h2; cases h2.2
-          have hd3 : Disjoint (V false false ∪ V false true) (V true false ∪ V true true) := by
-            rw [Finset.disjoint_left]; intro x h1 h2
-            simp [V] at h1 h2
-            rcases h1 with ⟨h1a, _⟩ | ⟨h1a, _⟩ <;> rcases h2 with ⟨h2a, _⟩ | ⟨h2a, _⟩ <;>
-              (rw [h1a] at h2a; cases h2a)
-          have hun : (V false false ∪ V false true) ∪ (V true false ∪ V true true) = Finset.univ := by
-            ext x; simp [V]; cases b1 x <;> cases b2 x <;> simp
-          rw [← hun, Finset.sum_union hd3, Finset.sum_union hd1, Finset.sum_union hd2]
-          ring
-        rw [hpart, hblock_eq false true, hblock_eq true false, hblock_eq true true] at hsum_all
-        have hV0_sum : ∑ v ∈ V false false, signZ (xor (F0 (eU i1).1 v) (F0 (eU i2).1 v)) = 0 := by
-          omega
-        have heq_sum : ∑ j : Fin (4 ^ s), signZ (xor (G0 i1 j) (G0 i2 j)) =
-            ∑ v ∈ V false false, signZ (xor (F0 (eU i1).1 v) (F0 (eU i2).1 v)) := by
-          rw [← Finset.sum_coe_sort (V false false)]
-          exact Fintype.sum_equiv eV (fun j => signZ (xor (G0 i1 j) (G0 i2 j)))
-            (fun v => signZ (xor (F0 (eU i1).1 v.1) (F0 (eU i2).1 v.1))) (fun _ => rfl)
-        rw [heq_sum, hV0_sum]
-      obtain ⟨α0, β0, φ0, ψ0, hIP0⟩ := ih G0 hG0_H hG0_NL
-      choose piU_val hpiU_mem hpiU_tag using fun u : Fin (4 ^ (s + 1)) => hU_surj false false (tagU u)
-      choose piV_val hpiV_mem hpiV_tag using fun v : Fin (4 ^ (s + 1)) => hV_surj false false (tagV v)
-      choose σU hσU using fun u : Fin (4 ^ (s + 1)) => htagU u (piU_val u) (hpiU_tag u).symm
-      choose σV hσV using fun v : Fin (4 ^ (s + 1)) => htagV v (piV_val v) (hpiV_tag v).symm
-      let piU : Fin (4 ^ (s + 1)) → Fin (4 ^ s) := fun u => eU.symm ⟨piU_val u, hpiU_mem u⟩
-      let piV : Fin (4 ^ (s + 1)) → Fin (4 ^ s) := fun v => eV.symm ⟨piV_val v, hpiV_mem v⟩
-      let α : Fin (4 ^ (s + 1)) → Bool := fun u =>
-        xor (xor (a1 u && a2 u) (σU u)) (α0 (piU u))
-      let β : Fin (4 ^ (s + 1)) → Bool := fun v =>
-        xor (xor (b1 v && b2 v) (σV v)) (β0 (piV v))
-      let φ : Fin (4 ^ (s + 1)) → Fin (2 * (s + 1)) → Bool := fun u i =>
-        if h : i.val < 2 * s then φ0 (piU u) ⟨i.val, h⟩
-        else if i.val = 2 * s then a1 u else a2 u
-      let ψ : Fin (4 ^ (s + 1)) → Fin (2 * (s + 1)) → Bool := fun v i =>
-        if h : i.val < 2 * s then ψ0 (piV v) ⟨i.val, h⟩
-        else if i.val = 2 * s then b2 v else b1 v
-      refine ⟨α, β, φ, ψ, fun u v => ?_⟩
-      have hF0_uv : F0 u v = xor (xor (σU u) (σV v)) (G0 (piU u) (piV v)) := by
-        have h1 := hσU u v
-        have h2 := hσV v (piU_val u)
-        have h3 : G0 (piU u) (piV v) = F0 (piU_val u) (piV_val v) := by
-          simp [G0, piU, piV]
-        rw [h1, h2, h3]
-        cases σU u <;> cases σV v <;> cases F0 (piU_val u) (piV_val v) <;> rfl
-      have hG0_val := hIP0 (piU u) (piV v)
-      have hsum_split :
-          (∑ i : Fin (2 * (s + 1)), b2z (φ u i) * b2z (ψ v i)) =
-            (∑ i : Fin (2 * s), b2z (φ0 (piU u) i) * b2z (ψ0 (piV v) i)) +
-            b2z (a1 u) * b2z (b2 v) + b2z (a2 u) * b2z (b1 v) := by
-        have hadd : 2 * (s + 1) = 2 * s + 2 := by omega
-        let eFin : Fin (2 * s + 2) ≃ Fin (2 * (s + 1)) := finCongr hadd.symm
-        rw [← Fintype.sum_equiv eFin (fun i => b2z (φ u (eFin i)) * b2z (ψ v (eFin i)))
-          (fun i => b2z (φ u i) * b2z (ψ v i)) (fun _ => rfl)]
-        rw [Fin.sum_univ_add]
-        have hL : ∑ i : Fin (2 * s),
-            b2z (φ u (eFin (Fin.castAdd 2 i))) * b2z (ψ v (eFin (Fin.castAdd 2 i))) =
-            ∑ i : Fin (2 * s), b2z (φ0 (piU u) i) * b2z (ψ0 (piV v) i) := by
-          apply Finset.sum_congr rfl
-          intro i _
-          have hlt : (eFin (Fin.castAdd 2 i)).val < 2 * s := by simp [eFin]
-          simp [φ, ψ, hlt, eFin]
-        have hR : ∑ i : Fin 2,
-            b2z (φ u (eFin (Fin.natAdd (2 * s) i))) * b2z (ψ v (eFin (Fin.natAdd (2 * s) i))) =
-            b2z (a1 u) * b2z (b2 v) + b2z (a2 u) * b2z (b1 v) := by
-          rw [Fin.sum_univ_two]
-          have h0_not : ¬ ((eFin (Fin.natAdd (2 * s) 0)).val < 2 * s) := by simp [eFin]
-          have h0_eq : (eFin (Fin.natAdd (2 * s) 0)).val = 2 * s := by simp [eFin]
-          have h1_not : ¬ ((eFin (Fin.natAdd (2 * s) 1)).val < 2 * s) := by simp [eFin]
-          have h1_ne : (eFin (Fin.natAdd (2 * s) 1)).val ≠ 2 * s := by simp [eFin]
-          simp [φ, ψ, h0_not, h0_eq, h1_not, h1_ne]
-        rw [hL, hR, add_assoc]
-      have hG_b2z : b2z (G u v) =
-          b2z (α u) + b2z (β v) + ∑ i : Fin (2 * (s + 1)), b2z (φ u i) * b2z (ψ v i) := by
-        rw [hG_xor u v, hF0_uv, hG0_val, hsum_split]
-        rw [b2z_xor, b2z_and, b2z_xor, b2z_xor, b2z_xor, b2z_xor, b2z_z2b]
-        simp only [α, β, b2z_xor, b2z_and]
-        ring
-      rw [← hG_b2z, z2b_b2z]
-
-lemma signedIP_closed3 {s : ℕ} {G : Fin (4 ^ s) → Fin (4 ^ s) → Bool}
-    (hH : IsHadamard G) (hIP : IsSignedIP s G) :
-    ∀ u1 u2 u3 : Fin (4 ^ s), ∃ (u4 : Fin (4 ^ s)) (c : Bool),
-      ∀ v : Fin (4 ^ s), xor (xor (G u1 v) (G u2 v)) (G u3 v) = xor (G u4 v) c := by
-  obtain ⟨α, β, φ, ψ, hG⟩ := hIP
-  have hinj : Function.Injective φ := by
-    intro u1 u2 heq
+    have hb := row_bal s hs u u' hne
+    have hconst : ∀ v, xor (Gf s u v) (Gf s u' v) = xor (A u) (A u') := by
+      intro v; rw [hG, hG, h]; exact bc1 _ _ _ _
+    simp only [hconst, Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul] at hb
+    generalize xor (A u) (A u') = z at hb
+    cases z <;> simp [chi] at hb <;> push_cast at hb <;> linarith
+  have hm : Function.Injective m := by
+    intro v v' h
     by_contra hne
-    have hdiff : ∀ v, xor (G u1 v) (G u2 v) = xor (α u1) (α u2) := by
-      intro v
-      have h1 : b2z (xor (G u1 v) (G u2 v)) = b2z (xor (α u1) (α u2)) := by
-        rw [b2z_xor, hG u1 v, hG u2 v, b2z_z2b, b2z_z2b, heq, b2z_xor]
-        have htwo : ∀ x : ZMod 2, x + x = 0 := fun x => by fin_cases x <;> decide
-        have hstep :
-            (b2z (α u1) + b2z (β v) + ∑ i : Fin (2 * s), b2z (φ u2 i) * b2z (ψ v i)) +
-            (b2z (α u2) + b2z (β v) + ∑ i : Fin (2 * s), b2z (φ u2 i) * b2z (ψ v i)) =
-            b2z (α u1) + b2z (α u2) + (b2z (β v) + b2z (β v)) +
-            ((∑ i : Fin (2 * s), b2z (φ u2 i) * b2z (ψ v i)) +
-             (∑ i : Fin (2 * s), b2z (φ u2 i) * b2z (ψ v i))) := by ring
-        rw [hstep, htwo, htwo, add_zero, add_zero]
-      rw [← z2b_b2z (xor (G u1 v) (G u2 v)), h1, z2b_b2z]
-    have hsum := hH u1 u2 hne
-    simp only [hdiff, Finset.sum_const, Finset.card_univ, Fintype.card_fin, smul_eq_mul] at hsum
-    have hsc : signZ (xor (α u1) (α u2)) ≠ 0 := by cases xor (α u1) (α u2) <;> decide
-    have hpos : (4 ^ s : ℤ) ≠ 0 := by positivity
-    exact absurd (mul_eq_zero.mp hsum) (by push_neg; exact ⟨hpos, hsc⟩)
-  have hcard : Fintype.card (Fin (4 ^ s)) = Fintype.card (Fin (2 * s) → Bool) := by
-    simp only [Fintype.card_fin, Fintype.card_fun, Fintype.card_bool]
-    rw [show 4 = 2 ^ 2 by rfl, ← pow_mul]
-  have hbij : Function.Bijective φ := (Fintype.bijective_iff_injective_and_card φ).mpr ⟨hinj, hcard⟩
-  intro u1 u2 u3
-  obtain ⟨u4, hu4⟩ := hbij.2 (fun i => xor (xor (φ u1 i) (φ u2 i)) (φ u3 i))
-  refine ⟨u4, xor (xor (α u1) (α u2)) (xor (α u3) (α u4)), fun v => ?_⟩
-  have h1 : b2z (xor (xor (G u1 v) (G u2 v)) (G u3 v)) =
-      b2z (xor (G u4 v) (xor (xor (α u1) (α u2)) (xor (α u3) (α u4)))) := by
-    simp only [b2z_xor, hG, b2z_z2b]
-    have hsum_eq : ∑ i : Fin (2 * s), b2z (φ u4 i) * b2z (ψ v i) =
-        (∑ i : Fin (2 * s), b2z (φ u1 i) * b2z (ψ v i)) +
-        (∑ i : Fin (2 * s), b2z (φ u2 i) * b2z (ψ v i)) +
-        (∑ i : Fin (2 * s), b2z (φ u3 i) * b2z (ψ v i)) := by
-      rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
-      apply Finset.sum_congr rfl
-      intro i _
-      have hi := congrFun hu4 i
-      rw [hi, b2z_xor, b2z_xor]
-      ring
-    rw [hsum_eq]
-    have htwo : ∀ x : ZMod 2, x + x = 0 := fun x => by fin_cases x <;> decide
-    have hstep :
-        (b2z (α u4) + b2z (β v) +
-          ((∑ i : Fin (2 * s), b2z (φ u1 i) * b2z (ψ v i)) +
-           (∑ i : Fin (2 * s), b2z (φ u2 i) * b2z (ψ v i)) +
-           (∑ i : Fin (2 * s), b2z (φ u3 i) * b2z (ψ v i)))) +
-        (b2z (α u1) + b2z (α u2) + (b2z (α u3) + b2z (α u4))) + (b2z (β v) + b2z (β v)) =
-        (b2z (α u1) + b2z (β v) + ∑ i : Fin (2 * s), b2z (φ u1 i) * b2z (ψ v i)) +
-        (b2z (α u2) + b2z (β v) + ∑ i : Fin (2 * s), b2z (φ u2 i) * b2z (ψ v i)) +
-        (b2z (α u3) + b2z (β v) + ∑ i : Fin (2 * s), b2z (φ u3 i) * b2z (ψ v i)) +
-        (b2z (α u4) + b2z (α u4)) := by ring
-    rw [htwo (b2z (β v)), htwo (b2z (α u4)), add_zero, add_zero] at hstep
-    exact hstep.symm
-  rw [← z2b_b2z (xor (xor (G u1 v) (G u2 v)) (G u3 v)), h1, z2b_b2z]
-
-def Gtarget (s : ℕ) (u v : Fin (2 ^ (2 * s))) : Bool :=
-  let parity := ((Finset.univ : Finset (Fin (2 * s))).filter (fun i =>
-    u.val.testBit i.val && v.val.testBit i.val)).card % 2 == 1
-  xor parity ((u.val.testBit 0 && u.val.testBit 1) && (v.val.testBit 2 && v.val.testBit 3))
-
-lemma Gtarget_eq_z2b (s : ℕ) (u v : Fin (2 ^ (2 * s))) :
-    Gtarget s u v = z2b ((∑ i : Fin (2 * s), b2z (u.val.testBit i.val) * b2z (v.val.testBit i.val)) +
-      b2z (u.val.testBit 0 && u.val.testBit 1) * b2z (v.val.testBit 2 && v.val.testBit 3)) := by
-  have hp : ((((Finset.univ : Finset (Fin (2 * s))).filter (fun i =>
-      u.val.testBit i.val && v.val.testBit i.val)).card % 2 == 1) : Bool) =
-      z2b (∑ i : Fin (2 * s), b2z (u.val.testBit i.val) * b2z (v.val.testBit i.val)) := by
-    rw [← z2b_sum_b2z_eq_card_mod2 (fun i : Fin (2 * s) => u.val.testBit i.val && v.val.testBit i.val)]
-    congr 1
-    apply Finset.sum_congr rfl
-    intro i _
-    exact b2z_and _ _
-  simp only [Gtarget, hp]
-  rw [z2b_add, ← b2z_and, z2b_b2z]
-
-lemma xor_pow2_lt {k x p : ℕ} (hx : x < 2 ^ k) (hp : p < k) : x ^^^ (2 ^ p) < 2 ^ k := by
-  apply Nat.lt_pow_two_of_testBit
-  intro i hi
-  rw [Nat.testBit_xor, Nat.testBit_two_pow]
-  have h1 : x.testBit i = false := Nat.testBit_lt_two_pow (lt_of_lt_of_le hx (Nat.pow_le_pow_right (by omega) hi))
-  have h2 : p ≠ i := by omega
-  simp [h1, h2]
-
-lemma Gtarget_hadamard (s : ℕ) (hs : 2 ≤ s) : IsHadamard (Gtarget s) := by
-  intro u1 u2 hne
-  have hex : ∃ p : Fin (2 * s), u1.val.testBit p.val ≠ u2.val.testBit p.val ∧
-      ((u1.val.testBit 0 && u1.val.testBit 1) ≠ (u2.val.testBit 0 && u2.val.testBit 1) → p.val < 2) := by
-    by_cases hsw : (u1.val.testBit 0 && u1.val.testBit 1) = (u2.val.testBit 0 && u2.val.testBit 1)
-    · by_contra hall
-      push_neg at hall
-      apply hne
-      apply Fin.ext
-      apply Nat.eq_of_testBit_eq
-      intro i
-      by_cases hi : i < 2 * s
-      · by_contra hne_i
-        exact (hall ⟨i, hi⟩ hne_i).1 hsw
-      · have h1 := Nat.testBit_lt_two_pow (lt_of_lt_of_le u1.isLt (Nat.pow_le_pow_right (by decide : 0 < 2) (by omega : 2 * s ≤ i)))
-        have h2 := Nat.testBit_lt_two_pow (lt_of_lt_of_le u2.isLt (Nat.pow_le_pow_right (by decide : 0 < 2) (by omega : 2 * s ≤ i)))
-        rw [h1, h2]
-    · by_cases h0 : u1.val.testBit 0 ≠ u2.val.testBit 0
-      · exact ⟨⟨0, by omega⟩, h0, fun _ => by simp⟩
-      · push_neg at h0
-        have h1 : u1.val.testBit 1 ≠ u2.val.testBit 1 := by
-          intro heq
-          exact hsw (by rw [h0, heq])
-        exact ⟨⟨1, by omega⟩, h1, fun _ => by simp⟩
-  obtain ⟨p, hp_ne, hp_lt2⟩ := hex
-  let σ : Fin (2 ^ (2 * s)) → Fin (2 ^ (2 * s)) := fun v =>
-    ⟨v.val ^^^ (2 ^ p.val), xor_pow2_lt v.isLt p.isLt⟩
-  have hinv : ∀ v, σ (σ v) = v := fun v => by
-    apply Fin.ext
-    simp [σ, Nat.xor_assoc, Nat.xor_self]
-  have hflip : ∀ v, xor (Gtarget s u1 (σ v)) (Gtarget s u2 (σ v)) =
-      !(xor (Gtarget s u1 v) (Gtarget s u2 v)) := by
-    intro v
-    have hdiff_val : ∀ w : Fin (2 ^ (2 * s)),
-        b2z (xor (Gtarget s u1 w) (Gtarget s u2 w)) =
-          (∑ i : Fin (2 * s), (b2z (u1.val.testBit i.val) + b2z (u2.val.testBit i.val)) * b2z (w.val.testBit i.val)) +
-          (b2z (u1.val.testBit 0 && u1.val.testBit 1) + b2z (u2.val.testBit 0 && u2.val.testBit 1)) *
-            b2z (w.val.testBit 2 && w.val.testBit 3) := by
-      intro w
-      rw [b2z_xor, Gtarget_eq_z2b, Gtarget_eq_z2b, b2z_z2b, b2z_z2b]
-      have h1 : (∑ i : Fin (2 * s), b2z (u1.val.testBit i.val) * b2z (w.val.testBit i.val)) +
-          (∑ i : Fin (2 * s), b2z (u2.val.testBit i.val) * b2z (w.val.testBit i.val)) =
-          ∑ i : Fin (2 * s), (b2z (u1.val.testBit i.val) + b2z (u2.val.testBit i.val)) * b2z (w.val.testBit i.val) := by
-        rw [← Finset.sum_add_distrib]
-        apply Finset.sum_congr rfl
-        intro i _; ring
-      rw [← h1]; ring
-    have hsw_same : (b2z (u1.val.testBit 0 && u1.val.testBit 1) + b2z (u2.val.testBit 0 && u2.val.testBit 1)) *
-        b2z ((σ v).val.testBit 2 && (σ v).val.testBit 3) =
-        (b2z (u1.val.testBit 0 && u1.val.testBit 1) + b2z (u2.val.testBit 0 && u2.val.testBit 1)) *
-        b2z (v.val.testBit 2 && v.val.testBit 3) := by
-      by_cases hsw : (u1.val.testBit 0 && u1.val.testBit 1) = (u2.val.testBit 0 && u2.val.testBit 1)
-      · rw [hsw]
-        have htwo : ∀ x : ZMod 2, x + x = 0 := fun x => by fin_cases x <;> decide
-        rw [htwo, zero_mul, zero_mul]
-      · have hlt2 := hp_lt2 hsw
-        have h2 : (σ v).val.testBit 2 = v.val.testBit 2 := by
-          simp [σ, Nat.testBit_xor, Nat.testBit_two_pow, show p.val ≠ 2 by omega]
-        have h3 : (σ v).val.testBit 3 = v.val.testBit 3 := by
-          simp [σ, Nat.testBit_xor, Nat.testBit_two_pow, show p.val ≠ 3 by omega]
-        rw [h2, h3]
-    have hsum_step :
-        (∑ i : Fin (2 * s), (b2z (u1.val.testBit i.val) + b2z (u2.val.testBit i.val)) * b2z ((σ v).val.testBit i.val)) =
-        (∑ i : Fin (2 * s), (b2z (u1.val.testBit i.val) + b2z (u2.val.testBit i.val)) * b2z (v.val.testBit i.val)) + 1 := by
-      rw [← Finset.add_sum_erase _ _ (Finset.mem_univ p)]
-      symm
-      rw [← Finset.add_sum_erase _ _ (Finset.mem_univ p)]
-      have hrest :
-          ∑ i ∈ (Finset.univ : Finset (Fin (2 * s))).erase p,
-            (b2z (u1.val.testBit i.val) + b2z (u2.val.testBit i.val)) * b2z ((σ v).val.testBit i.val) =
-          ∑ i ∈ (Finset.univ : Finset (Fin (2 * s))).erase p,
-            (b2z (u1.val.testBit i.val) + b2z (u2.val.testBit i.val)) * b2z (v.val.testBit i.val) := by
-        apply Finset.sum_congr rfl
-        intro i hi
-        have hne_i : p.val ≠ i.val := fun h => (Finset.mem_erase.mp hi).1 (Fin.ext h.symm)
-        simp [σ, Nat.testBit_xor, Nat.testBit_two_pow, hne_i]
-      rw [hrest]
-      have hp_bit : (σ v).val.testBit p.val = !(v.val.testBit p.val) := by
-        simp [σ, Nat.testBit_xor, Nat.testBit_two_pow]
-      rw [hp_bit]
-      have hcoef : b2z (u1.val.testBit p.val) + b2z (u2.val.testBit p.val) = 1 := by
-        cases h1 : u1.val.testBit p.val <;> cases h2 : u2.val.testBit p.val <;> simp_all [b2z]
-      rw [hcoef, one_mul, one_mul]
-      have hbnot : b2z (!(v.val.testBit p.val)) = b2z (v.val.testBit p.val) + 1 := by
-        cases v.val.testBit p.val <;> decide
-      rw [hbnot]; ring
-    have hb : b2z (xor (Gtarget s u1 (σ v)) (Gtarget s u2 (σ v))) =
-        b2z (xor (Gtarget s u1 v) (Gtarget s u2 v)) + 1 := by
-      rw [hdiff_val (σ v), hdiff_val v, hsw_same, hsum_step]; ring
-    have hnot : b2z (!(xor (Gtarget s u1 v) (Gtarget s u2 v))) =
-        b2z (xor (Gtarget s u1 v) (Gtarget s u2 v)) + 1 := by
-      cases xor (Gtarget s u1 v) (Gtarget s u2 v) <;> decide
-    rw [← z2b_b2z (xor (Gtarget s u1 (σ v)) (Gtarget s u2 (σ v))), hb, ← hnot, z2b_b2z]
-  exact sum_signZ_eq_zero_of_invol (fun v => xor (Gtarget s u1 v) (Gtarget s u2 v)) σ hinv hflip
-
-lemma Gtarget_not_closed3 (s : ℕ) (hs : 2 ≤ s) :
-    ¬ (∀ u1 u2 u3 : Fin (2 ^ (2 * s)), ∃ (u4 : Fin (2 ^ (2 * s))) (c : Bool),
-        ∀ v, xor (xor (Gtarget s u1 v) (Gtarget s u2 v)) (Gtarget s u3 v) = xor (Gtarget s u4 v) c) := by
-  intro hcl
-  have h16 : 16 ≤ 2 ^ (2 * s) := by
-    calc
-      16 = 2 ^ 4 := by decide
-      _ ≤ 2 ^ (2 * s) := Nat.pow_le_pow_right (by omega) (by omega)
-  let u0 : Fin (2 ^ (2 * s)) := ⟨0, by omega⟩
-  let u1 : Fin (2 ^ (2 * s)) := ⟨1, by omega⟩
-  let u2 : Fin (2 ^ (2 * s)) := ⟨2, by omega⟩
-  obtain ⟨u4, c, hu4⟩ := hcl u0 u1 u2
-  have hG_0 : ∀ v, Gtarget s u0 v = false := fun v => by
-    rw [Gtarget_eq_z2b]
-    simp [u0, b2z, z2b]
-  have hG_1 : ∀ v, Gtarget s u1 v = v.val.testBit 0 := fun v => by
-    rw [Gtarget_eq_z2b]
-    have hsum : ∑ i : Fin (2 * s), b2z ((1 : ℕ).testBit i.val) * b2z (v.val.testBit i.val) =
-        b2z (v.val.testBit 0) := by
-      rw [← Finset.add_sum_erase _ _ (Finset.mem_univ (⟨0, by omega⟩ : Fin (2 * s)))]
-      have h0 : (1 : ℕ).testBit 0 = true := by decide
-      have hrest : ∑ i ∈ (Finset.univ : Finset (Fin (2 * s))).erase ⟨0, by omega⟩,
-          b2z ((1 : ℕ).testBit i.val) * b2z (v.val.testBit i.val) = 0 := by
-        apply Finset.sum_eq_zero
-        intro i hi
-        have hne : i.val ≠ 0 := fun h => (Finset.mem_erase.mp hi).1 (Fin.ext h)
-        have hbit : (1 : ℕ).testBit i.val = false := by
-          have := Nat.testBit_two_pow (n := 0) (m := i.val)
-          simpa [hne.symm] using this
-        simp [hbit, b2z]
-      rw [hrest, add_zero]
-      simp [h0, b2z]
-    have h10 : (1 : ℕ).testBit 1 = false := by decide
-    simp only [u1, hsum, h10, Bool.and_false, show b2z false = 0 from rfl, zero_mul, add_zero, z2b_b2z]
-  have hG_2 : ∀ v, Gtarget s u2 v = v.val.testBit 1 := fun v => by
-    rw [Gtarget_eq_z2b]
-    have hsum : ∑ i : Fin (2 * s), b2z ((2 : ℕ).testBit i.val) * b2z (v.val.testBit i.val) =
-        b2z (v.val.testBit 1) := by
-      rw [← Finset.add_sum_erase _ _ (Finset.mem_univ (⟨1, by omega⟩ : Fin (2 * s)))]
-      have h1 : (2 : ℕ).testBit 1 = true := by decide
-      have hrest : ∑ i ∈ (Finset.univ : Finset (Fin (2 * s))).erase ⟨1, by omega⟩,
-          b2z ((2 : ℕ).testBit i.val) * b2z (v.val.testBit i.val) = 0 := by
-        apply Finset.sum_eq_zero
-        intro i hi
-        have hne : i.val ≠ 1 := fun h => (Finset.mem_erase.mp hi).1 (Fin.ext h)
-        have hbit : (2 : ℕ).testBit i.val = false := by
-          have := Nat.testBit_two_pow (n := 1) (m := i.val)
-          simpa [hne.symm] using this
-        simp [hbit, b2z]
-      rw [hrest, add_zero]
-      simp [h1, b2z]
-    have h20 : (2 : ℕ).testBit 0 = false := by decide
-    simp only [u2, hsum, h20, Bool.false_and, show b2z false = 0 from rfl, zero_mul, add_zero, z2b_b2z]
-  have hG_col0 : ∀ u, Gtarget s u u0 = false := fun u => by
-    rw [Gtarget_eq_z2b]
-    simp [u0, b2z, z2b]
-  have hc : c = false := by
-    have h0 := hu4 u0
-    rw [hG_col0 u0, hG_col0 u1, hG_col0 u2, hG_col0 u4] at h0
-    simpa using h0.symm
-  subst hc
-  have hG_unit : ∀ (j : Fin (2 * s)),
-      Gtarget s u4 ⟨2 ^ j.val, Nat.pow_lt_pow_right (by omega) j.isLt⟩ = u4.val.testBit j.val := by
-    intro j
-    rw [Gtarget_eq_z2b]
-    have hsum : ∑ i : Fin (2 * s), b2z (u4.val.testBit i.val) * b2z ((2 ^ j.val).testBit i.val) =
-        b2z (u4.val.testBit j.val) := by
-      rw [← Finset.add_sum_erase _ _ (Finset.mem_univ j)]
-      have hrest : ∑ i ∈ (Finset.univ : Finset (Fin (2 * s))).erase j,
-          b2z (u4.val.testBit i.val) * b2z ((2 ^ j.val).testBit i.val) = 0 := by
-        apply Finset.sum_eq_zero
-        intro i hi
-        have hne : j.val ≠ i.val := fun h => (Finset.mem_erase.mp hi).1 (Fin.ext h.symm)
-        simp [Nat.testBit_two_pow, hne, b2z]
-      rw [hrest, add_zero]
-      simp [Nat.testBit_two_pow, b2z]
-    have hsw : ((2 ^ j.val).testBit 2 && (2 ^ j.val).testBit 3) = false := by
-      simp [Nat.testBit_two_pow]
-      omega
-    simp only [hsum, hsw, show b2z false = 0 from rfl, mul_zero, add_zero, z2b_b2z]
-  have hu4_bits : ∀ j : Fin (2 * s), u4.val.testBit j.val = decide (j.val = 0 ∨ j.val = 1) := by
-    intro j
-    have hv := hu4 ⟨2 ^ j.val, Nat.pow_lt_pow_right (by omega) j.isLt⟩
-    rw [hG_0, hG_1, hG_2, hG_unit j, Bool.xor_false, Bool.false_xor] at hv
-    simp only [Nat.testBit_two_pow] at hv
-    rw [← hv]
-    by_cases h0 : j.val = 0
-    · simp [h0]
-    · by_cases h1 : j.val = 1
-      · simp [h1]
-      · simp [h0, h1]
-  let v12 : Fin (2 ^ (2 * s)) := ⟨12, by omega⟩
-  have h12 := hu4 v12
-  rw [hG_0, hG_1, hG_2, Bool.xor_false, Bool.false_xor] at h12
-  have hlhs : xor ((12 : ℕ).testBit 0) ((12 : ℕ).testBit 1) = false := by decide
-  have hrhs : Gtarget s u4 v12 = true := by
-    rw [Gtarget_eq_z2b]
-    have hsum : ∑ i : Fin (2 * s), b2z (u4.val.testBit i.val) * b2z ((12 : ℕ).testBit i.val) = 0 := by
-      apply Finset.sum_eq_zero
-      intro i _
-      rw [hu4_bits i]
-      by_cases h0 : i.val = 0
-      · simp [h0]; decide
-      · by_cases h1 : i.val = 1
-        · simp [h1]; decide
-        · simp [h0, h1, b2z]
-    have hbit0 : u4.val.testBit 0 = true := by
-      simpa using hu4_bits ⟨0, by omega⟩
-    have hbit1 : u4.val.testBit 1 = true := by
-      simpa using hu4_bits ⟨1, by omega⟩
-    have h12_2 : (12 : ℕ).testBit 2 = true := by decide
-    have h12_3 : (12 : ℕ).testBit 3 = true := by decide
-    simp only [v12, hsum, hbit0, hbit1, h12_2, h12_3, Bool.and_self, zero_add,
-      show b2z true = 1 from rfl, mul_one]
-    decide
-  simp only [v12] at h12
-  rw [hlhs, hrhs] at h12
-  cases h12
-
-lemma lower_bound (s : ℕ) (hs : 2 ≤ s) (C : Circuit)
-    (hfan : ∀ g ∈ C.gates, g.inputs.length ≤ 2)
-    (hrep : Represents (Gtarget s) C) :
-    s + 1 ≤ C.gates.countP nonlinear := by
+    have hc : ∀ u, xor (Gf s u v) (Gf s u v') = xor (B v) (B v') := by
+      intro u; rw [hG, hG, h]; exact bc2 _ _ _ _
+    obtain ⟨j, hj⟩ : ∃ j, v.val.testBit j ≠ v'.val.testBit j := by
+      by_contra hc'; push_neg at hc'; exact hne (Fin.ext (Nat.eq_of_testBit_eq hc'))
+    have hjk : j < 2 * s := by
+      by_contra hjk; push_neg at hjk
+      exact hj (by rw [testBit_high v hjk, testBit_high v' hjk])
+    have h0 := hc (zeroF s)
+    have h1 := hc (unitF s j hjk)
+    rw [Gf_zero_left, Gf_zero_left] at h0
+    rw [Gf_unit_left, Gf_unit_left, ← h0] at h1
+    apply hj
+    revert h1
+    generalize v.val.testBit j = p; generalize v'.val.testBit j = q
+    revert p q; decide
+  have hcard := Fintype.card_le_of_injective ℓ hℓ
+  rw [Fintype.card_fin, card_lab] at hcard
+  have h4 : (2 : ℕ) ^ (2 * s) = 4 ^ s := by rw [pow_mul]; norm_num
+  rw [h4] at hcard
+  have hst : s ≤ C.gates.countP nl := (Nat.pow_le_pow_iff_right (by norm_num)).mp hcard
   by_contra hlt
-  have hle : C.gates.countP nonlinear ≤ s := by omega
-  have hNL : HasNL s (Gtarget s) := circuit_hasNL C hfan hrep hle
-  have hpow : 2 ^ (2 * s) = 4 ^ s := by
-    rw [show 4 = 2 ^ 2 by rfl, ← pow_mul]
-  let e : Fin (4 ^ s) ≃ Fin (2 ^ (2 * s)) := finCongr hpow.symm
-  let G' : Fin (4 ^ s) → Fin (4 ^ s) → Bool := fun u v => Gtarget s (e u) (e v)
-  have hH' : IsHadamard G' := by
-    intro u1 u2 hne
-    have := Gtarget_hadamard s hs (e u1) (e u2) (fun h => hne (e.injective h))
-    rw [← Fintype.sum_equiv e (fun v => signZ (xor (G' u1 v) (G' u2 v)))
-      (fun v => signZ (xor (Gtarget s (e u1) v) (Gtarget s (e u2) v))) (fun _ => rfl)] at this
-    exact this
-  have hNL' : HasNL s G' := hasNL_comap hNL e e
-  have hIP' : IsSignedIP s G' := classification s G' hH' hNL'
-  have hcl' := signedIP_closed3 hH' hIP'
-  apply Gtarget_not_closed3 s hs
-  intro u1 u2 u3
-  obtain ⟨u4, c, hu4⟩ := hcl' (e.symm u1) (e.symm u2) (e.symm u3)
-  refine ⟨e u4, c, fun v => ?_⟩
-  simpa [G'] using hu4 (e.symm v)
+  have ht : C.gates.countP nl = s := by omega
+  have hcardeq : Fintype.card (Fin (2 ^ (2 * s))) = Fintype.card (Lab (C.gates.countP nl)) := by
+    rw [Fintype.card_fin, card_lab, ht, h4]
+  have hℓb : Function.Bijective ℓ :=
+    (Fintype.bijective_iff_injective_and_card ℓ).mpr ⟨hℓ, hcardeq⟩
+  have hmb : Function.Bijective m :=
+    (Fintype.bijective_iff_injective_and_card m).mpr ⟨hm, hcardeq⟩
+  have hRH : RowHad F := by
+    intro a a' hne
+    obtain ⟨u, rfl⟩ := hℓb.2 a
+    obtain ⟨u', rfl⟩ := hℓb.2 a'
+    have hne' : u ≠ u' := fun h => hne (by rw [h])
+    rw [← Fintype.sum_bijective m hmb (fun v => chi (xor (F (ℓ u) (m v)) (F (ℓ u') (m v))))
+      (fun b => chi (xor (F (ℓ u) b) (F (ℓ u') b))) (fun _ => rfl)]
+    have : ∀ v, chi (xor (F (ℓ u) (m v)) (F (ℓ u') (m v))) =
+        chi (xor (A u) (A u')) * chi (xor (Gf s u v) (Gf s u' v)) := by
+      intro v; rw [← chi_xor, hG u v, hG u' v]; congr 1; exact bc3 _ _ _ _ _
+    simp only [this, ← Finset.mul_sum, row_bal s hs u u' hne', mul_zero]
+  have hcl := had_closed _ F hF hRH
+  obtain ⟨a4, c, h4c⟩ := hcl (ℓ (zeroF s)) (ℓ (unitF s 0 (by omega))) (ℓ (unitF s 1 (by omega)))
+  obtain ⟨u4, rfl⟩ := hℓb.2 a4
+  apply not_closed s hs
+  refine ⟨u4, xor c (xor (xor (xor (A (zeroF s)) (A (unitF s 0 (by omega))))
+    (A (unitF s 1 (by omega)))) (A u4)), fun v => ?_⟩
+  rw [hG (zeroF s) v, hG (unitF s 0 (by omega)) v, hG (unitF s 1 (by omega)) v, hG u4 v,
+    ← h4c (m v)]
+  exact bc4 _ _ _ _ _ _ _ _ _
 
-structure Build (N : ℕ) where
-  gates : List Gate
-  hfan : ∀ g ∈ gates, g.inputs.length ≤ 2
-  hback : ∀ j (hj : j < gates.length), ∀ i ∈ gates[j].inputs, i < N + N + j
+/-! ## Part F: correctness of the upper bound circuit -/
 
-def Build.len {N : ℕ} (B : Build N) : ℕ := N + N + B.gates.length
+def lfU (s j w : ℕ) : Bool :=
+  if j < 2 * s then w.testBit j
+  else if j = 2 * s then (w.testBit 0 && w.testBit 1)
+  else if j = 2 * s + 1 then false
+  else xr s (fun i => w.testBit (2 * i) && w.testBit (2 * i + 1))
 
-def Build.val {N : ℕ} (B : Build N) (u v : Fin N) (w : ℕ) : Bool :=
-  (B.gates.foldl (fun ws g => ws ++ [g.op.eval (g.inputs.map (fun i => ws.getD i false))])
-    (oneEach u v)).getD w false
+def partner (j : ℕ) : ℕ := if j % 2 = 0 then j + 1 else j - 1
 
-def Build.cost {N : ℕ} (B : Build N) : ℕ := B.gates.countP nonlinear
+def lfV (s j w : ℕ) : Bool :=
+  if j < 2 * s then w.testBit (partner j)
+  else if j = 2 * s then false
+  else if j = 2 * s + 1 then (w.testBit 2 && w.testBit 3)
+  else xr s (fun i => w.testBit (2 * i) && w.testBit (2 * i + 1))
 
-lemma foldl_length (gs : List Gate) (init : List Bool) :
-    (gs.foldl (fun ws g => ws ++ [g.op.eval (g.inputs.map (fun i => ws.getD i false))]) init).length =
-      init.length + gs.length := by
-  induction gs generalizing init with
-  | nil => simp
-  | cons g gs ih =>
-    simp only [List.foldl_cons]
-    rw [ih]
-    simp; omega
+def lf (s N j w : ℕ) : Bool := if w < N then lfU s j w else lfV s j (w - N)
 
-lemma foldl_getD_append_gate (gs : List Gate) (g : Gate) (init : List Bool) :
-    let ws := gs.foldl (fun ws g => ws ++ [g.op.eval (g.inputs.map (fun i => ws.getD i false))]) init
-    ((gs ++ [g]).foldl (fun ws g => ws ++ [g.op.eval (g.inputs.map (fun i => ws.getD i false))]) init) =
-      ws ++ [g.op.eval (g.inputs.map (fun i => ws.getD i false))] := by
-  simp [List.foldl_append]
+def oW (n2 j : ℕ) : ℕ := n2 + j * (n2 + 1) + n2
 
-def Build.push {N : ℕ} (B : Build N) (g : Gate)
-    (hgf : g.inputs.length ≤ 2) (hgb : ∀ i ∈ g.inputs, i < B.len) : Build N where
-  gates := B.gates ++ [g]
-  hfan := by
-    intro g' hg'
-    simp only [List.mem_append, List.mem_singleton] at hg'
-    rcases hg' with h1 | rfl
-    · exact B.hfan g' h1
-    · exact hgf
-  hback := by
-    intro j hj i hi
-    by_cases hlt : j < B.gates.length
-    · rw [List.getElem_append_left hlt] at hi
-      exact B.hback j hlt i hi
-    · have heq : j = B.gates.length := by simp at hj; omega
-      subst heq
-      rw [List.getElem_append_right (le_refl _)] at hi
-      simp only [Nat.sub_self, List.getElem_singleton] at hi
-      exact hgb i hi
+def upC (s : ℕ) : Circuit :=
+  ⟨allB (2 ^ (2 * s) + 2 ^ (2 * s)) (lf s (2 ^ (2 * s))) (2 * s + 3) ++
+    stg ((2 ^ (2 * s) + 2 ^ (2 * s)) + (2 * s + 3) * ((2 ^ (2 * s) + 2 ^ (2 * s)) + 1))
+      (oW (2 ^ (2 * s) + 2 ^ (2 * s)) (2 * s + 2))
+      (fun i => oW (2 ^ (2 * s) + 2 ^ (2 * s)) (2 * i))
+      (fun i => oW (2 ^ (2 * s) + 2 ^ (2 * s)) (2 * i + 1)) (s + 1),
+   (2 ^ (2 * s) + 2 ^ (2 * s)) + (2 * s + 3) * ((2 ^ (2 * s) + 2 ^ (2 * s)) + 1) + 3 * (s + 1)⟩
 
-lemma Build.push_len {N : ℕ} (B : Build N) (g : Gate) hgf hgb :
-    (B.push g hgf hgb).len = B.len + 1 := by
-  simp [Build.push, Build.len]; omega
+lemma onehot_xr (s N j : ℕ) (u v : Fin N) :
+    xr (N + N) (fun w => lf s N j w && (PEqualNP.Represents.oneEach u v).getD w false) =
+      xor (lfU s j u.val) (lfV s j v.val) := by
+  simp only [oneEach_getD, Bool.and_xor_distrib_left]
+  rw [xr_xor, xr_delta, xr_delta]
+  have h1 : decide (u.val < N + N) = true := by simp only [decide_eq_true_eq]; omega
+  have h2 : decide (N + v.val < N + N) = true := by simp only [decide_eq_true_eq]; omega
+  rw [h1, h2, Bool.true_and, Bool.true_and]
+  have h3 : ¬ (N + v.val < N) := by omega
+  simp only [lf, if_pos u.isLt, if_neg h3, Nat.add_sub_cancel_left]
 
-lemma Build.push_cost {N : ℕ} (B : Build N) (g : Gate) hgf hgb :
-    (B.push g hgf hgb).cost = B.cost + (if nonlinear g then 1 else 0) := by
-  simp [Build.push, Build.cost, List.countP_append, List.countP_cons]
+def RBL (n : ℕ) (gs : List Gate) : Prop :=
+  ∀ j < gs.length, ∀ i ∈ (gs.getD j ⟨GateOp.or, []⟩).inputs, i < n + j
 
-lemma Build.push_val_old {N : ℕ} (B : Build N) (g : Gate) hgf hgb
-    (u v : Fin N) (w : ℕ) (hw : w < B.len) :
-    (B.push g hgf hgb).val u v w = B.val u v w := by
-  simp only [Build.val, Build.push, foldl_getD_append_gate]
-  have hlen : (B.gates.foldl (fun ws g => ws ++ [g.op.eval (g.inputs.map (fun i => ws.getD i false))])
-      (oneEach u v)).length = B.len := by
-    rw [foldl_length]; simp [oneEach, Build.len]
-  have hw' : w < (B.gates.foldl (fun ws g => ws ++ [g.op.eval (g.inputs.map (fun i => ws.getD i false))])
-      (oneEach u v)).length := by rw [hlen]; exact hw
-  rw [List.getD, List.getD, List.getElem?_append_left hw']
+lemma RBL_nil (n : ℕ) : RBL n [] := by intro j hj; simp at hj
 
-lemma Build.push_val_new {N : ℕ} (B : Build N) (g : Gate) hgf hgb (u v : Fin N) :
-    (B.push g hgf hgb).val u v B.len = g.op.eval (g.inputs.map (B.val u v)) := by
-  simp only [Build.val, Build.push, foldl_getD_append_gate]
-  have hlen : (B.gates.foldl (fun ws g => ws ++ [g.op.eval (g.inputs.map (fun i => ws.getD i false))])
-      (oneEach u v)).length = B.len := by
-    rw [foldl_length]; simp [oneEach, Build.len]
-  simp only [List.getD, ← hlen, List.getElem?_append_right (le_refl _), Nat.sub_self,
-    List.getElem?_cons_zero, Option.getD_some]
-  rfl
-
-def Build.empty (N : ℕ) : Build N where
-  gates := []
-  hfan := by simp
-  hback := by simp
-
-lemma Build.empty_val_left {N : ℕ} (u v : Fin N) (i : ℕ) (hi : i < N) :
-    (Build.empty N).val u v i = decide (i = u.val) := by
-  simp only [Build.empty, Build.val, List.foldl_nil, oneEach, List.getD]
-  have hlen : (List.ofFn (fun x : Fin N => decide (x = u))).length = N := by simp
-  rw [List.getElem?_append_left (by omega)]
-  simp [List.getElem?_ofFn, hi, Fin.ext_iff]
-
-lemma Build.empty_val_right {N : ℕ} (u v : Fin N) (j : ℕ) (hj : j < N) :
-    (Build.empty N).val u v (N + j) = decide (j = v.val) := by
-  simp only [Build.empty, Build.val, List.foldl_nil, oneEach, List.getD]
-  have hlen : (List.ofFn (fun x : Fin N => decide (x = u))).length = N := by simp
-  rw [List.getElem?_append_right (by omega), hlen, Nat.add_sub_cancel_left]
-  simp [List.getElem?_ofFn, hj, Fin.ext_iff]
-
-def mkFalse {N : ℕ} (B : Build N) : Build N × ℕ :=
-  (B.push ⟨GateOp.or, []⟩ (by simp) (by simp), B.len)
-
-def mkXor {N : ℕ} (B : Build N) (w1 w2 : ℕ) (h1 : w1 < B.len) (h2 : w2 < B.len) : Build N × ℕ :=
-  let B1 := B.push ⟨GateOp.mod 2, [w1, w2]⟩ (by simp) (by intro i hi; simp at hi; rcases hi with rfl | rfl <;> omega)
-  let B2 := B1.push ⟨GateOp.not, [B.len]⟩ (by simp) (by intro i hi; simp at hi; subst hi; rw [Build.push_len]; omega)
-  (B2, B1.len)
-
-def mkAnd {N : ℕ} (B : Build N) (w1 w2 : ℕ) (h1 : w1 < B.len) (h2 : w2 < B.len) : Build N × ℕ :=
-  (B.push ⟨GateOp.and, [w1, w2]⟩ (by simp) (by intro i hi; simp at hi; rcases hi with rfl | rfl <;> omega), B.len)
-
-lemma mkFalse_spec {N : ℕ} (B : Build N) :
-    (mkFalse B).2 < (mkFalse B).1.len ∧
-    B.len ≤ (mkFalse B).1.len ∧
-    (mkFalse B).1.cost = B.cost ∧
-    (∀ u v w, w < B.len → (mkFalse B).1.val u v w = B.val u v w) ∧
-    (∀ u v, (mkFalse B).1.val u v (mkFalse B).2 = false) := by
-  dsimp only [mkFalse]
-  refine ⟨?_, ?_, ?_, ?_, ?_⟩
-  · simp [Build.push_len]
-  · simp [Build.push_len]
-  · simp [Build.push_cost, nonlinear]
-  · intro u v w hw; exact Build.push_val_old B _ _ _ u v w hw
-  · intro u v; simp [Build.push_val_new, GateOp.eval]
-
-lemma mkXor_spec {N : ℕ} (B : Build N) (w1 w2 : ℕ) (h1 : w1 < B.len) (h2 : w2 < B.len) :
-    (mkXor B w1 w2 h1 h2).2 < (mkXor B w1 w2 h1 h2).1.len ∧
-    B.len ≤ (mkXor B w1 w2 h1 h2).1.len ∧
-    (mkXor B w1 w2 h1 h2).1.cost = B.cost ∧
-    (∀ u v w, w < B.len → (mkXor B w1 w2 h1 h2).1.val u v w = B.val u v w) ∧
-    (∀ u v, (mkXor B w1 w2 h1 h2).1.val u v (mkXor B w1 w2 h1 h2).2 =
-      xor (B.val u v w1) (B.val u v w2)) := by
-  have hnl1 : nonlinear ⟨GateOp.mod 2, [w1, w2]⟩ = false := by simp [nonlinear, GateOp.eval]
-  have hnl2 : nonlinear ⟨GateOp.not, [B.len]⟩ = false := by simp [nonlinear]
-  refine ⟨?_, ?_, ?_, ?_, ?_⟩
-  · simp only [mkXor, Build.push_len]; omega
-  · simp only [mkXor, Build.push_len]; omega
-  · simp only [mkXor, Build.push_cost, hnl1, hnl2]; simp
-  · intro u v w hw
-    dsimp only [mkXor]
-    rw [Build.push_val_old _ _ _ _ u v w (by rw [Build.push_len]; omega),
-      Build.push_val_old B _ _ _ u v w hw]
-  · intro u v
-    dsimp only [mkXor]
-    rw [Build.push_val_new]
-    simp only [List.map_cons, List.map_nil, GateOp.eval, List.headD_cons]
-    rw [Build.push_val_new]
-    simp only [List.map_cons, List.map_nil, GateOp.eval]
-    cases B.val u v w1 <;> cases B.val u v w2 <;> decide
-
-lemma mkAnd_spec {N : ℕ} (B : Build N) (w1 w2 : ℕ) (h1 : w1 < B.len) (h2 : w2 < B.len) :
-    (mkAnd B w1 w2 h1 h2).2 < (mkAnd B w1 w2 h1 h2).1.len ∧
-    B.len ≤ (mkAnd B w1 w2 h1 h2).1.len ∧
-    (mkAnd B w1 w2 h1 h2).1.cost = B.cost + 1 ∧
-    (∀ u v w, w < B.len → (mkAnd B w1 w2 h1 h2).1.val u v w = B.val u v w) ∧
-    (∀ u v, (mkAnd B w1 w2 h1 h2).1.val u v (mkAnd B w1 w2 h1 h2).2 =
-      (B.val u v w1 && B.val u v w2)) := by
-  dsimp only [mkAnd]
-  have hnl : nonlinear ⟨GateOp.and, [w1, w2]⟩ = true := by simp [nonlinear, GateOp.eval]
-  refine ⟨?_, ?_, ?_, ?_, ?_⟩
-  · simp [Build.push_len]
-  · simp [Build.push_len]
-  · simp [Build.push_cost, hnl]
-  · intro u v w hw; exact Build.push_val_old B _ _ _ u v w hw
-  · intro u v
-    simp only [Build.push_val_new, List.map_cons, List.map_nil, GateOp.eval]
-    cases B.val u v w1 <;> cases B.val u v w2 <;> decide
-
-lemma exists_false {N : ℕ} (B : Build N) :
-    ∃ (B' : Build N) (w : ℕ),
-      w < B'.len ∧ B.len ≤ B'.len ∧ B'.cost = B.cost ∧
-      (∀ u v w0, w0 < B.len → B'.val u v w0 = B.val u v w0) ∧
-      (∀ u v, B'.val u v w = false) :=
-  ⟨(mkFalse B).1, (mkFalse B).2, mkFalse_spec B⟩
-
-lemma exists_xor {N : ℕ} (B : Build N) (w1 w2 : ℕ) (h1 : w1 < B.len) (h2 : w2 < B.len) :
-    ∃ (B' : Build N) (w : ℕ),
-      w < B'.len ∧ B.len ≤ B'.len ∧ B'.cost = B.cost ∧
-      (∀ u v w0, w0 < B.len → B'.val u v w0 = B.val u v w0) ∧
-      (∀ u v, B'.val u v w = xor (B.val u v w1) (B.val u v w2)) :=
-  ⟨(mkXor B w1 w2 h1 h2).1, (mkXor B w1 w2 h1 h2).2, mkXor_spec B w1 w2 h1 h2⟩
-
-lemma exists_and {N : ℕ} (B : Build N) (w1 w2 : ℕ) (h1 : w1 < B.len) (h2 : w2 < B.len) :
-    ∃ (B' : Build N) (w : ℕ),
-      w < B'.len ∧ B.len ≤ B'.len ∧ B'.cost = B.cost + 1 ∧
-      (∀ u v w0, w0 < B.len → B'.val u v w0 = B.val u v w0) ∧
-      (∀ u v, B'.val u v w = (B.val u v w1 && B.val u v w2)) :=
-  ⟨(mkAnd B w1 w2 h1 h2).1, (mkAnd B w1 w2 h1 h2).2, mkAnd_spec B w1 w2 h1 h2⟩
-
-lemma build_exists_left {N : ℕ} (B0 : Build N) (f : Fin N → Bool)
-    (hB0_in : ∀ u v (i : ℕ) (hi : i < N), B0.val u v i = decide (i = u.val)) :
-    ∃ (B : Build N) (w : ℕ),
-      w < B.len ∧ B0.len ≤ B.len ∧ B.cost = B0.cost ∧
-      (∀ u v w0, w0 < B0.len → B.val u v w0 = B0.val u v w0) ∧
-      (∀ u v, B.val u v w = f u) := by
-  have hloop : ∀ m ≤ N,
-      ∃ (B : Build N) (w : ℕ),
-        w < B.len ∧ B0.len ≤ B.len ∧ B.cost = B0.cost ∧
-        (∀ u v w0, w0 < B0.len → B.val u v w0 = B0.val u v w0) ∧
-        (∀ u v, B.val u v w = if u.val < m then f u else false) := by
-    intro m
-    induction m with
-    | zero =>
-      intro _
-      obtain ⟨h1, h2, h3, h4, h5⟩ := mkFalse_spec B0
-      exact ⟨(mkFalse B0).1, (mkFalse B0).2, h1, h2, h3, h4, fun u v => by simp [h5 u v]⟩
-    | succ m ih =>
-      intro hm
-      obtain ⟨B, w, hw, hlen, hcost, hold, hval⟩ := ih (by omega)
-      by_cases hf : f ⟨m, by omega⟩ = true
-      · have hm_lt : m < B.len := by
-          have : m < B0.len := by simp [Build.len]; omega
-          omega
-        obtain ⟨h1, h2, h3, h4, h5⟩ := mkXor_spec B w m hw hm_lt
-        refine ⟨(mkXor B w m hw hm_lt).1, (mkXor B w m hw hm_lt).2, h1, le_trans hlen h2,
-          by rw [h3, hcost],
-          fun u v w0 hw0 => by rw [h4 u v w0 (lt_of_lt_of_le hw0 hlen), hold u v w0 hw0],
-          fun u v => ?_⟩
-        rw [h5 u v, hval u v]
-        have hm_b0 : m < B0.len := by simp [Build.len]; omega
-        rw [hold u v m hm_b0, hB0_in u v m (by omega)]
-        by_cases hu : u.val < m
-        · have hne : m ≠ u.val := by omega
-          have hlt : u.val < m + 1 := by omega
-          simp [hu, hne, hlt]
-        · by_cases heq : m = u.val
-          · have hlt : u.val < m + 1 := by omega
-            have hfu : f u = true := by
-              have : u = ⟨m, by omega⟩ := Fin.ext heq.symm
-              rw [this]; exact hf
-            simp [hu, heq, hlt, hfu]
-          · have hnot : ¬ (u.val < m + 1) := by omega
-            simp [hu, heq, hnot]
-      · refine ⟨B, w, hw, hlen, hcost, hold, fun u v => ?_⟩
-        rw [hval u v]
-        by_cases hu : u.val < m
-        · have hlt : u.val < m + 1 := by omega
-          simp [hu, hlt]
-        · by_cases heq : u.val = m
-          · have hlt : u.val < m + 1 := by omega
-            have hfu : f u = false := by
-              have : u = ⟨m, by omega⟩ := Fin.ext heq
-              rw [this]
-              cases h : f ⟨m, by omega⟩
-              · rfl
-              · exact absurd h hf
-            simp [hu, hlt, hfu]
-          · have hnot : ¬ (u.val < m + 1) := by omega
-            simp [hu, hnot]
-  obtain ⟨B, w, hw, hlen, hcost, hold, hval⟩ := hloop N (le_refl N)
-  exact ⟨B, w, hw, hlen, hcost, hold, fun u v => by simpa [u.isLt] using hval u v⟩
-
-lemma build_exists_right {N : ℕ} (B0 : Build N) (g : Fin N → Bool)
-    (hB0_in : ∀ u v (j : ℕ) (hj : j < N), B0.val u v (N + j) = decide (j = v.val)) :
-    ∃ (B : Build N) (w : ℕ),
-      w < B.len ∧ B0.len ≤ B.len ∧ B.cost = B0.cost ∧
-      (∀ u v w0, w0 < B0.len → B.val u v w0 = B0.val u v w0) ∧
-      (∀ u v, B.val u v w = g v) := by
-  have hloop : ∀ m ≤ N,
-      ∃ (B : Build N) (w : ℕ),
-        w < B.len ∧ B0.len ≤ B.len ∧ B.cost = B0.cost ∧
-        (∀ u v w0, w0 < B0.len → B.val u v w0 = B0.val u v w0) ∧
-        (∀ u v, B.val u v w = if v.val < m then g v else false) := by
-    intro m
-    induction m with
-    | zero =>
-      intro _
-      obtain ⟨h1, h2, h3, h4, h5⟩ := mkFalse_spec B0
-      exact ⟨(mkFalse B0).1, (mkFalse B0).2, h1, h2, h3, h4, fun u v => by simp [h5 u v]⟩
-    | succ m ih =>
-      intro hm
-      obtain ⟨B, w, hw, hlen, hcost, hold, hval⟩ := ih (by omega)
-      by_cases hg : g ⟨m, by omega⟩ = true
-      · have hm_b0 : N + m < B0.len := by simp [Build.len]; omega
-        have hm_lt : N + m < B.len := lt_of_lt_of_le hm_b0 hlen
-        obtain ⟨h1, h2, h3, h4, h5⟩ := mkXor_spec B w (N + m) hw hm_lt
-        refine ⟨(mkXor B w (N + m) hw hm_lt).1, (mkXor B w (N + m) hw hm_lt).2, h1, le_trans hlen h2,
-          by rw [h3, hcost],
-          fun u v w0 hw0 => by rw [h4 u v w0 (lt_of_lt_of_le hw0 hlen), hold u v w0 hw0],
-          fun u v => ?_⟩
-        rw [h5 u v, hval u v, hold u v (N + m) hm_b0, hB0_in u v m (by omega)]
-        by_cases hv : v.val < m
-        · have hne : m ≠ v.val := by omega
-          have hlt : v.val < m + 1 := by omega
-          simp [hv, hne, hlt]
-        · by_cases heq : m = v.val
-          · have hlt : v.val < m + 1 := by omega
-            have hgv : g v = true := by
-              have : v = ⟨m, by omega⟩ := Fin.ext heq.symm
-              rw [this]; exact hg
-            simp [hv, heq, hlt, hgv]
-          · have hnot : ¬ (v.val < m + 1) := by omega
-            simp [hv, heq, hnot]
-      · refine ⟨B, w, hw, hlen, hcost, hold, fun u v => ?_⟩
-        rw [hval u v]
-        by_cases hv : v.val < m
-        · have hlt : v.val < m + 1 := by omega
-          simp [hv, hlt]
-        · by_cases heq : v.val = m
-          · have hlt : v.val < m + 1 := by omega
-            have hgv : g v = false := by
-              have : v = ⟨m, by omega⟩ := Fin.ext heq
-              rw [this]
-              cases h : g ⟨m, by omega⟩
-              · rfl
-              · exact absurd h hg
-            simp [hv, hlt, hgv]
-          · have hnot : ¬ (v.val < m + 1) := by omega
-            simp [hv, hnot]
-  obtain ⟨B, w, hw, hlen, hcost, hold, hval⟩ := hloop N (le_refl N)
-  exact ⟨B, w, hw, hlen, hcost, hold, fun u v => by simpa [v.isLt] using hval u v⟩
-
-lemma pair_trick (a b c d : Bool) :
-    xor (xor (a && b) (c && d)) ((xor a d) && (xor b c)) = xor (a && c) (b && d) := by
-  cases a <;> cases b <;> cases c <;> cases d <;> rfl
-
-lemma upper_pair_step {N : ℕ} (B : Build N) (wacc : ℕ) (hwacc : wacc < B.len) (m : ℕ)
-    (hBL : ∀ u v (i : ℕ) (hi : i < N), B.val u v i = decide (i = u.val))
-    (hBR : ∀ u v (j : ℕ) (hj : j < N), B.val u v (N + j) = decide (j = v.val)) :
-    ∃ (B' : Build N) (wf : ℕ),
-      wf < B'.len ∧ B.len ≤ B'.len ∧ B'.cost = B.cost + 1 ∧
-      (∀ u v w0, w0 < B.len → B'.val u v w0 = B.val u v w0) ∧
-      (∀ u v, B'.val u v wf = xor (B.val u v wacc)
-        (xor (u.val.testBit (2 * m) && v.val.testBit (2 * m))
-          (u.val.testBit (2 * m + 1) && v.val.testBit (2 * m + 1)))) := by
-  have hBL_of : ∀ (B1 : Build N), B.len ≤ B1.len → (∀ u v w0, w0 < B.len → B1.val u v w0 = B.val u v w0) →
-      ∀ u v (i : ℕ) (hi : i < N), B1.val u v i = decide (i = u.val) := by
-    intro B1 _ hold u v i hi
-    have hiB : i < B.len := by simp [Build.len]; omega
-    rw [hold u v i hiB, hBL u v i hi]
-  have hBR_of : ∀ (B1 : Build N), B.len ≤ B1.len → (∀ u v w0, w0 < B.len → B1.val u v w0 = B.val u v w0) →
-      ∀ u v (j : ℕ) (hj : j < N), B1.val u v (N + j) = decide (j = v.val) := by
-    intro B1 _ hold u v j hj
-    have hjB : N + j < B.len := by simp [Build.len]; omega
-    rw [hold u v (N + j) hjB, hBR u v j hj]
-  obtain ⟨B1, wu1, hwu1, hlen1, hcost1, hold1, hval1⟩ :=
-    build_exists_left B (fun u => u.val.testBit (2 * m)) hBL
-  obtain ⟨B2, wu2, hwu2, hlen2, hcost2, hold2, hval2⟩ :=
-    build_exists_left B1 (fun u => u.val.testBit (2 * m + 1)) (hBL_of B1 hlen1 hold1)
-  have hold20 : ∀ u v w0, w0 < B.len → B2.val u v w0 = B.val u v w0 := fun u v w0 hw0 => by
-    rw [hold2 u v w0 (lt_of_lt_of_le hw0 hlen1), hold1 u v w0 hw0]
-  obtain ⟨B3, wv1, hwv1, hlen3, hcost3, hold3, hval3⟩ :=
-    build_exists_right B2 (fun v => v.val.testBit (2 * m)) (hBR_of B2 (le_trans hlen1 hlen2) hold20)
-  have hold30 : ∀ u v w0, w0 < B.len → B3.val u v w0 = B.val u v w0 := fun u v w0 hw0 => by
-    rw [hold3 u v w0 (lt_of_lt_of_le hw0 (le_trans hlen1 hlen2)), hold20 u v w0 hw0]
-  obtain ⟨B4, wv2, hwv2, hlen4, hcost4, hold4, hval4⟩ :=
-    build_exists_right B3 (fun v => v.val.testBit (2 * m + 1)) (hBR_of B3 (le_trans (le_trans hlen1 hlen2) hlen3) hold30)
-  have hold40 : ∀ u v w0, w0 < B.len → B4.val u v w0 = B.val u v w0 := fun u v w0 hw0 => by
-    rw [hold4 u v w0 (by omega), hold30 u v w0 hw0]
-  obtain ⟨B5, wu12, hwu12, hlen5, hcost5, hold5, hval5⟩ :=
-    build_exists_left B4 (fun u => u.val.testBit (2 * m) && u.val.testBit (2 * m + 1)) (hBL_of B4 (by omega) hold40)
-  have hold50 : ∀ u v w0, w0 < B.len → B5.val u v w0 = B.val u v w0 := fun u v w0 hw0 => by
-    rw [hold5 u v w0 (by omega), hold40 u v w0 hw0]
-  obtain ⟨B6, wv12, hwv12, hlen6, hcost6, hold6, hval6⟩ :=
-    build_exists_right B5 (fun v => v.val.testBit (2 * m) && v.val.testBit (2 * m + 1)) (hBR_of B5 (by omega) hold50)
-  have hold60 : ∀ u v w0, w0 < B.len → B6.val u v w0 = B.val u v w0 := fun u v w0 hw0 => by
-    rw [hold6 u v w0 (by omega), hold50 u v w0 hw0]
-  obtain ⟨B7, wx1, hwx1, hlen7, hcost7, hold7, hval7⟩ := exists_xor B6 wu1 wv2 (by omega) (by omega)
-  obtain ⟨B8, wx2, hwx2, hlen8, hcost8, hold8, hval8⟩ := exists_xor B7 wu2 wv1 (by omega) (by omega)
-  obtain ⟨B9, wp, hwp, hlen9, hcost9, hold9, hval9⟩ := exists_and B8 wx1 wx2 (by omega) hwx2
-  obtain ⟨B10, wuv, hwuv, hlen10, hcost10, hold10, hval10⟩ := exists_xor B9 wu12 wv12 (by omega) (by omega)
-  obtain ⟨B11, wt, hwt, hlen11, hcost11, hold11, hval11⟩ := exists_xor B10 wuv wp hwuv (by omega)
-  obtain ⟨B12, wf, hwf, hlen12, hcost12, hold12, hval12⟩ := exists_xor B11 wacc wt (by omega) hwt
-  have hhold : ∀ u v w0, w0 < B.len → B12.val u v w0 = B.val u v w0 := fun u v w0 hw0 => by
-    rw [hold12 u v w0 (by omega), hold11 u v w0 (by omega), hold10 u v w0 (by omega),
-      hold9 u v w0 (by omega), hold8 u v w0 (by omega), hold7 u v w0 (by omega), hold60 u v w0 hw0]
-  refine ⟨B12, wf, hwf, by omega, by omega, hhold, fun u v => ?_⟩
-  have h6_u1 : B6.val u v wu1 = u.val.testBit (2 * m) := by
-    rw [hold6 u v wu1 (by omega), hold5 u v wu1 (by omega), hold4 u v wu1 (by omega),
-      hold3 u v wu1 (by omega), hold2 u v wu1 hwu1, hval1 u v]
-  have h6_u2 : B6.val u v wu2 = u.val.testBit (2 * m + 1) := by
-    rw [hold6 u v wu2 (by omega), hold5 u v wu2 (by omega), hold4 u v wu2 (by omega),
-      hold3 u v wu2 hwu2, hval2 u v]
-  have h6_v1 : B6.val u v wv1 = v.val.testBit (2 * m) := by
-    rw [hold6 u v wv1 (by omega), hold5 u v wv1 (by omega), hold4 u v wv1 hwv1, hval3 u v]
-  have h6_v2 : B6.val u v wv2 = v.val.testBit (2 * m + 1) := by
-    rw [hold6 u v wv2 (by omega), hold5 u v wv2 hwv2, hval4 u v]
-  have h6_u12 : B6.val u v wu12 = (u.val.testBit (2 * m) && u.val.testBit (2 * m + 1)) := by
-    rw [hold6 u v wu12 hwu12, hval5 u v]
-  have h6_v12 : B6.val u v wv12 = (v.val.testBit (2 * m) && v.val.testBit (2 * m + 1)) := hval6 u v
-  rw [hval12 u v, hold11 u v wacc (by omega), hold10 u v wacc (by omega),
-    hold9 u v wacc (by omega), hold8 u v wacc (by omega), hold7 u v wacc (by omega),
-    hold60 u v wacc hwacc, hval11 u v, hval10 u v, hold9 u v wu12 (by omega),
-    hold8 u v wu12 (by omega), hold7 u v wu12 (by omega), h6_u12,
-    hold9 u v wv12 (by omega), hold8 u v wv12 (by omega), hold7 u v wv12 hwv12, h6_v12,
-    hold10 u v wp hwp, hval9 u v, hold8 u v wx1 hwx1, hval7 u v, h6_u1, h6_v2,
-    hval8 u v, hold7 u v wu2 (by omega), hold7 u v wv1 (by omega), h6_u2, h6_v1, pair_trick]
-
-lemma sum_range_two_mul {α : Type} [AddCommMonoid α] (f : ℕ → α) (n : ℕ) :
-    ∑ i ∈ Finset.range (2 * n), f i = ∑ j ∈ Finset.range n, (f (2 * j) + f (2 * j + 1)) := by
-  induction n with
-  | zero => simp
-  | succ k ih =>
-    rw [show 2 * (k + 1) = 2 * k + 1 + 1 by omega, Finset.sum_range_succ, Finset.sum_range_succ,
-      Finset.sum_range_succ, ih, add_assoc]
-
-lemma upper_bound (s : ℕ) (hs : 2 ≤ s) :
-    ∃ C : Circuit,
-      (∀ g ∈ C.gates, g.inputs.length ≤ 2) ∧
-      ReadsBack (2 ^ (2 * s) + 2 ^ (2 * s)) C ∧
-      Represents (Gtarget s) C ∧
-      C.gates.countP nonlinear = s + 1 := by
-  let N := 2 ^ (2 * s)
-  let B0 := Build.empty N
-  have hB0_L : ∀ u v (i : ℕ) (hi : i < N), B0.val u v i = decide (i = u.val) :=
-    Build.empty_val_left
-  have hB0_R : ∀ u v (j : ℕ) (hj : j < N), B0.val u v (N + j) = decide (j = v.val) :=
-    Build.empty_val_right
-  have hloop : ∀ m ≤ s,
-      ∃ (B : Build N) (w : ℕ),
-        w < B.len ∧ B0.len ≤ B.len ∧ B.cost = m ∧
-        (∀ u v w0, w0 < B0.len → B.val u v w0 = B0.val u v w0) ∧
-        (∀ u v, B.val u v w = z2b (∑ j ∈ Finset.range m,
-          (b2z (u.val.testBit (2 * j)) * b2z (v.val.testBit (2 * j)) +
-           b2z (u.val.testBit (2 * j + 1)) * b2z (v.val.testBit (2 * j + 1))))) := by
-    intro m
-    induction m with
-    | zero =>
-      intro _
-      obtain ⟨B1, w1, hw1, hlen1, hcost1, hold1, hval1⟩ := exists_false B0
-      refine ⟨B1, w1, hw1, hlen1, ?_, hold1, fun u v => ?_⟩
-      · rw [hcost1]; rfl
-      · simp [hval1 u v, z2b]
-    | succ m ih =>
-      intro hm
-      obtain ⟨B, wacc, hwacc, hlenB, hcostB, holdB, hvalB⟩ := ih (by omega)
-      have hBL : ∀ u v (i : ℕ) (hi : i < N), B.val u v i = decide (i = u.val) := fun u v i hi => by
-        rw [holdB u v i (by simp [B0, Build.empty, Build.len]; omega), hB0_L u v i hi]
-      have hBR : ∀ u v (j : ℕ) (hj : j < N), B.val u v (N + j) = decide (j = v.val) := fun u v j hj => by
-        rw [holdB u v (N + j) (by simp [B0, Build.empty, Build.len]; omega), hB0_R u v j hj]
-      obtain ⟨B', wf, hwf, hlen', hcost', hold', hval'⟩ := upper_pair_step B wacc hwacc m hBL hBR
-      refine ⟨B', wf, hwf, le_trans hlenB hlen', by omega,
-        fun u v w0 hw0 => by rw [hold' u v w0 (lt_of_lt_of_le hw0 hlenB), holdB u v w0 hw0],
-        fun u v => ?_⟩
-      rw [hval' u v, hvalB u v, Finset.sum_range_succ, z2b_add, z2b_add, ← b2z_and, ← b2z_and,
-        z2b_b2z, z2b_b2z]
-  obtain ⟨B, wacc, hwacc, hlenB, hcostB, holdB, hvalB⟩ := hloop s (le_refl s)
-  have hBL : ∀ u v (i : ℕ) (hi : i < N), B.val u v i = decide (i = u.val) := fun u v i hi => by
-    rw [holdB u v i (by simp [B0, Build.empty, Build.len]; omega), hB0_L u v i hi]
-  have hBR : ∀ u v (j : ℕ) (hj : j < N), B.val u v (N + j) = decide (j = v.val) := fun u v j hj => by
-    rw [holdB u v (N + j) (by simp [B0, Build.empty, Build.len]; omega), hB0_R u v j hj]
-  obtain ⟨B1, wu01, hwu01, hlen1, hcost1, hold1, hval1⟩ :=
-    build_exists_left B (fun u => u.val.testBit 0 && u.val.testBit 1) hBL
-  have hB1R : ∀ u v (j : ℕ) (hj : j < N), B1.val u v (N + j) = decide (j = v.val) := fun u v j hj => by
-    have hj0 : N + j < B0.len := by simp [B0, Build.empty, Build.len]; omega
-    rw [hold1 u v (N + j) (by omega), hBR u v j hj]
-  obtain ⟨B2, wv23, hwv23, hlen2, hcost2, hold2, hval2⟩ :=
-    build_exists_right B1 (fun v => v.val.testBit 2 && v.val.testBit 3) hB1R
-  obtain ⟨B3, wsw, hwsw, hlen3, hcost3, hold3, hval3⟩ := exists_and B2 wu01 wv23 (by omega) hwv23
-  obtain ⟨B4, wout, hwout, hlen4, hcost4, hold4, hval4⟩ := exists_xor B3 wacc wsw (by omega) hwsw
-  refine ⟨⟨B4.gates, wout⟩, B4.hfan, ?_, ?_, ?_⟩
-  · intro j hj i hi
-    have hj' : j < B4.gates.length := hj
-    have hgt : gateAt ⟨B4.gates, wout⟩ j = B4.gates[j] := by
-      simp [gateAt, List.getD, List.getElem?_eq_getElem hj']
-    rw [hgt] at hi
-    exact B4.hback j hj' i hi
-  · intro u v
-    have hval_out : (⟨B4.gates, wout⟩ : Circuit).eval (oneEach u v) = B4.val u v wout := rfl
-    rw [hval_out, hval4 u v, hold3 u v wacc (by omega), hold2 u v wacc (by omega),
-      hold1 u v wacc hwacc, hvalB u v, hval3 u v, hold2 u v wu01 hwu01, hval1 u v, hval2 u v,
-      Gtarget_eq_z2b]
-    rw [z2b_add, ← b2z_and, z2b_b2z]
-    congr 1
-    congr 1
-    have hsum_pair :
-        ∑ i : Fin (2 * s), b2z (u.val.testBit i.val) * b2z (v.val.testBit i.val) =
-        ∑ j ∈ Finset.range s,
-          (b2z (u.val.testBit (2 * j)) * b2z (v.val.testBit (2 * j)) +
-           b2z (u.val.testBit (2 * j + 1)) * b2z (v.val.testBit (2 * j + 1))) := by
-      let f : ℕ → ZMod 2 := fun i => b2z (u.val.testBit i) * b2z (v.val.testBit i)
-      exact (Fin.sum_univ_eq_sum_range f (2 * s)).trans (sum_range_two_mul f s)
-    exact hsum_pair.symm
-  · change B4.cost = s + 1
+lemma RBL_append (n : ℕ) (gs gs' : List Gate) (h1 : RBL n gs) (h2 : RBL (n + gs.length) gs') :
+    RBL n (gs ++ gs') := by
+  intro j hj i hi
+  by_cases hjl : j < gs.length
+  · rw [List.getD_append _ _ _ _ hjl] at hi; exact h1 j hjl i hi
+  · rw [List.getD_append_right _ _ _ _ (by omega)] at hi
+    have := h2 (j - gs.length) (by simp only [List.length_append] at hj; omega) i hi
     omega
+
+lemma RBL_single (n : ℕ) (g : Gate) (h : ∀ i ∈ g.inputs, i < n) : RBL n [g] := by
+  intro j hj i hi
+  simp only [List.length_singleton] at hj
+  have : j = 0 := by omega
+  subst this
+  simp only [List.getD_cons_zero] at hi
+  have := h i hi; omega
+
+lemma lb_RBL (M : ℕ) (c : ℕ → Bool) (base : ℕ) : ∀ m, RBL base (lb M c base m)
+  | 0 => RBL_single _ _ (by simp [cstG])
+  | m+1 => by
+    simp only [lb]
+    apply RBL_append _ _ _ (lb_RBL M c base m)
+    apply RBL_single
+    rw [lb_len]
+    intro i hi
+    simp only [lbG] at hi
+    split_ifs at hi <;> simp at hi <;> omega
+
+lemma allB_RBL (n2 : ℕ) (cf : ℕ → ℕ → Bool) : ∀ n, RBL n2 (allB n2 cf n)
+  | 0 => RBL_nil _
+  | n+1 => by
+    simp only [allB]
+    apply RBL_append _ _ _ (allB_RBL n2 cf n)
+    rw [allB_len]; exact lb_RBL _ _ _ _
+
+lemma stg_RBL (P0 oL : ℕ) (oX oY : ℕ → ℕ) (hL : oL < P0) :
+    ∀ n, (∀ i < n, oX i < P0 ∧ oY i < P0) → RBL P0 (stg P0 oL oX oY n)
+  | 0, _ => RBL_single _ _ (by simp [cpyG]; exact hL)
+  | n+1, hXY => by
+    simp only [stg]
+    have hX := (hXY n (by omega)).1
+    have hY := (hXY n (by omega)).2
+    refine RBL_append _ _ _ (RBL_append _ _ _ (RBL_append _ _ _
+      (stg_RBL P0 oL oX oY hL n (fun i hi => hXY i (by omega))) ?_) ?_) ?_
+    · apply RBL_single
+      simp only [andG, List.mem_cons, List.mem_nil_iff, or_false]
+      rintro i (rfl | rfl) <;> omega
+    · apply RBL_single
+      simp only [modG, List.length_append, stg_len, List.length_singleton, List.mem_cons,
+        List.mem_nil_iff, or_false]
+      rintro i (rfl | rfl) <;> omega
+    · apply RBL_single
+      simp only [notG, List.length_append, stg_len, List.length_singleton, List.mem_cons,
+        List.mem_nil_iff, or_false]
+      rintro i rfl; omega
+
+lemma lb_fan (M : ℕ) (c : ℕ → Bool) (base : ℕ) :
+    ∀ m, ∀ g ∈ lb M c base m, g.inputs.length ≤ 2 ∧ nl g = false
+  | 0 => by
+    intro g hg
+    simp only [lb, List.mem_singleton] at hg
+    subst hg; exact ⟨by simp [cstG], rfl⟩
+  | m+1 => by
+    intro g hg
+    simp only [lb, List.mem_append, List.mem_singleton] at hg
+    rcases hg with hg | hg
+    · exact lb_fan M c base m g hg
+    · subst hg; unfold lbG; split_ifs
+      · exact ⟨by simp, rfl⟩
+      · exact ⟨by simp, rfl⟩
+
+lemma allB_fan (n2 : ℕ) (cf : ℕ → ℕ → Bool) :
+    ∀ n, ∀ g ∈ allB n2 cf n, g.inputs.length ≤ 2 ∧ nl g = false
+  | 0 => by intro g hg; simp [allB] at hg
+  | n+1 => by
+    intro g hg
+    simp only [allB, List.mem_append] at hg
+    rcases hg with hg | hg
+    · exact allB_fan n2 cf n g hg
+    · exact lb_fan _ _ _ _ g hg
+
+lemma stg_fan (P0 oL : ℕ) (oX oY : ℕ → ℕ) :
+    ∀ n, (∀ g ∈ stg P0 oL oX oY n, g.inputs.length ≤ 2) ∧ (stg P0 oL oX oY n).countP nl = n
+  | 0 => by
+    refine ⟨?_, ?_⟩
+    · intro g hg; simp only [stg, List.mem_singleton] at hg; subst hg; simp [cpyG]
+    · rfl
+  | n+1 => by
+    obtain ⟨h1, h2⟩ := stg_fan P0 oL oX oY n
+    refine ⟨?_, ?_⟩
+    · intro g hg
+      simp only [stg, List.mem_append, List.mem_singleton] at hg
+      rcases hg with ((hg | rfl) | rfl) | rfl
+      · exact h1 g hg
+      · simp [andG]
+      · simp [modG]
+      · simp [notG]
+    · have e1 : nl (andG (oX n) (oY n)) = true := rfl
+      have e2 : nl (modG (P0 + 3 * n) (P0 + 3 * n + 1)) = false := rfl
+      have e3 : nl (notG (P0 + 3 * n + 2)) = false := rfl
+      simp only [stg, List.countP_append, h2, List.countP_cons, List.countP_nil, e1, e2, e3]
+      simp
+
+lemma xr_succ (n : ℕ) (f : ℕ → Bool) : xr (n + 1) f = xor (xr n f) (f n) := rfl
+
+lemma dotp_xr (k u v : ℕ) : dotp k u v = xr k (fun i => u.testBit i && v.testBit i) := by
+  rw [xr_card]; rfl
+
+theorem upper (s : ℕ) (hs : 2 ≤ s) :
+    (∀ g ∈ (upC s).gates, g.inputs.length ≤ 2) ∧
+    PEqualNP.MetaComplexity.NestedCover.ReadsBack (2 ^ (2 * s) + 2 ^ (2 * s)) (upC s) ∧
+    PEqualNP.Represents.Represents (Gf s) (upC s) ∧
+    (upC s).gates.countP nl = s + 1 := by
+  have hoW : ∀ j, j < 2 * s + 3 → oW (2 ^ (2 * s) + 2 ^ (2 * s)) j <
+      (2 ^ (2 * s) + 2 ^ (2 * s)) + (2 * s + 3) * ((2 ^ (2 * s) + 2 ^ (2 * s)) + 1) := by
+    intro j hj
+    simp only [oW]
+    have : j * (2 ^ (2 * s) + 2 ^ (2 * s) + 1) + (2 ^ (2 * s) + 2 ^ (2 * s) + 1) ≤
+        (2 * s + 3) * (2 ^ (2 * s) + 2 ^ (2 * s) + 1) := by
+      rw [← Nat.succ_mul]; exact Nat.mul_le_mul_right _ hj
+    omega
+  have hXY : ∀ i < s + 1, oW (2 ^ (2 * s) + 2 ^ (2 * s)) (2 * i) <
+      (2 ^ (2 * s) + 2 ^ (2 * s)) + (2 * s + 3) * ((2 ^ (2 * s) + 2 ^ (2 * s)) + 1) ∧
+      oW (2 ^ (2 * s) + 2 ^ (2 * s)) (2 * i + 1) <
+      (2 ^ (2 * s) + 2 ^ (2 * s)) + (2 * s + 3) * ((2 ^ (2 * s) + 2 ^ (2 * s)) + 1) :=
+    fun i hi => ⟨hoW _ (by omega), hoW _ (by omega)⟩
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · intro g hg
+    simp only [upC, List.mem_append] at hg
+    rcases hg with hg | hg
+    · exact (allB_fan _ _ _ g hg).1
+    · exact (stg_fan _ _ _ _ _).1 g hg
+  · intro j hj i hi
+    exact RBL_append (2 ^ (2 * s) + 2 ^ (2 * s)) _ _ (allB_RBL _ (lf s (2 ^ (2 * s))) (2 * s + 3))
+      (by rw [allB_len]; exact stg_RBL _ _ _ _ (hoW _ (by omega)) (s + 1) hXY) j hj i hi
+  · intro u v
+    show ((upC s).gates.foldl stepW (PEqualNP.Represents.oneEach u v)).getD (upC s).output false
+      = Gf s u v
+    simp only [upC]
+    rw [List.foldl_append]
+    have hx : (PEqualNP.Represents.oneEach u v).length = 2 ^ (2 * s) + 2 ^ (2 * s) :=
+      oneEach_len _ u v
+    have hY : ((allB (2 ^ (2 * s) + 2 ^ (2 * s)) (lf s (2 ^ (2 * s))) (2 * s + 3)).foldl stepW
+        (PEqualNP.Represents.oneEach u v)).length =
+        (2 ^ (2 * s) + 2 ^ (2 * s)) + (2 * s + 3) * ((2 ^ (2 * s) + 2 ^ (2 * s)) + 1) := by
+      rw [foldl_len, allB_len, hx]
+    rw [stg_val _ _ _ _ _ hY (hoW (2 * s + 2) (by omega)) (s + 1) hXY]
+    have hblk : ∀ j < 2 * s + 3,
+        ((allB (2 ^ (2 * s) + 2 ^ (2 * s)) (lf s (2 ^ (2 * s))) (2 * s + 3)).foldl stepW
+          (PEqualNP.Represents.oneEach u v)).getD (oW (2 ^ (2 * s) + 2 ^ (2 * s)) j) false =
+        xor (lfU s j u.val) (lfV s j v.val) := by
+      intro j hj
+      rw [oW, allB_val _ (lf s (2 ^ (2 * s))) _ hx (2 * s + 3) j hj, onehot_xr]
+    have e1 : ∀ i < s, lfU s (2 * i) u.val = u.val.testBit (2 * i) := by
+      intro i hi; simp only [lfU, if_pos (show 2 * i < 2 * s by omega)]
+    have e2 : ∀ i < s, lfV s (2 * i) v.val = v.val.testBit (2 * i + 1) := by
+      intro i hi
+      simp only [lfV, partner, if_pos (show 2 * i < 2 * s by omega),
+        if_pos (show 2 * i % 2 = 0 by omega)]
+    have e3 : ∀ i < s, lfU s (2 * i + 1) u.val = u.val.testBit (2 * i + 1) := by
+      intro i hi; simp only [lfU, if_pos (show 2 * i + 1 < 2 * s by omega)]
+    have e4 : ∀ i < s, lfV s (2 * i + 1) v.val = v.val.testBit (2 * i) := by
+      intro i hi
+      simp only [lfV, partner, if_pos (show 2 * i + 1 < 2 * s by omega),
+        if_neg (show ¬ ((2 * i + 1) % 2 = 0) by omega), Nat.add_sub_cancel]
+    have f1 : lfU s (2 * s + 2) u.val =
+        xr s (fun i => u.val.testBit (2 * i) && u.val.testBit (2 * i + 1)) := by
+      simp only [lfU, if_neg (show ¬ (2 * s + 2 < 2 * s) by omega),
+        if_neg (show ¬ (2 * s + 2 = 2 * s) by omega), if_neg (show ¬ (2 * s + 2 = 2 * s + 1) by omega)]
+    have f2 : lfV s (2 * s + 2) v.val =
+        xr s (fun i => v.val.testBit (2 * i) && v.val.testBit (2 * i + 1)) := by
+      simp only [lfV, if_neg (show ¬ (2 * s + 2 < 2 * s) by omega),
+        if_neg (show ¬ (2 * s + 2 = 2 * s) by omega), if_neg (show ¬ (2 * s + 2 = 2 * s + 1) by omega)]
+    have f3 : lfU s (2 * s) u.val = (u.val.testBit 0 && u.val.testBit 1) := by
+      simp only [lfU, if_neg (show ¬ (2 * s < 2 * s) by omega), if_true]
+    have f4 : lfV s (2 * s) v.val = false := by
+      simp only [lfV, if_neg (show ¬ (2 * s < 2 * s) by omega), if_true]
+    have f5 : lfU s (2 * s + 1) u.val = false := by
+      simp only [lfU, if_neg (show ¬ (2 * s + 1 < 2 * s) by omega),
+        if_neg (show ¬ (2 * s + 1 = 2 * s) by omega), if_true]
+    have f6 : lfV s (2 * s + 1) v.val = (v.val.testBit 2 && v.val.testBit 3) := by
+      simp only [lfV, if_neg (show ¬ (2 * s + 1 < 2 * s) by omega),
+        if_neg (show ¬ (2 * s + 1 = 2 * s) by omega), if_true]
+    have hX : xr (s + 1) (fun i =>
+        ((allB (2 ^ (2 * s) + 2 ^ (2 * s)) (lf s (2 ^ (2 * s))) (2 * s + 3)).foldl stepW
+          (PEqualNP.Represents.oneEach u v)).getD (oW (2 ^ (2 * s) + 2 ^ (2 * s)) (2 * i)) false &&
+        ((allB (2 ^ (2 * s) + 2 ^ (2 * s)) (lf s (2 ^ (2 * s))) (2 * s + 3)).foldl stepW
+          (PEqualNP.Represents.oneEach u v)).getD (oW (2 ^ (2 * s) + 2 ^ (2 * s)) (2 * i + 1)) false)
+        = xor (xr s (fun i => xor (u.val.testBit (2 * i)) (v.val.testBit (2 * i + 1)) &&
+            xor (u.val.testBit (2 * i + 1)) (v.val.testBit (2 * i))))
+          ((u.val.testBit 0 && u.val.testBit 1) && (v.val.testBit 2 && v.val.testBit 3)) := by
+      rw [xr_succ]
+      congr 1
+      · apply xr_congr
+        intro i hi
+        rw [hblk (2 * i) (by omega), hblk (2 * i + 1) (by omega), e1 i hi, e2 i hi, e3 i hi, e4 i hi]
+      · rw [hblk (2 * s) (by omega), hblk (2 * s + 1) (by omega), f3, f4, f5, f6, Bool.xor_false,
+          Bool.false_xor]
+    rw [hX, hblk (2 * s + 2) (by omega), f1, f2, ← Bool.xor_assoc,
+      ip_pairs s u.val.testBit v.val.testBit]
+    simp only [Gf, dotp_xr]
+  · simp only [upC, List.countP_append, (stg_fan _ _ _ _ _).2]
+    have : (allB (2 ^ (2 * s) + 2 ^ (2 * s)) (lf s (2 ^ (2 * s))) (2 * s + 3)).countP nl = 0 := by
+      rw [List.countP_eq_zero]
+      intro g hg
+      simp [(allB_fan _ _ _ g hg).2]
+    rw [this, zero_add]
 
 end PEqualNP.Outside.L_meta_25664_aux
 
-theorem PEqualNP.Outside.L_meta_25664 :
-∀ s : ℕ, 2 ≤ s →
+theorem PEqualNP.Outside.L_meta_25664 : ∀ s : ℕ, 2 ≤ s →
   let k := 2 * s
   let N := 2 ^ k
   let G := fun (u v : Fin N) =>
@@ -2083,10 +1190,10 @@ theorem PEqualNP.Outside.L_meta_25664 :
     xor (xor (g.op.eval [false,false]) (g.op.eval [false,true]))
         (xor (g.op.eval [true,false]) (g.op.eval [true,true])))
   (∀ C, represents C → s + 1 ≤ cost C) ∧ ∃ C, represents C ∧ cost C = s + 1 := by
-  intro s hs k N G represents cost
-  have hG : G = PEqualNP.Outside.L_meta_25664_aux.Gtarget s := rfl
-  constructor
-  · intro C hC
-    exact PEqualNP.Outside.L_meta_25664_aux.lower_bound s hs C hC.1 hC.2.2
-  · obtain ⟨C, hfan, hback, hrep, hcost⟩ := PEqualNP.Outside.L_meta_25664_aux.upper_bound s hs
-    exact ⟨C, ⟨hfan, hback, hrep⟩, hcost⟩
+  intro s hs
+  refine ⟨fun C hC => ?_, ⟨PEqualNP.Outside.L_meta_25664_aux.upC s, ?_, ?_⟩⟩
+  · obtain ⟨h1, _, h3⟩ := hC
+    exact PEqualNP.Outside.L_meta_25664_aux.lower s hs C h1 h3
+  · obtain ⟨h1, h2, h3, _⟩ := PEqualNP.Outside.L_meta_25664_aux.upper s hs
+    exact ⟨h1, h2, h3⟩
+  · exact (PEqualNP.Outside.L_meta_25664_aux.upper s hs).2.2.2
